@@ -18,14 +18,17 @@ package com.github.alexfalappa.nbspringboot.prefs;
 import java.net.MalformedURLException;
 import java.net.URL;
 
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.openide.util.NbPreferences;
 
-final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListener {
+final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListener, ChangeListener {
 
     private static final String PREF_INITIALIZR_URL = "nbspringboot.initializr.url";
+    private static final String PREF_INITIALIZR_TIMEOUT = "nbspringboot.initializr.timeout";
     private final BootPrefsOptionsPanelController controller;
 
     BootPrefsPanel(BootPrefsOptionsPanelController controller) {
@@ -34,6 +37,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         // TODO listen to changes in form fields and call controller.changed()
         // Register listener on the textFields to detect changes
         txInitializrUrl.getDocument().addDocumentListener(this);
+        spInitializrTimeout.addChangeListener(this);
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -45,6 +49,9 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         lInitializr = new javax.swing.JLabel();
         lInitializrUrl = new javax.swing.JLabel();
         txInitializrUrl = new javax.swing.JTextField();
+        lInitializrTimeout = new javax.swing.JLabel();
+        spInitializrTimeout = new javax.swing.JSpinner();
+        lSeconds = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(lInitializr, org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.lInitializr.text")); // NOI18N
 
@@ -52,6 +59,12 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
         txInitializrUrl.setColumns(20);
         txInitializrUrl.setText(org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.txInitializrUrl.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(lInitializrTimeout, org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.lInitializrTimeout.text")); // NOI18N
+
+        spInitializrTimeout.setModel(new javax.swing.SpinnerNumberModel(30, 5, 999, 5));
+
+        org.openide.awt.Mnemonics.setLocalizedText(lSeconds, org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.lSeconds.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -61,13 +74,21 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(lInitializrUrl)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(txInitializrUrl))
-                    .addGroup(layout.createSequentialGroup()
                         .addComponent(lInitializr)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lInitializrTimeout)
+                            .addComponent(lInitializrUrl))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(spInitializrTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lSeconds)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(txInitializrUrl))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -79,6 +100,11 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lInitializrUrl)
                     .addComponent(txInitializrUrl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lInitializrTimeout)
+                    .addComponent(spInitializrTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lSeconds))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -86,11 +112,13 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
     void load() {
         // read settings and initialize GUI
         txInitializrUrl.setText(NbPreferences.forModule(BootPrefsPanel.class).get(PREF_INITIALIZR_URL, "http://start.spring.io"));
+        spInitializrTimeout.setValue(NbPreferences.forModule(BootPrefsPanel.class).getInt(PREF_INITIALIZR_TIMEOUT, 30));
     }
 
     void store() {
         // store modified settings
         NbPreferences.forModule(BootPrefsPanel.class).put(PREF_INITIALIZR_URL, txInitializrUrl.getText());
+        NbPreferences.forModule(BootPrefsPanel.class).putInt(PREF_INITIALIZR_TIMEOUT, (int) spInitializrTimeout.getValue());
     }
 
     boolean valid() {
@@ -106,7 +134,10 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel lInitializr;
+    private javax.swing.JLabel lInitializrTimeout;
     private javax.swing.JLabel lInitializrUrl;
+    private javax.swing.JLabel lSeconds;
+    private javax.swing.JSpinner spInitializrTimeout;
     private javax.swing.JTextField txInitializrUrl;
     // End of variables declaration//GEN-END:variables
 
@@ -122,6 +153,11 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
     @Override
     public void changedUpdate(DocumentEvent e) {
+        controller.changed();
+    }
+
+    @Override
+    public void stateChanged(ChangeEvent e) {
         controller.changed();
     }
 }
