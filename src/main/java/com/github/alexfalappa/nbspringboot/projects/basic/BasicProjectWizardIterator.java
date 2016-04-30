@@ -58,28 +58,28 @@ import org.xml.sax.InputSource;
         content = "BasicSpringbootProjectProject.zip"
 )
 @Messages("BasicSpringbootProject_displayName=Spring Boot project (basic)")
-public class BasicSpringbootProjectWizardIterator implements WizardDescriptor./*Progress*/InstantiatingIterator {
+public class BasicProjectWizardIterator implements WizardDescriptor./*Progress*/InstantiatingIterator {
 
     private int index;
     private WizardDescriptor.Panel[] panels;
     private WizardDescriptor wiz;
 
-    public BasicSpringbootProjectWizardIterator() {
+    public BasicProjectWizardIterator() {
     }
 
-    public static BasicSpringbootProjectWizardIterator createIterator() {
-        return new BasicSpringbootProjectWizardIterator();
+    public static BasicProjectWizardIterator createIterator() {
+        return new BasicProjectWizardIterator();
     }
 
     private WizardDescriptor.Panel[] createPanels() {
         return new WizardDescriptor.Panel[]{
-            new BasicSpringbootProjectWizardPanel()
+            new BasicProjectWizardPanel()
         };
     }
 
     private String[] createSteps() {
         return new String[]{
-            NbBundle.getMessage(BasicSpringbootProjectWizardIterator.class, "LBL_CreateProjectStep")
+            NbBundle.getMessage(BasicProjectWizardIterator.class, "LBL_CreateProjectStep")
         };
     }
 

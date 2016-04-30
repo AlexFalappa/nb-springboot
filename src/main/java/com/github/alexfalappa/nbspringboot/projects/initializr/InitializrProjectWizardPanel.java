@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.projects.basic;
+package com.github.alexfalappa.nbspringboot.projects.initializr;
 
 import java.awt.Component;
 import java.util.HashSet;
@@ -30,27 +30,27 @@ import org.openide.util.NbBundle;
 /**
  * Panel just asking for basic info.
  */
-public class BasicSpringbootProjectWizardPanel implements WizardDescriptor.Panel,
+public class InitializrProjectWizardPanel implements WizardDescriptor.Panel,
         WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {
 
     private WizardDescriptor wizardDescriptor;
-    private BasicSpringbootProjectPanelVisual component;
+    private InitializrProjectPanelVisual component;
 
-    public BasicSpringbootProjectWizardPanel() {
+    public InitializrProjectWizardPanel() {
     }
 
     @Override
     public Component getComponent() {
         if (component == null) {
-            component = new BasicSpringbootProjectPanelVisual(this);
-            component.setName(NbBundle.getMessage(BasicSpringbootProjectWizardPanel.class, "LBL_CreateProjectStep"));
+            component = new InitializrProjectPanelVisual(this);
+            component.setName(NbBundle.getMessage(InitializrProjectWizardPanel.class, "LBL_CreateProjectStep"));
         }
         return component;
     }
 
     @Override
     public HelpCtx getHelp() {
-        return new HelpCtx(BasicSpringbootProjectWizardPanel.class);
+        return new HelpCtx(InitializrProjectWizardPanel.class);
     }
 
     @Override
