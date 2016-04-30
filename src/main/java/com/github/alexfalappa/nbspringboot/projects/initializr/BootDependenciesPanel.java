@@ -38,7 +38,7 @@ import static javax.swing.SwingConstants.HORIZONTAL;
  *
  * @author Alessandro Falappa
  */
-public class BootDependenciesPanel1 extends javax.swing.JPanel implements Scrollable {
+public class BootDependenciesPanel extends javax.swing.JPanel implements Scrollable {
 
     private static final int OUTER_GAP = 4;
     private static final int INNER_GAP = 2;
@@ -47,7 +47,7 @@ public class BootDependenciesPanel1 extends javax.swing.JPanel implements Scroll
     private boolean initialized = false;
     private final List<JCheckBox> chkBoxes = new ArrayList<>();
 
-    public BootDependenciesPanel1() {
+    public BootDependenciesPanel() {
         initComponents();
     }
 
