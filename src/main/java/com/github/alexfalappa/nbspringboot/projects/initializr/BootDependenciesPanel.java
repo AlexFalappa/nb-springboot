@@ -98,7 +98,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         initialized = true;
     }
 
-    public String getSelectedFeaturesString() {
+    public String getSelectedDependenciesString() {
         StringBuilder sb = new StringBuilder();
         for (JCheckBox ch : chkBoxes) {
             if (ch.isSelected()) {
@@ -112,7 +112,10 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         return sb.toString();
     }
 
-    public List<String> getSelectedFeatures() {
+    void setSelectedDependenciesString(String deps) {
+    }
+
+    public List<String> getSelectedDependencies() {
         List<String> ret = new ArrayList<>();
         for (JCheckBox ch : chkBoxes) {
             if (ch.isSelected()) {
@@ -120,6 +123,9 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             }
         }
         return ret;
+    }
+
+    void setSelectedDependencies(List<String> deps) {
     }
 
     @Override

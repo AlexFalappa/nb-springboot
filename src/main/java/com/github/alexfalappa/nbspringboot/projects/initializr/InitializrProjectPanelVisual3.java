@@ -28,13 +28,13 @@ import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.filesystems.FileUtil;
 
-public class InitializrProjectPanelVisual extends JPanel implements DocumentListener {
+public class InitializrProjectPanelVisual3 extends JPanel implements DocumentListener {
 
     public static final String PROP_PROJECT_NAME = "projectName";
 
-    private final InitializrProjectWizardPanel panel;
+    private final InitializrProjectWizardPanel3 panel;
 
-    public InitializrProjectPanelVisual(InitializrProjectWizardPanel panel) {
+    public InitializrProjectPanelVisual3(InitializrProjectWizardPanel3 panel) {
         initComponents();
         this.panel = panel;
         // Register listener on the textFields to make the automatic updates
@@ -61,13 +61,13 @@ public class InitializrProjectPanelVisual extends JPanel implements DocumentList
         createdFolderTextField = new javax.swing.JTextField();
 
         projectNameLabel.setLabelFor(projectNameTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(projectNameLabel, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual.class, "InitializrProjectPanelVisual.projectNameLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(projectNameLabel, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual3.class, "InitializrProjectPanelVisual3.projectNameLabel.text")); // NOI18N
 
         projectLocationLabel.setLabelFor(projectLocationTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(projectLocationLabel, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual.class, "InitializrProjectPanelVisual.projectLocationLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(projectLocationLabel, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual3.class, "InitializrProjectPanelVisual3.projectLocationLabel.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(browseButton, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual.class, "InitializrProjectPanelVisual.browseButton.text")); // NOI18N
-        browseButton.setActionCommand(org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual.class, "InitializrProjectPanelVisual.browseButton.actionCommand")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(browseButton, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual3.class, "InitializrProjectPanelVisual3.browseButton.text")); // NOI18N
+        browseButton.setActionCommand(org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual3.class, "InitializrProjectPanelVisual3.browseButton.actionCommand")); // NOI18N
         browseButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 browseButtonActionPerformed(evt);
@@ -75,7 +75,7 @@ public class InitializrProjectPanelVisual extends JPanel implements DocumentList
         });
 
         createdFolderLabel.setLabelFor(createdFolderTextField);
-        org.openide.awt.Mnemonics.setLocalizedText(createdFolderLabel, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual.class, "InitializrProjectPanelVisual.createdFolderLabel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(createdFolderLabel, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual3.class, "InitializrProjectPanelVisual3.createdFolderLabel.text")); // NOI18N
 
         createdFolderTextField.setEditable(false);
 

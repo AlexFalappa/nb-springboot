@@ -49,9 +49,13 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
-// TODO define position attribute
-@TemplateRegistration(folder = "Project/Maven2", displayName = "#InitializrSpringbootProject_displayName", description = "InitializrSpringbootProjectDescription.html", iconBase = "com/github/alexfalappa/nbspringboot/projects/initializr/InitializrSpringbootProject.png", content = "InitializrSpringbootProjectProject.zip")
-@Messages("InitializrSpringbootProject_displayName=Spring Boot project (from Spring Initializr )")
+@TemplateRegistration(
+        folder = "Project/Maven2",
+        displayName = "#InitializrSpringbootProject_displayName",
+        description = "InitializrSpringbootProjectDescription.html",
+        iconBase = "com/github/alexfalappa/nbspringboot/projects/initializr/InitializrSpringbootProject.png",
+        content = "InitializrSpringbootProjectProject.zip")
+@Messages("InitializrSpringbootProject_displayName=Spring Boot project (from Spring Initializr)")
 public class InitializrProjectWizardIterator implements WizardDescriptor./*Progress*/InstantiatingIterator {
 
     private int index;
@@ -67,11 +71,16 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
 
     private WizardDescriptor.Panel[] createPanels() {
         return new WizardDescriptor.Panel[]{
-            new InitializrProjectWizardPanel(),};
+            new InitializrProjectWizardPanel1(),
+            new InitializrProjectWizardPanel2(),
+            new InitializrProjectWizardPanel3()
+        };
     }
 
     private String[] createSteps() {
         return new String[]{
+            NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_BasePropsStep"),
+            NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_DependenciesStep"),
             NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_CreateProjectStep")
         };
     }

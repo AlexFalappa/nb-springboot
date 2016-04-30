@@ -17,6 +17,7 @@ package com.github.alexfalappa.nbspringboot.prefs;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.prefs.Preferences;
 
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
@@ -111,14 +112,16 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
     void load() {
         // read settings and initialize GUI
-        txInitializrUrl.setText(NbPreferences.forModule(BootPrefsPanel.class).get(PREF_INITIALIZR_URL, "http://start.spring.io"));
-        spInitializrTimeout.setValue(NbPreferences.forModule(BootPrefsPanel.class).getInt(PREF_INITIALIZR_TIMEOUT, 30));
+        final Preferences prefs = NbPreferences.forModule(BootPrefsPanel.class);
+        txInitializrUrl.setText(prefs.get(PREF_INITIALIZR_URL, "http://start.spring.io"));
+        spInitializrTimeout.setValue(prefs.getInt(PREF_INITIALIZR_TIMEOUT, 30));
     }
 
     void store() {
         // store modified settings
-        NbPreferences.forModule(BootPrefsPanel.class).put(PREF_INITIALIZR_URL, txInitializrUrl.getText());
-        NbPreferences.forModule(BootPrefsPanel.class).putInt(PREF_INITIALIZR_TIMEOUT, (int) spInitializrTimeout.getValue());
+        final Preferences prefs = NbPreferences.forModule(BootPrefsPanel.class);
+        prefs.put(PREF_INITIALIZR_URL, txInitializrUrl.getText());
+        prefs.putInt(PREF_INITIALIZR_TIMEOUT, (int) spInitializrTimeout.getValue());
     }
 
     boolean valid() {

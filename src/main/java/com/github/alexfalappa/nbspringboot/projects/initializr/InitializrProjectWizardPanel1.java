@@ -30,27 +30,27 @@ import org.openide.util.NbBundle;
 /**
  * Panel just asking for basic info.
  */
-public class InitializrProjectWizardPanel implements WizardDescriptor.Panel,
+public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel,
         WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {
 
     private WizardDescriptor wizardDescriptor;
-    private InitializrProjectPanelVisual component;
+    private InitializrProjectPanelVisual1 component;
 
-    public InitializrProjectWizardPanel() {
+    public InitializrProjectWizardPanel1() {
     }
 
     @Override
     public Component getComponent() {
         if (component == null) {
-            component = new InitializrProjectPanelVisual(this);
-            component.setName(NbBundle.getMessage(InitializrProjectWizardPanel.class, "LBL_CreateProjectStep"));
+            component = new InitializrProjectPanelVisual1(this);
+            component.setName(NbBundle.getMessage(InitializrProjectWizardPanel1.class, "LBL_CreateProjectStep"));
         }
         return component;
     }
 
     @Override
     public HelpCtx getHelp() {
-        return new HelpCtx(InitializrProjectWizardPanel.class);
+        return new HelpCtx(InitializrProjectWizardPanel1.class);
     }
 
     @Override
