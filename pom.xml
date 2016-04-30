@@ -78,6 +78,11 @@
             <artifactId>org-openide-awt</artifactId>
             <version>RELEASE81</version>
         </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-options-api</artifactId>
+            <version>RELEASE81</version>
+        </dependency>
     </dependencies>
 
     <build>
