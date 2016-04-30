@@ -122,7 +122,7 @@ public class BasicSpringbootProjectPanelVisual extends JPanel implements Documen
         String command = evt.getActionCommand();
         if ("BROWSE".equals(command)) {
             JFileChooser chooser = new JFileChooser();
-            FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
+            chooser.setCurrentDirectory(null);
             chooser.setDialogTitle("Select Project Location");
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             String path = this.projectLocationTextField.getText();
@@ -225,6 +225,7 @@ public class BasicSpringbootProjectPanelVisual extends JPanel implements Documen
     }
 
     // Implementation of DocumentListener --------------------------------------
+    @Override
     public void changedUpdate(DocumentEvent e) {
         updateTexts(e);
         if (this.projectNameTextField.getDocument() == e.getDocument()) {
@@ -232,6 +233,7 @@ public class BasicSpringbootProjectPanelVisual extends JPanel implements Documen
         }
     }
 
+    @Override
     public void insertUpdate(DocumentEvent e) {
         updateTexts(e);
         if (this.projectNameTextField.getDocument() == e.getDocument()) {
@@ -239,6 +241,7 @@ public class BasicSpringbootProjectPanelVisual extends JPanel implements Documen
         }
     }
 
+    @Override
     public void removeUpdate(DocumentEvent e) {
         updateTexts(e);
         if (this.projectNameTextField.getDocument() == e.getDocument()) {
