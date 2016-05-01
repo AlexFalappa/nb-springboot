@@ -108,7 +108,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
         String mvnVersion = (String) wiz.getProperty(WIZ_VERSION);
         String mvnName = (String) wiz.getProperty(WIZ_NAME);
         String mvnDesc = (String) wiz.getProperty(WIZ_DESCRIPTION);
-        String packaging = ((NamedItem) wiz.getProperty(WIZ_LANGUAGE)).getId();
+        String packaging = ((NamedItem) wiz.getProperty(WIZ_PACKAGING)).getId();
         String pkg = (String) wiz.getProperty(WIZ_PACKAGE);
         String lang = ((NamedItem) wiz.getProperty(WIZ_LANGUAGE)).getId();
         String javaVersion = ((NamedItem) wiz.getProperty(WIZ_JAVA_VERSION)).getId();
@@ -125,20 +125,26 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
         System.out.println(lang);
         System.out.println(javaVersion);
         System.out.println(deps);
-        // unZipFile(resttemplate.getInputStream(), dir);
-        // Always open top dir as a project:
-        resultSet.add(dir);
-        // Look for nested projects to open as well:
-        Enumeration<? extends FileObject> e = dir.getFolders(true);
-        while (e.hasMoreElements()) {
-            FileObject subfolder = e.nextElement();
-            if (ProjectManager.getDefault().isProject(subfolder)) {
-                resultSet.add(subfolder);
+        try {
+            InputStream stream = initializrService
+                    .getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
+            unZipFile(stream, dir);
+            // Always open top dir as a project:
+            resultSet.add(dir);
+            // Look for nested projects to open as well:
+            Enumeration<? extends FileObject> e = dir.getFolders(true);
+            while (e.hasMoreElements()) {
+                FileObject subfolder = e.nextElement();
+                if (ProjectManager.getDefault().isProject(subfolder)) {
+                    resultSet.add(subfolder);
+                }
             }
-        }
-        File parent = dirF.getParentFile();
-        if (parent != null && parent.exists()) {
-            ProjectChooser.setProjectsFolder(parent);
+            File parent = dirF.getParentFile();
+            if (parent != null && parent.exists()) {
+                ProjectChooser.setProjectsFolder(parent);
+            }
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(ex);
         }
         return resultSet;
     }
