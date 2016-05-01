@@ -81,12 +81,10 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     }
 
     void store(WizardDescriptor wd) {
-        System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual2.store()");
         wd.putProperty(WIZ_DEPENDENCIES, pBootDependencies.getSelectedDependenciesString());
     }
 
     void read(WizardDescriptor wd) {
-        System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual2.read()");
         if (!initialized) {
             init((JsonNode) wd.getProperty(WIZ_METADATA));
             initialized = true;

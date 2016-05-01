@@ -60,7 +60,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         if (nodeNum > 0) {
             this.remove(lNotInitialized);
         }
-        // prepare features checkboxes
+        // prepare dependencies checkboxes
         int row = 0;
         for (int i = 0; i < nodeNum; i++) {
             JsonNode gn = depArray.get(i);

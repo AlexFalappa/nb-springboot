@@ -235,7 +235,6 @@ public class InitializrProjectPanelVisual1 extends JPanel {
     }
 
     void store(WizardDescriptor wd) {
-        System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual1.store()");
         wd.putProperty(WIZ_GROUP, txGroup.getText().trim());
         wd.putProperty(WIZ_ARTIFACT, txArtifact.getText().trim());
         wd.putProperty(WIZ_VERSION, txVersion.getText().trim());
@@ -249,7 +248,6 @@ public class InitializrProjectPanelVisual1 extends JPanel {
     }
 
     void read(WizardDescriptor wd) {
-        System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual1.read()");
         if (!initialized) {
             init((JsonNode) wd.getProperty(WIZ_METADATA));
             initialized = true;
