@@ -28,6 +28,9 @@ import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.filesystems.FileUtil;
 
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PROJ_NAME;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PROJ_LOCATION;
+
 public class InitializrProjectPanelVisual3 extends JPanel implements DocumentListener {
 
     public static final String PROP_PROJECT_NAME = "projectName";
@@ -122,7 +125,6 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
         String command = evt.getActionCommand();
         if ("BROWSE".equals(command)) {
             JFileChooser chooser = new JFileChooser();
-            FileUtil.preventFileChooserSymlinkTraversal(chooser, null);
             chooser.setDialogTitle("Select Project Location");
             chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
             String path = this.projectLocationTextField.getText();
@@ -201,13 +203,12 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
     void store(WizardDescriptor d) {
         String name = projectNameTextField.getText().trim();
         String folder = createdFolderTextField.getText().trim();
-
-        d.putProperty("projdir", new File(folder));
-        d.putProperty("name", name);
+        d.putProperty(WIZ_PROJ_NAME, name);
+        d.putProperty(WIZ_PROJ_LOCATION, new File(folder));
     }
 
     void read(WizardDescriptor settings) {
-        File projectLocation = (File) settings.getProperty("projdir");
+        File projectLocation = (File) settings.getProperty(WIZ_PROJ_LOCATION);
         if (projectLocation == null || projectLocation.getParentFile() == null || !projectLocation.getParentFile().isDirectory()) {
             projectLocation = ProjectChooser.getProjectsFolder();
         } else {
@@ -215,7 +216,7 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
         }
         this.projectLocationTextField.setText(projectLocation.getAbsolutePath());
 
-        String projectName = (String) settings.getProperty("name");
+        String projectName = (String) settings.getProperty(WIZ_PROJ_NAME);
         if (projectName == null) {
             projectName = "InitializrSpringbootProject";
         }

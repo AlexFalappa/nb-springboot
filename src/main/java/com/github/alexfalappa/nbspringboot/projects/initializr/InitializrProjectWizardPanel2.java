@@ -27,6 +27,8 @@ import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
 /**
  * Panel just asking for basic info.
  */
@@ -37,6 +39,10 @@ public class InitializrProjectWizardPanel2 implements WizardDescriptor.Panel,
     private InitializrProjectPanelVisual2 component;
 
     public InitializrProjectWizardPanel2() {
+    }
+
+    InitializrProjectWizardPanel2(JsonNode metadata) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
     }
 
     @Override

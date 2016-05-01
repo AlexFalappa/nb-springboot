@@ -15,30 +15,41 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
-import java.io.File;
+import java.util.Objects;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.text.Document;
 
-import org.netbeans.spi.project.ui.support.ProjectChooser;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
-import org.openide.filesystems.FileUtil;
 
-public class InitializrProjectPanelVisual1 extends JPanel implements DocumentListener {
+import com.fasterxml.jackson.databind.JsonNode;
+
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ARTIFACT;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DESCRIPTION;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_GROUP;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_JAVA_VERSION;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_LANGUAGE;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_METADATA;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_NAME;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGE;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGING;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_VERSION;
+
+public class InitializrProjectPanelVisual1 extends JPanel {
 
     public static final String PROP_PROJECT_NAME = "projectName";
+    private final DefaultComboBoxModel<CboxItem> dcbmBootVersion = new DefaultComboBoxModel<>();
+    private final DefaultComboBoxModel<CboxItem> dcbmLanguage = new DefaultComboBoxModel<>();
+    private final DefaultComboBoxModel<CboxItem> dcbmJavaVersion = new DefaultComboBoxModel<>();
+    private final DefaultComboBoxModel<CboxItem> dcbmPackaging = new DefaultComboBoxModel<>();
 
     private final InitializrProjectWizardPanel1 panel;
 
     public InitializrProjectPanelVisual1(InitializrProjectWizardPanel1 panel) {
         initComponents();
         this.panel = panel;
-        // Register listener on the textFields to make the automatic updates
-        txGroup.getDocument().addDocumentListener(this);
-        txArtifact.getDocument().addDocumentListener(this);
     }
 
     public String getProjectName() {
@@ -67,6 +78,10 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
         cbPackaging = new javax.swing.JComboBox<>();
         cbJavaVersion = new javax.swing.JComboBox<>();
         cbLanguage = new javax.swing.JComboBox<>();
+        lVersion = new javax.swing.JLabel();
+        txVersion = new javax.swing.JTextField();
+        lBootVersion = new javax.swing.JLabel();
+        cbBootVersion = new javax.swing.JComboBox<>();
 
         lGroup.setLabelFor(txGroup);
         org.openide.awt.Mnemonics.setLocalizedText(lGroup, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual1.class, "InitializrProjectPanelVisual1.lGroup.text")); // NOI18N
@@ -102,6 +117,14 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
 
         txPackage.setColumns(20);
 
+        lVersion.setLabelFor(txName);
+        org.openide.awt.Mnemonics.setLocalizedText(lVersion, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual1.class, "InitializrProjectPanelVisual1.lVersion.text")); // NOI18N
+
+        txVersion.setColumns(20);
+
+        lBootVersion.setLabelFor(txGroup);
+        org.openide.awt.Mnemonics.setLocalizedText(lBootVersion, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual1.class, "InitializrProjectPanelVisual1.lBootVersion.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -109,24 +132,28 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lVersion)
+                    .addComponent(lGroup)
+                    .addComponent(lArtifact)
+                    .addComponent(lName)
                     .addComponent(lDesc)
                     .addComponent(lPackage)
                     .addComponent(lPackaging)
                     .addComponent(lJavaVersion)
-                    .addComponent(lGroup)
                     .addComponent(lLanguage)
-                    .addComponent(lArtifact)
-                    .addComponent(lName))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                    .addComponent(lBootVersion))
+                .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txArtifact)
                     .addComponent(txName)
+                    .addComponent(txDesc)
+                    .addComponent(txPackage)
+                    .addComponent(cbPackaging, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbJavaVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txVersion)
                     .addComponent(txGroup)
-                    .addComponent(txDesc)
-                    .addComponent(txArtifact)
-                    .addComponent(txPackage)
-                    .addComponent(cbPackaging, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbBootVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
@@ -134,12 +161,20 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lBootVersion)
+                    .addComponent(cbBootVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lGroup)
                     .addComponent(txGroup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lArtifact)
                     .addComponent(txArtifact, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lVersion)
+                    .addComponent(txVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lName)
@@ -169,10 +204,12 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JComboBox<String> cbBootVersion;
     private javax.swing.JComboBox<String> cbJavaVersion;
     private javax.swing.JComboBox<String> cbLanguage;
     private javax.swing.JComboBox<String> cbPackaging;
     private javax.swing.JLabel lArtifact;
+    private javax.swing.JLabel lBootVersion;
     private javax.swing.JLabel lDesc;
     private javax.swing.JLabel lGroup;
     private javax.swing.JLabel lJavaVersion;
@@ -180,11 +217,13 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
     private javax.swing.JLabel lName;
     private javax.swing.JLabel lPackage;
     private javax.swing.JLabel lPackaging;
+    private javax.swing.JLabel lVersion;
     private javax.swing.JTextField txArtifact;
     private javax.swing.JTextField txDesc;
     private javax.swing.JTextField txGroup;
     private javax.swing.JTextField txName;
     private javax.swing.JTextField txPackage;
+    private javax.swing.JTextField txVersion;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -195,116 +234,95 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
     }
 
     boolean valid(WizardDescriptor wizardDescriptor) {
-
-        if (txGroup.getText().length() == 0) {
-            // TODO if using org.openide.dialogs >= 7.8, can use WizardDescriptor.PROP_ERROR_MESSAGE:
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", "Project Name is not a valid folder name.");
-            return false; // Display name not specified
-        }
-        File f = FileUtil.normalizeFile(new File(txArtifact.getText()).getAbsoluteFile());
-        if (!f.isDirectory()) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", message);
-            return false;
-        }
-        final File destFolder = FileUtil.normalizeFile(new File(txName.getText()).getAbsoluteFile());
-
-        File projLoc = destFolder;
-        while (projLoc != null && !projLoc.exists()) {
-            projLoc = projLoc.getParentFile();
-        }
-        if (projLoc == null || !projLoc.canWrite()) {
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", "Project Folder cannot be created.");
-            return false;
-        }
-
-        if (FileUtil.toFileObject(projLoc) == null) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", message);
-            return false;
-        }
-
-        File[] kids = destFolder.listFiles();
-        if (destFolder.exists() && kids != null && kids.length > 0) {
-            // Folder exists and is not empty
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", "Project Folder already exists and is not empty.");
-            return false;
-        }
-        wizardDescriptor.putProperty("WizardPanel_errorMessage", "");
         return true;
     }
 
     void store(WizardDescriptor d) {
-        String name = txGroup.getText().trim();
-        String folder = txName.getText().trim();
-
-        d.putProperty("projdir", new File(folder));
-        d.putProperty("name", name);
+        d.putProperty(WIZ_GROUP, txGroup.getText().trim());
+        d.putProperty(WIZ_ARTIFACT, txArtifact.getText().trim());
+        d.putProperty(WIZ_VERSION, txVersion.getText().trim());
+        d.putProperty(WIZ_NAME, txName.getText().trim());
+        d.putProperty(WIZ_DESCRIPTION, txDesc.getText().trim());
+        d.putProperty(WIZ_PACKAGE, txPackage.getText().trim());
+        d.putProperty(WIZ_JAVA_VERSION, cbJavaVersion.getSelectedItem());
+        d.putProperty(WIZ_PACKAGING, cbPackaging.getSelectedItem());
+        d.putProperty(WIZ_LANGUAGE, cbLanguage.getSelectedItem());
     }
 
     void read(WizardDescriptor settings) {
-        File projectLocation = (File) settings.getProperty("projdir");
-        if (projectLocation == null || projectLocation.getParentFile() == null || !projectLocation.getParentFile().isDirectory()) {
-            projectLocation = ProjectChooser.getProjectsFolder();
-        } else {
-            projectLocation = projectLocation.getParentFile();
+        JsonNode meta = (JsonNode) settings.getProperty(WIZ_METADATA);
+        if (meta != null) {
+            this.txGroup.setText(meta.path("groupId").path("default").asText());
+            this.txArtifact.setText(meta.path("artifactId").path("default").asText());
+            this.txVersion.setText(meta.path("version").path("default").asText());
+            this.txName.setText(meta.path("name").path("default").asText());
+            this.txDesc.setText(meta.path("description").path("default").asText());
+            this.txPackage.setText(meta.path("packageName").path("default").asText());
+            fillCombo(meta.path("bootVersion"), dcbmBootVersion, cbBootVersion);
+            fillCombo(meta.path("javaVersion"), dcbmJavaVersion, cbJavaVersion);
+            fillCombo(meta.path("language"), dcbmLanguage, cbLanguage);
+            fillCombo(meta.path("packaging"), dcbmPackaging, cbPackaging);
         }
-        this.txArtifact.setText(projectLocation.getAbsolutePath());
+    }
 
-        String projectName = (String) settings.getProperty("name");
-        if (projectName == null) {
-            projectName = "InitializrSpringbootProject";
+    private void fillCombo(JsonNode attrNode, DefaultComboBoxModel<CboxItem> comboModel, JComboBox combo) {
+        JsonNode valArray = attrNode.path("values");
+        comboModel.removeAllElements();
+        for (JsonNode val : valArray) {
+            comboModel.addElement(new CboxItem(val.get("id").asText(), val.get("name").asText()));
         }
-        this.txGroup.setText(projectName);
-        this.txGroup.selectAll();
+        combo.setModel(comboModel);
+        combo.setSelectedItem(attrNode.path("default").asText());
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {
         // nothing to validate
     }
 
-    // Implementation of DocumentListener --------------------------------------
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        updateTexts(e);
-        if (this.txGroup.getDocument() == e.getDocument()) {
-            firePropertyChange(PROP_PROJECT_NAME, null, this.txGroup.getText());
+    class CboxItem {
+
+        private final String id;
+        private final String description;
+
+        public CboxItem(String id, String description) {
+            this.id = id;
+            this.description = description;
         }
-    }
 
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        updateTexts(e);
-        if (this.txGroup.getDocument() == e.getDocument()) {
-            firePropertyChange(PROP_PROJECT_NAME, null, this.txGroup.getText());
+        public String getId() {
+            return id;
         }
-    }
 
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        updateTexts(e);
-        if (this.txGroup.getDocument() == e.getDocument()) {
-            firePropertyChange(PROP_PROJECT_NAME, null, this.txGroup.getText());
+        public String getDescription() {
+            return description;
         }
-    }
 
-    /** Handles changes in the Project name and project directory, */
-    private void updateTexts(DocumentEvent e) {
-
-        Document doc = e.getDocument();
-
-        if (doc == txGroup.getDocument() || doc == txArtifact.getDocument()) {
-            // Change in the project name
-
-            String projectName = txGroup.getText();
-            String projectFolder = txArtifact.getText();
-
-            //if (projectFolder.trim().length() == 0 || projectFolder.equals(oldName)) {
-            txName.setText(projectFolder + File.separatorChar + projectName);
-            //}
-
+        @Override
+        public String toString() {
+            return description;
         }
-        panel.fireChangeEvent(); // Notify that the panel changed
-    }
 
+        @Override
+        public int hashCode() {
+            int hash = 3;
+            hash = 23 * hash + Objects.hashCode(this.id);
+            return hash;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null) {
+                return false;
+            }
+            if (getClass() != obj.getClass()) {
+                return false;
+            }
+            final CboxItem other = (CboxItem) obj;
+            return Objects.equals(this.id, other.id);
+        }
+
+    }
 }

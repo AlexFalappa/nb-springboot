@@ -26,10 +26,13 @@ import javax.swing.event.DocumentListener;
 
 import org.openide.util.NbPreferences;
 
+import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService;
+
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.PREF_INITIALIZR_TIMEOUT;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.PREF_INITIALIZR_URL;
+
 final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListener, ChangeListener {
 
-    private static final String PREF_INITIALIZR_URL = "nbspringboot.initializr.url";
-    private static final String PREF_INITIALIZR_TIMEOUT = "nbspringboot.initializr.timeout";
     private final BootPrefsOptionsPanelController controller;
 
     BootPrefsPanel(BootPrefsOptionsPanelController controller) {
@@ -112,14 +115,14 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
     void load() {
         // read settings and initialize GUI
-        final Preferences prefs = NbPreferences.forModule(BootPrefsPanel.class);
+        final Preferences prefs = NbPreferences.forModule(InitializrService.class);
         txInitializrUrl.setText(prefs.get(PREF_INITIALIZR_URL, "http://start.spring.io"));
         spInitializrTimeout.setValue(prefs.getInt(PREF_INITIALIZR_TIMEOUT, 30));
     }
 
     void store() {
         // store modified settings
-        final Preferences prefs = NbPreferences.forModule(BootPrefsPanel.class);
+        final Preferences prefs = NbPreferences.forModule(InitializrService.class);
         prefs.put(PREF_INITIALIZR_URL, txInitializrUrl.getText());
         prefs.putInt(PREF_INITIALIZR_TIMEOUT, (int) spInitializrTimeout.getValue());
     }

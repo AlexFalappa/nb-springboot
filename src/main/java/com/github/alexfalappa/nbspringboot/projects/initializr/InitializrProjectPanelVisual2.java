@@ -20,6 +20,11 @@ import javax.swing.JPanel;
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DEPENDENCIES;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_METADATA;
+
 public class InitializrProjectPanelVisual2 extends JPanel {
 
     public static final String PROP_PROJECT_NAME = "projectName";
@@ -90,15 +95,14 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     }
 
     void store(WizardDescriptor d) {
-        d.putProperty("dependencies", pBootDependencies.getSelectedDependenciesString());
+        d.putProperty(WIZ_DEPENDENCIES, pBootDependencies.getSelectedDependenciesString());
     }
 
     void read(WizardDescriptor settings) {
-        String deps = (String) settings.getProperty("dependencies");
-        if (deps == null) {
-            deps = "";
+        JsonNode meta = (JsonNode) settings.getProperty(WIZ_METADATA);
+        if (meta != null) {
+            pBootDependencies.init(meta);
         }
-        this.pBootDependencies.setSelectedDependenciesString(deps);
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {

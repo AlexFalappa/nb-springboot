@@ -17,27 +17,31 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lVersion" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lGroup" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lArtifact" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lName" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="lDesc" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="lPackage" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="lPackaging" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="lJavaVersion" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lGroup" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="lLanguage" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lArtifact" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lName" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lBootVersion" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace min="-2" pref="6" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="txName" alignment="0" max="32767" attributes="0"/>
-                  <Component id="cbJavaVersion" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="cbLanguage" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="txGroup" alignment="0" max="32767" attributes="0"/>
-                  <Component id="txDesc" alignment="0" max="32767" attributes="0"/>
                   <Component id="txArtifact" alignment="0" max="32767" attributes="0"/>
+                  <Component id="txName" alignment="0" max="32767" attributes="0"/>
+                  <Component id="txDesc" alignment="0" max="32767" attributes="0"/>
                   <Component id="txPackage" alignment="0" max="32767" attributes="0"/>
                   <Component id="cbPackaging" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="cbJavaVersion" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="cbLanguage" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="txVersion" alignment="0" max="32767" attributes="0"/>
+                  <Component id="txGroup" alignment="0" max="32767" attributes="0"/>
+                  <Component id="cbBootVersion" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -45,7 +49,12 @@
     </DimensionLayout>
     <DimensionLayout dim="1">
       <Group type="103" groupAlignment="0" attributes="0">
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lBootVersion" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cbBootVersion" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lGroup" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -55,6 +64,11 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lArtifact" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txArtifact" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lVersion" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="txVersion" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
@@ -214,6 +228,39 @@
       </AuxValues>
     </Component>
     <Component class="javax.swing.JComboBox" name="cbLanguage">
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lVersion">
+      <Properties>
+        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txName"/>
+        </Property>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="com/github/alexfalappa/nbspringboot/projects/initializr/Bundle.properties" key="InitializrProjectPanelVisual1.lVersion.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JTextField" name="txVersion">
+      <Properties>
+        <Property name="columns" type="int" value="20"/>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lBootVersion">
+      <Properties>
+        <Property name="labelFor" type="java.awt.Component" editor="org.netbeans.modules.form.ComponentChooserEditor">
+          <ComponentRef name="txGroup"/>
+        </Property>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="com/github/alexfalappa/nbspringboot/projects/initializr/Bundle.properties" key="InitializrProjectPanelVisual1.lBootVersion.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="generateMnemonicsCode" type="java.lang.Boolean" value="true"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="cbBootVersion">
       <AuxValues>
         <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
       </AuxValues>

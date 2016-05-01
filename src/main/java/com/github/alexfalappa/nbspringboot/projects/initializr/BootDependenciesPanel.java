@@ -51,8 +51,8 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         initComponents();
     }
 
-    public void init(JsonNode node) {
-        JsonNode depArray = node.path("dependencies").path("values");
+    public void init(JsonNode metaData) {
+        JsonNode depArray = metaData.path("dependencies").path("values");
         final int nodeNum = depArray.size();
         // remove informative label
         if (nodeNum > 0) {

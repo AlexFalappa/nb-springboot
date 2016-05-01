@@ -36,7 +36,6 @@ import javax.swing.event.ChangeListener;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.templates.TemplateRegistration;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
-import org.netbeans.spi.project.ui.templates.support.Templates;
 import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -48,6 +47,21 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+
+import com.fasterxml.jackson.databind.JsonNode;
+
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ARTIFACT;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_BOOT_VERSION;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DEPENDENCIES;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DESCRIPTION;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_GROUP;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_JAVA_VERSION;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_LANGUAGE;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_METADATA;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_NAME;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGE;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGING;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PROJ_LOCATION;
 
 @TemplateRegistration(
         folder = "Project/Maven2",
@@ -61,6 +75,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
     private int index;
     private WizardDescriptor.Panel[] panels;
     private WizardDescriptor wiz;
+    private final InitializrService initializrService = new InitializrService();
 
     public InitializrProjectWizardIterator() {
     }
@@ -86,15 +101,22 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
     }
 
     @Override
-    public Set/*<FileObject>*/ instantiate(/*ProgressHandle handle*/) throws IOException {
+    public Set<FileObject> instantiate(/*ProgressHandle handle*/) throws IOException {
         Set<FileObject> resultSet = new LinkedHashSet<>();
-        File dirF = FileUtil.normalizeFile((File) wiz.getProperty("projdir"));
+        File dirF = FileUtil.normalizeFile((File) wiz.getProperty(WIZ_PROJ_LOCATION));
         dirF.mkdirs();
-
-        FileObject template = Templates.getTemplate(wiz);
         FileObject dir = FileUtil.toFileObject(dirF);
-        unZipFile(template.getInputStream(), dir);
-
+        // prepare service invocation params
+        String botVersion = (String) wiz.getProperty(WIZ_BOOT_VERSION);
+        String mvnGroup = (String) wiz.getProperty(WIZ_GROUP);
+        String mvnArtifact = (String) wiz.getProperty(WIZ_ARTIFACT);
+        String mvnName = (String) wiz.getProperty(WIZ_NAME);
+        String mvnDesc = (String) wiz.getProperty(WIZ_DESCRIPTION);
+        String lang = (String) wiz.getProperty(WIZ_LANGUAGE);
+        String javaVersion = (String) wiz.getProperty(WIZ_JAVA_VERSION);
+        String deps = (String) wiz.getProperty(WIZ_DEPENDENCIES);
+        // TODO invoke initializr webservice and unzip response
+        // unZipFile(resttemplate.getInputStream(), dir);
         // Always open top dir as a project:
         resultSet.add(dir);
         // Look for nested projects to open as well:
@@ -105,12 +127,10 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
                 resultSet.add(subfolder);
             }
         }
-
         File parent = dirF.getParentFile();
         if (parent != null && parent.exists()) {
             ProjectChooser.setProjectsFolder(parent);
         }
-
         return resultSet;
     }
 
@@ -118,9 +138,23 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
     public void initialize(WizardDescriptor wiz) {
         this.wiz = wiz;
         index = 0;
-        panels = createPanels();
-        // Make sure list of steps is accurate.
-        String[] steps = createSteps();
+        String[] steps;
+        try {
+            // invoke initializr service to get metadata
+            JsonNode metadata = initializrService.getMetadata();
+            this.wiz.putProperty(WIZ_METADATA, metadata);
+            // create the normal panels
+            panels = createPanels();
+            // Make sure list of steps is accurate.
+            steps = createSteps();
+        } catch (Exception ex) {
+            // create an error panel to indicate service access problems
+            final ErrorWizardPanel errorWizardPanel = new ErrorWizardPanel();
+            errorWizardPanel.setError(ex.getMessage());
+            panels = new WizardDescriptor.Panel[]{errorWizardPanel};
+            steps = new String[]{NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_ErrorStep")};
+            Exceptions.printStackTrace(ex);
+        }
         for (int i = 0; i < panels.length; i++) {
             Component c = panels[i].getComponent();
             if (steps[i] == null) {
@@ -132,26 +166,30 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
             if (c instanceof JComponent) { // assume Swing components
                 JComponent jc = (JComponent) c;
                 // Step #.
-                // TODO if using org.openide.dialogs >= 7.8, can use WizardDescriptor.PROP_*:
-                jc.putClientProperty("WizardPanel_contentSelectedIndex", i);
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i);
                 // Step name (actually the whole list for reference).
-                jc.putClientProperty("WizardPanel_contentData", steps);
+                jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
             }
         }
     }
 
     @Override
     public void uninitialize(WizardDescriptor wiz) {
-        this.wiz.putProperty("projdir", null);
-        this.wiz.putProperty("name", null);
-        this.wiz = null;
+        this.wiz.putProperty(WIZ_NAME, null);
+        this.wiz.putProperty(WIZ_GROUP, null);
+        this.wiz.putProperty(WIZ_ARTIFACT, null);
+        this.wiz.putProperty(WIZ_DESCRIPTION, null);
+        this.wiz.putProperty(WIZ_PACKAGING, null);
+        this.wiz.putProperty(WIZ_PACKAGE, null);
+        this.wiz.putProperty(WIZ_JAVA_VERSION, null);
+        this.wiz.putProperty(WIZ_LANGUAGE, null);
+        this.wiz.putProperty(WIZ_DEPENDENCIES, null);
         panels = null;
     }
 
     @Override
     public String name() {
-        return MessageFormat.format("{0} of {1}",
-                new Object[]{index + 1, panels.length});
+        return MessageFormat.format("{0} of {1}", new Object[]{index + 1, panels.length});
     }
 
     @Override
