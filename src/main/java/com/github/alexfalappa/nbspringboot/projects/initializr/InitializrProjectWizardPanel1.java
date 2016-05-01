@@ -27,13 +27,10 @@ import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 /**
  * Panel just asking for basic info.
  */
-public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel,
-        WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {
+public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel, WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {
 
     private WizardDescriptor wizardDescriptor;
     private InitializrProjectPanelVisual1 component;
@@ -41,15 +38,11 @@ public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel,
     public InitializrProjectWizardPanel1() {
     }
 
-    InitializrProjectWizardPanel1(JsonNode metadata) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
     @Override
     public Component getComponent() {
         if (component == null) {
             component = new InitializrProjectPanelVisual1(this);
-            component.setName(NbBundle.getMessage(InitializrProjectWizardPanel1.class, "LBL_CreateProjectStep"));
+            component.setName(NbBundle.getMessage(InitializrProjectWizardPanel1.class, "LBL_BasePropsStep"));
         }
         return component;
     }
@@ -106,7 +99,7 @@ public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel,
 
     @Override
     public boolean isFinishPanel() {
-        return true;
+        return false;
     }
 
     @Override

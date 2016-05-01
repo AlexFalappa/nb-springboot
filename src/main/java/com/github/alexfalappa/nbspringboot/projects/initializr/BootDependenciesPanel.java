@@ -21,6 +21,8 @@ import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 
 import javax.swing.JCheckBox;
@@ -113,6 +115,10 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     }
 
     void setSelectedDependenciesString(String deps) {
+        HashSet<String> hs = new HashSet<>(Arrays.asList(deps.split(",")));
+        for (JCheckBox cb : chkBoxes) {
+            cb.setSelected(hs.contains(cb.getName()));
+        }
     }
 
     public List<String> getSelectedDependencies() {
@@ -126,6 +132,10 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     }
 
     void setSelectedDependencies(List<String> deps) {
+        HashSet<String> hs = new HashSet<>(deps);
+        for (JCheckBox cb : chkBoxes) {
+            cb.setSelected(hs.contains(cb.getName()));
+        }
     }
 
     @Override

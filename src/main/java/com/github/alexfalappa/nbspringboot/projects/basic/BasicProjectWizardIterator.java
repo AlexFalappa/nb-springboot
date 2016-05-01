@@ -55,7 +55,8 @@ import org.xml.sax.InputSource;
         displayName = "#BasicSpringbootProject_displayName",
         description = "BasicSpringbootProjectDescription.html",
         iconBase = "com/github/alexfalappa/nbspringboot/projects/basic/BasicSpringbootProject.png",
-        content = "BasicSpringbootProjectProject.zip"
+        content = "BasicSpringbootProjectProject.zip",
+        position = 1
 )
 @Messages("BasicSpringbootProject_displayName=Spring Boot project (basic)")
 public class BasicProjectWizardIterator implements WizardDescriptor./*Progress*/InstantiatingIterator {

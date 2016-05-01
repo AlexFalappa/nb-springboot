@@ -30,8 +30,7 @@ import org.openide.util.NbBundle;
 /**
  * Panel just asking for basic info.
  */
-public class InitializrProjectWizardPanel3 implements WizardDescriptor.Panel,
-        WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {
+public class InitializrProjectWizardPanel3 implements WizardDescriptor.Panel, WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {
 
     private WizardDescriptor wizardDescriptor;
     private InitializrProjectPanelVisual3 component;

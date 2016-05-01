@@ -27,14 +27,12 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 
 public class InitializrProjectPanelVisual2 extends JPanel {
 
-    public static final String PROP_PROJECT_NAME = "projectName";
-
     private final InitializrProjectWizardPanel2 panel;
+    private boolean initialized = false;
 
     public InitializrProjectPanelVisual2(InitializrProjectWizardPanel2 panel) {
         initComponents();
         this.panel = panel;
-        // Register listener on the textFields to make the automatic updates
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -82,17 +80,23 @@ public class InitializrProjectPanelVisual2 extends JPanel {
         return true;
     }
 
-    void store(WizardDescriptor d) {
+    void store(WizardDescriptor wd) {
         System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual2.store()");
-        d.putProperty(WIZ_DEPENDENCIES, pBootDependencies.getSelectedDependenciesString());
+        wd.putProperty(WIZ_DEPENDENCIES, pBootDependencies.getSelectedDependenciesString());
     }
 
-    void read(WizardDescriptor settings) {
+    void read(WizardDescriptor wd) {
         System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual2.read()");
-        JsonNode meta = (JsonNode) settings.getProperty(WIZ_METADATA);
-        if (meta != null) {
-            pBootDependencies.init(meta);
+        if (!initialized) {
+            init((JsonNode) wd.getProperty(WIZ_METADATA));
+            initialized = true;
+        } else {
+            pBootDependencies.setSelectedDependenciesString((String) wd.getProperty(WIZ_DEPENDENCIES));
         }
+    }
+
+    void init(JsonNode meta) {
+        pBootDependencies.init(meta);
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {

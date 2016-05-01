@@ -27,6 +27,7 @@ import org.openide.WizardValidationException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ARTIFACT;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_BOOT_VERSION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DESCRIPTION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_GROUP;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_JAVA_VERSION;
@@ -44,16 +45,12 @@ public class InitializrProjectPanelVisual1 extends JPanel {
     private final DefaultComboBoxModel<CboxItem> dcbmLanguage = new DefaultComboBoxModel<>();
     private final DefaultComboBoxModel<CboxItem> dcbmJavaVersion = new DefaultComboBoxModel<>();
     private final DefaultComboBoxModel<CboxItem> dcbmPackaging = new DefaultComboBoxModel<>();
-
     private final InitializrProjectWizardPanel1 panel;
+    private boolean initialized = false;
 
     public InitializrProjectPanelVisual1(InitializrProjectWizardPanel1 panel) {
         initComponents();
         this.panel = panel;
-    }
-
-    public String getProjectName() {
-        return this.txGroup.getText();
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -237,34 +234,50 @@ public class InitializrProjectPanelVisual1 extends JPanel {
         return true;
     }
 
-    void store(WizardDescriptor d) {
+    void store(WizardDescriptor wd) {
         System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual1.store()");
-        d.putProperty(WIZ_GROUP, txGroup.getText().trim());
-        d.putProperty(WIZ_ARTIFACT, txArtifact.getText().trim());
-        d.putProperty(WIZ_VERSION, txVersion.getText().trim());
-        d.putProperty(WIZ_NAME, txName.getText().trim());
-        d.putProperty(WIZ_DESCRIPTION, txDesc.getText().trim());
-        d.putProperty(WIZ_PACKAGE, txPackage.getText().trim());
-        d.putProperty(WIZ_JAVA_VERSION, cbJavaVersion.getSelectedItem());
-        d.putProperty(WIZ_PACKAGING, cbPackaging.getSelectedItem());
-        d.putProperty(WIZ_LANGUAGE, cbLanguage.getSelectedItem());
+        wd.putProperty(WIZ_GROUP, txGroup.getText().trim());
+        wd.putProperty(WIZ_ARTIFACT, txArtifact.getText().trim());
+        wd.putProperty(WIZ_VERSION, txVersion.getText().trim());
+        wd.putProperty(WIZ_NAME, txName.getText().trim());
+        wd.putProperty(WIZ_DESCRIPTION, txDesc.getText().trim());
+        wd.putProperty(WIZ_PACKAGE, txPackage.getText().trim());
+        wd.putProperty(WIZ_BOOT_VERSION, cbBootVersion.getSelectedItem());
+        wd.putProperty(WIZ_JAVA_VERSION, cbJavaVersion.getSelectedItem());
+        wd.putProperty(WIZ_LANGUAGE, cbLanguage.getSelectedItem());
+        wd.putProperty(WIZ_PACKAGING, cbPackaging.getSelectedItem());
     }
 
-    void read(WizardDescriptor settings) {
+    void read(WizardDescriptor wd) {
         System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual1.read()");
-        JsonNode meta = (JsonNode) settings.getProperty(WIZ_METADATA);
-        if (meta != null) {
-            this.txGroup.setText(meta.path("groupId").path("default").asText());
-            this.txArtifact.setText(meta.path("artifactId").path("default").asText());
-            this.txVersion.setText(meta.path("version").path("default").asText());
-            this.txName.setText(meta.path("name").path("default").asText());
-            this.txDesc.setText(meta.path("description").path("default").asText());
-            this.txPackage.setText(meta.path("packageName").path("default").asText());
-            fillCombo(meta.path("bootVersion"), dcbmBootVersion, cbBootVersion);
-            fillCombo(meta.path("javaVersion"), dcbmJavaVersion, cbJavaVersion);
-            fillCombo(meta.path("language"), dcbmLanguage, cbLanguage);
-            fillCombo(meta.path("packaging"), dcbmPackaging, cbPackaging);
+        if (!initialized) {
+            init((JsonNode) wd.getProperty(WIZ_METADATA));
+            initialized = true;
+        } else {
+            this.txGroup.setText((String) wd.getProperty(WIZ_GROUP));
+            this.txArtifact.setText((String) wd.getProperty(WIZ_ARTIFACT));
+            this.txVersion.setText((String) wd.getProperty(WIZ_VERSION));
+            this.txName.setText((String) wd.getProperty(WIZ_NAME));
+            this.txDesc.setText((String) wd.getProperty(WIZ_DESCRIPTION));
+            this.txPackage.setText((String) wd.getProperty(WIZ_PACKAGE));
+            cbBootVersion.setSelectedItem(wd.getProperty(WIZ_BOOT_VERSION));
+            cbJavaVersion.setSelectedItem(wd.getProperty(WIZ_JAVA_VERSION));
+            cbLanguage.setSelectedItem(wd.getProperty(WIZ_LANGUAGE));
+            cbPackaging.setSelectedItem(wd.getProperty(WIZ_PACKAGING));
         }
+    }
+
+    void init(JsonNode meta) {
+        this.txGroup.setText(meta.path("groupId").path("default").asText());
+        this.txArtifact.setText(meta.path("artifactId").path("default").asText());
+        this.txVersion.setText(meta.path("version").path("default").asText());
+        this.txName.setText(meta.path("name").path("default").asText());
+        this.txDesc.setText(meta.path("description").path("default").asText());
+        this.txPackage.setText(meta.path("packageName").path("default").asText());
+        fillCombo(meta.path("bootVersion"), dcbmBootVersion, cbBootVersion);
+        fillCombo(meta.path("javaVersion"), dcbmJavaVersion, cbJavaVersion);
+        fillCombo(meta.path("language"), dcbmLanguage, cbLanguage);
+        fillCombo(meta.path("packaging"), dcbmPackaging, cbPackaging);
     }
 
     private void fillCombo(JsonNode attrNode, DefaultComboBoxModel<CboxItem> comboModel, JComboBox combo) {

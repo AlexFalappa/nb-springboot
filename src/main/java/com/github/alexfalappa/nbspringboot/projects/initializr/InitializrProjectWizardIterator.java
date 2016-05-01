@@ -68,7 +68,9 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
         displayName = "#InitializrSpringbootProject_displayName",
         description = "InitializrSpringbootProjectDescription.html",
         iconBase = "com/github/alexfalappa/nbspringboot/projects/initializr/InitializrSpringbootProject.png",
-        content = "InitializrSpringbootProjectProject.zip")
+        content = "InitializrSpringbootProjectProject.zip",
+        position = 2
+)
 @Messages("InitializrSpringbootProject_displayName=Spring Boot project (from Spring Initializr)")
 public class InitializrProjectWizardIterator implements WizardDescriptor./*Progress*/InstantiatingIterator {
 
@@ -82,14 +84,6 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
 
     public static InitializrProjectWizardIterator createIterator() {
         return new InitializrProjectWizardIterator();
-    }
-
-    private WizardDescriptor.Panel[] createPanels() {
-        return new WizardDescriptor.Panel[]{
-            new InitializrProjectWizardPanel1(),
-            new InitializrProjectWizardPanel2(),
-            new InitializrProjectWizardPanel3()
-        };
     }
 
     private String[] createSteps() {
@@ -145,7 +139,12 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
             JsonNode metadata = initializrService.getMetadata();
             this.wiz.putProperty(WIZ_METADATA, metadata);
             // create the normal panels
-            panels = createPanels();
+            panels = new WizardDescriptor.Panel[]{
+                new InitializrProjectWizardPanel1(),
+                new InitializrProjectWizardPanel2(),
+                new InitializrProjectWizardPanel3()
+            };
+
             // Make sure list of steps is accurate.
             steps = createSteps();
         } catch (Exception ex) {
