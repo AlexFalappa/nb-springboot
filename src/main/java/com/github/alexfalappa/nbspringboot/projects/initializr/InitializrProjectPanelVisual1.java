@@ -165,6 +165,14 @@ public class InitializrProjectPanelVisual1 extends JPanel {
                     .addComponent(cbBootVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lLanguage)
+                    .addComponent(cbLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lJavaVersion)
+                    .addComponent(cbJavaVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lGroup)
                     .addComponent(txGroup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -177,6 +185,10 @@ public class InitializrProjectPanelVisual1 extends JPanel {
                     .addComponent(txVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lPackaging)
+                    .addComponent(cbPackaging, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lName)
                     .addComponent(txName, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -187,18 +199,6 @@ public class InitializrProjectPanelVisual1 extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lPackage)
                     .addComponent(txPackage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lPackaging)
-                    .addComponent(cbPackaging, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lJavaVersion)
-                    .addComponent(cbJavaVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lLanguage)
-                    .addComponent(cbLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -238,6 +238,7 @@ public class InitializrProjectPanelVisual1 extends JPanel {
     }
 
     void store(WizardDescriptor d) {
+        System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual1.store()");
         d.putProperty(WIZ_GROUP, txGroup.getText().trim());
         d.putProperty(WIZ_ARTIFACT, txArtifact.getText().trim());
         d.putProperty(WIZ_VERSION, txVersion.getText().trim());
@@ -250,6 +251,7 @@ public class InitializrProjectPanelVisual1 extends JPanel {
     }
 
     void read(WizardDescriptor settings) {
+        System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual1.read()");
         JsonNode meta = (JsonNode) settings.getProperty(WIZ_METADATA);
         if (meta != null) {
             this.txGroup.setText(meta.path("groupId").path("default").asText());
@@ -272,7 +274,7 @@ public class InitializrProjectPanelVisual1 extends JPanel {
             comboModel.addElement(new CboxItem(val.get("id").asText(), val.get("name").asText()));
         }
         combo.setModel(comboModel);
-        combo.setSelectedItem(attrNode.path("default").asText());
+        combo.setSelectedItem(new CboxItem(attrNode.path("default").asText(), ""));
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {

@@ -43,11 +43,8 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lDependencies = new javax.swing.JLabel();
         scroller = new javax.swing.JScrollPane();
         pBootDependencies = new com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel();
-
-        org.openide.awt.Mnemonics.setLocalizedText(lDependencies, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual2.class, "InitializrProjectPanelVisual2.lDependencies.text")); // NOI18N
 
         scroller.setMinimumSize(new java.awt.Dimension(200, 100));
         scroller.setViewportView(pBootDependencies);
@@ -58,28 +55,19 @@ public class InitializrProjectPanelVisual2 extends JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(lDependencies)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lDependencies)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel lDependencies;
     private com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel pBootDependencies;
     private javax.swing.JScrollPane scroller;
     // End of variables declaration//GEN-END:variables
@@ -95,10 +83,12 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     }
 
     void store(WizardDescriptor d) {
+        System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual2.store()");
         d.putProperty(WIZ_DEPENDENCIES, pBootDependencies.getSelectedDependenciesString());
     }
 
     void read(WizardDescriptor settings) {
+        System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectPanelVisual2.read()");
         JsonNode meta = (JsonNode) settings.getProperty(WIZ_METADATA);
         if (meta != null) {
             pBootDependencies.init(meta);

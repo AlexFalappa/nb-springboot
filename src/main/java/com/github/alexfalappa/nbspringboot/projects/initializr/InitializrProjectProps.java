@@ -35,7 +35,9 @@ public class InitializrProjectProps {
     public static final String WIZ_DEPENDENCIES = "dependencies";
     public static final String WIZ_PROJ_NAME = "project.name";
     public static final String WIZ_PROJ_LOCATION = "project.location";
+
     public static final String PREF_INITIALIZR_URL = "nbspringboot.initializr.url";
     public static final String PREF_INITIALIZR_TIMEOUT = "nbspringboot.initializr.timeout";
+
     public static final String REST_USER_AGENT = "nb-springboot-plugin/0.1";
 }

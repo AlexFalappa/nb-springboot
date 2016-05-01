@@ -102,6 +102,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
 
     @Override
     public Set<FileObject> instantiate(/*ProgressHandle handle*/) throws IOException {
+        System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectWizardIterator.instantiate()");
         Set<FileObject> resultSet = new LinkedHashSet<>();
         File dirF = FileUtil.normalizeFile((File) wiz.getProperty(WIZ_PROJ_LOCATION));
         dirF.mkdirs();
