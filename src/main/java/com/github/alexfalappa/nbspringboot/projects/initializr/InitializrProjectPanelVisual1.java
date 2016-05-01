@@ -15,8 +15,6 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
-import java.util.Objects;
-
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
@@ -41,10 +39,10 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 public class InitializrProjectPanelVisual1 extends JPanel {
 
     public static final String PROP_PROJECT_NAME = "projectName";
-    private final DefaultComboBoxModel<CboxItem> dcbmBootVersion = new DefaultComboBoxModel<>();
-    private final DefaultComboBoxModel<CboxItem> dcbmLanguage = new DefaultComboBoxModel<>();
-    private final DefaultComboBoxModel<CboxItem> dcbmJavaVersion = new DefaultComboBoxModel<>();
-    private final DefaultComboBoxModel<CboxItem> dcbmPackaging = new DefaultComboBoxModel<>();
+    private final DefaultComboBoxModel<NamedItem> dcbmBootVersion = new DefaultComboBoxModel<>();
+    private final DefaultComboBoxModel<NamedItem> dcbmLanguage = new DefaultComboBoxModel<>();
+    private final DefaultComboBoxModel<NamedItem> dcbmJavaVersion = new DefaultComboBoxModel<>();
+    private final DefaultComboBoxModel<NamedItem> dcbmPackaging = new DefaultComboBoxModel<>();
     private final InitializrProjectWizardPanel1 panel;
     private boolean initialized = false;
 
@@ -278,64 +276,18 @@ public class InitializrProjectPanelVisual1 extends JPanel {
         fillCombo(meta.path("packaging"), dcbmPackaging, cbPackaging);
     }
 
-    private void fillCombo(JsonNode attrNode, DefaultComboBoxModel<CboxItem> comboModel, JComboBox combo) {
+    private void fillCombo(JsonNode attrNode, DefaultComboBoxModel<NamedItem> comboModel, JComboBox combo) {
         JsonNode valArray = attrNode.path("values");
         comboModel.removeAllElements();
         for (JsonNode val : valArray) {
-            comboModel.addElement(new CboxItem(val.get("id").asText(), val.get("name").asText()));
+            comboModel.addElement(new NamedItem(val.get("id").asText(), val.get("name").asText()));
         }
         combo.setModel(comboModel);
-        combo.setSelectedItem(new CboxItem(attrNode.path("default").asText(), ""));
+        combo.setSelectedItem(new NamedItem(attrNode.path("default").asText(), ""));
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {
         // nothing to validate
     }
 
-    class CboxItem {
-
-        private final String id;
-        private final String description;
-
-        public CboxItem(String id, String description) {
-            this.id = id;
-            this.description = description;
-        }
-
-        public String getId() {
-            return id;
-        }
-
-        public String getDescription() {
-            return description;
-        }
-
-        @Override
-        public String toString() {
-            return description;
-        }
-
-        @Override
-        public int hashCode() {
-            int hash = 3;
-            hash = 23 * hash + Objects.hashCode(this.id);
-            return hash;
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-            if (this == obj) {
-                return true;
-            }
-            if (obj == null) {
-                return false;
-            }
-            if (getClass() != obj.getClass()) {
-                return false;
-            }
-            final CboxItem other = (CboxItem) obj;
-            return Objects.equals(this.id, other.id);
-        }
-
-    }
 }

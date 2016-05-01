@@ -62,6 +62,7 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGE;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGING;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PROJ_LOCATION;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_VERSION;
 
 @TemplateRegistration(
         folder = "Project/Maven2",
@@ -101,15 +102,29 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
         dirF.mkdirs();
         FileObject dir = FileUtil.toFileObject(dirF);
         // prepare service invocation params
-        String botVersion = (String) wiz.getProperty(WIZ_BOOT_VERSION);
+        String bootVersion = ((NamedItem) wiz.getProperty(WIZ_BOOT_VERSION)).getId();
         String mvnGroup = (String) wiz.getProperty(WIZ_GROUP);
         String mvnArtifact = (String) wiz.getProperty(WIZ_ARTIFACT);
+        String mvnVersion = (String) wiz.getProperty(WIZ_VERSION);
         String mvnName = (String) wiz.getProperty(WIZ_NAME);
         String mvnDesc = (String) wiz.getProperty(WIZ_DESCRIPTION);
-        String lang = (String) wiz.getProperty(WIZ_LANGUAGE);
-        String javaVersion = (String) wiz.getProperty(WIZ_JAVA_VERSION);
+        String packaging = ((NamedItem) wiz.getProperty(WIZ_LANGUAGE)).getId();
+        String pkg = (String) wiz.getProperty(WIZ_PACKAGE);
+        String lang = ((NamedItem) wiz.getProperty(WIZ_LANGUAGE)).getId();
+        String javaVersion = ((NamedItem) wiz.getProperty(WIZ_JAVA_VERSION)).getId();
         String deps = (String) wiz.getProperty(WIZ_DEPENDENCIES);
         // TODO invoke initializr webservice and unzip response
+        System.out.println(bootVersion);
+        System.out.println(mvnGroup);
+        System.out.println(mvnArtifact);
+        System.out.println(mvnVersion);
+        System.out.println(mvnName);
+        System.out.println(mvnDesc);
+        System.out.println(packaging);
+        System.out.println(pkg);
+        System.out.println(lang);
+        System.out.println(javaVersion);
+        System.out.println(deps);
         // unZipFile(resttemplate.getInputStream(), dir);
         // Always open top dir as a project:
         resultSet.add(dir);

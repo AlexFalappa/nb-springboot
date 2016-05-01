@@ -152,7 +152,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         if (orientation == HORIZONTAL) {
             return getPreferredSize().width / 2;
         } else {
-            return getPreferredSize().height / 16;
+            return getPreferredSize().height / 24;
         }
     }
 
