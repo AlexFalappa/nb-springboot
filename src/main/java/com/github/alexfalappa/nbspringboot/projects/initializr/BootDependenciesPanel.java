@@ -42,6 +42,7 @@ import static javax.swing.SwingConstants.HORIZONTAL;
  */
 public class BootDependenciesPanel extends javax.swing.JPanel implements Scrollable {
 
+    private static final String PROP_VERSION_RANGE = "versionRange";
     private static final int OUTER_GAP = 4;
     private static final int INNER_GAP = 2;
     private static final int INDENT = 10;
@@ -79,6 +80,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
                 String description = dn.path("description").asText();
                 JCheckBox ch1 = new JCheckBox(name);
                 ch1.setName(id);
+                ch1.putClientProperty(PROP_VERSION_RANGE, dn.path("versionRange").asText());
                 ch1.setToolTipText(description);
                 chkBoxes.add(ch1);
                 this.add(ch1, constraintsForFirstColumnCheckbox(row));
@@ -103,7 +105,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     public String getSelectedDependenciesString() {
         StringBuilder sb = new StringBuilder();
         for (JCheckBox ch : chkBoxes) {
-            if (ch.isSelected()) {
+            if (ch.isEnabled() && ch.isSelected()) {
                 sb.append(ch.getName()).append(',');
             }
         }
@@ -124,7 +126,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     public List<String> getSelectedDependencies() {
         List<String> ret = new ArrayList<>();
         for (JCheckBox ch : chkBoxes) {
-            if (ch.isSelected()) {
+            if (ch.isEnabled() && ch.isSelected()) {
                 ret.add(ch.getName());
             }
         }
@@ -224,4 +226,46 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel lNotInitialized;
     // End of variables declaration//GEN-END:variables
+
+    void adaptToBootVersion(String bootVersion) {
+        for (JCheckBox cb : chkBoxes) {
+            String verRange = (String) cb.getClientProperty(PROP_VERSION_RANGE);
+            final boolean allowable = allowable(verRange, bootVersion);
+            cb.setEnabled(allowable);
+        }
+    }
+
+    private static boolean allowable(String verRange, String bootVersion) {
+        boolean ret = true;
+        if (verRange != null && !verRange.isEmpty()) {
+            if (verRange.indexOf('[') >= 0 || verRange.indexOf('(') >= 0
+                    || verRange.indexOf(']') >= 0 || verRange.indexOf(')') >= 0) {
+                // bounded range
+                String[] bounds = verRange.substring(1, verRange.length() - 1).split(",");
+                // check there are two bounds
+                if (bounds.length != 2) {
+                    return false;
+                }
+                // test various cases
+                if (bootVersion.compareTo(bounds[0]) > 0 && bootVersion.compareTo(bounds[1]) < 0) {
+                    return true;
+                } else if (bootVersion.compareTo(bounds[0]) == 0 && verRange.startsWith("[")) {
+                    return true;
+                } else if (bootVersion.compareTo(bounds[0]) == 0 && verRange.startsWith("(")) {
+                    return false;
+                } else if (bootVersion.compareTo(bounds[1]) == 0 && verRange.endsWith("]")) {
+                    return true;
+                } else if (bootVersion.compareTo(bounds[1]) == 0 && verRange.endsWith(")")) {
+                    return false;
+                } else {
+                    return false;
+                }
+            } else {
+                // unbounded range
+                return bootVersion.compareTo(verRange) >= 0;
+            }
+        }
+        return ret;
+    }
+
 }

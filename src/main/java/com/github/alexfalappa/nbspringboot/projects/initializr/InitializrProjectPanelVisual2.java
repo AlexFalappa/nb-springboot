@@ -22,6 +22,7 @@ import org.openide.WizardValidationException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_BOOT_VERSION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DEPENDENCIES;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_METADATA;
 
@@ -43,9 +44,15 @@ public class InitializrProjectPanelVisual2 extends JPanel {
 
         scroller = new javax.swing.JScrollPane();
         pBootDependencies = new com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel();
+        lDeps = new javax.swing.JLabel();
+        lBootVer = new javax.swing.JLabel();
 
         scroller.setMinimumSize(new java.awt.Dimension(200, 100));
         scroller.setViewportView(pBootDependencies);
+
+        org.openide.awt.Mnemonics.setLocalizedText(lDeps, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual2.class, "InitializrProjectPanelVisual2.lDeps.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(lBootVer, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual2.class, "InitializrProjectPanelVisual2.lBootVer.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -53,19 +60,31 @@ public class InitializrProjectPanelVisual2 extends JPanel {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lDeps)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(lBootVer)
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lDeps)
+                    .addComponent(lBootVer))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel lBootVer;
+    private javax.swing.JLabel lDeps;
     private com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel pBootDependencies;
     private javax.swing.JScrollPane scroller;
     // End of variables declaration//GEN-END:variables
@@ -86,15 +105,16 @@ public class InitializrProjectPanelVisual2 extends JPanel {
 
     void read(WizardDescriptor wd) {
         if (!initialized) {
-            init((JsonNode) wd.getProperty(WIZ_METADATA));
+            pBootDependencies.init((JsonNode) wd.getProperty(WIZ_METADATA));
             initialized = true;
         } else {
             pBootDependencies.setSelectedDependenciesString((String) wd.getProperty(WIZ_DEPENDENCIES));
         }
-    }
-
-    void init(JsonNode meta) {
-        pBootDependencies.init(meta);
+        final NamedItem bootVersionItem = (NamedItem) wd.getProperty(WIZ_BOOT_VERSION);
+        if (bootVersionItem != null) {
+            lBootVer.setText(bootVersionItem.getName());
+            pBootDependencies.adaptToBootVersion(bootVersionItem.getId());
+        }
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {
