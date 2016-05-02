@@ -69,8 +69,7 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
         displayName = "#InitializrSpringbootProject_displayName",
         description = "InitializrSpringbootProjectDescription.html",
         iconBase = "com/github/alexfalappa/nbspringboot/projects/initializr/InitializrSpringbootProject.png",
-        content = "InitializrSpringbootProjectProject.zip",
-        position = 2
+        position = 256
 )
 @Messages("InitializrSpringbootProject_displayName=Spring Boot project (from Spring Initializr)")
 public class InitializrProjectWizardIterator implements WizardDescriptor./*Progress*/InstantiatingIterator {
