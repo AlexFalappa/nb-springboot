@@ -113,21 +113,11 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
         String lang = ((NamedItem) wiz.getProperty(WIZ_LANGUAGE)).getId();
         String javaVersion = ((NamedItem) wiz.getProperty(WIZ_JAVA_VERSION)).getId();
         String deps = (String) wiz.getProperty(WIZ_DEPENDENCIES);
-        // TODO invoke initializr webservice and unzip response
-        System.out.println(bootVersion);
-        System.out.println(mvnGroup);
-        System.out.println(mvnArtifact);
-        System.out.println(mvnVersion);
-        System.out.println(mvnName);
-        System.out.println(mvnDesc);
-        System.out.println(packaging);
-        System.out.println(pkg);
-        System.out.println(lang);
-        System.out.println(javaVersion);
-        System.out.println(deps);
         try {
+            // invoke initializr webservice
             InputStream stream = initializrService
                     .getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
+            // unzip response
             unZipFile(stream, dir);
             // Always open top dir as a project:
             resultSet.add(dir);
