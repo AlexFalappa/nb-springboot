@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.alexfalappa.nbspringboot.cfgeditor;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
+
 import org.netbeans.api.editor.completion.Completion;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.spi.editor.completion.CompletionItem;
@@ -41,17 +42,17 @@ import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 /**
  * The Spring Boot Configuration implementation of CompletionItem.
  *
- * It utilizes an ItemMetadata and the project classpath to render the
- * completion item and support the documentation.
+ * It utilizes an ItemMetadata and the project classpath to render the completion item and support the documentation.
  *
  * @author Aggelos Karalias &lt;aggelos.karalias at gmail.com&gt;
  */
-public class SpringBootConfigurationCompletionItem  implements CompletionItem {
+public class SpringBootConfigurationCompletionItem implements CompletionItem {
 
     private final ItemMetadata configurationItem;
     private final ClassPath classPath;
-    private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage("com/keevosh/springframework/boot/netbeans/springboot-logo.png"));
-    private static final Color fieldColor = Color.decode("0x0000B2");
+    private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
+            "com/keevosh/springframework/boot/netbeans/springboot-logo.png"));
+    private static final Color COLOR_FIELD = Color.decode("0x0000B2");
     private final int caretOffset;
     private final int dotOffset;
 
@@ -77,12 +78,12 @@ public class SpringBootConfigurationCompletionItem  implements CompletionItem {
     public String getTextRight() {
         String type = configurationItem.getType();
 
-        if(null == type) {
+        if (null == type) {
             return null;
         }
 
         int lastIndexOfDot = type.lastIndexOf(".");
-        if(lastIndexOfDot > -1 && type.length() > lastIndexOfDot) {
+        if (lastIndexOfDot > -1 && type.length() > lastIndexOfDot) {
             type = type.substring(lastIndexOfDot + 1);
         }
 
@@ -116,10 +117,12 @@ public class SpringBootConfigurationCompletionItem  implements CompletionItem {
     @Override
     public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height, boolean selected) {
         String leftHtmlText = getText();
-        if(configurationItem.isDeprecated()) {
+        if (configurationItem.getDeprecation() != null) {
             leftHtmlText = "<s>" + leftHtmlText + "</s>";
         }
-        CompletionUtilities.renderHtml(fieldIcon, leftHtmlText, getTextRight(), g, defaultFont, (selected ? Color.white : fieldColor), width, height, selected);
+        CompletionUtilities.renderHtml(fieldIcon, leftHtmlText, getTextRight(), g, defaultFont, (selected ? Color.white : COLOR_FIELD),
+                width,
+                height, selected);
     }
 
     @Override
@@ -127,7 +130,8 @@ public class SpringBootConfigurationCompletionItem  implements CompletionItem {
         return new AsyncCompletionTask(new AsyncCompletionQuery() {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                completionResultSet.setDocumentation(new SpringBootConfigurationCompletionDocumentation(SpringBootConfigurationCompletionItem.this));
+                completionResultSet.setDocumentation(new SpringBootConfigurationCompletionDocumentation(
+                        SpringBootConfigurationCompletionItem.this));
                 completionResultSet.finish();
             }
         });
