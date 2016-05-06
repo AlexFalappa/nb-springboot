@@ -127,8 +127,8 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
                     for (ItemMetadata item : configurationMeta.getItems()) {
                         final String itemName = item.getName();
                         if (item.isOfItemType(ItemMetadata.ItemType.PROPERTY)
-                                && !itemName.equals("")
-                                && itemName.startsWith(filter)) {
+                                && !itemName.isEmpty()
+                                && itemName.contains(filter)) {
                             completionResultSet
                                     .addItem(new SpringBootConfigurationCompletionItem(item, hints.get(itemName), cp, startOffset, caretOffset));
                         }
