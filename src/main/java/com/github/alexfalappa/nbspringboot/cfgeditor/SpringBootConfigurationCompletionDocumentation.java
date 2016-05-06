@@ -18,6 +18,7 @@ package com.github.alexfalappa.nbspringboot.cfgeditor;
 import java.awt.event.ActionEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -29,6 +30,7 @@ import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectNotFoundException;
 import org.openide.util.Exceptions;
 import org.springframework.boot.configurationprocessor.metadata.ItemDeprecation;
+import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 
 /**
@@ -53,7 +55,7 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
         StringBuilder sb = new StringBuilder();
         // name and type
         sb.append("<b>").append(configurationItem.getName()).append("</b>");
-        sb.append("<br/><a>").append(configurationItem.getType()).append("</a>");
+        sb.append("<br/><a>").append(simpleHtmlEscape(configurationItem.getType())).append("</a>");
         // default value (optional)
         if (null != configurationItem.getDefaultValue()) {
             sb.append("<br/><i>Default Value:</i> ").append(String.valueOf(configurationItem.getDefaultValue()));
@@ -64,7 +66,7 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
             sb.append("<br/><br/><b>Deprecated</b>");
             String reason = deprecation.getReason();
             if (reason != null) {
-                sb.append(": ").append(reason);
+                sb.append(": ").append(simpleHtmlEscape(reason));
             }
             String replacement = deprecation.getReplacement();
             if (replacement != null) {
@@ -72,12 +74,28 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
             }
         }
         // description (optional)
-        if (configurationItem.getDescription() != null) {
-            sb.append("<br/><br/>").append(configurationItem.getDescription());
+        final String description = configurationItem.getDescription();
+        if (description != null) {
+            sb.append("<br/><br/>").append(simpleHtmlEscape(description));
         }
-        // TODO list of values (optional)
-        // needs to access ConfigurationMetadata class
+        // list of values (optional)
+        ItemHint hint = item.getHint();
+        if (hint != null) {
+            List<ItemHint.ValueHint> values = hint.getValues();
+            if (values != null && !values.isEmpty()) {
+                sb.append("<table><tr><th>Value</th><th>Description</th></tr>");
+                for (ItemHint.ValueHint vHint : values) {
+                    sb.append("<tr><td>").append(vHint.getValue()).append("</td><td>");
+                    sb.append(simpleHtmlEscape(vHint.getDescription())).append("</th></tr>");
+                }
+                sb.append("</table>");
+            }
+        }
         return sb.toString();
+    }
+
+    private String simpleHtmlEscape(String text) {
+        return text.replace("<", "&lt;").replace(">", "&gt;");
     }
 
     @Override
