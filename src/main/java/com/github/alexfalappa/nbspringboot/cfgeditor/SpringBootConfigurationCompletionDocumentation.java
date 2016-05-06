@@ -37,7 +37,7 @@ import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
  * It utilizes a {@link SpringBootConfigurationCompletionItem} to display the documentation for that item and actions like opening the
  * source type of a property in editor and navigate to a general spring boot configuration documentation page.
  *
- * @author Aggelos Karalias &lt;aggelos.karalias at gmail.com&gt;
+ * @author Aggelos Karalias
  */
 public class SpringBootConfigurationCompletionDocumentation implements CompletionDocumentation {
 
@@ -72,7 +72,7 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
             }
         }
         // description (optional)
-        if (null != configurationItem.getDescription()) {
+        if (configurationItem.getDescription() != null) {
             sb.append("<br/><br/>").append(configurationItem.getDescription());
         }
         return sb.toString();
@@ -96,15 +96,13 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
     @Override
     public Action getGotoSourceAction() {
         String sourceType = item.getConfigurationItem().getSourceType();
-        if (null == sourceType) {
+        if (sourceType == null) {
             return null;
         }
-
         final FileObject fo = item.getClassPath().findResource(sourceType.replaceAll("\\.", "/").concat(".class"));
-        if (null == fo) {
+        if (fo == null) {
             return null;
         }
-
         return new AbstractAction() {
             @Override
             public void actionPerformed(ActionEvent e) {

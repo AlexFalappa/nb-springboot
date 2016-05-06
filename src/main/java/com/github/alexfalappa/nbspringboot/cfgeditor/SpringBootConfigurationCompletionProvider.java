@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package com.github.alexfalappa.nbspringboot.cfgeditor;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
+
 import org.netbeans.api.editor.mimelookup.MimeRegistration;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.spi.editor.completion.CompletionProvider;
@@ -44,50 +45,41 @@ import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
 /**
  * The Spring Boot Configuration implementation of CompletionProvider.
  *
- * The entry point of completion support. This provider is registered for
- * text/x-properties files and is enabled if spring-boot is available on the
- * classpath.
+ * The entry point of completion support. This provider is registered for text/x-properties files and is enabled if spring-boot is available
+ * on the classpath.
  *
- * It scans the classpath for {@code META-INF/spring-configuration-metadata.json}
- * files, Then demarshalls the files into the corresponding {@link
- * ConfigurationMetadata} classes and later in the query task scans for
- * items and fills the {@link CompletionResultSet}.
+ * It scans the classpath for {@code META-INF/spring-configuration-metadata.json} files, Then demarshalls the files into the corresponding {@link
+ * ConfigurationMetadata} classes and later in the query task scans for items and fills the {@link CompletionResultSet}.
  *
- * @author Aggelos Karalias &lt;aggelos.karalias at gmail.com&gt;
+ * @author Aggelos Karalias
  */
 @MimeRegistration(mimeType = "text/x-properties", service = CompletionProvider.class)
 public class SpringBootConfigurationCompletionProvider implements CompletionProvider {
 
     @Override
     public CompletionTask createTask(int queryType, JTextComponent jtc) {
-
         if (queryType != CompletionProvider.COMPLETION_QUERY_TYPE) {
             return null;
         }
-
         final TopComponent activeTC = TopComponent.getRegistry().getActivated();
-        if (null == activeTC) {
+        if (activeTC == null) {
             return null;
         }
-
         final FileObject fileObject = activeTC.getLookup().lookup(FileObject.class);
-        if (null == fileObject) {
+        if (fileObject == null) {
             return null;
         }
-
         final ClassPath cp = ClassPath.getClassPath(fileObject, ClassPath.EXECUTE);
-        if (null == cp) {
+        if (cp == null) {
             return null;
         }
-
         try {
             cp.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
         } catch (ClassNotFoundException ex) {
             return null;
         }
-
         final List<FileObject> configurationMetaFiles = cp.findAllResources("META-INF/spring-configuration-metadata.json");
-        final List<ConfigurationMetadata> configurationMetas = new ArrayList<ConfigurationMetadata>(configurationMetaFiles.size());
+        final List<ConfigurationMetadata> configurationMetas = new ArrayList<>(configurationMetaFiles.size());
         final JsonMarshaller jsonMarsaller = new JsonMarshaller();
         for (FileObject configurationMetaFile : configurationMetaFiles) {
             try {
@@ -96,13 +88,11 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
                 Exceptions.printStackTrace(ex);
             }
         }
-
         return new AsyncCompletionTask(new AsyncCompletionQuery() {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int caretOffset) {
                 String filter = null;
                 int startOffset = caretOffset - 1;
-
                 try {
                     final StyledDocument bDoc = (StyledDocument) document;
                     final int lineStartOffset = getRowFirstNonWhite(bDoc, caretOffset);
@@ -117,10 +107,11 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
                 } catch (BadLocationException ex) {
                     Exceptions.printStackTrace(ex);
                 }
-
                 for (ConfigurationMetadata configurationMeta : configurationMetas) {
                     for (ItemMetadata item : configurationMeta.getItems()) {
-                        if (item.isOfItemType(ItemMetadata.ItemType.PROPERTY) && !item.getName().equals("") && item.getName().startsWith(filter)) {
+                        if (item.isOfItemType(ItemMetadata.ItemType.PROPERTY)
+                                && !item.getName().equals("")
+                                && item.getName().startsWith(filter)) {
                             completionResultSet.addItem(new SpringBootConfigurationCompletionItem(item, cp, startOffset, caretOffset));
                         }
                     }
@@ -154,7 +145,8 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
                     break;
                 }
             } catch (BadLocationException ex) {
-                throw (BadLocationException) new BadLocationException("calling getText(" + start + ", " + (start + 1) + ") on doc of length: " + doc.getLength(), start).initCause(ex);
+                throw (BadLocationException) new BadLocationException("calling getText(" + start + ", " + (start + 1) + ") on doc of length: " + doc
+                        .getLength(), start).initCause(ex);
             }
             start++;
         }

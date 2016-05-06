@@ -44,7 +44,7 @@ import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
  *
  * It utilizes an ItemMetadata and the project classpath to render the completion item and support the documentation.
  *
- * @author Aggelos Karalias &lt;aggelos.karalias at gmail.com&gt;
+ * @author Aggelos Karalias
  */
 public class SpringBootConfigurationCompletionItem implements CompletionItem {
 
@@ -77,16 +77,13 @@ public class SpringBootConfigurationCompletionItem implements CompletionItem {
 
     public String getTextRight() {
         String type = configurationItem.getType();
-
-        if (null == type) {
+        if (type == null) {
             return null;
         }
-
         int lastIndexOfDot = type.lastIndexOf(".");
         if (lastIndexOfDot > -1 && type.length() > lastIndexOfDot) {
             type = type.substring(lastIndexOfDot + 1);
         }
-
         return type;
     }
 
@@ -121,8 +118,7 @@ public class SpringBootConfigurationCompletionItem implements CompletionItem {
             leftHtmlText = "<s>" + leftHtmlText + "</s>";
         }
         CompletionUtilities.renderHtml(fieldIcon, leftHtmlText, getTextRight(), g, defaultFont, (selected ? Color.white : COLOR_FIELD),
-                width,
-                height, selected);
+                width, height, selected);
     }
 
     @Override
@@ -130,8 +126,8 @@ public class SpringBootConfigurationCompletionItem implements CompletionItem {
         return new AsyncCompletionTask(new AsyncCompletionQuery() {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                completionResultSet.setDocumentation(new SpringBootConfigurationCompletionDocumentation(
-                        SpringBootConfigurationCompletionItem.this));
+                completionResultSet
+                        .setDocumentation(new SpringBootConfigurationCompletionDocumentation(SpringBootConfigurationCompletionItem.this));
                 completionResultSet.finish();
             }
         });
