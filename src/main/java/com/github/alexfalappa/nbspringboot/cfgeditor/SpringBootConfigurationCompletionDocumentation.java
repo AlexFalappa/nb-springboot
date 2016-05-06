@@ -64,7 +64,7 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
             sb.append("<br/><br/><b>Deprecated</b>");
             String reason = deprecation.getReason();
             if (reason != null) {
-                sb.append("<br/>").append(reason);
+                sb.append(": ").append(reason);
             }
             String replacement = deprecation.getReplacement();
             if (replacement != null) {
@@ -75,6 +75,8 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
         if (configurationItem.getDescription() != null) {
             sb.append("<br/><br/>").append(configurationItem.getDescription());
         }
+        // TODO list of values (optional)
+        // needs to access ConfigurationMetadata class
         return sb.toString();
     }
 
@@ -107,9 +109,8 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
-                    DataObject dataObject;
-                    dataObject = DataObject.find(fo);
-                    OpenCookie oc = dataObject.getLookup().lookup(org.openide.cookies.OpenCookie.class);
+                    DataObject dataObject = DataObject.find(fo);
+                    OpenCookie oc = dataObject.getLookup().lookup(OpenCookie.class);
                     if (oc != null) {
                         oc.open();
                     }

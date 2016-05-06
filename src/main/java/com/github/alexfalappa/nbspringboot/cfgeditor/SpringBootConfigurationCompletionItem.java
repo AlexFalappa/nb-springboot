@@ -51,8 +51,8 @@ public class SpringBootConfigurationCompletionItem implements CompletionItem {
     private final ItemMetadata configurationItem;
     private final ClassPath classPath;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
-            "com/keevosh/springframework/boot/netbeans/springboot-logo.png"));
-    private static final Color COLOR_FIELD = Color.decode("0x0000B2");
+            "com/github/alexfalappa/nbspringboot/cfgeditor/springboot-logo.png"));
+    private static final Color COLOR_FIELD = Color.decode("0x6666B2");
     private final int caretOffset;
     private final int dotOffset;
 
