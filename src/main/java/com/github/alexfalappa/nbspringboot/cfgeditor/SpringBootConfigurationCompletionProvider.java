@@ -17,7 +17,9 @@ package com.github.alexfalappa.nbspringboot.cfgeditor;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.swing.text.BadLocationException;
@@ -39,6 +41,7 @@ import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 import org.springframework.boot.configurationprocessor.metadata.ConfigurationMetadata;
+import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
 
@@ -48,7 +51,7 @@ import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
  * The entry point of completion support. This provider is registered for text/x-properties files and is enabled if spring-boot is available
  * on the classpath.
  *
- * It scans the classpath for {@code META-INF/spring-configuration-metadata.json} files, Then demarshalls the files into the corresponding {@link
+ * It scans the classpath for {@code META-INF/spring-configuration-metadata.json} files, then unmarshalls the files into the corresponding {@link
  * ConfigurationMetadata} classes and later in the query task scans for items and fills the {@link CompletionResultSet}.
  *
  * @author Aggelos Karalias
@@ -78,14 +81,27 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
         } catch (ClassNotFoundException ex) {
             return null;
         }
+        // get the available metadata json files found in the classpath
         final List<FileObject> configurationMetaFiles = cp.findAllResources("META-INF/spring-configuration-metadata.json");
         final List<ConfigurationMetadata> configurationMetas = new ArrayList<>(configurationMetaFiles.size());
+        // unmarshal the files found
         final JsonMarshaller jsonMarsaller = new JsonMarshaller();
         for (FileObject configurationMetaFile : configurationMetaFiles) {
             try {
                 configurationMetas.add(jsonMarsaller.read(configurationMetaFile.getInputStream()));
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
+            }
+        }
+        // organize hints in a map indexed by property name
+        final Map<String, ItemHint> hints = new HashMap<>();
+        for (ConfigurationMetadata meta : configurationMetas) {
+            for (ItemHint hint : meta.getHints()) {
+                final String hintName = hint.getName();
+                if (hints.containsKey(hintName)) {
+                    System.out.format("Duplicate hints for property: %s%n", hintName);
+                }
+                hints.put(hintName, hint);
             }
         }
         return new AsyncCompletionTask(new AsyncCompletionQuery() {
@@ -109,10 +125,12 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
                 }
                 for (ConfigurationMetadata configurationMeta : configurationMetas) {
                     for (ItemMetadata item : configurationMeta.getItems()) {
+                        final String itemName = item.getName();
                         if (item.isOfItemType(ItemMetadata.ItemType.PROPERTY)
-                                && !item.getName().equals("")
-                                && item.getName().startsWith(filter)) {
-                            completionResultSet.addItem(new SpringBootConfigurationCompletionItem(item, cp, startOffset, caretOffset));
+                                && !itemName.equals("")
+                                && itemName.startsWith(filter)) {
+                            completionResultSet
+                                    .addItem(new SpringBootConfigurationCompletionItem(item, hints.get(itemName), cp, startOffset, caretOffset));
                         }
                     }
                 }

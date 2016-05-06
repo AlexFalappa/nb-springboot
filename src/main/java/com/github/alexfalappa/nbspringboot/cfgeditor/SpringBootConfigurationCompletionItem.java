@@ -37,6 +37,7 @@ import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
+import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 
 /**
@@ -49,6 +50,8 @@ import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 public class SpringBootConfigurationCompletionItem implements CompletionItem {
 
     private final ItemMetadata configurationItem;
+    // may be null
+    private final ItemHint hint;
     private final ClassPath classPath;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgeditor/springboot-logo.png"));
@@ -56,8 +59,9 @@ public class SpringBootConfigurationCompletionItem implements CompletionItem {
     private final int caretOffset;
     private final int dotOffset;
 
-    public SpringBootConfigurationCompletionItem(ItemMetadata configurationItem, ClassPath classPath, int dotOffset, int caretOffset) {
+    public SpringBootConfigurationCompletionItem(ItemMetadata configurationItem, ItemHint hint, ClassPath classPath, int dotOffset, int caretOffset) {
         this.configurationItem = configurationItem;
+        this.hint = hint;
         this.classPath = classPath;
         this.dotOffset = dotOffset;
         this.caretOffset = caretOffset;
@@ -65,6 +69,10 @@ public class SpringBootConfigurationCompletionItem implements CompletionItem {
 
     public ItemMetadata getConfigurationItem() {
         return configurationItem;
+    }
+
+    public ItemHint getHint() {
+        return hint;
     }
 
     public ClassPath getClassPath() {
