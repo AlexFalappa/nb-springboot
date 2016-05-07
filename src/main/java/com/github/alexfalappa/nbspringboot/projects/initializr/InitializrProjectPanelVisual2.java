@@ -15,6 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
+import javax.swing.DefaultComboBoxModel;
+import javax.swing.JComboBox;
 import javax.swing.JPanel;
 
 import org.openide.WizardDescriptor;
@@ -29,6 +31,7 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 public class InitializrProjectPanelVisual2 extends JPanel {
 
     private final InitializrProjectWizardPanel2 panel;
+    private final DefaultComboBoxModel<NamedItem> dcbmBootVersion = new DefaultComboBoxModel<>();
     private boolean initialized = false;
 
     public InitializrProjectPanelVisual2(InitializrProjectWizardPanel2 panel) {
@@ -44,15 +47,19 @@ public class InitializrProjectPanelVisual2 extends JPanel {
 
         scroller = new javax.swing.JScrollPane();
         pBootDependencies = new com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel();
-        lDeps = new javax.swing.JLabel();
-        lBootVer = new javax.swing.JLabel();
+        lBootVersion = new javax.swing.JLabel();
+        cbBootVersion = new javax.swing.JComboBox<>();
 
         scroller.setMinimumSize(new java.awt.Dimension(200, 100));
         scroller.setViewportView(pBootDependencies);
 
-        org.openide.awt.Mnemonics.setLocalizedText(lDeps, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual2.class, "InitializrProjectPanelVisual2.lDeps.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(lBootVersion, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual2.class, "InitializrProjectPanelVisual2.lBootVersion.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(lBootVer, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual2.class, "InitializrProjectPanelVisual2.lBootVer.text")); // NOI18N
+        cbBootVersion.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                cbBootVersionActionPerformed(evt);
+            }
+        });
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -63,9 +70,9 @@ public class InitializrProjectPanelVisual2 extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lDeps)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lBootVer)
+                        .addComponent(lBootVersion)
+                        .addGap(6, 6, 6)
+                        .addComponent(cbBootVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -74,17 +81,22 @@ public class InitializrProjectPanelVisual2 extends JPanel {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lDeps)
-                    .addComponent(lBootVer))
+                    .addComponent(lBootVersion)
+                    .addComponent(cbBootVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void cbBootVersionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBootVersionActionPerformed
+        final NamedItem bootVersionItem = (NamedItem) cbBootVersion.getSelectedItem();
+        pBootDependencies.adaptToBootVersion(bootVersionItem.getId());
+    }//GEN-LAST:event_cbBootVersionActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JLabel lBootVer;
-    private javax.swing.JLabel lDeps;
+    private javax.swing.JComboBox<String> cbBootVersion;
+    private javax.swing.JLabel lBootVersion;
     private com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel pBootDependencies;
     private javax.swing.JScrollPane scroller;
     // End of variables declaration//GEN-END:variables
@@ -100,25 +112,38 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     }
 
     void store(WizardDescriptor wd) {
+        wd.putProperty(WIZ_BOOT_VERSION, cbBootVersion.getSelectedItem());
         wd.putProperty(WIZ_DEPENDENCIES, pBootDependencies.getSelectedDependenciesString());
     }
 
     void read(WizardDescriptor wd) {
         if (!initialized) {
-            pBootDependencies.init((JsonNode) wd.getProperty(WIZ_METADATA));
+            final JsonNode meta = (JsonNode) wd.getProperty(WIZ_METADATA);
+            fillCombo(meta.path("bootVersion"), dcbmBootVersion, cbBootVersion);
+            pBootDependencies.init(meta);
             initialized = true;
         } else {
+            cbBootVersion.setSelectedItem(wd.getProperty(WIZ_BOOT_VERSION));
             pBootDependencies.setSelectedDependenciesString((String) wd.getProperty(WIZ_DEPENDENCIES));
         }
         final NamedItem bootVersionItem = (NamedItem) wd.getProperty(WIZ_BOOT_VERSION);
         if (bootVersionItem != null) {
-            lBootVer.setText(bootVersionItem.getName());
             pBootDependencies.adaptToBootVersion(bootVersionItem.getId());
         }
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {
         // nothing to validate
+    }
+
+    private void fillCombo(JsonNode attrNode, DefaultComboBoxModel<NamedItem> comboModel, JComboBox combo) {
+        JsonNode valArray = attrNode.path("values");
+        comboModel.removeAllElements();
+        for (JsonNode val : valArray) {
+            comboModel.addElement(new NamedItem(val.get("id").asText(), val.get("name").asText()));
+        }
+        combo.setModel(comboModel);
+        combo.setSelectedItem(new NamedItem(attrNode.path("default").asText(), ""));
     }
 
 }

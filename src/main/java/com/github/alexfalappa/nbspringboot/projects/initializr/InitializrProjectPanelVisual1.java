@@ -25,7 +25,6 @@ import org.openide.WizardValidationException;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ARTIFACT;
-import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_BOOT_VERSION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DESCRIPTION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_GROUP;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_JAVA_VERSION;
@@ -39,7 +38,6 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 public class InitializrProjectPanelVisual1 extends JPanel {
 
     public static final String PROP_PROJECT_NAME = "projectName";
-    private final DefaultComboBoxModel<NamedItem> dcbmBootVersion = new DefaultComboBoxModel<>();
     private final DefaultComboBoxModel<NamedItem> dcbmLanguage = new DefaultComboBoxModel<>();
     private final DefaultComboBoxModel<NamedItem> dcbmJavaVersion = new DefaultComboBoxModel<>();
     private final DefaultComboBoxModel<NamedItem> dcbmPackaging = new DefaultComboBoxModel<>();
@@ -75,8 +73,6 @@ public class InitializrProjectPanelVisual1 extends JPanel {
         cbLanguage = new javax.swing.JComboBox<>();
         lVersion = new javax.swing.JLabel();
         txVersion = new javax.swing.JTextField();
-        lBootVersion = new javax.swing.JLabel();
-        cbBootVersion = new javax.swing.JComboBox<>();
 
         lGroup.setLabelFor(txGroup);
         org.openide.awt.Mnemonics.setLocalizedText(lGroup, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual1.class, "InitializrProjectPanelVisual1.lGroup.text")); // NOI18N
@@ -117,28 +113,25 @@ public class InitializrProjectPanelVisual1 extends JPanel {
 
         txVersion.setColumns(20);
 
-        lBootVersion.setLabelFor(txGroup);
-        org.openide.awt.Mnemonics.setLocalizedText(lBootVersion, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual1.class, "InitializrProjectPanelVisual1.lBootVersion.text")); // NOI18N
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lVersion)
+                    .addComponent(lLanguage)
                     .addComponent(lGroup)
                     .addComponent(lArtifact)
                     .addComponent(lName)
                     .addComponent(lDesc)
                     .addComponent(lPackage)
                     .addComponent(lPackaging)
-                    .addComponent(lJavaVersion)
-                    .addComponent(lLanguage)
-                    .addComponent(lBootVersion))
+                    .addComponent(lVersion)
+                    .addComponent(lJavaVersion))
                 .addGap(6, 6, 6)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txGroup)
                     .addComponent(txArtifact)
                     .addComponent(txName)
                     .addComponent(txDesc)
@@ -146,27 +139,13 @@ public class InitializrProjectPanelVisual1 extends JPanel {
                     .addComponent(cbPackaging, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbJavaVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(cbLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(txVersion)
-                    .addComponent(txGroup)
-                    .addComponent(cbBootVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(txVersion))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lBootVersion)
-                    .addComponent(cbBootVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lLanguage)
-                    .addComponent(cbLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lJavaVersion)
-                    .addComponent(cbJavaVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lGroup)
                     .addComponent(txGroup, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -194,17 +173,23 @@ public class InitializrProjectPanelVisual1 extends JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lPackage)
                     .addComponent(txPackage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addGap(18, 18, 18)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lLanguage)
+                    .addComponent(cbLanguage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lJavaVersion)
+                    .addComponent(cbJavaVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> cbBootVersion;
     private javax.swing.JComboBox<String> cbJavaVersion;
     private javax.swing.JComboBox<String> cbLanguage;
     private javax.swing.JComboBox<String> cbPackaging;
     private javax.swing.JLabel lArtifact;
-    private javax.swing.JLabel lBootVersion;
     private javax.swing.JLabel lDesc;
     private javax.swing.JLabel lGroup;
     private javax.swing.JLabel lJavaVersion;
@@ -239,7 +224,6 @@ public class InitializrProjectPanelVisual1 extends JPanel {
         wd.putProperty(WIZ_NAME, txName.getText().trim());
         wd.putProperty(WIZ_DESCRIPTION, txDesc.getText().trim());
         wd.putProperty(WIZ_PACKAGE, txPackage.getText().trim());
-        wd.putProperty(WIZ_BOOT_VERSION, cbBootVersion.getSelectedItem());
         wd.putProperty(WIZ_JAVA_VERSION, cbJavaVersion.getSelectedItem());
         wd.putProperty(WIZ_LANGUAGE, cbLanguage.getSelectedItem());
         wd.putProperty(WIZ_PACKAGING, cbPackaging.getSelectedItem());
@@ -256,7 +240,6 @@ public class InitializrProjectPanelVisual1 extends JPanel {
             this.txName.setText((String) wd.getProperty(WIZ_NAME));
             this.txDesc.setText((String) wd.getProperty(WIZ_DESCRIPTION));
             this.txPackage.setText((String) wd.getProperty(WIZ_PACKAGE));
-            cbBootVersion.setSelectedItem(wd.getProperty(WIZ_BOOT_VERSION));
             cbJavaVersion.setSelectedItem(wd.getProperty(WIZ_JAVA_VERSION));
             cbLanguage.setSelectedItem(wd.getProperty(WIZ_LANGUAGE));
             cbPackaging.setSelectedItem(wd.getProperty(WIZ_PACKAGING));
@@ -270,7 +253,6 @@ public class InitializrProjectPanelVisual1 extends JPanel {
         this.txName.setText(meta.path("name").path("default").asText());
         this.txDesc.setText(meta.path("description").path("default").asText());
         this.txPackage.setText(meta.path("packageName").path("default").asText());
-        fillCombo(meta.path("bootVersion"), dcbmBootVersion, cbBootVersion);
         fillCombo(meta.path("javaVersion"), dcbmJavaVersion, cbJavaVersion);
         fillCombo(meta.path("language"), dcbmLanguage, cbLanguage);
         fillCombo(meta.path("packaging"), dcbmPackaging, cbPackaging);
