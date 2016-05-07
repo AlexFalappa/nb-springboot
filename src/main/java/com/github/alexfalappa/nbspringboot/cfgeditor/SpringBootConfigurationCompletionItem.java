@@ -46,6 +46,7 @@ import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
  * It utilizes an ItemMetadata and the project classpath to render the completion item and support the documentation.
  *
  * @author Aggelos Karalias
+ * @author Alessandro Falappa
  */
 public class SpringBootConfigurationCompletionItem implements CompletionItem {
 
@@ -59,7 +60,8 @@ public class SpringBootConfigurationCompletionItem implements CompletionItem {
     private final int caretOffset;
     private final int dotOffset;
 
-    public SpringBootConfigurationCompletionItem(ItemMetadata configurationItem, ItemHint hint, ClassPath classPath, int dotOffset, int caretOffset) {
+    public SpringBootConfigurationCompletionItem(ItemMetadata configurationItem, ItemHint hint, ClassPath classPath, int dotOffset,
+            int caretOffset) {
         this.configurationItem = configurationItem;
         this.hint = hint;
         this.classPath = classPath;

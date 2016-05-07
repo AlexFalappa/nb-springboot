@@ -16,11 +16,11 @@
 package com.github.alexfalappa.nbspringboot.cfgeditor;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -36,6 +36,7 @@ import org.netbeans.spi.editor.completion.CompletionTask;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 import org.openide.windows.Mode;
 import org.openide.windows.TopComponent;
@@ -44,20 +45,41 @@ import org.springframework.boot.configurationprocessor.metadata.ConfigurationMet
 import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.WARNING;
+import static org.springframework.boot.configurationprocessor.metadata.ItemMetadata.ItemType.GROUP;
+import static org.springframework.boot.configurationprocessor.metadata.ItemMetadata.ItemType.PROPERTY;
 
 /**
  * The Spring Boot Configuration implementation of CompletionProvider.
- *
+ * <p>
  * The entry point of completion support. This provider is registered for text/x-properties files and is enabled if spring-boot is available
  * on the classpath.
- *
+ * <p>
  * It scans the classpath for {@code META-INF/spring-configuration-metadata.json} files, then unmarshalls the files into the corresponding {@link
  * ConfigurationMetadata} classes and later in the query task scans for items and fills the {@link CompletionResultSet}.
+ * <p>
+ * The provider organizes properties, groups and hints in maps indexed by name. It also maintains a cache of configuration metadata parsed
+ * from JSON files in jars to speed up completion.
  *
  * @author Aggelos Karalias
+ * @author Alessandro Falappa
  */
 @MimeRegistration(mimeType = "text/x-properties", service = CompletionProvider.class)
 public class SpringBootConfigurationCompletionProvider implements CompletionProvider {
+
+    private static final Logger logger = Logger.getLogger(SpringBootConfigurationCompletionProvider.class.getName());
+    private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
+    private static final String ADDITIONAL_METADATA_JSON = "META-INF/additional-spring-configuration-metadata.json";
+    private final JsonMarshaller jsonMarsaller = new JsonMarshaller();
+    private final Map<String, ConfigurationMetadata> cfgMetasInJars = new HashMap<>();
+    private final MultiValueMap<String, ItemMetadata> properties = new LinkedMultiValueMap<>();
+    private final MultiValueMap<String, ItemMetadata> groups = new LinkedMultiValueMap<>();
+    private final Map<String, ItemHint> hints = new HashMap<>();
 
     @Override
     public CompletionTask createTask(int queryType, JTextComponent jtc) {
@@ -81,29 +103,6 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
         } catch (ClassNotFoundException ex) {
             return null;
         }
-        // get the available metadata json files found in the classpath
-        final List<FileObject> configurationMetaFiles = cp.findAllResources("META-INF/spring-configuration-metadata.json");
-        final List<ConfigurationMetadata> configurationMetas = new ArrayList<>(configurationMetaFiles.size());
-        // unmarshal the files found
-        final JsonMarshaller jsonMarsaller = new JsonMarshaller();
-        for (FileObject configurationMetaFile : configurationMetaFiles) {
-            try {
-                configurationMetas.add(jsonMarsaller.read(configurationMetaFile.getInputStream()));
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        }
-        // organize hints in a map indexed by property name
-        final Map<String, ItemHint> hints = new HashMap<>();
-        for (ConfigurationMetadata meta : configurationMetas) {
-            for (ItemHint hint : meta.getHints()) {
-                final String hintName = hint.getName();
-                if (hints.containsKey(hintName)) {
-                    System.out.format("Duplicate hints for property: %s%n", hintName);
-                }
-                hints.put(hintName, hint);
-            }
-        }
         return new AsyncCompletionTask(new AsyncCompletionQuery() {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int caretOffset) {
@@ -123,17 +122,7 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
                 } catch (BadLocationException ex) {
                     Exceptions.printStackTrace(ex);
                 }
-                for (ConfigurationMetadata configurationMeta : configurationMetas) {
-                    for (ItemMetadata item : configurationMeta.getItems()) {
-                        final String itemName = item.getName();
-                        if (item.isOfItemType(ItemMetadata.ItemType.PROPERTY)
-                                && !itemName.isEmpty()
-                                && itemName.contains(filter)) {
-                            completionResultSet
-                                    .addItem(new SpringBootConfigurationCompletionItem(item, hints.get(itemName), cp, startOffset, caretOffset));
-                        }
-                    }
-                }
+                complete(completionResultSet, filter, cp, startOffset, caretOffset);
                 completionResultSet.finish();
             }
         }, jtc);
@@ -163,8 +152,8 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
                     break;
                 }
             } catch (BadLocationException ex) {
-                throw (BadLocationException) new BadLocationException("calling getText(" + start + ", " + (start + 1) + ") on doc of length: " + doc
-                        .getLength(), start).initCause(ex);
+                throw (BadLocationException) new BadLocationException(
+                        "calling getText(" + start + ", " + (start + 1) + ") on doc of length: " + doc.getLength(), start).initCause(ex);
             }
             start++;
         }
@@ -180,5 +169,65 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
             }
         }
         return -1;
+    }
+
+    // Create a completion result list based on a filter string, classpath and document offsets.
+    private void complete(CompletionResultSet completionResultSet, String filter, ClassPath cp, int startOffset, int caretOffset) {
+        long mark = System.currentTimeMillis();
+        updateCachesMaps(cp);
+        for (String propName : properties.keySet()) {
+            if (propName.contains(filter)) {
+                completionResultSet.addItem(
+                        new SpringBootConfigurationCompletionItem(properties.getFirst(propName), hints.get(propName), cp, startOffset,
+                                caretOffset));
+            }
+        }
+        logger.log(INFO, "Completion of '{0}' took: {1} msecs", new Object[]{filter, System.currentTimeMillis() - mark});
+    }
+
+    // Update internal caches and maps from the given classpath.
+    private void updateCachesMaps(ClassPath cp) {
+        this.properties.clear();
+        this.hints.clear();
+        this.groups.clear();
+        final List<FileObject> cfgMetaFiles = cp.findAllResources(METADATA_JSON);
+        // TODO take also additional metadata into consideration
+        // final List<FileObject> additCfgMetaFiles = cp.findAllResources(ADDITIONAL_METADATA_JSON);
+        for (FileObject fo : cfgMetaFiles) {
+            try {
+                ConfigurationMetadata meta;
+                FileObject archiveFo = FileUtil.getArchiveFile(fo);
+                if (archiveFo != null) {
+                    String archivePath = archiveFo.getPath();
+                    if (!cfgMetasInJars.containsKey(archivePath)) {
+                        logger.log(FINE, "Unmarshalling configuration metadata from {0}", FileUtil.getFileDisplayName(fo));
+                        cfgMetasInJars.put(archivePath, jsonMarsaller.read(fo.getInputStream()));
+                    }
+                    meta = cfgMetasInJars.get(archivePath);
+                } else {
+                    logger.log(FINE, "Unmarshalling configuration metadata from {0}", FileUtil.getFileDisplayName(fo));
+                    meta = jsonMarsaller.read(fo.getInputStream());
+                }
+                // update property and groups maps
+                for (ItemMetadata item : meta.getItems()) {
+                    final String itemName = item.getName();
+                    if (item.isOfItemType(PROPERTY)) {
+                        properties.add(itemName, item);
+                    }
+                    if (item.isOfItemType(GROUP)) {
+                        groups.add(itemName, item);
+                    }
+                }
+                // update hints maps
+                for (ItemHint hint : meta.getHints()) {
+                    ItemHint old = hints.put(hint.getName(), hint);
+                    if (old != null) {
+                        logger.log(WARNING, "Overwritten hint {0}", old.toString());
+                    }
+                }
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
+        }
     }
 }
