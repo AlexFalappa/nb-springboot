@@ -119,17 +119,18 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     void read(WizardDescriptor wd) {
         if (!initialized) {
             final JsonNode meta = (JsonNode) wd.getProperty(WIZ_METADATA);
-            fillCombo(meta.path("bootVersion"), dcbmBootVersion, cbBootVersion);
             pBootDependencies.init(meta);
+            // the following will also trigger adaptation of dependencies to default boot version
+            fillCombo(meta.path("bootVersion"), dcbmBootVersion, cbBootVersion);
             initialized = true;
         } else {
-            cbBootVersion.setSelectedItem(wd.getProperty(WIZ_BOOT_VERSION));
             pBootDependencies.setSelectedDependenciesString((String) wd.getProperty(WIZ_DEPENDENCIES));
+            cbBootVersion.setSelectedItem(wd.getProperty(WIZ_BOOT_VERSION));
         }
-        final NamedItem bootVersionItem = (NamedItem) wd.getProperty(WIZ_BOOT_VERSION);
-        if (bootVersionItem != null) {
-            pBootDependencies.adaptToBootVersion(bootVersionItem.getId());
-        }
+//        final NamedItem bootVersionItem = (NamedItem) wd.getProperty(WIZ_BOOT_VERSION);
+//        if (bootVersionItem != null) {
+//            pBootDependencies.adaptToBootVersion(bootVersionItem.getId());
+//        }
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {
