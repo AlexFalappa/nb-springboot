@@ -58,7 +58,10 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
         StringBuilder sb = new StringBuilder();
         // name and type
         sb.append("<b>").append(configurationItem.getName()).append("</b>");
-        sb.append("<br/><a>").append(simpleHtmlEscape(configurationItem.getType())).append("</a>");
+        sb.append("<br/>").append(simpleHtmlEscape(configurationItem.getType()));
+        // source
+        String sourceType = configurationItem.getSourceType();
+        sb.append("<br/>in <code>").append(sourceType).append("</code>");
         // deprecation (optional)
         ItemDeprecation deprecation = configurationItem.getDeprecation();
         if (deprecation != null) {
