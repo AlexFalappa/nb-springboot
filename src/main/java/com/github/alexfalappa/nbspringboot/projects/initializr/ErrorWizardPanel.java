@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa <alex.falappa at gmail.com>.
+ * Copyright 2016 Alessandro Falappa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,8 +24,9 @@ import org.openide.WizardDescriptor;
 import org.openide.util.HelpCtx;
 
 /**
+ * Wizard panel shown in case of errors.
  *
- * @author Alessandro Falappa <alex.falappa at gmail.com>
+ * @author Alessandro Falappa
  */
 class ErrorWizardPanel implements WizardDescriptor.Panel {
 

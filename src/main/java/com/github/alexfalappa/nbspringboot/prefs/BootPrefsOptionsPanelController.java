@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 sasha.
+ * Copyright 2016 Alessandro Falappa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,6 +25,11 @@ import org.netbeans.spi.options.OptionsPanelController;
 import org.openide.util.HelpCtx;
 import org.openide.util.Lookup;
 
+/**
+ * Plugin option panel controller.
+ *
+ * @author Alessandro Falappa
+ */
 @OptionsPanelController.SubRegistration(
         location = "Java",
         displayName = "#AdvancedOption_DisplayName_BootPrefs",

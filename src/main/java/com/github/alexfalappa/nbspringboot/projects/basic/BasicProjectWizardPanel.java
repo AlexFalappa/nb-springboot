@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 sasha.
+ * Copyright 2016 Alessandro Falappa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,9 @@ import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
 /**
- * Panel just asking for basic info.
+ * Panel asking for typical project info.
+ * <p>
+ * Asks for disk location, and project directory name in that location.
  */
 public class BasicProjectWizardPanel implements WizardDescriptor.Panel,
         WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {

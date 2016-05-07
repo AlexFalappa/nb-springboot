@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 sasha.
+ * Copyright 2016 Alessandro Falappa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static javax.swing.SwingConstants.HORIZONTAL;
 
 /**
- * Specialized, scrollable panel to manage a list of checkboxes groups each arranged in two columns.
+ * Specialized scrollable panel to manage a list of checkboxes groups each containing two columns of checkboxes.
  * <p>
  * The panel is dynamically filled processing a JSON tree received from the Spring Initializr rest service.
  *

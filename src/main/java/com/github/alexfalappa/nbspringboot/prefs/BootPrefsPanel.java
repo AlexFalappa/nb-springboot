@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 sasha.
+ * Copyright 2016 Alessandro Falappa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,6 +31,13 @@ import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.PREF_INITIALIZR_TIMEOUT;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.PREF_INITIALIZR_URL;
 
+/**
+ * Plugin options panel.
+ * <p>
+ * It is shown under the Java category in Tools/Options dialog.
+ *
+ * @author Alessandro Falappa
+ */
 final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListener, ChangeListener {
 
     private final BootPrefsOptionsPanelController controller;

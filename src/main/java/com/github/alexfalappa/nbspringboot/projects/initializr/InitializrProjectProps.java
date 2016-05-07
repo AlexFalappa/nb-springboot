@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa <alex.falappa at gmail.com>.
+ * Copyright 2016 Alessandro Falappa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,8 +16,9 @@
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
 /**
+ * Global constants
  *
- * @author Alessandro Falappa <alex.falappa at gmail.com>
+ * @author Alessandro Falappa
  */
 public class InitializrProjectProps {
 
