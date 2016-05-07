@@ -57,22 +57,25 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
         // name and type
         sb.append("<b>").append(configurationItem.getName()).append("</b>");
         sb.append("<br/><a>").append(simpleHtmlEscape(configurationItem.getType())).append("</a>");
-        // default value (optional)
-        if (null != configurationItem.getDefaultValue()) {
-            sb.append("<br/><i>Default Value:</i> ").append(String.valueOf(configurationItem.getDefaultValue()));
-        }
         // deprecation (optional)
         ItemDeprecation deprecation = configurationItem.getDeprecation();
         if (deprecation != null) {
-            sb.append("<br/><br/><b>Deprecated</b>");
+            sb.append("<br/><br/><b><i>Deprecated");
+            // deprecation reason if present
             String reason = deprecation.getReason();
             if (reason != null) {
-                sb.append(": ").append(simpleHtmlEscape(reason));
+                sb.append(":</i></b> ").append(simpleHtmlEscape(reason));
+            } else {
+                sb.append("</i></b>");
             }
             String replacement = deprecation.getReplacement();
             if (replacement != null) {
-                sb.append("<br/>Replaced by <code>").append(replacement).append("</code>");
+                sb.append("<br/><i>Replaced by:</i> <code>").append(replacement).append("</code>");
             }
+        }
+        // default value (optional)
+        if (null != configurationItem.getDefaultValue()) {
+            sb.append("<br/><br/><i>Default:</i> ").append(String.valueOf(configurationItem.getDefaultValue()));
         }
         // description (optional)
         final String description = configurationItem.getDescription();
