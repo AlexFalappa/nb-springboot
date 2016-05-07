@@ -40,6 +40,7 @@ import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
  * source type of a property in editor and navigate to a general spring boot configuration documentation page.
  *
  * @author Aggelos Karalias
+ * @author Alessandro Falappa
  */
 public class SpringBootConfigurationCompletionDocumentation implements CompletionDocumentation {
 
@@ -70,13 +71,13 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
             }
             String replacement = deprecation.getReplacement();
             if (replacement != null) {
-                sb.append("<br/>Replaced by <tt>").append(replacement).append("</tt>");
+                sb.append("<br/>Replaced by <code>").append(replacement).append("</code>");
             }
         }
         // description (optional)
         final String description = configurationItem.getDescription();
         if (description != null) {
-            sb.append("<br/><br/>").append(simpleHtmlEscape(description));
+            sb.append("<br/><br/>").append(description);
         }
         // list of values (optional)
         ItemHint hint = item.getHint();
