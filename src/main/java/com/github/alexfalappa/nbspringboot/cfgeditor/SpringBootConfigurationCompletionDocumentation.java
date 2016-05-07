@@ -33,6 +33,8 @@ import org.springframework.boot.configurationprocessor.metadata.ItemDeprecation;
 import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 
+import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEscape;
+
 /**
  * The Spring Boot Configuration implementation of CompletionDocumentation.
  *
@@ -96,10 +98,6 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
             }
         }
         return sb.toString();
-    }
-
-    private String simpleHtmlEscape(String text) {
-        return text.replace("<", "&lt;").replace(">", "&gt;");
     }
 
     @Override
