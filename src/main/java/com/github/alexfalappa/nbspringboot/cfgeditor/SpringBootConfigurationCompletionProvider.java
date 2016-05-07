@@ -177,12 +177,13 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
         updateCachesMaps(cp);
         for (String propName : properties.keySet()) {
             if (propName.contains(filter)) {
-                completionResultSet.addItem(
-                        new SpringBootConfigurationCompletionItem(properties.getFirst(propName), hints.get(propName), cp, startOffset,
-                                caretOffset));
+                for (ItemMetadata item : properties.get(propName)) {
+                    completionResultSet.addItem(new SpringBootConfigurationCompletionItem(item, hints.get(propName), cp, startOffset,
+                            caretOffset));
+                }
             }
         }
-        logger.log(INFO, "Completion of '{0}' took: {1} msecs", new Object[]{filter, System.currentTimeMillis() - mark});
+        logger.log(INFO, "Completion of ''{0}'' took: {1} msecs", new Object[]{filter, System.currentTimeMillis() - mark});
     }
 
     // Update internal caches and maps from the given classpath.
