@@ -50,7 +50,7 @@ import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEsca
  * @author Aggelos Karalias
  * @author Alessandro Falappa
  */
-public class SpringBootConfigurationCompletionItem implements CompletionItem {
+public class BootConfigurationCompletionItem implements CompletionItem {
 
     private final ItemMetadata configurationItem;
     // may be null
@@ -62,7 +62,7 @@ public class SpringBootConfigurationCompletionItem implements CompletionItem {
     private final int caretOffset;
     private final int dotOffset;
 
-    public SpringBootConfigurationCompletionItem(ItemMetadata configurationItem, ItemHint hint, ClassPath classPath, int dotOffset,
+    public BootConfigurationCompletionItem(ItemMetadata configurationItem, ItemHint hint, ClassPath classPath, int dotOffset,
             int caretOffset) {
         this.configurationItem = configurationItem;
         this.hint = hint;
@@ -142,7 +142,7 @@ public class SpringBootConfigurationCompletionItem implements CompletionItem {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int i) {
                 completionResultSet
-                        .setDocumentation(new SpringBootConfigurationCompletionDocumentation(SpringBootConfigurationCompletionItem.this));
+                        .setDocumentation(new BootConfigurationCompletionDocumentation(BootConfigurationCompletionItem.this));
                 completionResultSet.finish();
             }
         });

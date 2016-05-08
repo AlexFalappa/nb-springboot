@@ -69,10 +69,10 @@ import static org.springframework.boot.configurationprocessor.metadata.ItemMetad
  * @author Alessandro Falappa
  */
 @MimeRegistration(mimeType = "text/x-properties", service = CompletionProvider.class)
-public class SpringBootConfigurationCompletionProvider implements CompletionProvider {
+public class BootConfigurationCompletionProvider implements CompletionProvider {
 
     private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
-    private static final Logger logger = Logger.getLogger(SpringBootConfigurationCompletionProvider.class.getName());
+    private static final Logger logger = Logger.getLogger(BootConfigurationCompletionProvider.class.getName());
     private final JsonMarshaller jsonMarsaller = new JsonMarshaller();
     private final Map<String, ConfigurationMetadata> cfgMetasInJars = new HashMap<>();
     private final MultiValueMap<String, ItemMetadata> properties = new LinkedMultiValueMap<>();
@@ -176,7 +176,7 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
         for (String propName : properties.keySet()) {
             if (propName.contains(filter)) {
                 for (ItemMetadata item : properties.get(propName)) {
-                    completionResultSet.addItem(new SpringBootConfigurationCompletionItem(item, hints.get(propName), cp, startOffset,
+                    completionResultSet.addItem(new BootConfigurationCompletionItem(item, hints.get(propName), cp, startOffset,
                             caretOffset));
                 }
             }

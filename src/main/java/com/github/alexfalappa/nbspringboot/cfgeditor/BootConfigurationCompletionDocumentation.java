@@ -38,17 +38,17 @@ import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEsca
 /**
  * The Spring Boot Configuration implementation of CompletionDocumentation.
  *
- * It utilizes a {@link SpringBootConfigurationCompletionItem} to display the documentation for that item and actions like opening the
+ * It utilizes a {@link BootConfigurationCompletionItem} to display the documentation for that item and actions like opening the
  * source type of a property in editor and navigate to a general spring boot configuration documentation page.
  *
  * @author Aggelos Karalias
  * @author Alessandro Falappa
  */
-public class SpringBootConfigurationCompletionDocumentation implements CompletionDocumentation {
+public class BootConfigurationCompletionDocumentation implements CompletionDocumentation {
 
-    private final SpringBootConfigurationCompletionItem item;
+    private final BootConfigurationCompletionItem item;
 
-    public SpringBootConfigurationCompletionDocumentation(SpringBootConfigurationCompletionItem item) {
+    public BootConfigurationCompletionDocumentation(BootConfigurationCompletionItem item) {
         this.item = item;
     }
 
