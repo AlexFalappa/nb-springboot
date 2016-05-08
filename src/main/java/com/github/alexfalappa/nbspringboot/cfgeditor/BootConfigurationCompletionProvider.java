@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -73,6 +75,7 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
 
     private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
     private static final Logger logger = Logger.getLogger(BootConfigurationCompletionProvider.class.getName());
+    private static final Pattern PATTERN_PROP_NAME = Pattern.compile("[^=\\s]+");
     private final JsonMarshaller jsonMarsaller = new JsonMarshaller();
     private final Map<String, ConfigurationMetadata> cfgMetasInJars = new HashMap<>();
     private final MultiValueMap<String, ItemMetadata> properties = new LinkedMultiValueMap<>();
@@ -104,23 +107,39 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
         return new AsyncCompletionTask(new AsyncCompletionQuery() {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int caretOffset) {
-                String filter = null;
-                int startOffset = caretOffset - 1;
+                final StyledDocument styDoc = (StyledDocument) document;
+                Element lineElement = styDoc.getParagraphElement(caretOffset);
+                int lineStartOffset = lineElement.getStartOffset();
                 try {
-                    final StyledDocument bDoc = (StyledDocument) document;
-                    final int lineStartOffset = getRowFirstNonWhite(bDoc, caretOffset);
-                    final char[] line = bDoc.getText(lineStartOffset, caretOffset - lineStartOffset).toCharArray();
-                    final int whiteOffset = indexOfWhite(line);
-                    filter = new String(line, whiteOffset + 1, line.length - whiteOffset - 1);
-                    if (whiteOffset > 0) {
-                        startOffset = lineStartOffset + whiteOffset + 1;
-                    } else {
-                        startOffset = lineStartOffset;
+                    String lineToCaret = styDoc.getText(lineStartOffset, caretOffset - lineStartOffset);
+                    if (!lineToCaret.contains("#")) {
+                        String[] parts = lineToCaret.split("=");
+                        //property name extraction from part before =
+                        Matcher matcher = PATTERN_PROP_NAME.matcher(parts[0]);
+                        String propPrefix = null;
+                        int propPrefixOffset = 0;
+                        while (matcher.find()) {
+                            propPrefix = matcher.group();
+                            propPrefixOffset = matcher.start();
+                        }
+                        // check which kind of completion
+                        final int equalSignOffset = lineToCaret.indexOf('=');
+                        if (parts.length > 1) {
+                            //value completion
+                            String valPrefix = parts[1].trim();
+                            completePropValue(completionResultSet, propPrefix, valPrefix, cp, lineStartOffset + lineToCaret.indexOf(
+                                    valPrefix), caretOffset);
+                        } else if (equalSignOffset >= 0) {
+                            //value completion with empty filter
+                            completePropValue(completionResultSet, propPrefix, null, cp, lineStartOffset + equalSignOffset + 1, caretOffset);
+                        } else {
+                            // property completion
+                            completePropName(completionResultSet, propPrefix, cp, lineStartOffset + propPrefixOffset, caretOffset);
+                        }
                     }
                 } catch (BadLocationException ex) {
                     Exceptions.printStackTrace(ex);
                 }
-                complete(completionResultSet, filter, cp, startOffset, caretOffset);
                 completionResultSet.finish();
             }
         }, jtc);
@@ -141,36 +160,8 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
         return null;
     }
 
-    static int getRowFirstNonWhite(StyledDocument doc, int offset) throws BadLocationException {
-        Element lineElement = doc.getParagraphElement(offset);
-        int start = lineElement.getStartOffset();
-        while (start + 1 < lineElement.getEndOffset()) {
-            try {
-                if (doc.getText(start, 1).charAt(0) != ' ') {
-                    break;
-                }
-            } catch (BadLocationException ex) {
-                throw (BadLocationException) new BadLocationException(
-                        "calling getText(" + start + ", " + (start + 1) + ") on doc of length: " + doc.getLength(), start).initCause(ex);
-            }
-            start++;
-        }
-        return start;
-    }
-
-    static int indexOfWhite(char[] line) {
-        int i = line.length;
-        while (--i > -1) {
-            final char c = line[i];
-            if (Character.isWhitespace(c)) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    // Create a completion result list based on a filter string, classpath and document offsets.
-    private void complete(CompletionResultSet completionResultSet, String filter, ClassPath cp, int startOffset, int caretOffset) {
+    // Create a completion result list of config properties based on a filter string, classpath and document offsets.
+    private void completePropName(CompletionResultSet completionResultSet, String filter, ClassPath cp, int startOffset, int caretOffset) {
         long mark = System.currentTimeMillis();
         updateCachesMaps(cp);
         for (String propName : properties.keySet()) {
@@ -181,7 +172,27 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
                 }
             }
         }
-        logger.log(INFO, "Completion of ''{0}'' took: {1} msecs", new Object[]{filter, System.currentTimeMillis() - mark});
+        logger.log(INFO, "Property completion of ''{0}'' took: {1} msecs", new Object[]{filter, System.currentTimeMillis() - mark});
+    }
+
+    // Create a completion result list of properties values based on a property name, filter string, classpath and document offsets.
+    private void completePropValue(CompletionResultSet completionResultSet, String propName, String filter, ClassPath cp, int startOffset,
+            int caretOffset) {
+        long mark = System.currentTimeMillis();
+        updateCachesMaps(cp);
+        if (hints.containsKey(propName)) {
+            ItemHint hint = hints.get(propName);
+            final List<ItemHint.ValueHint> values = hint.getValues();
+            if (values != null) {
+                for (ItemHint.ValueHint valHint : values) {
+                    if (filter == null || valHint.getValue().toString().startsWith(filter)) {
+                        completionResultSet.addItem(new ConfigValueCompletionItem(valHint, cp, startOffset, caretOffset));
+                    }
+                }
+            }
+        }
+        logger.log(INFO, "Value completion of ''{0}'' on ''{1}'' took: {2} msecs",
+                new Object[]{filter, propName, System.currentTimeMillis() - mark});
     }
 
     // Update internal caches and maps from the given classpath.
