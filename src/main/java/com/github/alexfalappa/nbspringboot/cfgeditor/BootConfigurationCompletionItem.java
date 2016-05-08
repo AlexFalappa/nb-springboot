@@ -41,6 +41,7 @@ import org.openide.util.ImageUtilities;
 import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 
+import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.shortenJavaType;
 import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEscape;
 
 /**
@@ -92,14 +93,7 @@ public class BootConfigurationCompletionItem implements CompletionItem {
         if (type == null) {
             return null;
         }
-        // TODO the following logic doesn't work for generics
-        // e.g. java.util.Set<java.util.Date>
-        // java.util.Map<java.lang.String,java.lang.Object>
-        int lastIndexOfDot = type.lastIndexOf(".");
-        if (lastIndexOfDot > -1 && type.length() > lastIndexOfDot) {
-            type = type.substring(lastIndexOfDot + 1);
-        }
-        return simpleHtmlEscape(type);
+        return simpleHtmlEscape(shortenJavaType(type));
     }
 
     @Override
