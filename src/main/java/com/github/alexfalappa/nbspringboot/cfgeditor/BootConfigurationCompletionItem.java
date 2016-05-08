@@ -22,6 +22,7 @@ import java.awt.event.KeyEvent;
 
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
+import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
@@ -58,7 +59,6 @@ public class BootConfigurationCompletionItem implements CompletionItem {
     private final ClassPath classPath;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgeditor/springboot-logo.png"));
-    private static final Color COLOR_FIELD = Color.decode("0x6666B2");
     private final int caretOffset;
     private final int dotOffset;
 
@@ -132,8 +132,8 @@ public class BootConfigurationCompletionItem implements CompletionItem {
         if (configurationItem.getDeprecation() != null) {
             leftHtmlText = "<s>" + leftHtmlText + "</s>";
         }
-        CompletionUtilities.renderHtml(fieldIcon, leftHtmlText, getTextRight(), g, defaultFont, (selected ? Color.white : COLOR_FIELD),
-                width, height, selected);
+        CompletionUtilities.renderHtml(fieldIcon, leftHtmlText, getTextRight(), g, defaultFont, (selected ? UIManager.getColor(
+                "List.selectionForeground") : UIManager.getColor("List.foreground")), width, height, selected);
     }
 
     @Override
