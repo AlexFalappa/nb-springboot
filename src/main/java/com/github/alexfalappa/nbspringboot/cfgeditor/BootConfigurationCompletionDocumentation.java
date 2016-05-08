@@ -38,8 +38,8 @@ import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEsca
 /**
  * The Spring Boot Configuration implementation of CompletionDocumentation.
  *
- * It utilizes a {@link BootConfigurationCompletionItem} to display the documentation for that item and actions like opening the
- * source type of a property in editor and navigate to a general spring boot configuration documentation page.
+ * It utilizes a {@link BootConfigurationCompletionItem} to display the documentation for that item and actions like opening the source type
+ * of a property in editor and navigate to a general spring boot configuration documentation page.
  *
  * @author Aggelos Karalias
  * @author Alessandro Falappa
@@ -94,7 +94,7 @@ public class BootConfigurationCompletionDocumentation implements CompletionDocum
         if (hint != null) {
             List<ItemHint.ValueHint> values = hint.getValues();
             if (values != null && !values.isEmpty()) {
-                sb.append("<table><tr><td><i>Value</i></td><td><i>Description</i></td></tr>");
+                sb.append("<br/><br/><table><tr><td><i>Value</i></td><td><i>Description</i></td></tr>");
                 for (ItemHint.ValueHint vHint : values) {
                     sb.append("<tr><td>").append(vHint.getValue()).append("</td><td>");
                     sb.append(simpleHtmlEscape(vHint.getDescription())).append("</th></tr>");
