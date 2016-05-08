@@ -165,7 +165,7 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
         long mark = System.currentTimeMillis();
         updateCachesMaps(cp);
         for (String propName : properties.keySet()) {
-            if (propName.contains(filter)) {
+            if (filter == null || propName.contains(filter)) {
                 for (ItemMetadata item : properties.get(propName)) {
                     completionResultSet.addItem(new BootConfigurationCompletionItem(item, hints.get(propName), cp, startOffset,
                             caretOffset));
