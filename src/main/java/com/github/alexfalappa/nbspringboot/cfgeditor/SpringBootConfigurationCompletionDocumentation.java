@@ -94,7 +94,7 @@ public class SpringBootConfigurationCompletionDocumentation implements Completio
         if (hint != null) {
             List<ItemHint.ValueHint> values = hint.getValues();
             if (values != null && !values.isEmpty()) {
-                sb.append("<table><tr><th>Value</th><th>Description</th></tr>");
+                sb.append("<table><tr><td><i>Value</i></td><td><i>Description</i></td></tr>");
                 for (ItemHint.ValueHint vHint : values) {
                     sb.append("<tr><td>").append(vHint.getValue()).append("</td><td>");
                     sb.append(simpleHtmlEscape(vHint.getDescription())).append("</th></tr>");

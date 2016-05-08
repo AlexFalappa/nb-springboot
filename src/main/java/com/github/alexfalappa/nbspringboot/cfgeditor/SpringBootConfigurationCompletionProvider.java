@@ -48,7 +48,6 @@ import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
 import static org.springframework.boot.configurationprocessor.metadata.ItemMetadata.ItemType.GROUP;
@@ -72,9 +71,8 @@ import static org.springframework.boot.configurationprocessor.metadata.ItemMetad
 @MimeRegistration(mimeType = "text/x-properties", service = CompletionProvider.class)
 public class SpringBootConfigurationCompletionProvider implements CompletionProvider {
 
-    private static final Logger logger = Logger.getLogger(SpringBootConfigurationCompletionProvider.class.getName());
     private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
-    private static final String ADDITIONAL_METADATA_JSON = "META-INF/additional-spring-configuration-metadata.json";
+    private static final Logger logger = Logger.getLogger(SpringBootConfigurationCompletionProvider.class.getName());
     private final JsonMarshaller jsonMarsaller = new JsonMarshaller();
     private final Map<String, ConfigurationMetadata> cfgMetasInJars = new HashMap<>();
     private final MultiValueMap<String, ItemMetadata> properties = new LinkedMultiValueMap<>();
@@ -192,21 +190,21 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
         this.hints.clear();
         this.groups.clear();
         final List<FileObject> cfgMetaFiles = cp.findAllResources(METADATA_JSON);
-        // TODO take also additional metadata into consideration
-        // final List<FileObject> additCfgMetaFiles = cp.findAllResources(ADDITIONAL_METADATA_JSON);
         for (FileObject fo : cfgMetaFiles) {
             try {
                 ConfigurationMetadata meta;
                 FileObject archiveFo = FileUtil.getArchiveFile(fo);
                 if (archiveFo != null) {
+                    // parse and cache configuration metadata from JSON file in jar
                     String archivePath = archiveFo.getPath();
                     if (!cfgMetasInJars.containsKey(archivePath)) {
-                        logger.log(FINE, "Unmarshalling configuration metadata from {0}", FileUtil.getFileDisplayName(fo));
+                        logger.log(INFO, "Unmarshalling configuration metadata from {0}", FileUtil.getFileDisplayName(fo));
                         cfgMetasInJars.put(archivePath, jsonMarsaller.read(fo.getInputStream()));
                     }
                     meta = cfgMetasInJars.get(archivePath);
                 } else {
-                    logger.log(FINE, "Unmarshalling configuration metadata from {0}", FileUtil.getFileDisplayName(fo));
+                    // parse configuration metadata from JSON file (usually produced by spring configuration processor)
+                    logger.log(INFO, "Unmarshalling configuration metadata from {0}", FileUtil.getFileDisplayName(fo));
                     meta = jsonMarsaller.read(fo.getInputStream());
                 }
                 // update property and groups maps
@@ -223,7 +221,7 @@ public class SpringBootConfigurationCompletionProvider implements CompletionProv
                 for (ItemHint hint : meta.getHints()) {
                     ItemHint old = hints.put(hint.getName(), hint);
                     if (old != null) {
-                        logger.log(WARNING, "Overwritten hint {0}", old.toString());
+                        logger.log(WARNING, "Overwritten hint for property ''{0}''", old.toString());
                     }
                 }
             } catch (IOException ex) {
