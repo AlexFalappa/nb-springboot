@@ -41,11 +41,6 @@ import org.openide.util.ImageUtilities;
 import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 
 /**
- * The Spring Boot Configuration implementation of CompletionItem.
- *
- * It utilizes an ItemMetadata and the project classpath to render the completion item and support the documentation.
- *
- * @author Aggelos Karalias
  * @author Alessandro Falappa
  */
 public class ConfigValueCompletionItem implements CompletionItem {
@@ -112,15 +107,13 @@ public class ConfigValueCompletionItem implements CompletionItem {
 
     @Override
     public CompletionTask createDocumentationTask() {
-        return null;
-        //        return new AsyncCompletionTask(new AsyncCompletionQuery() {
-        //            @Override
-        //            protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-        //                completionResultSet
-        //                        .setDocumentation(new BootConfigurationCompletionDocumentation(ConfigValueCompletionItem.this));
-        //                completionResultSet.finish();
-        //            }
-        //        });
+        return new AsyncCompletionTask(new AsyncCompletionQuery() {
+            @Override
+            protected void query(CompletionResultSet completionResultSet, Document document, int i) {
+                completionResultSet.setDocumentation(new ConfigValueCompletionDocumentation(ConfigValueCompletionItem.this));
+                completionResultSet.finish();
+            }
+        });
     }
 
     @Override
