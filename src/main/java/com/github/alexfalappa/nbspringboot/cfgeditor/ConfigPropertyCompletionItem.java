@@ -1,5 +1,6 @@
 /*
  * Copyright 2015 Keevosh ULP.
+ * Modifications copyright 2016 Alessandro Falappa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,7 +53,7 @@ import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEsca
  * @author Aggelos Karalias
  * @author Alessandro Falappa
  */
-public class BootConfigurationCompletionItem implements CompletionItem {
+public class ConfigPropertyCompletionItem implements CompletionItem {
 
     private final ItemMetadata configurationItem;
     // may be null
@@ -63,7 +64,7 @@ public class BootConfigurationCompletionItem implements CompletionItem {
     private final int caretOffset;
     private final int dotOffset;
 
-    public BootConfigurationCompletionItem(ItemMetadata configurationItem, ItemHint hint, ClassPath classPath, int dotOffset,
+    public ConfigPropertyCompletionItem(ItemMetadata configurationItem, ItemHint hint, ClassPath classPath, int dotOffset,
             int caretOffset) {
         this.configurationItem = configurationItem;
         this.hint = hint;
@@ -136,7 +137,7 @@ public class BootConfigurationCompletionItem implements CompletionItem {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int i) {
                 completionResultSet
-                        .setDocumentation(new BootConfigurationCompletionDocumentation(BootConfigurationCompletionItem.this));
+                        .setDocumentation(new ConfigPropertyCompletionDocumentation(ConfigPropertyCompletionItem.this));
                 completionResultSet.finish();
             }
         });

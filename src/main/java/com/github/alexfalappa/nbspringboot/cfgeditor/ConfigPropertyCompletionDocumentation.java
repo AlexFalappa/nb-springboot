@@ -1,5 +1,6 @@
 /*
  * Copyright 2015 Keevosh ULP.
+ * Modifications copyright 2016 Alessandro Falappa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,17 +39,17 @@ import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEsca
 /**
  * The Spring Boot Configuration implementation of CompletionDocumentation.
  *
- * It utilizes a {@link BootConfigurationCompletionItem} to display the documentation for that item and actions like opening the source type
- * of a property in editor and navigate to a general spring boot configuration documentation page.
+ * It utilizes a {@link ConfigPropertyCompletionItem} to display the documentation for that item and actions like opening the source type of
+ * a property in editor and navigate to a general spring boot configuration documentation page.
  *
  * @author Aggelos Karalias
  * @author Alessandro Falappa
  */
-public class BootConfigurationCompletionDocumentation implements CompletionDocumentation {
+public class ConfigPropertyCompletionDocumentation implements CompletionDocumentation {
 
-    private final BootConfigurationCompletionItem item;
+    private final ConfigPropertyCompletionItem item;
 
-    public BootConfigurationCompletionDocumentation(BootConfigurationCompletionItem item) {
+    public ConfigPropertyCompletionDocumentation(ConfigPropertyCompletionItem item) {
         this.item = item;
     }
 

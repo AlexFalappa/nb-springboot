@@ -1,5 +1,6 @@
 /*
  * Copyright 2015 Keevosh ULP.
+ * Modifications copyright 2016 Alessandro Falappa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -167,7 +168,7 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
         for (String propName : properties.keySet()) {
             if (filter == null || propName.contains(filter)) {
                 for (ItemMetadata item : properties.get(propName)) {
-                    completionResultSet.addItem(new BootConfigurationCompletionItem(item, hints.get(propName), cp, startOffset,
+                    completionResultSet.addItem(new ConfigPropertyCompletionItem(item, hints.get(propName), cp, startOffset,
                             caretOffset));
                 }
             }
