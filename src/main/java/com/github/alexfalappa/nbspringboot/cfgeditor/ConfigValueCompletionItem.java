@@ -53,7 +53,7 @@ public class ConfigValueCompletionItem implements CompletionItem {
     private final ItemHint.ValueHint hint;
     private final ClassPath classPath;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
-            "com/github/alexfalappa/nbspringboot/cfgeditor/springboot-logo.png"));
+            "com/github/alexfalappa/nbspringboot/cfgeditor/springboot-value.png"));
     private final int caretOffset;
     private final int dotOffset;
 
