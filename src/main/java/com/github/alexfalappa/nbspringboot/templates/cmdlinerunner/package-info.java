@@ -21,7 +21,7 @@
         description = "description.html",
         scriptEngine = "freemarker",
         position = 100)
-@Messages(value = "cmdlinerunner_displayName=Spring Boot CommandLineRunner")
+@Messages(value = "cmdlinerunner_displayName=CommandLineRunner class")
 package com.github.alexfalappa.nbspringboot.templates.cmdlinerunner;
 
 import org.netbeans.api.templates.TemplateRegistration;

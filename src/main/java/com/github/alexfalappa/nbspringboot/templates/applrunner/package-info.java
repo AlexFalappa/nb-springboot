@@ -21,7 +21,7 @@
         description = "description.html",
         scriptEngine = "freemarker",
         position = 200)
-@Messages(value = "applrunner_displayName=Spring Boot ApplicationRunner")
+@Messages(value = "applrunner_displayName=ApplicationRunner class")
 package com.github.alexfalappa.nbspringboot.templates.applrunner;
 
 import org.netbeans.api.templates.TemplateRegistration;

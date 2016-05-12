@@ -21,7 +21,7 @@
         description = "description.html",
         scriptEngine = "freemarker",
         position = 600)
-@Messages(value = "applprop_displayName=Spring Boot application properties")
+@Messages(value = "applprop_displayName=Application properties")
 package com.github.alexfalappa.nbspringboot.templates.applproperties;
 
 import org.netbeans.api.templates.TemplateRegistration;
