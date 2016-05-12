@@ -47,6 +47,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     private static final int INNER_GAP = 2;
     private static final int INDENT = 10;
     private static final int GROUP_SPACE = 16;
+    private static final int TOOLTIP_WIDTH = 40;
     private boolean initialized = false;
     private final List<JCheckBox> chkBoxes = new ArrayList<>();
 
@@ -81,7 +82,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
                 JCheckBox ch1 = new JCheckBox(name);
                 ch1.setName(id);
                 ch1.putClientProperty(PROP_VERSION_RANGE, dn.path("versionRange").asText());
-                ch1.setToolTipText(description);
+                ch1.setToolTipText(wrap(description));
                 chkBoxes.add(ch1);
                 this.add(ch1, constraintsForFirstColumnCheckbox(row));
                 // second column (optional)
@@ -92,7 +93,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
                     description = dn.path("description").asText();
                     JCheckBox ch2 = new JCheckBox(name);
                     ch2.setName(id);
-                    ch2.setToolTipText(description);
+                    ch2.setToolTipText(wrap(description));
                     chkBoxes.add(ch2);
                     this.add(ch2, constraintsForSecondColumnCheckbox(row));
                 }
@@ -266,6 +267,25 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             }
         }
         return ret;
+    }
+
+    private String wrap(String description) {
+        StringBuilder sb = new StringBuilder("<html>");
+        String[] words = description.split(" ");
+        String w = words[0];
+        sb.append(w);
+        int len = w.length();
+        for (int i = 1; i < words.length; i++) {
+            w = words[i];
+            if (len + w.length() + 1 > TOOLTIP_WIDTH) {
+                sb.append("<br/>").append(w);
+                len = w.length();
+            } else {
+                sb.append(" ").append(w);
+                len += w.length() + 1;
+            }
+        }
+        return sb.toString();
     }
 
 }
