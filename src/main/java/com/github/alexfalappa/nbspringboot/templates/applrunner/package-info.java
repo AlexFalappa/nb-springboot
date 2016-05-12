@@ -16,13 +16,13 @@
 @TemplateRegistration(
         folder = "Spring Boot",
         iconBase = "com/github/alexfalappa/nbspringboot/templates/springboot-logo.png",
-        displayName = "#cmdlinerunner_displayName",
-        content = "CmdLineRunner.java.template",
+        displayName = "#applrunner_displayName",
+        content = "ApplRunner.java.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        position = 100)
-@Messages(value = "cmdlinerunner_displayName=Spring Boot CommandLineRunner")
-package com.github.alexfalappa.nbspringboot.templates.cmdlinerunner;
+        position = 200)
+@Messages(value = "applrunner_displayName=Spring Boot ApplicationRunner")
+package com.github.alexfalappa.nbspringboot.templates.applrunner;
 
 import org.netbeans.api.templates.TemplateRegistration;
 import org.openide.util.NbBundle.Messages;
