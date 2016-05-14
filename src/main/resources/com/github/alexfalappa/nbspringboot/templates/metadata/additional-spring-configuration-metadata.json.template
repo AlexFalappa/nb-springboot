@@ -1,0 +1,40 @@
+{
+    "properties": [
+        {
+            "name": "prefix.propertyname",
+            "type": "java.lang.String",
+            "sourceType": "com.example.MyProperties",
+            "description": "Description of the property.",
+            "defaultValue": "val",
+            "deprecation":{
+                "reason":"Deprecation reason",
+                "replacement":"prefix.otherproperty"
+            }
+        }
+    ],
+    "hints": [
+        {
+            "name": "prefix.propertyname",
+            "values": [
+                {
+                    "value": "one",
+                    "description": "First value."
+                },
+                {
+                    "value": "two",
+                    "description": "Second value."
+                },
+                {
+                    "value": "third",
+                    "description": "Third value."
+                }
+            ],
+            "providers":[
+                {              
+                    "name":"any"
+                }
+                
+            ]
+        }
+    ]
+}

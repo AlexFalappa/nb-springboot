@@ -1,0 +1,23 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "../Licenses/license-${project.license}.txt">
+<#if package?? && package != "">
+package ${package};
+
+</#if>
+import org.springframework.boot.ApplicationArguments;
+import org.springframework.boot.ApplicationRunner;
+
+/**
+ *
+ * @author ${user}
+ */
+public class ${name} implements ApplicationRunner {
+
+    @Override
+    public void run(ApplicationArguments aa) throws Exception {
+        
+    }
+
+}
