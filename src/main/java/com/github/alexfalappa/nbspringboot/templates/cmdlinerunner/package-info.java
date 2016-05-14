@@ -15,7 +15,7 @@
  */
 @TemplateRegistration(
         folder = "Spring Boot",
-        iconBase = "com/github/alexfalappa/nbspringboot/templates/springboot-logo.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/templates/cmdlinerunner/boot-class-file.png",
         displayName = "#cmdlinerunner_displayName",
         content = "CmdLineRunner.java.template",
         description = "description.html",

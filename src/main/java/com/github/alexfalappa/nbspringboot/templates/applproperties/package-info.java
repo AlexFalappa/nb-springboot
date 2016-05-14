@@ -15,7 +15,7 @@
  */
 @TemplateRegistration(
         folder = "Spring Boot",
-        iconBase = "com/github/alexfalappa/nbspringboot/templates/springboot-logo.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/templates/applproperties/boot-properties-file.png",
         displayName = "#applprop_displayName",
         content = "application.properties.template",
         description = "description.html",

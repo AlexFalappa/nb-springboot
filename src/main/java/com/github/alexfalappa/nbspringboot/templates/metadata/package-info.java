@@ -15,12 +15,12 @@
  */
 @TemplateRegistration(
         folder = "Spring Boot",
-        iconBase = "com/github/alexfalappa/nbspringboot/templates/springboot-logo.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/templates/metadata/boot-json-file.png",
         displayName = "#metadata_displayName",
         content = "additional-spring-configuration-metadata.json.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        position = 100)
+        position = 800)
 @Messages(value = "metadata_displayName=Additional properties metadata")
 package com.github.alexfalappa.nbspringboot.templates.metadata;
 

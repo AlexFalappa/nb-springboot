@@ -15,7 +15,7 @@
  */
 @TemplateRegistration(
         folder = "Spring Boot",
-        iconBase = "com/github/alexfalappa/nbspringboot/templates/springboot-logo.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/templates/applrunner/boot-class-file.png",
         displayName = "#applrunner_displayName",
         content = "ApplRunner.java.template",
         description = "description.html",
