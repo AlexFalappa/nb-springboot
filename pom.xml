@@ -69,7 +69,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
-            <version>${netbeans.api.version}</version>
+            <version>RELEASE81</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -115,6 +115,16 @@
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-nodes</artifactId>
             <version>${netbeans.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-editor-lib2</artifactId>
+            <version>RELEASE81</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-editor-mimelookup</artifactId>
+            <version>RELEASE81</version>
         </dependency>
     </dependencies>
 

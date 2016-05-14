@@ -1,0 +1,68 @@
+/*
+ * Copyright 2016 sasha.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package com.github.alexfalappa.nbspringboot.codegen;
+
+import java.util.Collections;
+import java.util.List;
+
+import javax.swing.text.JTextComponent;
+
+import org.netbeans.api.editor.mimelookup.MimeRegistration;
+import org.netbeans.spi.editor.codegen.CodeGenerator;
+import org.openide.util.Lookup;
+
+public class DevToolsGenerator implements CodeGenerator {
+
+    private final String SNIPPET = "<dependency>\n"
+            + "            <groupId>org.springframework.boot</groupId>\n"
+            + "            <artifactId>spring-boot-devtools</artifactId>\n"
+            + "        </dependency>";
+    JTextComponent textComp;
+
+    /**
+     *
+     * @param context containing JTextComponent and possibly other items registered by {@link CodeGeneratorContextProvider}
+     */
+    private DevToolsGenerator(Lookup context) { // Good practice is not to save Lookup outside ctor
+        textComp = context.lookup(JTextComponent.class);
+    }
+
+    @MimeRegistration(mimeType = "text/x-maven-pom+xml", position = 975, service = CodeGenerator.Factory.class)
+    public static class Factory implements CodeGenerator.Factory {
+
+        @Override
+        public List<? extends CodeGenerator> create(Lookup context) {
+            return Collections.singletonList(new DevToolsGenerator(context));
+        }
+    }
+
+    /**
+     * The name which will be inserted inside Insert Code dialog
+     */
+    @Override
+    public String getDisplayName() {
+        return "Springboot devtools";
+    }
+
+    /**
+     * This will be invoked when user chooses this Generator from Insert Code dialog
+     */
+    @Override
+    public void invoke() {
+        textComp.replaceSelection(SNIPPET);
+    }
+
+}
