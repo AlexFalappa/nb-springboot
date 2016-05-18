@@ -69,7 +69,7 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-openide-util-lookup</artifactId>
-            <version>RELEASE81</version>
+            <version>${netbeans.api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
@@ -119,12 +119,42 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-editor-lib2</artifactId>
-            <version>RELEASE81</version>
+            <version>${netbeans.api.version}</version>
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-editor-mimelookup</artifactId>
-            <version>RELEASE81</version>
+            <version>${netbeans.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-maven-model</artifactId>
+            <version>RELEASE691</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-maven-embedder</artifactId>
+            <version>RELEASE691</version>
+        </dependency>
+        <!--        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-maven-embedder</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>-->
+        <!--        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-maven-grammar</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>-->
+        <!--        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-maven</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>-->
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-xml-xam</artifactId>
+            <version>${netbeans.api.version}</version>
         </dependency>
     </dependencies>
 
@@ -159,6 +189,19 @@
                 <artifactId>nbm-maven-plugin</artifactId>
                 <version>3.13</version>
                 <extensions>true</extensions>
+                <configuration>
+                    <moduleDependencies>
+                        <dependency>
+                            <id>org.netbeans.modules:org-netbeans-modules-maven-model</id>
+                            <type>impl</type>
+                        </dependency>
+                        <dependency>
+                            <id>org.netbeans.modules:org-netbeans-modules-maven-embedder</id>
+                            <type>impl</type>
+                            <explicitValue>org.netbeans.modules.maven.embedder/2 = 2.51.1</explicitValue>
+                        </dependency>
+                    </moduleDependencies>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -179,6 +222,13 @@
             </plugin>
         </plugins>
     </build>
+
+    <licenses>
+        <license>
+            <name>Apache License 2.0</name>
+            <url>http://opensource.org/licenses/Apache-2.0</url>
+        </license>
+    </licenses>
 
     <repositories>
         <repository>

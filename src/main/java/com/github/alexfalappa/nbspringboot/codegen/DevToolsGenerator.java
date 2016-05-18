@@ -15,37 +15,84 @@
  */
 package com.github.alexfalappa.nbspringboot.codegen;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.text.JTextComponent;
 
 import org.netbeans.api.editor.mimelookup.MimeRegistration;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.modules.maven.model.pom.Dependency;
+import org.netbeans.modules.maven.model.pom.DependencyContainer;
+import org.netbeans.modules.maven.model.pom.POMModel;
+import org.netbeans.modules.xml.xam.Component;
 import org.netbeans.spi.editor.codegen.CodeGenerator;
+import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
-public class DevToolsGenerator implements CodeGenerator {
+public class DevToolsGenerator extends AbstractGenerator<POMModel> {
 
-    private final String SNIPPET = "<dependency>\n"
-            + "            <groupId>org.springframework.boot</groupId>\n"
-            + "            <artifactId>spring-boot-devtools</artifactId>\n"
-            + "        </dependency>";
-    JTextComponent textComp;
-
-    /**
-     *
-     * @param context containing JTextComponent and possibly other items registered by {@link CodeGeneratorContextProvider}
-     */
-    private DevToolsGenerator(Lookup context) { // Good practice is not to save Lookup outside ctor
-        textComp = context.lookup(JTextComponent.class);
+    private DevToolsGenerator(POMModel model, JTextComponent component) {
+        super(model, component);
     }
 
-    @MimeRegistration(mimeType = "text/x-maven-pom+xml", position = 975, service = CodeGenerator.Factory.class)
+    @Override
+    protected void doInvoke() {
+        FileObject fo = model.getModelSource().getLookup().lookup(FileObject.class);
+        assert fo != null;
+        org.netbeans.api.project.Project prj = FileOwnerQuery.getOwner(fo);
+        assert prj != null;
+        int pos = component.getCaretPosition();
+        final String groupId = "org.springframework.boot";
+        final String artifactId = "spring-boot-devtools";
+//            final String version = ret[2];
+//            final String scope = ret[3];
+//            final String type = ret[4];
+        final String classifier = "jar";
+        writeModel(new ModelWriter() {
+            @Override
+            public int write() {
+                int pos = component.getCaretPosition();
+                DependencyContainer container = findContainer(pos, model);
+                Dependency dep = container.findDependencyById(groupId, artifactId, classifier);
+                if (dep == null) {
+                    dep = model.getFactory().createDependency();
+                    dep.setGroupId(groupId);
+                    dep.setArtifactId(artifactId);
+//                    dep.setVersion(version);
+//                    dep.setScope(scope);
+//                    dep.setType(type);
+                    dep.setClassifier(classifier);
+                    container.addDependency(dep);
+                }
+                return dep.getModel().getAccess().findPosition(dep.getPeer());
+            }
+
+            private DependencyContainer findContainer(int pos, POMModel model) {
+                Component dc = model.findComponent(pos);
+                while (dc != null) {
+                    if (dc instanceof DependencyContainer) {
+                        return (DependencyContainer) dc;
+                    }
+                    dc = dc.getParent();
+                }
+                return model.getProject();
+            }
+        });
+    }
+
+    @MimeRegistration(mimeType = "text/x-maven-pom+xml", service = CodeGenerator.Factory.class, position = 975)
     public static class Factory implements CodeGenerator.Factory {
 
         @Override
         public List<? extends CodeGenerator> create(Lookup context) {
-            return Collections.singletonList(new DevToolsGenerator(context));
+            ArrayList<CodeGenerator> toRet = new ArrayList<>();
+            POMModel model = context.lookup(POMModel.class);
+            JTextComponent component = context.lookup(JTextComponent.class);
+            if (model != null) {
+                toRet.add(new DevToolsGenerator(model, component));
+            }
+            return toRet;
         }
     }
 
@@ -55,14 +102,6 @@ public class DevToolsGenerator implements CodeGenerator {
     @Override
     public String getDisplayName() {
         return "Springboot devtools";
-    }
-
-    /**
-     * This will be invoked when user chooses this Generator from Insert Code dialog
-     */
-    @Override
-    public void invoke() {
-        textComp.replaceSelection(SNIPPET);
     }
 
 }
