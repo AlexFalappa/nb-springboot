@@ -32,53 +32,11 @@ import org.openide.util.Lookup;
 
 public class DevToolsGenerator extends AbstractGenerator<POMModel> {
 
+    private final String GROUP_ID = "org.springframework.boot";
+    private final String ARTIFACT_ID = "spring-boot-devtools";
+
     private DevToolsGenerator(POMModel model, JTextComponent component) {
         super(model, component);
-    }
-
-    @Override
-    protected void doInvoke() {
-        FileObject fo = model.getModelSource().getLookup().lookup(FileObject.class);
-        assert fo != null;
-        org.netbeans.api.project.Project prj = FileOwnerQuery.getOwner(fo);
-        assert prj != null;
-        int pos = component.getCaretPosition();
-        final String groupId = "org.springframework.boot";
-        final String artifactId = "spring-boot-devtools";
-//            final String version = ret[2];
-//            final String scope = ret[3];
-//            final String type = ret[4];
-        final String classifier = "jar";
-        writeModel(new ModelWriter() {
-            @Override
-            public int write() {
-                int pos = component.getCaretPosition();
-                DependencyContainer container = findContainer(pos, model);
-                Dependency dep = container.findDependencyById(groupId, artifactId, classifier);
-                if (dep == null) {
-                    dep = model.getFactory().createDependency();
-                    dep.setGroupId(groupId);
-                    dep.setArtifactId(artifactId);
-//                    dep.setVersion(version);
-//                    dep.setScope(scope);
-//                    dep.setType(type);
-                    dep.setClassifier(classifier);
-                    container.addDependency(dep);
-                }
-                return dep.getModel().getAccess().findPosition(dep.getPeer());
-            }
-
-            private DependencyContainer findContainer(int pos, POMModel model) {
-                Component dc = model.findComponent(pos);
-                while (dc != null) {
-                    if (dc instanceof DependencyContainer) {
-                        return (DependencyContainer) dc;
-                    }
-                    dc = dc.getParent();
-                }
-                return model.getProject();
-            }
-        });
     }
 
     @MimeRegistration(mimeType = "text/x-maven-pom+xml", service = CodeGenerator.Factory.class, position = 975)
@@ -101,7 +59,41 @@ public class DevToolsGenerator extends AbstractGenerator<POMModel> {
      */
     @Override
     public String getDisplayName() {
-        return "Springboot devtools";
+        return "Spring Boot devtools";
+    }
+
+    @Override
+    protected void doInvoke() {
+        FileObject fo = model.getModelSource().getLookup().lookup(FileObject.class);
+        assert fo != null;
+        org.netbeans.api.project.Project prj = FileOwnerQuery.getOwner(fo);
+        assert prj != null;
+        writeModel(new ModelWriter() {
+            @Override
+            public int write() {
+                int pos = component.getCaretPosition();
+                DependencyContainer container = findContainer(pos, model);
+                Dependency dep = container.findDependencyById(GROUP_ID, ARTIFACT_ID, "jar");
+                if (dep == null) {
+                    dep = model.getFactory().createDependency();
+                    dep.setGroupId(GROUP_ID);
+                    dep.setArtifactId(ARTIFACT_ID);
+                    container.addDependency(dep);
+                }
+                return dep.getModel().getAccess().findPosition(dep.getPeer());
+            }
+
+            private DependencyContainer findContainer(int pos, POMModel model) {
+                Component dc = model.findComponent(pos);
+                while (dc != null) {
+                    if (dc instanceof DependencyContainer) {
+                        return (DependencyContainer) dc;
+                    }
+                    dc = dc.getParent();
+                }
+                return model.getProject();
+            }
+        });
     }
 
 }

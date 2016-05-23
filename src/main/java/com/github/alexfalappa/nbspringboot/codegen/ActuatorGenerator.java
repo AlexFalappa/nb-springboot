@@ -15,29 +15,28 @@
  */
 package com.github.alexfalappa.nbspringboot.codegen;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.text.JTextComponent;
 
 import org.netbeans.api.editor.mimelookup.MimeRegistration;
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.modules.maven.model.pom.Dependency;
+import org.netbeans.modules.maven.model.pom.DependencyContainer;
+import org.netbeans.modules.maven.model.pom.POMModel;
+import org.netbeans.modules.xml.xam.Component;
 import org.netbeans.spi.editor.codegen.CodeGenerator;
+import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
-public class ActuatorGenerator implements CodeGenerator {
+public class ActuatorGenerator extends AbstractGenerator<POMModel> {
 
-    private final String SNIPPET = "<dependency>\n"
-            + "            <groupId>org.springframework.boot</groupId>\n"
-            + "            <artifactId>spring-boot-starter-actuator</artifactId>\n"
-            + "        </dependency>";
-    JTextComponent textComp;
+    private final String GROUP_ID = "org.springframework.boot";
+    private final String ARTIFACT_ID = "spring-boot-actuator";
 
-    /**
-     *
-     * @param context containing JTextComponent and possibly other items registered by {@link CodeGeneratorContextProvider}
-     */
-    private ActuatorGenerator(Lookup context) { // Good practice is not to save Lookup outside ctor
-        textComp = context.lookup(JTextComponent.class);
+    private ActuatorGenerator(POMModel model, JTextComponent component) {
+        super(model, component);
     }
 
     @MimeRegistration(mimeType = "text/x-maven-pom+xml", position = 1000, service = CodeGenerator.Factory.class)
@@ -45,7 +44,13 @@ public class ActuatorGenerator implements CodeGenerator {
 
         @Override
         public List<? extends CodeGenerator> create(Lookup context) {
-            return Collections.singletonList(new ActuatorGenerator(context));
+            ArrayList<CodeGenerator> toRet = new ArrayList<>();
+            POMModel model = context.lookup(POMModel.class);
+            JTextComponent component = context.lookup(JTextComponent.class);
+            if (model != null) {
+                toRet.add(new ActuatorGenerator(model, component));
+            }
+            return toRet;
         }
     }
 
@@ -54,15 +59,41 @@ public class ActuatorGenerator implements CodeGenerator {
      */
     @Override
     public String getDisplayName() {
-        return "Springboot actuator";
+        return "Spring Boot actuator";
     }
 
-    /**
-     * This will be invoked when user chooses this Generator from Insert Code dialog
-     */
     @Override
-    public void invoke() {
-        textComp.replaceSelection(SNIPPET);
+    protected void doInvoke() {
+        FileObject fo = model.getModelSource().getLookup().lookup(FileObject.class);
+        assert fo != null;
+        org.netbeans.api.project.Project prj = FileOwnerQuery.getOwner(fo);
+        assert prj != null;
+        writeModel(new ModelWriter() {
+            @Override
+            public int write() {
+                int pos = component.getCaretPosition();
+                DependencyContainer container = findContainer(pos, model);
+                Dependency dep = container.findDependencyById(GROUP_ID, ARTIFACT_ID, "jar");
+                if (dep == null) {
+                    dep = model.getFactory().createDependency();
+                    dep.setGroupId(GROUP_ID);
+                    dep.setArtifactId(ARTIFACT_ID);
+                    container.addDependency(dep);
+                }
+                return dep.getModel().getAccess().findPosition(dep.getPeer());
+            }
+
+            private DependencyContainer findContainer(int pos, POMModel model) {
+                Component dc = model.findComponent(pos);
+                while (dc != null) {
+                    if (dc instanceof DependencyContainer) {
+                        return (DependencyContainer) dc;
+                    }
+                    dc = dc.getParent();
+                }
+                return model.getProject();
+            }
+        });
     }
 
 }
