@@ -127,30 +127,15 @@
             <version>${netbeans.api.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.netbeans.api</groupId>
+            <groupId>org.netbeans.modules</groupId>
             <artifactId>org-netbeans-modules-maven-model</artifactId>
-            <version>RELEASE691</version>
+            <version>${netbeans.api.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.netbeans.api</groupId>
+            <groupId>org.netbeans.modules</groupId>
             <artifactId>org-netbeans-modules-maven-embedder</artifactId>
-            <version>RELEASE691</version>
+            <version>${netbeans.api.version}</version>
         </dependency>
-        <!--        <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-modules-maven-embedder</artifactId>
-            <version>${netbeans.api.version}</version>
-        </dependency>-->
-        <!--        <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-modules-maven-grammar</artifactId>
-            <version>${netbeans.api.version}</version>
-        </dependency>-->
-        <!--        <dependency>
-            <groupId>org.netbeans.modules</groupId>
-            <artifactId>org-netbeans-modules-maven</artifactId>
-            <version>${netbeans.api.version}</version>
-        </dependency>-->
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-xml-xam</artifactId>
@@ -198,7 +183,6 @@
                         <dependency>
                             <id>org.netbeans.modules:org-netbeans-modules-maven-embedder</id>
                             <type>impl</type>
-                            <explicitValue>org.netbeans.modules.maven.embedder/2 = 2.51.1</explicitValue>
                         </dependency>
                     </moduleDependencies>
                 </configuration>
