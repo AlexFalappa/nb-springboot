@@ -4,7 +4,7 @@
 
     <groupId>com.github.alexfalappa</groupId>
     <artifactId>nb-springboot-plugin</artifactId>
-    <version>0.3</version>
+    <version>0.4</version>
     <packaging>nbm</packaging>
 
     <properties>
