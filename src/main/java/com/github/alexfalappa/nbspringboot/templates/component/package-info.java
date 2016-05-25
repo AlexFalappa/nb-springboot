@@ -21,7 +21,7 @@
         description = "description.html",
         scriptEngine = "freemarker",
         position = 200)
-@Messages(value = "component_displayName=Spring component class")
+@Messages(value = "component_displayName=Component class")
 package com.github.alexfalappa.nbspringboot.templates.component;
 
 import org.netbeans.api.templates.TemplateRegistration;

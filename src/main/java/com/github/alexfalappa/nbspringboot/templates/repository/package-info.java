@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 @TemplateRegistration(
-        folder = "Spring",
-        iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-class-file.png",
-        displayName = "#config_displayName",
-        content = "Configuration.java.template",
+        folder = "Spring Data",
+        iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-data-logo.png",
+        displayName = "#repo_displayName",
+        content = "Repository.java.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        position = 100)
-@Messages(value = "config_displayName=Configuration class")
-package com.github.alexfalappa.nbspringboot.templates.config;
+        position = 400)
+@Messages(value = "repo_displayName=Repository interface")
+package com.github.alexfalappa.nbspringboot.templates.repository;
 
 import org.netbeans.api.templates.TemplateRegistration;
 import org.openide.util.NbBundle.Messages;

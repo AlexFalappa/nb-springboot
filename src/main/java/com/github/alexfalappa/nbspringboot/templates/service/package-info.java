@@ -21,7 +21,7 @@
         description = "description.html",
         scriptEngine = "freemarker",
         position = 300)
-@Messages(value = "service_displayName=Spring service class")
+@Messages(value = "service_displayName=Service class")
 package com.github.alexfalappa.nbspringboot.templates.service;
 
 import org.netbeans.api.templates.TemplateRegistration;

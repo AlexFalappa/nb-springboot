@@ -14,15 +14,15 @@
  * limitations under the License.
  */
 @TemplateRegistration(
-        folder = "Spring",
+        folder = "Spring MVC",
         iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-class-file.png",
-        displayName = "#config_displayName",
-        content = "Configuration.java.template",
+        displayName = "#rest_displayName",
+        content = "RestController.java.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        position = 100)
-@Messages(value = "config_displayName=Configuration class")
-package com.github.alexfalappa.nbspringboot.templates.config;
+        position = 600)
+@Messages(value = "rest_displayName=REST controller class")
+package com.github.alexfalappa.nbspringboot.templates.restcontroller;
 
 import org.netbeans.api.templates.TemplateRegistration;
 import org.openide.util.NbBundle.Messages;
