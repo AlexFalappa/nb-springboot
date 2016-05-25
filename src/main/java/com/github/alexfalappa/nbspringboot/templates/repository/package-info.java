@@ -20,7 +20,7 @@
         content = "Repository.java.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        position = 400)
+        position = 100)
 @Messages(value = "repo_displayName=Repository interface")
 package com.github.alexfalappa.nbspringboot.templates.repository;
 

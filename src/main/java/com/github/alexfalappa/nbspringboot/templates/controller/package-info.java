@@ -20,7 +20,7 @@
         content = "Controller.java.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        position = 500)
+        position = 100)
 @Messages(value = "controller_displayName=Controller class")
 package com.github.alexfalappa.nbspringboot.templates.controller;
 

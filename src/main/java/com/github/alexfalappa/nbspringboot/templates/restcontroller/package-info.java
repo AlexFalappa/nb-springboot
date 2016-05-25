@@ -20,7 +20,7 @@
         content = "RestController.java.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        position = 600)
+        position = 200)
 @Messages(value = "rest_displayName=REST controller class")
 package com.github.alexfalappa.nbspringboot.templates.restcontroller;
 
