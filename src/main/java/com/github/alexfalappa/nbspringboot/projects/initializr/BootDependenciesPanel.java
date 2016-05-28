@@ -93,6 +93,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
                     description = dn.path("description").asText();
                     JCheckBox ch2 = new JCheckBox(name);
                     ch2.setName(id);
+                    ch2.putClientProperty(PROP_VERSION_RANGE, dn.path("versionRange").asText());
                     ch2.setToolTipText(wrap(description));
                     chkBoxes.add(ch2);
                     this.add(ch2, constraintsForSecondColumnCheckbox(row));
@@ -233,6 +234,11 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             String verRange = (String) cb.getClientProperty(PROP_VERSION_RANGE);
             final boolean allowable = allowable(verRange, bootVersion);
             cb.setEnabled(allowable);
+            if (allowable) {
+                System.out.format("%s allowed with %s%n", cb.getName(), verRange);
+            } else {
+                System.out.format("%s NOT allowed with %s%n", cb.getName(), verRange);
+            }
         }
     }
 
