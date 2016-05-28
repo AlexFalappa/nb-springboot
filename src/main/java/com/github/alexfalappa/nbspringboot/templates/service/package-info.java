@@ -15,7 +15,7 @@
  */
 @TemplateRegistration(
         folder = "Spring",
-        iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-class-file.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-class.png",
         displayName = "#service_displayName",
         content = "Service.java.template",
         description = "description.html",

@@ -15,7 +15,7 @@
  */
 @TemplateRegistration(
         folder = "Spring Data",
-        iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-data-logo.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/templates/repository-interface.png",
         displayName = "#repo_displayName",
         content = "Repository.java.template",
         description = "description.html",

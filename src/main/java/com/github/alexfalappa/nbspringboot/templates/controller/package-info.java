@@ -15,7 +15,7 @@
  */
 @TemplateRegistration(
         folder = "Spring MVC",
-        iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-class-file.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-class.png",
         displayName = "#controller_displayName",
         content = "Controller.java.template",
         description = "description.html",
