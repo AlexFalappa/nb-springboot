@@ -6,7 +6,9 @@ NetBeans IDE plugin supporting programming with [Spring Boot](http://projects.sp
 ## Installation
 
 Download the `nbm` package from https://github.com/AlexFalappa/nb-springboot/releases.
+
 In NetBeans go to _Tools_ > _Plugins_ > _Downloaded_ and click on _Add Plugins..._ button.
+
 Choose the downloaded `nbm` package file then click _Install_.
 
 ## Features
@@ -31,7 +33,9 @@ Choose the downloaded `nbm` package file then click _Install_.
 ## Resources and Documentation
 
 Source: [GitHub project](http://github.com/AlexFalappa/nb-springboot)
+
 Bug tracking: [GitHub Issues](http://)
+
 Documentation: [GitHub Wiki](http://)
 
 
@@ -43,6 +47,7 @@ The plugin and its source code are licensed under [Apache 2.0 license](http://ww
 ## Acknowledgements
 
 Completion of Spring Boot configuration properties feature is based on [Keevosh plugin](https://github.com/keevosh/nb-springboot-configuration-support).
+
 Template and code generator were inspired by those found on [Spring Boot Tools 4 NetBeans](https://github.com/GeertjanWielenga/SpringBootTools4NetBeans).
 
 
