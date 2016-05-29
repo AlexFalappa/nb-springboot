@@ -16,13 +16,13 @@
 @TemplateRegistration(
         folder = "Spring Boot",
         iconBase = "com/github/alexfalappa/nbspringboot/templates/boot-class.png",
-        displayName = "#applrunner_displayName",
-        content = "ApplRunner.java.template",
+        displayName = "#cfgprops_displayName",
+        content = "Properties.java.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        position = 600)
-@Messages(value = "applrunner_displayName=ApplicationRunner class")
-package com.github.alexfalappa.nbspringboot.templates.applrunner;
+        position = 200)
+@Messages(value = "cfgprops_displayName=Configuration properties class")
+package com.github.alexfalappa.nbspringboot.templates.configprops;
 
 import org.netbeans.api.templates.TemplateRegistration;
 import org.openide.util.NbBundle.Messages;

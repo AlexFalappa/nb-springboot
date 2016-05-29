@@ -20,7 +20,7 @@
         content = "additional-spring-configuration-metadata.json.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        position = 800)
+        position = 1000)
 @Messages(value = "metadata_displayName=Additional properties metadata")
 package com.github.alexfalappa.nbspringboot.templates.metadata;
 

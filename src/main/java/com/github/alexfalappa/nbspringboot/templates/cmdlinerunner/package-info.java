@@ -15,12 +15,12 @@
  */
 @TemplateRegistration(
         folder = "Spring Boot",
-        iconBase = "com/github/alexfalappa/nbspringboot/templates/cmdlinerunner/boot-class-file.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/templates/boot-class.png",
         displayName = "#cmdlinerunner_displayName",
         content = "CmdLineRunner.java.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        position = 100)
+        position = 400)
 @Messages(value = "cmdlinerunner_displayName=CommandLineRunner class")
 package com.github.alexfalappa.nbspringboot.templates.cmdlinerunner;
 
