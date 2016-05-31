@@ -234,11 +234,6 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             String verRange = (String) cb.getClientProperty(PROP_VERSION_RANGE);
             final boolean allowable = allowable(verRange, bootVersion);
             cb.setEnabled(allowable);
-            if (allowable) {
-                System.out.format("%s allowed with %s%n", cb.getName(), verRange);
-            } else {
-                System.out.format("%s NOT allowed with %s%n", cb.getName(), verRange);
-            }
         }
     }
 
