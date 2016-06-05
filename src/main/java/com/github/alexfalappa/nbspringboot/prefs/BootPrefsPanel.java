@@ -69,7 +69,6 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         org.openide.awt.Mnemonics.setLocalizedText(lInitializrUrl, org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.lInitializrUrl.text")); // NOI18N
 
         txInitializrUrl.setColumns(20);
-        txInitializrUrl.setText(org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.txInitializrUrl.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(lInitializrTimeout, org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.lInitializrTimeout.text")); // NOI18N
 
