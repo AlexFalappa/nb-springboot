@@ -20,3 +20,8 @@ release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
 .mvn/timing.properties
+
+
+### NBM signing ###
+/keystore.jks
+/nbactions.xml

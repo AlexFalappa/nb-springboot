@@ -7,6 +7,9 @@
     <version>1.0</version>
     <packaging>nbm</packaging>
 
+    <name>NB SpringBoot</name>
+    <description>Spring Boot framework support for NetBeans</description>
+
     <properties>
         <netbeans.api.version>RELEASE81</netbeans.api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -172,9 +175,13 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>3.13</version>
+                <version>4.1</version>
                 <extensions>true</extensions>
                 <configuration>
+                    <licenseFile>LICENSE</licenseFile>
+                    <licenseName>Apache 2.0</licenseName>
+                    <keystore>keystore.jks</keystore>
+                    <keystorealias>AlexFalappa</keystorealias>
                     <moduleDependencies>
                         <dependency>
                             <id>org.netbeans.modules:org-netbeans-modules-maven-model</id>
@@ -206,6 +213,13 @@
             </plugin>
         </plugins>
     </build>
+
+    <url>https://github.com/AlexFalappa/nb-springboot</url>
+
+    <organization>
+        <name>Alessandro Falappa</name>
+        <url>https://github.com/AlexFalappa</url>
+    </organization>
 
     <licenses>
         <license>
