@@ -43,6 +43,7 @@ import static javax.swing.SwingConstants.HORIZONTAL;
 public class BootDependenciesPanel extends javax.swing.JPanel implements Scrollable {
 
     private static final String PROP_VERSION_RANGE = "versionRange";
+    private static final String PROP_DESCRIPTION = "boot.description";
     private static final int OUTER_GAP = 4;
     private static final int INNER_GAP = 2;
     private static final int INDENT = 10;
@@ -76,27 +77,11 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             for (int j = 0; j < valArray.size(); j++) {
                 // first column
                 JsonNode dn = valArray.get(j);
-                String name = dn.path("name").asText();
-                String id = dn.path("id").asText();
-                String description = dn.path("description").asText();
-                JCheckBox ch1 = new JCheckBox(name);
-                ch1.setName(id);
-                ch1.putClientProperty(PROP_VERSION_RANGE, dn.path("versionRange").asText());
-                ch1.setToolTipText(wrap(description));
-                chkBoxes.add(ch1);
-                this.add(ch1, constraintsForFirstColumnCheckbox(row));
+                this.add(checkBoxForNode(dn), constraintsForFirstColumnCheckbox(row));
                 // second column (optional)
                 if (++j < valArray.size()) {
                     dn = valArray.get(j);
-                    name = dn.path("name").asText();
-                    id = dn.path("id").asText();
-                    description = dn.path("description").asText();
-                    JCheckBox ch2 = new JCheckBox(name);
-                    ch2.setName(id);
-                    ch2.putClientProperty(PROP_VERSION_RANGE, dn.path("versionRange").asText());
-                    ch2.setToolTipText(wrap(description));
-                    chkBoxes.add(ch2);
-                    this.add(ch2, constraintsForSecondColumnCheckbox(row));
+                    this.add(checkBoxForNode(dn), constraintsForSecondColumnCheckbox(row));
                 }
                 row++;
             }
@@ -179,6 +164,19 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         return false;
     }
 
+    private JCheckBox checkBoxForNode(JsonNode dn) {
+        final String name = dn.path("name").asText();
+        final String id = dn.path("id").asText();
+        final String description = dn.path("description").asText();
+        final String versRange = dn.path("versionRange").asText();
+        JCheckBox ch = new JCheckBox(name);
+        ch.setName(id);
+        ch.putClientProperty(PROP_VERSION_RANGE, versRange);
+        ch.putClientProperty(PROP_DESCRIPTION, description);
+        chkBoxes.add(ch);
+        return ch;
+    }
+
     private GridBagConstraints constraintsForSecondColumnCheckbox(int row) {
         GridBagConstraints gbc;
         gbc = new java.awt.GridBagConstraints();
@@ -232,8 +230,10 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     void adaptToBootVersion(String bootVersion) {
         for (JCheckBox cb : chkBoxes) {
             String verRange = (String) cb.getClientProperty(PROP_VERSION_RANGE);
+            String description = (String) cb.getClientProperty(PROP_DESCRIPTION);
             final boolean allowable = allowable(verRange, bootVersion);
             cb.setEnabled(allowable);
+            cb.setToolTipText(prepTooltip(description, allowable, verRange));
         }
     }
 
@@ -270,7 +270,15 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         return ret;
     }
 
-    private String wrap(String description) {
+    private String prepTooltip(String description, boolean allowable, String versRange) {
+        StringBuilder sb = new StringBuilder(wrap(description));
+        if (!allowable) {
+            sb.append("<br/><i>").append(decode(versRange)).append("</i>");
+        }
+        return sb.toString();
+    }
+
+    private StringBuilder wrap(String description) {
         StringBuilder sb = new StringBuilder("<html>");
         String[] words = description.split(" ");
         String w = words[0];
@@ -284,6 +292,37 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             } else {
                 sb.append(" ").append(w);
                 len += w.length() + 1;
+            }
+        }
+        return sb;
+    }
+
+    private String decode(String verRange) {
+        StringBuilder sb = new StringBuilder();
+        if (verRange != null && !verRange.isEmpty()) {
+            if (verRange.indexOf('[') >= 0 || verRange.indexOf('(') >= 0
+                    || verRange.indexOf(']') >= 0 || verRange.indexOf(')') >= 0) {
+                // bounded range
+                String[] bounds = verRange.substring(1, verRange.length() - 1).split(",");
+                // check there are two bounds
+                if (bounds.length == 2) {
+                    sb.append(bounds[0]);
+                    if (verRange.startsWith("[")) {
+                        sb.append(" &lt;= ");
+                    } else if (verRange.startsWith("(")) {
+                        sb.append(" &lt; ");
+                    }
+                    sb.append("Version");
+                    if (verRange.endsWith("]")) {
+                        sb.append(" &gt;= ");
+                    } else if (verRange.endsWith(")")) {
+                        sb.append(" &gt; ");
+                    }
+                    sb.append(bounds[1]);
+                }
+            } else {
+                // unbounded range
+                sb.append("Version &gt;= ").append(verRange);
             }
         }
         return sb.toString();

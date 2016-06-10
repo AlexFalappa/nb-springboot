@@ -127,10 +127,6 @@ public class InitializrProjectPanelVisual2 extends JPanel {
             pBootDependencies.setSelectedDependenciesString((String) wd.getProperty(WIZ_DEPENDENCIES));
             cbBootVersion.setSelectedItem(wd.getProperty(WIZ_BOOT_VERSION));
         }
-//        final NamedItem bootVersionItem = (NamedItem) wd.getProperty(WIZ_BOOT_VERSION);
-//        if (bootVersionItem != null) {
-//            pBootDependencies.adaptToBootVersion(bootVersionItem.getId());
-//        }
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {
