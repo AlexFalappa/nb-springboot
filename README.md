@@ -21,11 +21,21 @@ Choose the downloaded `nbm` package file then click _Install_.
 * Enhanced properties file editor:
     * completion and documentation of configuration properties names
     * completion and documentation of configuration properties values (`hints` in configuration metadata)
-* File templates:
-    * _Spring Boot_ related files: `CommandlineRunner` annotated classes, `ApplicationRunner` annotated classes, `application.properties` files, `ConfigurationProperties` annotated classes, `additional-spring-configuration-metadata.json` files
-    * _Spring_ related files: `Component` annotated classes, `Configuration` annotated classes, `Service` annotated classes
-    * _Spring MVC_ related files: `Controller` and `RestController` annotated classes
-    * _Spring Data_ related files: interfaces extending `Repository`
+* _Spring Boot_ file templates:
+    * `CommandlineRunner` annotated classes
+    * `ApplicationRunner` annotated classes
+    * `application.properties` files
+    * `ConfigurationProperties` annotated classes
+    * `additional-spring-configuration-metadata.json` files
+* _Spring_ file templates:
+    * `Component` annotated classes
+    * `Configuration` annotated classes
+    * `Service` annotated classes
+* _Spring MVC_ file templates:
+    * `Controller` annotated classes
+    * `RestController` annotated classes
+* _Spring Data_ file templates:
+    * interfaces extending `Repository`
 * Code generators in `pom.xml` files:
     * Add spring configuration processor dependency
     * Add `spring-devtools` dependency
