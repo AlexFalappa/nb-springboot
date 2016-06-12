@@ -16,12 +16,15 @@
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
 import java.awt.Component;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
@@ -120,6 +123,10 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
                     .getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
             // unzip response
             unZipFile(stream, dir, (boolean) wiz.getProperty(WIZ_REMOVE_MVN_WRAPPER));
+            // optionally add custom maven actions configuration
+            if ((boolean) wiz.getProperty(WIZ_USE_SB_MVN_PLUGIN)) {
+                createNbActions(pkg, mvnName, dir);
+            }
             // Always open top dir as a project:
             resultSet.add(dir);
             // Look for nested projects to open as well:
@@ -307,6 +314,23 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
             writeFile(str, fo);
         }
 
+    }
+
+    private void createNbActions(String pkg, String mvnName, FileObject dir) throws IOException {
+        // build main class string
+        StringBuilder mainClass = new StringBuilder(pkg).append('.');
+        mainClass.append(mvnName.substring(0, 1).toUpperCase()).append(mvnName.substring(1));
+        mainClass.append("Application");
+        // substitute placeholder in template
+        FileObject fo = FileUtil.createData(dir, "nbactions.xml");
+        try (PrintWriter out = new PrintWriter(fo.getOutputStream())) {
+            try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(getClass().getResourceAsStream("nbactions.tmpl"), "UTF8"))) {
+                for (String line; (line = br.readLine()) != null;) {
+                    out.println(line.replace("$mainclass$", mainClass));
+                }
+            }
+        }
     }
 
 }
