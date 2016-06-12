@@ -16,12 +16,15 @@
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
 import java.awt.Component;
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
@@ -62,6 +65,8 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGE;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGING;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PROJ_LOCATION;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_REMOVE_MVN_WRAPPER;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_USE_SB_MVN_PLUGIN;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_VERSION;
 
 @TemplateRegistration(
@@ -117,7 +122,11 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
             InputStream stream = initializrService
                     .getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
             // unzip response
-            unZipFile(stream, dir);
+            unZipFile(stream, dir, (boolean) wiz.getProperty(WIZ_REMOVE_MVN_WRAPPER));
+            // optionally add custom maven actions configuration
+            if ((boolean) wiz.getProperty(WIZ_USE_SB_MVN_PLUGIN)) {
+                createNbActions(pkg, mvnName, dir);
+            }
             // Always open top dir as a project:
             resultSet.add(dir);
             // Look for nested projects to open as well:
@@ -147,13 +156,15 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
             // invoke initializr service to get metadata
             JsonNode metadata = initializrService.getMetadata();
             this.wiz.putProperty(WIZ_METADATA, metadata);
+            // set other defaults
+            this.wiz.putProperty(WIZ_USE_SB_MVN_PLUGIN, false);
+            this.wiz.putProperty(WIZ_REMOVE_MVN_WRAPPER, true);
             // create the normal panels
             panels = new WizardDescriptor.Panel[]{
                 new InitializrProjectWizardPanel1(),
                 new InitializrProjectWizardPanel2(),
                 new InitializrProjectWizardPanel3()
             };
-
             // Make sure list of steps is accurate.
             steps = createSteps();
         } catch (Exception ex) {
@@ -193,6 +204,9 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
         this.wiz.putProperty(WIZ_JAVA_VERSION, null);
         this.wiz.putProperty(WIZ_LANGUAGE, null);
         this.wiz.putProperty(WIZ_DEPENDENCIES, null);
+        this.wiz.putProperty(WIZ_PROJ_LOCATION, null);
+        this.wiz.putProperty(WIZ_USE_SB_MVN_PLUGIN, null);
+        this.wiz.putProperty(WIZ_REMOVE_MVN_WRAPPER, null);
         panels = null;
     }
 
@@ -241,16 +255,21 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
     public final void removeChangeListener(ChangeListener l) {
     }
 
-    private static void unZipFile(InputStream source, FileObject projectRoot) throws IOException {
+    private static void unZipFile(InputStream source, FileObject projectRoot, boolean removeMvnWrapper) throws IOException {
         try {
             ZipInputStream str = new ZipInputStream(source);
             ZipEntry entry;
             while ((entry = str.getNextEntry()) != null) {
+                final String entryName = entry.getName();
+                // optionally skip entries related to maven wrapper
+                if (removeMvnWrapper && (entryName.contains(".mvn") || entryName.contains("mvnw"))) {
+                    continue;
+                }
                 if (entry.isDirectory()) {
-                    FileUtil.createFolder(projectRoot, entry.getName());
+                    FileUtil.createFolder(projectRoot, entryName);
                 } else {
-                    FileObject fo = FileUtil.createData(projectRoot, entry.getName());
-                    if ("nbproject/project.xml".equals(entry.getName())) {
+                    FileObject fo = FileUtil.createData(projectRoot, entryName);
+                    if ("nbproject/project.xml".equals(entryName)) {
                         // Special handling for setting name of Ant-based projects; customize as needed:
                         filterProjectXML(fo, str, projectRoot.getName());
                     } else {
@@ -295,6 +314,23 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
             writeFile(str, fo);
         }
 
+    }
+
+    private void createNbActions(String pkg, String mvnName, FileObject dir) throws IOException {
+        // build main class string
+        StringBuilder mainClass = new StringBuilder(pkg).append('.');
+        mainClass.append(mvnName.substring(0, 1).toUpperCase()).append(mvnName.substring(1));
+        mainClass.append("Application");
+        // substitute placeholder in template
+        FileObject fo = FileUtil.createData(dir, "nbactions.xml");
+        try (PrintWriter out = new PrintWriter(fo.getOutputStream())) {
+            try (BufferedReader br = new BufferedReader(
+                    new InputStreamReader(getClass().getResourceAsStream("nbactions.tmpl"), "UTF8"))) {
+                for (String line; (line = br.readLine()) != null;) {
+                    out.println(line.replace("$mainclass$", mainClass));
+                }
+            }
+        }
     }
 
 }

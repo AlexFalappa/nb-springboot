@@ -28,8 +28,10 @@ import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.filesystems.FileUtil;
 
-import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PROJ_NAME;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PROJ_LOCATION;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PROJ_NAME;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_REMOVE_MVN_WRAPPER;
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_USE_SB_MVN_PLUGIN;
 
 public class InitializrProjectPanelVisual3 extends JPanel implements DocumentListener {
 
@@ -62,6 +64,8 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
         browseButton = new javax.swing.JButton();
         createdFolderLabel = new javax.swing.JLabel();
         createdFolderTextField = new javax.swing.JTextField();
+        chUseSBMavenPlugin = new javax.swing.JCheckBox();
+        chRemoveWrapper = new javax.swing.JCheckBox();
 
         projectNameLabel.setLabelFor(projectNameTextField);
         org.openide.awt.Mnemonics.setLocalizedText(projectNameLabel, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual3.class, "InitializrProjectPanelVisual3.projectNameLabel.text")); // NOI18N
@@ -82,6 +86,10 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
 
         createdFolderTextField.setEditable(false);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chUseSBMavenPlugin, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual3.class, "InitializrProjectPanelVisual3.chUseSBMavenPlugin.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(chRemoveWrapper, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual3.class, "InitializrProjectPanelVisual3.chRemoveWrapper.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -89,16 +97,23 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(projectNameLabel)
-                    .addComponent(projectLocationLabel)
-                    .addComponent(createdFolderLabel))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(projectNameTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
-                    .addComponent(projectLocationTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE)
-                    .addComponent(createdFolderTextField, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 191, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(browseButton)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(projectNameLabel)
+                            .addComponent(projectLocationLabel)
+                            .addComponent(createdFolderLabel))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(projectNameTextField, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(projectLocationTextField, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(createdFolderTextField, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(browseButton))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chUseSBMavenPlugin)
+                            .addComponent(chRemoveWrapper))
+                        .addGap(0, 126, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -117,7 +132,11 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(createdFolderLabel)
                     .addComponent(createdFolderTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(213, Short.MAX_VALUE))
+                .addGap(18, 18, 18)
+                .addComponent(chUseSBMavenPlugin)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chRemoveWrapper)
+                .addContainerGap(141, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -140,11 +159,12 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
             }
             panel.fireChangeEvent();
         }
-
     }//GEN-LAST:event_browseButtonActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
+    private javax.swing.JCheckBox chRemoveWrapper;
+    private javax.swing.JCheckBox chUseSBMavenPlugin;
     private javax.swing.JLabel createdFolderLabel;
     private javax.swing.JTextField createdFolderTextField;
     private javax.swing.JLabel projectLocationLabel;
@@ -161,10 +181,8 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
     }
 
     boolean valid(WizardDescriptor wizardDescriptor) {
-
         if (projectNameTextField.getText().length() == 0) {
-            // TODO if using org.openide.dialogs >= 7.8, can use WizardDescriptor.PROP_ERROR_MESSAGE:
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", "Project Name is not a valid folder name.");
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Project Name is not a valid folder name.");
             return false; // Display name not specified
         }
         File f = FileUtil.normalizeFile(new File(projectLocationTextField.getText()).getAbsoluteFile());
@@ -174,29 +192,26 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
             return false;
         }
         final File destFolder = FileUtil.normalizeFile(new File(createdFolderTextField.getText()).getAbsoluteFile());
-
         File projLoc = destFolder;
         while (projLoc != null && !projLoc.exists()) {
             projLoc = projLoc.getParentFile();
         }
         if (projLoc == null || !projLoc.canWrite()) {
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", "Project Folder cannot be created.");
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Project Folder cannot be created.");
             return false;
         }
-
         if (FileUtil.toFileObject(projLoc) == null) {
             String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", message);
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, message);
             return false;
         }
-
         File[] kids = destFolder.listFiles();
         if (destFolder.exists() && kids != null && kids.length > 0) {
             // Folder exists and is not empty
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", "Project Folder already exists and is not empty.");
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Project Folder already exists and is not empty.");
             return false;
         }
-        wizardDescriptor.putProperty("WizardPanel_errorMessage", "");
+        wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "");
         return true;
     }
 
@@ -205,6 +220,9 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
         String folder = createdFolderTextField.getText().trim();
         d.putProperty(WIZ_PROJ_NAME, name);
         d.putProperty(WIZ_PROJ_LOCATION, new File(folder));
+        d.putProperty(WIZ_USE_SB_MVN_PLUGIN, chUseSBMavenPlugin.isSelected());
+        d.putProperty(WIZ_REMOVE_MVN_WRAPPER, chRemoveWrapper.isSelected());
+
     }
 
     void read(WizardDescriptor settings) {
@@ -215,13 +233,14 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
             projectLocation = projectLocation.getParentFile();
         }
         this.projectLocationTextField.setText(projectLocation.getAbsolutePath());
-
         String projectName = (String) settings.getProperty(WIZ_PROJ_NAME);
         if (projectName == null) {
             projectName = "InitializrSpringbootProject";
         }
         this.projectNameTextField.setText(projectName);
         this.projectNameTextField.selectAll();
+        this.chUseSBMavenPlugin.setSelected((boolean) settings.getProperty(WIZ_USE_SB_MVN_PLUGIN));
+        this.chRemoveWrapper.setSelected((boolean) settings.getProperty(WIZ_REMOVE_MVN_WRAPPER));
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {
@@ -255,19 +274,14 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
 
     /** Handles changes in the Project name and project directory, */
     private void updateTexts(DocumentEvent e) {
-
         Document doc = e.getDocument();
-
         if (doc == projectNameTextField.getDocument() || doc == projectLocationTextField.getDocument()) {
             // Change in the project name
-
             String projectName = projectNameTextField.getText();
             String projectFolder = projectLocationTextField.getText();
-
             //if (projectFolder.trim().length() == 0 || projectFolder.equals(oldName)) {
             createdFolderTextField.setText(projectFolder + File.separatorChar + projectName);
             //}
-
         }
         panel.fireChangeEvent(); // Notify that the panel changed
     }
