@@ -7,11 +7,13 @@ package ${package};
 
 </#if>
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author ${user}
  */
+@Component
 public class ${name} implements CommandLineRunner{
 
     @Override
