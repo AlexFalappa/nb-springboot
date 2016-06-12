@@ -287,7 +287,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         for (int i = 1; i < words.length; i++) {
             w = words[i];
             if (len + w.length() + 1 > TOOLTIP_WIDTH) {
-                sb.append("<br/>").append(w);
+                sb.append("<br/><br/>").append(w);
                 len = w.length();
             } else {
                 sb.append(" ").append(w);
@@ -312,7 +312,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
                     } else if (verRange.startsWith("(")) {
                         sb.append(" &lt; ");
                     }
-                    sb.append("Version");
+                    sb.append("Boot version");
                     if (verRange.endsWith("]")) {
                         sb.append(" &gt;= ");
                     } else if (verRange.endsWith(")")) {
@@ -322,7 +322,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
                 }
             } else {
                 // unbounded range
-                sb.append("Version &gt;= ").append(verRange);
+                sb.append("Boot version &gt;= ").append(verRange);
             }
         }
         return sb.toString();
