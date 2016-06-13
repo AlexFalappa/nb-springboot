@@ -166,7 +166,6 @@ public class InitializrProjectPanelVisual2 extends JPanel {
 
     private void clearFilter() {
         txFilter.setText(null);
-        pBootDependencies.clearFilter();
     }
 
     private class FilterFieldListener extends KeyAdapter implements DocumentListener {
@@ -179,25 +178,21 @@ public class InitializrProjectPanelVisual2 extends JPanel {
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            System.out.println("changedUpdate");
             doFilter();
         }
 
         @Override
         public void insertUpdate(DocumentEvent e) {
-            System.out.println("insertUpdate");
             doFilter();
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            System.out.println("removeUpdate");
             doFilter();
         }
 
         @Override
         public void keyPressed(KeyEvent e) {
-            System.out.println("keyPressed");
             if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
                 clearFilter();
                 e.consume();

@@ -346,16 +346,15 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     }
 
     void filter(String text) {
-        System.out.println("filter for " + String.valueOf(text));
         this.removeAll();
-        for (int i = 0; i < grpLabels.size(); i++) {
-            JLabel lGroup = grpLabels.get(i);
+        int cg = 1;
+        for (JLabel lGroup : grpLabels) {
             List<JCheckBox> cbList = cbFilter(lGroup.getText(), text);
             if (!cbList.isEmpty()) {
-                this.add(lGroup, constraintsForGroupLabel(i == 0));
-                int c = 1;
+                this.add(lGroup, constraintsForGroupLabel(cg++ == 0));
+                int cd = 1;
                 for (JCheckBox cb : cbList) {
-                    if (c++ % 2 == 0) {
+                    if (cd++ % 2 == 0) {
                         this.add(cb, constraintsForSecondColumnCheckbox());
                     } else {
                         this.add(cb, constraintsForFirstColumnCheckbox());
