@@ -22,8 +22,10 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -50,7 +52,8 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     private static final int GROUP_SPACE = 16;
     private static final int TOOLTIP_WIDTH = 40;
     private boolean initialized = false;
-    private final List<JCheckBox> chkBoxes = new ArrayList<>();
+    private final Map<String, List<JCheckBox>> chkBoxesMap = new HashMap<>();
+    private final List<JLabel> grpLabels = new ArrayList<>();
 
     public BootDependenciesPanel() {
         initComponents();
@@ -64,26 +67,25 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             this.remove(lNotInitialized);
         }
         // prepare dependencies checkboxes
-        int row = 0;
         for (int i = 0; i < nodeNum; i++) {
             JsonNode gn = depArray.get(i);
+            final String groupName = gn.path("name").asText();
             // group label
-            JLabel lGroup = new JLabel(gn.path("name").asText());
+            JLabel lGroup = new JLabel(groupName);
             lGroup.setFont(lGroup.getFont().deriveFont(Font.BOLD, lGroup.getFont().getSize() + 2));
-            this.add(lGroup, constraintsForGroupLabel(row));
-            row++;
+            grpLabels.add(lGroup);
+            this.add(lGroup, constraintsForGroupLabel(i == 0));
             // starter checkboxes in two columns
             final JsonNode valArray = gn.path("values");
             for (int j = 0; j < valArray.size(); j++) {
                 // first column
                 JsonNode dn = valArray.get(j);
-                this.add(checkBoxForNode(dn), constraintsForFirstColumnCheckbox(row));
+                this.add(checkBoxForNode(groupName, dn), constraintsForFirstColumnCheckbox());
                 // second column (optional)
                 if (++j < valArray.size()) {
                     dn = valArray.get(j);
-                    this.add(checkBoxForNode(dn), constraintsForSecondColumnCheckbox(row));
+                    this.add(checkBoxForNode(groupName, dn), constraintsForSecondColumnCheckbox());
                 }
-                row++;
             }
         }
         initialized = true;
@@ -91,9 +93,11 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
 
     public String getSelectedDependenciesString() {
         StringBuilder sb = new StringBuilder();
-        for (JCheckBox ch : chkBoxes) {
-            if (ch.isEnabled() && ch.isSelected()) {
-                sb.append(ch.getName()).append(',');
+        for (List<JCheckBox> chList : chkBoxesMap.values()) {
+            for (JCheckBox cb : chList) {
+                if (cb.isEnabled() && cb.isSelected()) {
+                    sb.append(cb.getName()).append(',');
+                }
             }
         }
         // remove last comma (if present)
@@ -105,16 +109,20 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
 
     void setSelectedDependenciesString(String deps) {
         HashSet<String> hs = new HashSet<>(Arrays.asList(deps.split(",")));
-        for (JCheckBox cb : chkBoxes) {
-            cb.setSelected(hs.contains(cb.getName()));
+        for (List<JCheckBox> chList : chkBoxesMap.values()) {
+            for (JCheckBox cb : chList) {
+                cb.setSelected(hs.contains(cb.getName()));
+            }
         }
     }
 
     public List<String> getSelectedDependencies() {
         List<String> ret = new ArrayList<>();
-        for (JCheckBox ch : chkBoxes) {
-            if (ch.isEnabled() && ch.isSelected()) {
-                ret.add(ch.getName());
+        for (List<JCheckBox> chList : chkBoxesMap.values()) {
+            for (JCheckBox cb : chList) {
+                if (cb.isEnabled() && cb.isSelected()) {
+                    ret.add(cb.getName());
+                }
             }
         }
         return ret;
@@ -122,8 +130,10 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
 
     void setSelectedDependencies(List<String> deps) {
         HashSet<String> hs = new HashSet<>(deps);
-        for (JCheckBox cb : chkBoxes) {
-            cb.setSelected(hs.contains(cb.getName()));
+        for (List<JCheckBox> chList : chkBoxesMap.values()) {
+            for (JCheckBox cb : chList) {
+                cb.setSelected(hs.contains(cb.getName()));
+            }
         }
     }
 
@@ -164,7 +174,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         return false;
     }
 
-    private JCheckBox checkBoxForNode(JsonNode dn) {
+    private JCheckBox checkBoxForNode(String group, JsonNode dn) {
         final String name = dn.path("name").asText();
         final String id = dn.path("id").asText();
         final String description = dn.path("description").asText();
@@ -173,37 +183,38 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         ch.setName(id);
         ch.putClientProperty(PROP_VERSION_RANGE, versRange);
         ch.putClientProperty(PROP_DESCRIPTION, description);
-        chkBoxes.add(ch);
+        if (!chkBoxesMap.containsKey(group)) {
+            chkBoxesMap.put(group, new ArrayList<JCheckBox>());
+        }
+        chkBoxesMap.get(group).add(ch);
         return ch;
     }
 
-    private GridBagConstraints constraintsForSecondColumnCheckbox(int row) {
+    private GridBagConstraints constraintsForSecondColumnCheckbox() {
         GridBagConstraints gbc;
         gbc = new java.awt.GridBagConstraints();
         gbc.gridx = 1;
-        gbc.gridy = row;
-        gbc.insets = new Insets(INNER_GAP, INNER_GAP, 0, 0);
-        gbc.anchor = GridBagConstraints.LINE_START;
-        return gbc;
-    }
-
-    private GridBagConstraints constraintsForFirstColumnCheckbox(int row) {
-        GridBagConstraints gbc;
-        gbc = new java.awt.GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.gridy = row;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.insets = new Insets(INNER_GAP, INDENT, 0, 0);
         gbc.anchor = GridBagConstraints.LINE_START;
         return gbc;
     }
 
-    private GridBagConstraints constraintsForGroupLabel(int row) {
+    private GridBagConstraints constraintsForFirstColumnCheckbox() {
+        GridBagConstraints gbc;
+        gbc = new java.awt.GridBagConstraints();
+        gbc.gridx = 0;
+        gbc.insets = new Insets(INNER_GAP, INDENT, 0, 0);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        return gbc;
+    }
+
+    private GridBagConstraints constraintsForGroupLabel(boolean first) {
         GridBagConstraints gbc = new java.awt.GridBagConstraints();
         gbc.gridx = 0;
-        gbc.gridy = row;
-        gbc.gridwidth = 2;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = (row == 0) ? new Insets(OUTER_GAP, OUTER_GAP, 0, OUTER_GAP) : new Insets(GROUP_SPACE, OUTER_GAP, 0, OUTER_GAP);
+        gbc.insets = (first) ? new Insets(OUTER_GAP, OUTER_GAP, 0, OUTER_GAP) : new Insets(GROUP_SPACE, OUTER_GAP, 0, OUTER_GAP);
         return gbc;
     }
 
@@ -228,12 +239,14 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     // End of variables declaration//GEN-END:variables
 
     void adaptToBootVersion(String bootVersion) {
-        for (JCheckBox cb : chkBoxes) {
-            String verRange = (String) cb.getClientProperty(PROP_VERSION_RANGE);
-            String description = (String) cb.getClientProperty(PROP_DESCRIPTION);
-            final boolean allowable = allowable(verRange, bootVersion);
-            cb.setEnabled(allowable);
-            cb.setToolTipText(prepTooltip(description, allowable, verRange));
+        for (List<JCheckBox> chList : chkBoxesMap.values()) {
+            for (JCheckBox cb : chList) {
+                String verRange = (String) cb.getClientProperty(PROP_VERSION_RANGE);
+                String description = (String) cb.getClientProperty(PROP_DESCRIPTION);
+                final boolean allowable = allowable(verRange, bootVersion);
+                cb.setEnabled(allowable);
+                cb.setToolTipText(prepTooltip(description, allowable, verRange));
+            }
         }
     }
 
@@ -328,4 +341,39 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         return sb.toString();
     }
 
+    void clearFilter() {
+        filter(null);
+    }
+
+    void filter(String text) {
+        System.out.println("filter for " + String.valueOf(text));
+        this.removeAll();
+        for (int i = 0; i < grpLabels.size(); i++) {
+            JLabel lGroup = grpLabels.get(i);
+            List<JCheckBox> cbList = cbFilter(lGroup.getText(), text);
+            if (!cbList.isEmpty()) {
+                this.add(lGroup, constraintsForGroupLabel(i == 0));
+                int c = 1;
+                for (JCheckBox cb : cbList) {
+                    if (c++ % 2 == 0) {
+                        this.add(cb, constraintsForSecondColumnCheckbox());
+                    } else {
+                        this.add(cb, constraintsForFirstColumnCheckbox());
+                    }
+                }
+            }
+        }
+        this.revalidate();
+        this.repaint();
+    }
+
+    private List<JCheckBox> cbFilter(String group, String text) {
+        ArrayList<JCheckBox> ret = new ArrayList<>();
+        for (JCheckBox cb : chkBoxesMap.get(group)) {
+            if (text == null || cb.getText().toLowerCase().contains(text)) {
+                ret.add(cb);
+            }
+        }
+        return ret;
+    }
 }

@@ -15,9 +15,14 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -37,6 +42,9 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     public InitializrProjectPanelVisual2(InitializrProjectWizardPanel2 panel) {
         initComponents();
         this.panel = panel;
+        FilterFieldListener ffl = new FilterFieldListener(pBootDependencies);
+        txFilter.addKeyListener(ffl);
+        txFilter.getDocument().addDocumentListener(ffl);
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -49,6 +57,8 @@ public class InitializrProjectPanelVisual2 extends JPanel {
         pBootDependencies = new com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel();
         lBootVersion = new javax.swing.JLabel();
         cbBootVersion = new javax.swing.JComboBox<>();
+        txFilter = new javax.swing.JTextField();
+        lFilter = new javax.swing.JLabel();
 
         scroller.setMinimumSize(new java.awt.Dimension(200, 100));
         scroller.setViewportView(pBootDependencies);
@@ -60,6 +70,10 @@ public class InitializrProjectPanelVisual2 extends JPanel {
                 cbBootVersionActionPerformed(evt);
             }
         });
+
+        txFilter.setColumns(8);
+
+        org.openide.awt.Mnemonics.setLocalizedText(lFilter, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual2.class, "InitializrProjectPanelVisual2.lFilter.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -73,7 +87,10 @@ public class InitializrProjectPanelVisual2 extends JPanel {
                         .addComponent(lBootVersion)
                         .addGap(6, 6, 6)
                         .addComponent(cbBootVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(18, 18, Short.MAX_VALUE)
+                        .addComponent(lFilter)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txFilter)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -82,7 +99,9 @@ public class InitializrProjectPanelVisual2 extends JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lBootVersion)
-                    .addComponent(cbBootVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addComponent(cbBootVersion, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(txFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lFilter))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addContainerGap())
@@ -97,8 +116,10 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JComboBox<String> cbBootVersion;
     private javax.swing.JLabel lBootVersion;
+    private javax.swing.JLabel lFilter;
     private com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel pBootDependencies;
     private javax.swing.JScrollPane scroller;
+    private javax.swing.JTextField txFilter;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -143,4 +164,54 @@ public class InitializrProjectPanelVisual2 extends JPanel {
         combo.setSelectedItem(new NamedItem(attrNode.path("default").asText(), ""));
     }
 
+    private void clearFilter() {
+        txFilter.setText(null);
+        pBootDependencies.clearFilter();
+    }
+
+    private class FilterFieldListener extends KeyAdapter implements DocumentListener {
+
+        private final BootDependenciesPanel depsPane;
+
+        public FilterFieldListener(BootDependenciesPanel depsPane) {
+            this.depsPane = depsPane;
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            System.out.println("changedUpdate");
+            doFilter();
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            System.out.println("insertUpdate");
+            doFilter();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            System.out.println("removeUpdate");
+            doFilter();
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            System.out.println("keyPressed");
+            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                clearFilter();
+                e.consume();
+            }
+        }
+
+        private void doFilter() {
+            String text = txFilter.getText().toLowerCase();
+            if (text.length() > 0) {
+                depsPane.filter(text);
+            } else {
+                depsPane.clearFilter();
+            }
+        }
+
+    }
 }
