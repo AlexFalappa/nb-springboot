@@ -15,9 +15,12 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
+import javax.lang.model.SourceVersion;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
@@ -35,7 +38,7 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGING;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_VERSION;
 
-public class InitializrProjectPanelVisual1 extends JPanel {
+public class InitializrProjectPanelVisual1 extends JPanel implements DocumentListener {
 
     public static final String PROP_PROJECT_NAME = "projectName";
     private final DefaultComboBoxModel<NamedItem> dcbmLanguage = new DefaultComboBoxModel<>();
@@ -47,6 +50,11 @@ public class InitializrProjectPanelVisual1 extends JPanel {
     public InitializrProjectPanelVisual1(InitializrProjectWizardPanel1 panel) {
         initComponents();
         this.panel = panel;
+        txGroup.getDocument().addDocumentListener(this);
+        txArtifact.getDocument().addDocumentListener(this);
+        txVersion.getDocument().addDocumentListener(this);
+        txName.getDocument().addDocumentListener(this);
+        txPackage.getDocument().addDocumentListener(this);
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -214,6 +222,32 @@ public class InitializrProjectPanelVisual1 extends JPanel {
     }
 
     boolean valid(WizardDescriptor wizardDescriptor) {
+        if (txGroup.getText().isEmpty()) {
+            //Empty group
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Group can't be empty.");
+            return false;
+        }
+        if (txArtifact.getText().isEmpty()) {
+            //Empty artifact
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Artifact can't be empty.");
+            return false;
+        }
+        if (txVersion.getText().isEmpty()) {
+            //Empty version
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Version can't be empty.");
+            return false;
+        }
+        if (txName.getText().isEmpty()) {
+            //Empty name
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Name can't be empty.");
+            return false;
+        }
+        if (!SourceVersion.isName(txPackage.getText())) {
+            //Invalid package name
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Package Name is not a valid Java package name.");
+            return false;
+        }
+        wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "");
         return true;
     }
 
@@ -270,6 +304,21 @@ public class InitializrProjectPanelVisual1 extends JPanel {
 
     void validate(WizardDescriptor d) throws WizardValidationException {
         // nothing to validate
+    }
+
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        panel.fireChangeEvent();
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        panel.fireChangeEvent();
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        panel.fireChangeEvent();
     }
 
 }

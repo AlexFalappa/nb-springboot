@@ -182,13 +182,13 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
 
     boolean valid(WizardDescriptor wizardDescriptor) {
         if (projectNameTextField.getText().length() == 0) {
+            // Display name not specified
             wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Project Name is not a valid folder name.");
-            return false; // Display name not specified
+            return false;
         }
         File f = FileUtil.normalizeFile(new File(projectLocationTextField.getText()).getAbsoluteFile());
         if (!f.isDirectory()) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty("WizardPanel_errorMessage", message);
+            wizardDescriptor.putProperty("WizardPanel_errorMessage", "Project Folder is not a valid path.");
             return false;
         }
         final File destFolder = FileUtil.normalizeFile(new File(createdFolderTextField.getText()).getAbsoluteFile());
@@ -201,8 +201,7 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
             return false;
         }
         if (FileUtil.toFileObject(projLoc) == null) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, message);
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Project Folder is not a valid path.");
             return false;
         }
         File[] kids = destFolder.listFiles();
@@ -279,11 +278,10 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
             // Change in the project name
             String projectName = projectNameTextField.getText();
             String projectFolder = projectLocationTextField.getText();
-            //if (projectFolder.trim().length() == 0 || projectFolder.equals(oldName)) {
             createdFolderTextField.setText(projectFolder + File.separatorChar + projectName);
-            //}
         }
-        panel.fireChangeEvent(); // Notify that the panel changed
+        // Notify that the panel changed
+        panel.fireChangeEvent();
     }
 
 }
