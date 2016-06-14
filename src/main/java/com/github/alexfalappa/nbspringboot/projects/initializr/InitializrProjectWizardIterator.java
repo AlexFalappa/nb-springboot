@@ -53,6 +53,7 @@ import org.xml.sax.InputSource;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ADD_SB_CFGPROCESSOR;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ARTIFACT;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_BOOT_VERSION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DEPENDENCIES;
@@ -126,6 +127,10 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
             // optionally add custom maven actions configuration
             if ((boolean) wiz.getProperty(WIZ_USE_SB_MVN_PLUGIN)) {
                 createNbActions(pkg, mvnName, dir);
+            }
+            // optionally add spring boot configuration processor
+            if ((boolean) wiz.getProperty(WIZ_ADD_SB_CFGPROCESSOR)) {
+                // TODO modify pom.xml content and add cfg dependency snippet
             }
             // Always open top dir as a project:
             resultSet.add(dir);
@@ -207,6 +212,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
         this.wiz.putProperty(WIZ_PROJ_LOCATION, null);
         this.wiz.putProperty(WIZ_USE_SB_MVN_PLUGIN, null);
         this.wiz.putProperty(WIZ_REMOVE_MVN_WRAPPER, null);
+        this.wiz.putProperty(WIZ_ADD_SB_CFGPROCESSOR, null);
         panels = null;
     }
 

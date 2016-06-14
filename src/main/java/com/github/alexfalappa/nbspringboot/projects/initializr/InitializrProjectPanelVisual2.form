@@ -86,6 +86,9 @@
     <Component class="javax.swing.JTextField" name="txFilter">
       <Properties>
         <Property name="columns" type="int" value="8"/>
+        <Property name="toolTipText" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="com/github/alexfalappa/nbspringboot/projects/initializr/Bundle.properties" key="InitializrProjectPanelVisual2.txFilter.toolTipText" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
       </Properties>
     </Component>
     <Component class="javax.swing.JLabel" name="lFilter">

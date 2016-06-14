@@ -72,6 +72,7 @@ public class InitializrProjectPanelVisual2 extends JPanel {
         });
 
         txFilter.setColumns(8);
+        txFilter.setToolTipText(org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual2.class, "InitializrProjectPanelVisual2.txFilter.toolTipText")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(lFilter, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual2.class, "InitializrProjectPanelVisual2.lFilter.text")); // NOI18N
 

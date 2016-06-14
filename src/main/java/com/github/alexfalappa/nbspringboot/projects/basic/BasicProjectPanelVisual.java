@@ -159,13 +159,14 @@ public class BasicProjectPanelVisual extends JPanel implements DocumentListener 
 
     boolean valid(WizardDescriptor wizardDescriptor) {
         if (projectNameTextField.getText().length() == 0) {
+            // Display name not specified
             wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Project Name is not a valid folder name.");
-            return false; // Display name not specified
+            return false;
         }
         File f = FileUtil.normalizeFile(new File(projectLocationTextField.getText()).getAbsoluteFile());
         if (!f.isDirectory()) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, message);
+            // folder not a directory
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Project Folder is not a valid path.");
             return false;
         }
         final File destFolder = FileUtil.normalizeFile(new File(createdFolderTextField.getText()).getAbsoluteFile());
@@ -174,12 +175,12 @@ public class BasicProjectPanelVisual extends JPanel implements DocumentListener 
             projLoc = projLoc.getParentFile();
         }
         if (projLoc == null || !projLoc.canWrite()) {
+            // can't create folder
             wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Project Folder cannot be created.");
             return false;
         }
         if (FileUtil.toFileObject(projLoc) == null) {
-            String message = "Project Folder is not a valid path.";
-            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, message);
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Project Folder is not a valid path.");
             return false;
         }
         File[] kids = destFolder.listFiles();
