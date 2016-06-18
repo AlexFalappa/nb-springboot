@@ -45,7 +45,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
     BootPrefsPanel(BootPrefsOptionsPanelController controller) {
         this.controller = controller;
         initComponents();
-        // TODO listen to changes in form fields and call controller.changed()
+        // listen to changes in form fields and call controller.changed()
         // Register listener on the textFields to detect changes
         txInitializrUrl.getDocument().addDocumentListener(this);
         spInitializrTimeout.addChangeListener(this);
