@@ -27,15 +27,21 @@ import org.openide.WizardValidationException;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
+import com.fasterxml.jackson.databind.JsonNode;
+
+import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_METADATA;
+
 /**
  * Panel just asking for basic info.
  */
 public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel, WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {
 
-    private WizardDescriptor wizardDescriptor;
+    WizardDescriptor wizardDescriptor;
     private InitializrProjectPanelVisual1 component;
+    private final InitializrService initializrService;
 
-    public InitializrProjectWizardPanel1() {
+    public InitializrProjectWizardPanel1(InitializrService initializrService) {
+        this.initializrService = initializrService;
     }
 
     @Override
@@ -106,6 +112,14 @@ public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel, Wi
     public void validate() throws WizardValidationException {
         getComponent();
         component.validate(wizardDescriptor);
+    }
+
+    public JsonNode getInitializrMetadata() throws Exception {
+        // invoke initializr service to get metadata
+        JsonNode metadata = initializrService.getMetadata();
+        // store metadata as wizard descriptor property
+        this.wizardDescriptor.putProperty(WIZ_METADATA, metadata);
+        return metadata;
     }
 
 }

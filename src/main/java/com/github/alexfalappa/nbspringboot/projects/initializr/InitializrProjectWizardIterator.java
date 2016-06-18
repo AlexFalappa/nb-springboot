@@ -42,17 +42,17 @@ import org.netbeans.spi.project.ui.support.ProjectChooser;
 import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.AsyncGUIJob;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.Utilities;
 import org.openide.xml.XMLUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ADD_SB_CFGPROCESSOR;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ARTIFACT;
@@ -62,7 +62,6 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_GROUP;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_JAVA_VERSION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_LANGUAGE;
-import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_METADATA;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_NAME;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGE;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGING;
@@ -91,14 +90,6 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
 
     public static InitializrProjectWizardIterator createIterator() {
         return new InitializrProjectWizardIterator();
-    }
-
-    private String[] createSteps() {
-        return new String[]{
-            NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_BasePropsStep"),
-            NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_DependenciesStep"),
-            NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_CreateProjectStep")
-        };
     }
 
     @Override
@@ -179,31 +170,23 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
     public void initialize(WizardDescriptor wiz) {
         this.wiz = wiz;
         index = 0;
-        String[] steps;
-        try {
-            // invoke initializr service to get metadata
-            JsonNode metadata = initializrService.getMetadata();
-            this.wiz.putProperty(WIZ_METADATA, metadata);
-            // set other defaults
-            this.wiz.putProperty(WIZ_USE_SB_MVN_PLUGIN, false);
-            this.wiz.putProperty(WIZ_REMOVE_MVN_WRAPPER, true);
-            this.wiz.putProperty(WIZ_ADD_SB_CFGPROCESSOR, false);
-            // create the normal panels
-            panels = new WizardDescriptor.Panel[]{
-                new InitializrProjectWizardPanel1(),
-                new InitializrProjectWizardPanel2(),
-                new InitializrProjectWizardPanel3()
-            };
-            // Make sure list of steps is accurate.
-            steps = createSteps();
-        } catch (Exception ex) {
-            // create an error panel to indicate service access problems
-            final ErrorWizardPanel errorWizardPanel = new ErrorWizardPanel();
-            errorWizardPanel.setError(ex.getMessage());
-            panels = new WizardDescriptor.Panel[]{errorWizardPanel};
-            steps = new String[]{NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_ErrorStep")};
-            Exceptions.printStackTrace(ex);
-        }
+        // set other defaults
+        this.wiz.putProperty(WIZ_USE_SB_MVN_PLUGIN, false);
+        this.wiz.putProperty(WIZ_REMOVE_MVN_WRAPPER, true);
+        this.wiz.putProperty(WIZ_ADD_SB_CFGPROCESSOR, false);
+        // create the wizard panels
+        panels = new WizardDescriptor.Panel[]{
+            new InitializrProjectWizardPanel1(initializrService),
+            new InitializrProjectWizardPanel2(),
+            new InitializrProjectWizardPanel3()
+        };
+        // Make sure list of steps is accurate.
+        String[] steps = new String[]{
+            NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_BasePropsStep"),
+            NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_DependenciesStep"),
+            NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_CreateProjectStep")
+        };
+        // create wizard steps gui components
         for (int i = 0; i < panels.length; i++) {
             Component c = panels[i].getComponent();
             if (steps[i] == null) {
@@ -212,7 +195,8 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
                 // chooser to appear in the list of steps.
                 steps[i] = c.getName();
             }
-            if (c instanceof JComponent) { // assume Swing components
+            if (c instanceof JComponent) {
+                // assume Swing components
                 JComponent jc = (JComponent) c;
                 // Step #.
                 jc.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, i);
@@ -220,6 +204,8 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
                 jc.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, steps);
             }
         }
+        // schedule async retrieval of initializr metadata in panel visual 1
+        Utilities.attachInitJob(panels[0].getComponent(), (AsyncGUIJob) panels[0].getComponent());
     }
 
     @Override

@@ -15,6 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
+import java.util.logging.Level;
+
 import javax.lang.model.SourceVersion;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
@@ -24,6 +26,8 @@ import javax.swing.event.DocumentListener;
 
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
+import org.openide.util.AsyncGUIJob;
+import org.openide.util.Exceptions;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -32,29 +36,25 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_GROUP;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_JAVA_VERSION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_LANGUAGE;
-import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_METADATA;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_NAME;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGE;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGING;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_VERSION;
 
-public class InitializrProjectPanelVisual1 extends JPanel implements DocumentListener {
+public class InitializrProjectPanelVisual1 extends JPanel implements DocumentListener, AsyncGUIJob {
 
     public static final String PROP_PROJECT_NAME = "projectName";
     private final DefaultComboBoxModel<NamedItem> dcbmLanguage = new DefaultComboBoxModel<>();
     private final DefaultComboBoxModel<NamedItem> dcbmJavaVersion = new DefaultComboBoxModel<>();
     private final DefaultComboBoxModel<NamedItem> dcbmPackaging = new DefaultComboBoxModel<>();
     private final InitializrProjectWizardPanel1 panel;
+    private JsonNode meta;
     private boolean initialized = false;
+    private boolean failed = false;
 
     public InitializrProjectPanelVisual1(InitializrProjectWizardPanel1 panel) {
         initComponents();
         this.panel = panel;
-        txGroup.getDocument().addDocumentListener(this);
-        txArtifact.getDocument().addDocumentListener(this);
-        txVersion.getDocument().addDocumentListener(this);
-        txName.getDocument().addDocumentListener(this);
-        txPackage.getDocument().addDocumentListener(this);
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -107,19 +107,31 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
         org.openide.awt.Mnemonics.setLocalizedText(lLanguage, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual1.class, "InitializrProjectPanelVisual1.lLanguage.text")); // NOI18N
 
         txGroup.setColumns(20);
+        txGroup.setEnabled(false);
 
         txArtifact.setColumns(20);
+        txArtifact.setEnabled(false);
 
         txName.setColumns(20);
+        txName.setEnabled(false);
 
         txDesc.setColumns(20);
+        txDesc.setEnabled(false);
 
         txPackage.setColumns(20);
+        txPackage.setEnabled(false);
+
+        cbPackaging.setEnabled(false);
+
+        cbJavaVersion.setEnabled(false);
+
+        cbLanguage.setEnabled(false);
 
         lVersion.setLabelFor(txName);
         org.openide.awt.Mnemonics.setLocalizedText(lVersion, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual1.class, "InitializrProjectPanelVisual1.lVersion.text")); // NOI18N
 
         txVersion.setColumns(20);
+        txVersion.setEnabled(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -222,6 +234,14 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
     }
 
     boolean valid(WizardDescriptor wizardDescriptor) {
+        if (!initialized) {
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_INFO_MESSAGE, "Contacting service...");
+            return false;
+        }
+        if (failed) {
+            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Problems in contacting service!");
+            return false;
+        }
         if (txGroup.getText().isEmpty()) {
             //Empty group
             wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Group can't be empty.");
@@ -264,10 +284,7 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
     }
 
     void read(WizardDescriptor wd) {
-        if (!initialized) {
-            init((JsonNode) wd.getProperty(WIZ_METADATA));
-            initialized = true;
-        } else {
+        if (initialized) {
             this.txGroup.setText((String) wd.getProperty(WIZ_GROUP));
             this.txArtifact.setText((String) wd.getProperty(WIZ_ARTIFACT));
             this.txVersion.setText((String) wd.getProperty(WIZ_VERSION));
@@ -278,18 +295,6 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
             cbLanguage.setSelectedItem(wd.getProperty(WIZ_LANGUAGE));
             cbPackaging.setSelectedItem(wd.getProperty(WIZ_PACKAGING));
         }
-    }
-
-    void init(JsonNode meta) {
-        this.txGroup.setText(meta.path("groupId").path("default").asText());
-        this.txArtifact.setText(meta.path("artifactId").path("default").asText());
-        this.txVersion.setText(meta.path("version").path("default").asText());
-        this.txName.setText(meta.path("name").path("default").asText());
-        this.txDesc.setText(meta.path("description").path("default").asText());
-        this.txPackage.setText(meta.path("packageName").path("default").asText());
-        fillCombo(meta.path("javaVersion"), dcbmJavaVersion, cbJavaVersion);
-        fillCombo(meta.path("language"), dcbmLanguage, cbLanguage);
-        fillCombo(meta.path("packaging"), dcbmPackaging, cbPackaging);
     }
 
     private void fillCombo(JsonNode attrNode, DefaultComboBoxModel<NamedItem> comboModel, JComboBox combo) {
@@ -319,6 +324,52 @@ public class InitializrProjectPanelVisual1 extends JPanel implements DocumentLis
     @Override
     public void changedUpdate(DocumentEvent e) {
         panel.fireChangeEvent();
+    }
+
+    @Override
+    public void construct() {
+        try {
+            meta = panel.getInitializrMetadata();
+            initialized = true;
+        } catch (Exception ex) {
+            panel.wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Could not query Initializr service");
+            Exceptions.printStackTrace(Exceptions.attachSeverity(ex, Level.WARNING));
+            failed = true;
+            panel.fireChangeEvent();
+        }
+    }
+
+    @Override
+    public void finished() {
+        if (initialized) {
+            // fill fields
+            txGroup.setText(meta.path("groupId").path("default").asText());
+            txArtifact.setText(meta.path("artifactId").path("default").asText());
+            txVersion.setText(meta.path("version").path("default").asText());
+            txName.setText(meta.path("name").path("default").asText());
+            txDesc.setText(meta.path("description").path("default").asText());
+            txPackage.setText(meta.path("packageName").path("default").asText());
+            fillCombo(meta.path("javaVersion"), dcbmJavaVersion, cbJavaVersion);
+            fillCombo(meta.path("language"), dcbmLanguage, cbLanguage);
+            fillCombo(meta.path("packaging"), dcbmPackaging, cbPackaging);
+            // add listeners for validation
+            txGroup.getDocument().addDocumentListener(this);
+            txArtifact.getDocument().addDocumentListener(this);
+            txVersion.getDocument().addDocumentListener(this);
+            txName.getDocument().addDocumentListener(this);
+            txPackage.getDocument().addDocumentListener(this);
+            // enable fields
+            txGroup.setEnabled(true);
+            txArtifact.setEnabled(true);
+            txName.setEnabled(true);
+            txDesc.setEnabled(true);
+            txPackage.setEnabled(true);
+            cbPackaging.setEnabled(true);
+            cbJavaVersion.setEnabled(true);
+            cbLanguage.setEnabled(true);
+            txVersion.setEnabled(true);
+            panel.fireChangeEvent();
+        }
     }
 
 }
