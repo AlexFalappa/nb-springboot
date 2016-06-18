@@ -48,6 +48,7 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.xml.XMLUtil;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 
@@ -130,7 +131,29 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
             }
             // optionally add spring boot configuration processor
             if ((boolean) wiz.getProperty(WIZ_ADD_SB_CFGPROCESSOR)) {
-                // TODO modify pom.xml content and add cfg dependency snippet
+                // modify pom.xml content and add cfg dependency snippet
+                FileObject foPom = dir.getFileObject("pom.xml");
+                Document doc = XMLUtil.parse(new InputSource(foPom.getInputStream()), false, false, null, null);
+                NodeList nl = doc.getElementsByTagName("dependencies");
+                if (nl != null && nl.getLength() > 0) {
+                    Element el = (Element) nl.item(0);
+                    if ("dependencies".equals(el.getNodeName())) {
+                        Node dep = doc.createElement("dependency");
+                        Node grp = doc.createElement("groupId");
+                        grp.setTextContent("org.springframework.boot");
+                        dep.appendChild(grp);
+                        Node art = doc.createElement("artifactId");
+                        art.setTextContent("spring-boot-configuration-processor");
+                        dep.appendChild(art);
+                        Node opt = doc.createElement("optional");
+                        opt.setTextContent("true");
+                        dep.appendChild(opt);
+                        el.appendChild(dep);
+                    }
+                }
+                try (OutputStream out = foPom.getOutputStream()) {
+                    XMLUtil.write(doc, out, "UTF-8");
+                }
             }
             // Always open top dir as a project:
             resultSet.add(dir);
@@ -164,6 +187,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
             // set other defaults
             this.wiz.putProperty(WIZ_USE_SB_MVN_PLUGIN, false);
             this.wiz.putProperty(WIZ_REMOVE_MVN_WRAPPER, true);
+            this.wiz.putProperty(WIZ_ADD_SB_CFGPROCESSOR, false);
             // create the normal panels
             panels = new WizardDescriptor.Panel[]{
                 new InitializrProjectWizardPanel1(),
