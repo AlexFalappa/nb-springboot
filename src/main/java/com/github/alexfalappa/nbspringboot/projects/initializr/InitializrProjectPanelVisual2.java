@@ -15,12 +15,14 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
+import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
 import javax.swing.JPanel;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
@@ -42,9 +44,14 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     public InitializrProjectPanelVisual2(InitializrProjectWizardPanel2 panel) {
         initComponents();
         this.panel = panel;
+        // setup key listener on search field linked to dependencies panel
         FilterFieldListener ffl = new FilterFieldListener(pBootDependencies);
         txFilter.addKeyListener(ffl);
         txFilter.getDocument().addDocumentListener(ffl);
+        // fix white area showing when the scroller is wider than the dependencies panel on some LAFs
+        // for some reasons setting the UIManager color directly doesn't work it must be copied in a new Color object
+        final Color cr = UIManager.getColor("Panel.background");
+        scroller.getViewport().setBackground(new Color(cr.getRGB()));
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
