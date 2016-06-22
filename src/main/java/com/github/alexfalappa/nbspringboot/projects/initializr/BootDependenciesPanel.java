@@ -300,7 +300,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         for (int i = 1; i < words.length; i++) {
             w = words[i];
             if (len + w.length() + 1 > TOOLTIP_WIDTH) {
-                sb.append("<br/><br/>").append(w);
+                sb.append("<br/>").append(w);
                 len = w.length();
             } else {
                 sb.append(" ").append(w);
