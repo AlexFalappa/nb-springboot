@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -54,6 +55,8 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     private boolean initialized = false;
     private final Map<String, List<JCheckBox>> chkBoxesMap = new HashMap<>();
     private final List<JLabel> grpLabels = new ArrayList<>();
+    private Integer vertUnitIncrement = null;
+    private Integer vertBlockIncrement = null;
 
     public BootDependenciesPanel() {
         initComponents();
@@ -89,6 +92,9 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             }
         }
         initialized = true;
+        // force recompute of increments
+        vertUnitIncrement = null;
+        vertBlockIncrement = null;
     }
 
     public String getSelectedDependenciesString() {
@@ -149,18 +155,24 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     @Override
     public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
         if (orientation == HORIZONTAL) {
-            return getPreferredSize().width / 2;
+            return getPreferredSize().width / 10;
         } else {
-            return getPreferredSize().height / 24;
+            if (vertUnitIncrement == null) {
+                vertUnitIncrement = computeUnitIncrement();
+            }
+            return vertUnitIncrement;
         }
     }
 
     @Override
     public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
         if (orientation == HORIZONTAL) {
-            return getPreferredSize().width / 2;
+            return getPreferredSize().width / 5;
         } else {
-            return getPreferredSize().height / 8;
+            if (vertBlockIncrement == null) {
+                vertBlockIncrement = computeBlockIncrement();
+            }
+            return vertUnitIncrement;
         }
     }
 
@@ -374,5 +386,29 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             }
         }
         return ret;
+    }
+
+    private int computeUnitIncrement() {
+        System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel.computeUnitIncrement()");
+        final Iterator<List<JCheckBox>> it = chkBoxesMap.values().iterator();
+        if (it.hasNext()) {
+            List<JCheckBox> list = it.next();
+            if (!list.isEmpty()) {
+                return list.get(0).getPreferredSize().height;
+            }
+        }
+        return getPreferredSize().height / 24;
+    }
+
+    private Integer computeBlockIncrement() {
+        System.out.println("com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel.computeBlockIncrement()");
+        final Iterator<List<JCheckBox>> it = chkBoxesMap.values().iterator();
+        if (it.hasNext()) {
+            List<JCheckBox> list = it.next();
+            if (!list.isEmpty()) {
+                return list.get(0).getPreferredSize().height * 4;
+            }
+        }
+        return getPreferredSize().height / 8;
     }
 }
