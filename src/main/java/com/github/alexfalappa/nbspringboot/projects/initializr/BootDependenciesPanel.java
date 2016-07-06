@@ -32,6 +32,8 @@ import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.Scrollable;
 
+import org.apache.commons.lang.WordUtils;
+
 import com.fasterxml.jackson.databind.JsonNode;
 
 import static javax.swing.SwingConstants.HORIZONTAL;
@@ -296,30 +298,12 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     }
 
     private String prepTooltip(String description, boolean allowable, String versRange) {
-        StringBuilder sb = new StringBuilder(wrap(description));
+        StringBuilder sb = new StringBuilder("<html>");
+        sb.append(WordUtils.wrap(description, TOOLTIP_WIDTH, "<br/>", false));
         if (!allowable) {
             sb.append("<br/><i>").append(decode(versRange)).append("</i>");
         }
         return sb.toString();
-    }
-
-    private StringBuilder wrap(String description) {
-        StringBuilder sb = new StringBuilder("<html>");
-        String[] words = description.split(" ");
-        String w = words[0];
-        sb.append(w);
-        int len = w.length();
-        for (int i = 1; i < words.length; i++) {
-            w = words[i];
-            if (len + w.length() + 1 > TOOLTIP_WIDTH) {
-                sb.append("<br/>").append(w);
-                len = w.length();
-            } else {
-                sb.append(" ").append(w);
-                len += w.length() + 1;
-            }
-        }
-        return sb;
     }
 
     private String decode(String verRange) {
