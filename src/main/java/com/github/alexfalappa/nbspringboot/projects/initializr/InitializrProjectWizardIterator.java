@@ -135,6 +135,11 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
                 pomAddConfigProc(pomDoc);
                 pomModified = true;
             }
+            // tweak dev tools dependency if present
+            if (deps.contains("devtools")) {
+                pomDevTools(pomDoc);
+                pomModified = true;
+            }
             // save pom document if modified
             if (pomModified) {
                 try (OutputStream out = foPom.getOutputStream()) {
@@ -381,6 +386,25 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
                     frk.setTextContent("true");
                     cfg.appendChild(frk);
                     el.appendChild(cfg);
+                }
+            }
+        }
+    }
+
+    private void pomDevTools(Document doc) {
+        // modify pom.xml content and add cfg dependency snippet
+        NodeList nl = doc.getElementsByTagName("dependency");
+        if (nl != null && nl.getLength() > 0) {
+            for (int i = 0; i < nl.getLength(); i++) {
+                Element el = (Element) nl.item(i);
+                NodeList grpId = el.getElementsByTagName("groupId");
+                NodeList artId = el.getElementsByTagName("artifactId");
+                if (grpId.getLength() > 0 && artId.getLength() > 0
+                        && "org.springframework.boot".equals(grpId.item(0).getTextContent())
+                        && "spring-boot-devtools".equals(artId.item(0).getTextContent())) {
+                    Node opt = doc.createElement("optional");
+                    opt.setTextContent("true");
+                    el.appendChild(opt);
                 }
             }
         }
