@@ -78,6 +78,7 @@ public class DevToolsGenerator extends AbstractGenerator<POMModel> {
                     dep = model.getFactory().createDependency();
                     dep.setGroupId(GROUP_ID);
                     dep.setArtifactId(ARTIFACT_ID);
+                    dep.setOptional(Boolean.TRUE);
                     container.addDependency(dep);
                 }
                 return dep.getModel().getAccess().findPosition(dep.getPeer());
