@@ -118,16 +118,28 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
                     .getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
             // unzip response
             unZipFile(stream, dir, (boolean) wiz.getProperty(WIZ_REMOVE_MVN_WRAPPER));
+            // parse pom.xml
+            final FileObject foPom = dir.getFileObject("pom.xml");
+            Document pomDoc = XMLUtil.parse(new InputSource(foPom.getInputStream()), false, false, null, null);
+            boolean pomModified = false;
             // manage run/debug trough maven plugin
             if ((boolean) wiz.getProperty(WIZ_USE_SB_MVN_PLUGIN)) {
                 // create nbactions.xml file with custom maven actions configuration
                 createNbActions(pkg, mvnName, dir);
                 // modify pom.xml content and add forking flag to plugin configuration
-                pomConfigMvnPlugin(dir);
+                pomConfigMvnPlugin(pomDoc);
+                pomModified = true;
             }
             // manage addition of spring boot configuration processor
             if ((boolean) wiz.getProperty(WIZ_ADD_SB_CFGPROCESSOR)) {
-                pomAddConfigProc(dir);
+                pomAddConfigProc(pomDoc);
+                pomModified = true;
+            }
+            // save pom document if modified
+            if (pomModified) {
+                try (OutputStream out = foPom.getOutputStream()) {
+                    XMLUtil.write(pomDoc, out, "UTF-8");
+                }
             }
             // Always open top dir as a project:
             resultSet.add(dir);
@@ -332,10 +344,8 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
         }
     }
 
-    private void pomAddConfigProc(FileObject dir) throws DOMException, SAXException, IOException {
+    private void pomAddConfigProc(Document doc) throws DOMException, SAXException, IOException {
         // modify pom.xml content and add cfg dependency snippet
-        FileObject foPom = dir.getFileObject("pom.xml");
-        Document doc = XMLUtil.parse(new InputSource(foPom.getInputStream()), false, false, null, null);
         NodeList nl = doc.getElementsByTagName("dependencies");
         if (nl != null && nl.getLength() > 0) {
             Element el = (Element) nl.item(0);
@@ -353,15 +363,10 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
                 el.appendChild(dep);
             }
         }
-        try (OutputStream out = foPom.getOutputStream()) {
-            XMLUtil.write(doc, out, "UTF-8");
-        }
     }
 
-    private void pomConfigMvnPlugin(FileObject dir) throws DOMException, SAXException, IOException {
+    private void pomConfigMvnPlugin(Document doc) throws DOMException, SAXException, IOException {
         // modify pom.xml content and add cfg to spring maven plugin
-        FileObject foPom = dir.getFileObject("pom.xml");
-        Document doc = XMLUtil.parse(new InputSource(foPom.getInputStream()), false, false, null, null);
         NodeList nl = doc.getElementsByTagName("plugin");
         if (nl != null && nl.getLength() > 0) {
             for (int i = 0; i < nl.getLength(); i++) {
@@ -378,9 +383,6 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
                     el.appendChild(cfg);
                 }
             }
-        }
-        try (OutputStream out = foPom.getOutputStream()) {
-            XMLUtil.write(doc, out, "UTF-8");
         }
     }
 }
