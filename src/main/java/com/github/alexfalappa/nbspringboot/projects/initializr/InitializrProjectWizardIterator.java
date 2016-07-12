@@ -48,11 +48,13 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.Utilities;
 import org.openide.xml.XMLUtil;
+import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
+import org.xml.sax.SAXException;
 
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ADD_SB_CFGPROCESSOR;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ARTIFACT;
@@ -116,35 +118,16 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
                     .getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
             // unzip response
             unZipFile(stream, dir, (boolean) wiz.getProperty(WIZ_REMOVE_MVN_WRAPPER));
-            // optionally add custom maven actions configuration
+            // manage run/debug trough maven plugin
             if ((boolean) wiz.getProperty(WIZ_USE_SB_MVN_PLUGIN)) {
+                // create nbactions.xml file with custom maven actions configuration
                 createNbActions(pkg, mvnName, dir);
+                // modify pom.xml content and add forking flag to plugin configuration
+                pomConfigMvnPlugin(dir);
             }
-            // optionally add spring boot configuration processor
+            // manage addition of spring boot configuration processor
             if ((boolean) wiz.getProperty(WIZ_ADD_SB_CFGPROCESSOR)) {
-                // modify pom.xml content and add cfg dependency snippet
-                FileObject foPom = dir.getFileObject("pom.xml");
-                Document doc = XMLUtil.parse(new InputSource(foPom.getInputStream()), false, false, null, null);
-                NodeList nl = doc.getElementsByTagName("dependencies");
-                if (nl != null && nl.getLength() > 0) {
-                    Element el = (Element) nl.item(0);
-                    if ("dependencies".equals(el.getNodeName())) {
-                        Node dep = doc.createElement("dependency");
-                        Node grp = doc.createElement("groupId");
-                        grp.setTextContent("org.springframework.boot");
-                        dep.appendChild(grp);
-                        Node art = doc.createElement("artifactId");
-                        art.setTextContent("spring-boot-configuration-processor");
-                        dep.appendChild(art);
-                        Node opt = doc.createElement("optional");
-                        opt.setTextContent("true");
-                        dep.appendChild(opt);
-                        el.appendChild(dep);
-                    }
-                }
-                try (OutputStream out = foPom.getOutputStream()) {
-                    XMLUtil.write(doc, out, "UTF-8");
-                }
+                pomAddConfigProc(dir);
             }
             // Always open top dir as a project:
             resultSet.add(dir);
@@ -349,4 +332,55 @@ public class InitializrProjectWizardIterator implements WizardDescriptor./*Progr
         }
     }
 
+    private void pomAddConfigProc(FileObject dir) throws DOMException, SAXException, IOException {
+        // modify pom.xml content and add cfg dependency snippet
+        FileObject foPom = dir.getFileObject("pom.xml");
+        Document doc = XMLUtil.parse(new InputSource(foPom.getInputStream()), false, false, null, null);
+        NodeList nl = doc.getElementsByTagName("dependencies");
+        if (nl != null && nl.getLength() > 0) {
+            Element el = (Element) nl.item(0);
+            if ("dependencies".equals(el.getNodeName())) {
+                Node dep = doc.createElement("dependency");
+                Node grp = doc.createElement("groupId");
+                grp.setTextContent("org.springframework.boot");
+                dep.appendChild(grp);
+                Node art = doc.createElement("artifactId");
+                art.setTextContent("spring-boot-configuration-processor");
+                dep.appendChild(art);
+                Node opt = doc.createElement("optional");
+                opt.setTextContent("true");
+                dep.appendChild(opt);
+                el.appendChild(dep);
+            }
+        }
+        try (OutputStream out = foPom.getOutputStream()) {
+            XMLUtil.write(doc, out, "UTF-8");
+        }
+    }
+
+    private void pomConfigMvnPlugin(FileObject dir) throws DOMException, SAXException, IOException {
+        // modify pom.xml content and add cfg to spring maven plugin
+        FileObject foPom = dir.getFileObject("pom.xml");
+        Document doc = XMLUtil.parse(new InputSource(foPom.getInputStream()), false, false, null, null);
+        NodeList nl = doc.getElementsByTagName("plugin");
+        if (nl != null && nl.getLength() > 0) {
+            for (int i = 0; i < nl.getLength(); i++) {
+                Element el = (Element) nl.item(i);
+                NodeList grpId = el.getElementsByTagName("groupId");
+                NodeList artId = el.getElementsByTagName("artifactId");
+                if (grpId.getLength() > 0 && artId.getLength() > 0
+                        && "org.springframework.boot".equals(grpId.item(0).getTextContent())
+                        && "spring-boot-maven-plugin".equals(artId.item(0).getTextContent())) {
+                    Node cfg = doc.createElement("configuration");
+                    Node frk = doc.createElement("fork");
+                    frk.setTextContent("true");
+                    cfg.appendChild(frk);
+                    el.appendChild(cfg);
+                }
+            }
+        }
+        try (OutputStream out = foPom.getOutputStream()) {
+            XMLUtil.write(doc, out, "UTF-8");
+        }
+    }
 }
