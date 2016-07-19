@@ -20,7 +20,7 @@
         content = "application.properties.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        position = 800)
+        position = 400)
 @Messages(value = "applprop_displayName=Application properties")
 package com.github.alexfalappa.nbspringboot.templates.applproperties;
 

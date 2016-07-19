@@ -35,11 +35,24 @@ public class FileTemplates {
     @TemplateRegistration(
             folder = FOLDER_SPRING_BOOT,
             iconBase = "com/github/alexfalappa/nbspringboot/templates/boot-class.png",
+            displayName = "#cfgprops_displayName",
+            content = "CfgProperties.java.template",
+            description = "CfgProperties.html",
+            scriptEngine = "freemarker",
+            position = 100)
+    @NbBundle.Messages(value = "cfgprops_displayName=Configuration properties class")
+    public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> cfgProperties() {
+        return JavaTemplates.createJavaTemplateIterator();
+    }
+
+    @TemplateRegistration(
+            folder = FOLDER_SPRING_BOOT,
+            iconBase = "com/github/alexfalappa/nbspringboot/templates/boot-class.png",
             displayName = "#cmdlinerunner_displayName",
             content = "CmdLineRunner.java.template",
             description = "CmdLineRunner.html",
             scriptEngine = "freemarker",
-            position = 400)
+            position = 200)
     @NbBundle.Messages(value = "cmdlinerunner_displayName=CommandLineRunner class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> cmdLineRunner() {
         return JavaTemplates.createJavaTemplateIterator();
@@ -52,7 +65,7 @@ public class FileTemplates {
             content = "ApplRunner.java.template",
             description = "ApplRunner.html",
             scriptEngine = "freemarker",
-            position = 600)
+            position = 300)
     @NbBundle.Messages(value = "applrunner_displayName=ApplicationRunner class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> applicationRunner() {
         return JavaTemplates.createJavaTemplateIterator();
