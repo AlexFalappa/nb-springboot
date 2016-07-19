@@ -61,7 +61,9 @@ public final class ReloadTriggerAction implements ActionListener {
         AuxiliaryConfiguration aux = ProjectUtils.getAuxiliaryConfiguration(context);
         if (aux != null) {
             Element el = aux.getConfigurationFragment("netbeans.hint.license", "http://www.netbeans.org/ns/maven-properties-data/1", true);
-            System.out.println(el.getTextContent());
+            if (el != null) {
+                System.out.println(el.getTextContent());
+            }
         }
         Sources src = ProjectUtils.getSources(context);
         if (src != null) {
