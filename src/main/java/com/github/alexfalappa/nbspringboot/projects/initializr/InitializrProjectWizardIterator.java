@@ -80,7 +80,7 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
         position = 256
 )
 @Messages("InitializrSpringbootProject_displayName=Spring Boot project (from Spring Initializr)")
-public class InitializrProjectWizardIterator implements WizardDescriptor./*Progress*/InstantiatingIterator {
+public class InitializrProjectWizardIterator implements WizardDescriptor.InstantiatingIterator {
 
     private int index;
     private WizardDescriptor.Panel[] panels;

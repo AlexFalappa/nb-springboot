@@ -16,21 +16,19 @@
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
 import java.awt.Component;
-import java.util.HashSet;
-import java.util.Set;
 
-import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
+import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
 /**
  * Panel just asking for basic info.
  */
-public class InitializrProjectWizardPanel3 implements WizardDescriptor.Panel, WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {
+public class InitializrProjectWizardPanel3 implements WizardDescriptor.Panel<WizardDescriptor>, WizardDescriptor.ValidatingPanel<WizardDescriptor>, WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private WizardDescriptor wizardDescriptor;
     private InitializrProjectPanelVisual3 component;
@@ -49,7 +47,10 @@ public class InitializrProjectWizardPanel3 implements WizardDescriptor.Panel, Wi
 
     @Override
     public HelpCtx getHelp() {
-        return new HelpCtx(InitializrProjectWizardPanel3.class);
+        // Show no Help button for this panel:
+        return HelpCtx.DEFAULT_HELP;
+        // If you have context help:
+        // return new HelpCtx("help.key.here");
     }
 
     @Override
@@ -58,42 +59,35 @@ public class InitializrProjectWizardPanel3 implements WizardDescriptor.Panel, Wi
         return component.valid(wizardDescriptor);
     }
 
-    private final Set<ChangeListener> listeners = new HashSet<>(1); // or can use ChangeSupport in NB 6.0
+    private final ChangeSupport chgSupport = new ChangeSupport(this);
 
     @Override
     public final void addChangeListener(ChangeListener l) {
-        synchronized (listeners) {
-            listeners.add(l);
+        synchronized (chgSupport) {
+            chgSupport.addChangeListener(l);
         }
     }
 
     @Override
     public final void removeChangeListener(ChangeListener l) {
-        synchronized (listeners) {
-            listeners.remove(l);
+        synchronized (chgSupport) {
+            chgSupport.removeChangeListener(l);
         }
     }
 
     protected final void fireChangeEvent() {
-        Set<ChangeListener> ls;
-        synchronized (listeners) {
-            ls = new HashSet<>(listeners);
-        }
-        ChangeEvent ev = new ChangeEvent(this);
-        for (ChangeListener l : ls) {
-            l.stateChanged(ev);
-        }
+        chgSupport.fireChange();
     }
 
     @Override
-    public void readSettings(Object settings) {
-        wizardDescriptor = (WizardDescriptor) settings;
+    public void readSettings(WizardDescriptor wiz) {
+        wizardDescriptor = wiz;
         component.read(wizardDescriptor);
     }
 
     @Override
-    public void storeSettings(Object settings) {
-        WizardDescriptor d = (WizardDescriptor) settings;
+    public void storeSettings(WizardDescriptor wiz) {
+        WizardDescriptor d = wiz;
         component.store(d);
     }
 
