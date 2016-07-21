@@ -37,12 +37,12 @@ import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplC
 @TemplateRegistration(
         folder = "Spring Boot",
         iconBase = "com/github/alexfalappa/nbspringboot/templates/applproperties/boot-properties.png",
-        displayName = "#applprop_displayName",
+        displayName = "#applicprop_displayName",
         content = "application.properties.template",
         description = "description.html",
         scriptEngine = "freemarker",
         position = 400)
-@Messages(value = "applprop_displayName=Application properties")
+@Messages(value = "applicprop_displayName=Application properties")
 public final class ApplWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 
     private WizardDescriptor wizard;

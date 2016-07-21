@@ -21,10 +21,10 @@ package com.github.alexfalappa.nbspringboot.templates.metadata;
  */
 public final class MetadataConstants {
 
-    public static final String WIZ_SECT_PROPS = "section.properties";
-    public static final String WIZ_SECT_HINTS = "section.hints";
-    public static final String WIZ_SECT_HINTS_VALUES = "section.hints.values";
-    public static final String WIZ_SECT_HINTS_PROVIDERS = "section.hints.providers";
+    public static final String WIZ_SECT_PROPS = "properties";
+    public static final String WIZ_SECT_HINTS = "hints";
+    public static final String WIZ_SECT_HINTS_VALUES = "hintsValues";
+    public static final String WIZ_SECT_HINTS_PROVIDERS = "hintsProviders";
 
     // prevent instantiation
     private MetadataConstants() {

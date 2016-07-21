@@ -15,30 +15,19 @@
  */
 package com.github.alexfalappa.nbspringboot.templates.metadata;
 
-import java.io.File;
-
 import javax.swing.JPanel;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
 
-import org.netbeans.spi.project.ui.templates.support.Templates;
 import org.openide.WizardDescriptor;
-import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 
 import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS;
 import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS_PROVIDERS;
 import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS_VALUES;
 import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_PROPS;
 
-public final class MetadataVisualPanel1 extends JPanel implements DocumentListener {
+public final class MetadataVisualPanel1 extends JPanel {
 
-    private final MetadataWizardPanel1 panel;
-    private File resourceFolder = new File(System.getProperty("user.dir"));
-
-    public MetadataVisualPanel1(MetadataWizardPanel1 panel) {
+    public MetadataVisualPanel1() {
         initComponents();
-        this.panel = panel;
     }
 
     @Override
@@ -54,20 +43,6 @@ public final class MetadataVisualPanel1 extends JPanel implements DocumentListen
     }
 
     void read(WizardDescriptor wd) {
-//        final Project project = Templates.getProject(wd);
-//        if (project != null) {
-//            NbMavenProject nbProj = project.getLookup().lookup(NbMavenProject.class);
-//            if (nbProj != null) {
-//                final URI[] resources = nbProj.getResources(false);
-//                if (resources.length > 0) {
-//                    try {
-//                        resourceFolder = FileUtil.archiveOrDirForURL(resources[0].toURL());
-//                    } catch (MalformedURLException ex) {
-//                        Exceptions.printStackTrace(ex);
-//                    }
-//                }
-//            }
-//        }
         Boolean flag = (Boolean) wd.getProperty(WIZ_SECT_PROPS);
         if (flag != null) {
             chProperties.setSelected(flag);
@@ -110,10 +85,8 @@ public final class MetadataVisualPanel1 extends JPanel implements DocumentListen
         });
 
         org.openide.awt.Mnemonics.setLocalizedText(chHintsValues, org.openide.util.NbBundle.getBundle(MetadataVisualPanel1.class).getString("MetadataVisualPanel1.chHintsValues.text")); // NOI18N
-        chHintsValues.setEnabled(false);
 
         org.openide.awt.Mnemonics.setLocalizedText(chHintsProviders, org.openide.util.NbBundle.getBundle(MetadataVisualPanel1.class).getString("MetadataVisualPanel1.chHintsProviders.text")); // NOI18N
-        chHintsProviders.setEnabled(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -164,59 +137,5 @@ public final class MetadataVisualPanel1 extends JPanel implements DocumentListen
     private javax.swing.JCheckBox chProperties;
     private javax.swing.JLabel lSections;
     // End of variables declaration//GEN-END:variables
-
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        updateTexts();
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        updateTexts();
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        updateTexts();
-    }
-
-    // Handles changes in the base name and profile
-    private void updateTexts() {
-        // Change in the project name
-        String baseName = txBaseName.getText();
-        String profile = txProfile.getText();
-        StringBuilder sb = new StringBuilder(resourceFolder.getAbsolutePath());
-        sb.append(File.separatorChar);
-        if (chConfigSubd.isSelected()) {
-            sb.append("config").append(File.separatorChar);
-        }
-        sb.append(baseName);
-        if (!profile.isEmpty()) {
-            sb.append('-').append(profile);
-        }
-        sb.append(".properties");
-        txCreated.setText(sb.toString());
-        // Notify that the panel changed
-        panel.fireChangeEvent();
-    }
-
-    boolean valid(WizardDescriptor wizardDescriptor) {
-        if (txBaseName.getText().isEmpty()) {
-            // Base name not specified
-            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Base name cannot be empty!");
-            return false;
-        }
-        File f = getCreatedFile();
-        if (f.exists()) {
-            // Existing file
-            wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "Application properties file exists!");
-            return false;
-        }
-        wizardDescriptor.putProperty(WizardDescriptor.PROP_ERROR_MESSAGE, "");
-        final FileObject targetFolder = FileUtil.toFileObject(f.getParentFile());
-        Templates.setTargetFolder(wizardDescriptor, targetFolder);
-        Templates.setTargetName(wizardDescriptor, f.getName());
-        return true;
-    }
 
 }

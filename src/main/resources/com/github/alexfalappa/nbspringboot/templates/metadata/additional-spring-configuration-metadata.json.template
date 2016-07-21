@@ -1,4 +1,5 @@
 {
+<#if properties>
     "properties": [
         {
             "name": "prefix.propertyname",
@@ -12,9 +13,11 @@
             }
         }
     ],
+</#if>
+<#if hints>
     "hints": [
         {
-            "name": "prefix.propertyname",
+            "name": "prefix.propertyname"<#if hintsValues>,
             "values": [
                 {
                     "value": "one",
@@ -28,13 +31,14 @@
                     "value": "third",
                     "description": "Third value."
                 }
-            ],
+            ]</#if><#if hintsProviders>,
             "providers":[
                 {              
                     "name":"any"
                 }
                 
-            ]
+            ]</#if>
         }
     ]
+</#if>
 }

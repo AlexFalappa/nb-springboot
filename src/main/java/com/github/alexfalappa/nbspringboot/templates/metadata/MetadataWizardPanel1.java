@@ -15,8 +15,6 @@
  */
 package com.github.alexfalappa.nbspringboot.templates.metadata;
 
-import com.github.alexfalappa.nbspringboot.templates.applproperties.*;
-
 import javax.swing.event.ChangeListener;
 
 import org.openide.WizardDescriptor;
@@ -35,7 +33,7 @@ public class MetadataWizardPanel1 implements WizardDescriptor.Panel<WizardDescri
     @Override
     public MetadataVisualPanel1 getComponent() {
         if (component == null) {
-            component = new MetadataVisualPanel1(this);
+            component = new MetadataVisualPanel1();
         }
         return component;
     }
@@ -50,8 +48,7 @@ public class MetadataWizardPanel1 implements WizardDescriptor.Panel<WizardDescri
 
     @Override
     public boolean isValid() {
-        getComponent();
-        return component.valid(wizardDescriptor);
+        return true;
     }
 
     private final ChangeSupport chgSupport = new ChangeSupport(this);
