@@ -13,16 +13,21 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@TemplateRegistration(
-        folder = "Spring Boot",
-        iconBase = "com/github/alexfalappa/nbspringboot/templates/metadata/boot-json.png",
-        displayName = "#metadata_displayName",
-        content = "additional-spring-configuration-metadata.json.template",
-        description = "description.html",
-        scriptEngine = "freemarker",
-        position = 500)
-@Messages(value = "metadata_displayName=Additional properties metadata")
 package com.github.alexfalappa.nbspringboot.templates.metadata;
 
-import org.netbeans.api.templates.TemplateRegistration;
-import org.openide.util.NbBundle.Messages;
+/**
+ *
+ * @author Alessandro Falappa
+ */
+public final class MetadataConstants {
+
+    public static final String WIZ_SECT_PROPS = "section.properties";
+    public static final String WIZ_SECT_HINTS = "section.hints";
+    public static final String WIZ_SECT_HINTS_VALUES = "section.hints.values";
+    public static final String WIZ_SECT_HINTS_PROVIDERS = "section.hints.providers";
+
+    // prevent instantiation
+    private MetadataConstants() {
+    }
+
+}
