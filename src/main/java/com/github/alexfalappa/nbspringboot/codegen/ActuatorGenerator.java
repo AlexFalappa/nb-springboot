@@ -22,6 +22,7 @@ import javax.swing.text.JTextComponent;
 
 import org.netbeans.api.editor.mimelookup.MimeRegistration;
 import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.modules.maven.api.Constants;
 import org.netbeans.modules.maven.model.pom.Dependency;
 import org.netbeans.modules.maven.model.pom.DependencyContainer;
 import org.netbeans.modules.maven.model.pom.POMModel;
@@ -39,7 +40,7 @@ public class ActuatorGenerator extends AbstractGenerator<POMModel> {
         super(model, component);
     }
 
-    @MimeRegistration(mimeType = "text/x-maven-pom+xml", position = 1000, service = CodeGenerator.Factory.class)
+    @MimeRegistration(mimeType = Constants.POM_MIME_TYPE, position = 1000, service = CodeGenerator.Factory.class)
     public static class Factory implements CodeGenerator.Factory {
 
         @Override
