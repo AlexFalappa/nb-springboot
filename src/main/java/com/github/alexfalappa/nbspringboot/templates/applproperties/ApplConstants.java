@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@TemplateRegistration(
-        folder = "Spring Boot",
-        iconBase = "com/github/alexfalappa/nbspringboot/templates/applproperties/boot-properties.png",
-        displayName = "#applprop_displayName",
-        content = "application.properties.template",
-        description = "description.html",
-        scriptEngine = "freemarker",
-        position = 400)
-@Messages(value = "applprop_displayName=Application properties")
 package com.github.alexfalappa.nbspringboot.templates.applproperties;
 
-import org.netbeans.api.templates.TemplateRegistration;
-import org.openide.util.NbBundle.Messages;
+/**
+ *
+ * @author Alessandro Falappa
+ */
+public final class ApplConstants {
+
+    public static final String WIZ_BASE_NAME = "base.name";
+    public static final String WIZ_PROFILE = "profile";
+
+    // prevent instantiation
+    private ApplConstants() {
+    }
+
+}

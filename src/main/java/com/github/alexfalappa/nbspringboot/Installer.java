@@ -33,6 +33,7 @@ public class Installer extends Yenta {
     @Override
     protected Set<String> friends() {
         return new HashSet<>(Arrays.asList(
+                "org.netbeans.modules.maven",
                 "org.netbeans.modules.maven.embedder",
                 "org.netbeans.modules.maven.model"
         ));
