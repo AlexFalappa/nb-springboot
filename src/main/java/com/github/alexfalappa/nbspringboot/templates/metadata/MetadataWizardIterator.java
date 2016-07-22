@@ -52,7 +52,7 @@ import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataCon
         description = "description.html",
         scriptEngine = "freemarker",
         position = 500)
-@Messages(value = "addmetadata_displayName=Additional properties metadata")
+@Messages(value = "addmetadata_displayName=Additional Properties Metadata")
 public final class MetadataWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 
     private WizardDescriptor wizard;
@@ -79,7 +79,14 @@ public final class MetadataWizardIterator implements WizardDescriptor.Instantiat
             fDir.mkdirs();
             FileObject foDir = FileUtil.toFileObject(fDir);
             Templates.setTargetFolder(wizard, foDir);
-            // Create file from template
+            // set target name into Templates and delete existing file if it exists
+            final String targetName = "additional-spring-configuration-metadata.json";
+            Templates.setTargetName(wizard, targetName);
+            File fExisting = new File(fDir, targetName);
+            if (fExisting.exists()) {
+                fExisting.delete();
+            }
+            // create file from template
             FileObject foTemplate = Templates.getTemplate(wizard);
             DataObject doTemplate = DataObject.find(foTemplate);
             DataFolder df = DataFolder.findFolder(foDir);
@@ -88,7 +95,7 @@ public final class MetadataWizardIterator implements WizardDescriptor.Instantiat
             props.put(WIZ_SECT_HINTS, wizard.getProperty(WIZ_SECT_HINTS));
             props.put(WIZ_SECT_HINTS_VALUES, wizard.getProperty(WIZ_SECT_HINTS_VALUES));
             props.put(WIZ_SECT_HINTS_PROVIDERS, wizard.getProperty(WIZ_SECT_HINTS_PROVIDERS));
-            DataObject doCreated = doTemplate.createFromTemplate(df, Templates.getTargetName(wizard), props);
+            DataObject doCreated = doTemplate.createFromTemplate(df, targetName, props);
             FileObject foCreated = doCreated.getPrimaryFile();
             return Collections.singleton(foCreated);
         } catch (MalformedURLException ex) {

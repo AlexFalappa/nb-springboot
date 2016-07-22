@@ -15,10 +15,19 @@
  */
 package com.github.alexfalappa.nbspringboot.templates.metadata;
 
+import java.io.File;
+import java.net.URI;
+import java.util.logging.Level;
+
 import javax.swing.event.ChangeListener;
 
+import org.netbeans.api.project.Project;
+import org.netbeans.modules.maven.api.NbMavenProject;
+import org.netbeans.spi.project.ui.templates.support.Templates;
 import org.openide.WizardDescriptor;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.ChangeSupport;
+import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
@@ -74,6 +83,18 @@ public class MetadataWizardPanel1 implements WizardDescriptor.Panel<WizardDescri
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
+        try {
+            final Project project = Templates.getProject(wiz);
+            NbMavenProject nbProj = project.getLookup().lookup(NbMavenProject.class);
+            final URI[] resources = nbProj.getResources(false);
+            File resourceFolder = FileUtil.normalizeFile(FileUtil.archiveOrDirForURL(resources[0].toURL()));
+            File addMeta = new File(resourceFolder, "META-INF/additional-spring-configuration-metadata.json");
+            if (addMeta.exists()) {
+                wiz.putProperty(WizardDescriptor.PROP_WARNING_MESSAGE, "Existing additional metadata file will be overwritten!");
+            }
+        } catch (Exception ex) {
+            Exceptions.printStackTrace(Exceptions.attachSeverity(ex, Level.WARNING));
+        }
         component.read(wiz);
     }
 

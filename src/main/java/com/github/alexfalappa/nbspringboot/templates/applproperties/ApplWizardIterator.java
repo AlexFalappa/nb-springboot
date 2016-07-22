@@ -42,7 +42,7 @@ import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplC
         description = "description.html",
         scriptEngine = "freemarker",
         position = 400)
-@Messages(value = "applicprop_displayName=Application properties")
+@Messages(value = "applicprop_displayName=Application Properties")
 public final class ApplWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 
     private WizardDescriptor wizard;

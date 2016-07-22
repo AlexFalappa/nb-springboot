@@ -12,12 +12,12 @@
                 "replacement":"prefix.otherproperty"
             }
         }
-    ],
-</#if>
+    ]</#if><#if properties && hints>,</#if>
 <#if hints>
     "hints": [
         {
-            "name": "prefix.propertyname"<#if hintsValues>,
+            "name": "prefix.propertyname"<#if hintsValues || hintsProviders>,</#if>
+<#if hintsValues>
             "values": [
                 {
                     "value": "one",
@@ -31,7 +31,8 @@
                     "value": "third",
                     "description": "Third value."
                 }
-            ]</#if><#if hintsProviders>,
+            ]</#if><#if hintsValues && hintsProviders>,</#if>
+<#if hintsProviders>
             "providers":[
                 {              
                     "name":"any"
