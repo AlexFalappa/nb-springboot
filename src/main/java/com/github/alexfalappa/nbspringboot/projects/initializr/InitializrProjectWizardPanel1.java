@@ -55,7 +55,10 @@ public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel, Wi
 
     @Override
     public HelpCtx getHelp() {
-        return new HelpCtx(InitializrProjectWizardPanel1.class);
+        // Show no Help button for this panel:
+        return HelpCtx.DEFAULT_HELP;
+        // If you have context help:
+        // return new HelpCtx("help.key.here");
     }
 
     @Override

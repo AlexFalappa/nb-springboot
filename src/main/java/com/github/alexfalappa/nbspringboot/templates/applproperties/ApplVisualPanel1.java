@@ -48,11 +48,6 @@ public final class ApplVisualPanel1 extends JPanel implements DocumentListener {
         txProfile.getDocument().addDocumentListener(this);
     }
 
-    @Override
-    public String getName() {
-        return "File Name";
-    }
-
     File getCreatedFile() {
         return FileUtil.normalizeFile(new File(txCreated.getText()).getAbsoluteFile());
     }

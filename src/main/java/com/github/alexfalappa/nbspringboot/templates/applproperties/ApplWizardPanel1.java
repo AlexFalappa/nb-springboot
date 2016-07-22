@@ -20,6 +20,7 @@ import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
+import org.openide.util.NbBundle;
 
 public class ApplWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor>, WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
@@ -34,6 +35,7 @@ public class ApplWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor
     public ApplVisualPanel1 getComponent() {
         if (component == null) {
             component = new ApplVisualPanel1(this);
+            component.setName(NbBundle.getMessage(ApplWizardPanel1.class, "LBL_FileNameStep"));
         }
         return component;
     }

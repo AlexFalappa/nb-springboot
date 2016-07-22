@@ -52,7 +52,10 @@ public class BasicProjectWizardPanel implements WizardDescriptor.Panel,
 
     @Override
     public HelpCtx getHelp() {
-        return new HelpCtx(BasicProjectWizardPanel.class);
+        // Show no Help button for this panel:
+        return HelpCtx.DEFAULT_HELP;
+        // If you have context help:
+        // return new HelpCtx("help.key.here");
     }
 
     @Override

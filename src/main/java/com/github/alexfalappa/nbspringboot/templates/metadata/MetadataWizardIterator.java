@@ -101,6 +101,7 @@ public final class MetadataWizardIterator implements WizardDescriptor.Instantiat
     public void initialize(WizardDescriptor wizard) {
         this.wizard = wizard;
         panel = new MetadataWizardPanel1();
+        // force creation of visual part
         panel.getComponent();
         wizard.putProperty(WIZ_SECT_PROPS, false);
         wizard.putProperty(WIZ_SECT_HINTS, true);

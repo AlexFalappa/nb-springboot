@@ -30,11 +30,6 @@ public final class MetadataVisualPanel1 extends JPanel {
         initComponents();
     }
 
-    @Override
-    public String getName() {
-        return "Sections";
-    }
-
     void store(WizardDescriptor wd) {
         wd.putProperty(WIZ_SECT_PROPS, chProperties.isSelected());
         wd.putProperty(WIZ_SECT_HINTS, chHints.isSelected());

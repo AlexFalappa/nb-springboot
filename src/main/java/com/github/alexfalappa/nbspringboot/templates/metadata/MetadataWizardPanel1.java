@@ -20,10 +20,10 @@ import javax.swing.event.ChangeListener;
 import org.openide.WizardDescriptor;
 import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
+import org.openide.util.NbBundle;
 
 public class MetadataWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor>, WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
-    private WizardDescriptor wizardDescriptor;
     private MetadataVisualPanel1 component;
 
     // Get the visual component for the panel. In this template, the component
@@ -34,6 +34,7 @@ public class MetadataWizardPanel1 implements WizardDescriptor.Panel<WizardDescri
     public MetadataVisualPanel1 getComponent() {
         if (component == null) {
             component = new MetadataVisualPanel1();
+            component.setName(NbBundle.getMessage(MetadataWizardPanel1.class, "LBL_SectionStep"));
         }
         return component;
     }
@@ -73,13 +74,11 @@ public class MetadataWizardPanel1 implements WizardDescriptor.Panel<WizardDescri
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
-        wizardDescriptor = wiz;
         component.read(wiz);
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        wizardDescriptor = wiz;
         component.store(wiz);
     }
 
