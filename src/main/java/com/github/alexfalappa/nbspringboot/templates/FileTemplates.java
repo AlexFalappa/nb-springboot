@@ -40,7 +40,7 @@ public class FileTemplates {
             description = "CfgProperties.html",
             scriptEngine = "freemarker",
             position = 100)
-    @NbBundle.Messages(value = "cfgprops_displayName=Configuration properties class")
+    @NbBundle.Messages(value = "cfgprops_displayName=Configuration Properties Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> cfgProperties() {
         return JavaTemplates.createJavaTemplateIterator();
     }
@@ -53,7 +53,7 @@ public class FileTemplates {
             description = "CmdLineRunner.html",
             scriptEngine = "freemarker",
             position = 200)
-    @NbBundle.Messages(value = "cmdlinerunner_displayName=CommandLineRunner class")
+    @NbBundle.Messages(value = "cmdlinerunner_displayName=CommandLineRunner Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> cmdLineRunner() {
         return JavaTemplates.createJavaTemplateIterator();
     }
@@ -66,7 +66,7 @@ public class FileTemplates {
             description = "ApplRunner.html",
             scriptEngine = "freemarker",
             position = 300)
-    @NbBundle.Messages(value = "applrunner_displayName=ApplicationRunner class")
+    @NbBundle.Messages(value = "applrunner_displayName=ApplicationRunner Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> applicationRunner() {
         return JavaTemplates.createJavaTemplateIterator();
     }
@@ -79,7 +79,7 @@ public class FileTemplates {
             description = "Configuration.html",
             scriptEngine = "freemarker",
             position = 100)
-    @NbBundle.Messages(value = "config_displayName=Configuration class")
+    @NbBundle.Messages(value = "config_displayName=Configuration Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> configuration() {
         return JavaTemplates.createJavaTemplateIterator();
     }
@@ -92,7 +92,7 @@ public class FileTemplates {
             description = "Component.html",
             scriptEngine = "freemarker",
             position = 200)
-    @NbBundle.Messages(value = "component_displayName=Component class")
+    @NbBundle.Messages(value = "component_displayName=Component Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> component() {
         return JavaTemplates.createJavaTemplateIterator();
     }
@@ -105,7 +105,7 @@ public class FileTemplates {
             description = "Service.html",
             scriptEngine = "freemarker",
             position = 300)
-    @NbBundle.Messages(value = "service_displayName=Service class")
+    @NbBundle.Messages(value = "service_displayName=Service Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> service() {
         return JavaTemplates.createJavaTemplateIterator();
     }
@@ -118,7 +118,7 @@ public class FileTemplates {
             description = "Controller.html",
             scriptEngine = "freemarker",
             position = 100)
-    @NbBundle.Messages(value = "controller_displayName=Controller class")
+    @NbBundle.Messages(value = "controller_displayName=Controller Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> controller() {
         return JavaTemplates.createJavaTemplateIterator();
     }
@@ -131,7 +131,7 @@ public class FileTemplates {
             description = "RestController.html",
             scriptEngine = "freemarker",
             position = 200)
-    @NbBundle.Messages(value = "rest_displayName=REST controller class")
+    @NbBundle.Messages(value = "rest_displayName=REST Controller Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> restController() {
         return JavaTemplates.createJavaTemplateIterator();
     }
@@ -144,7 +144,7 @@ public class FileTemplates {
             description = "Repository.html",
             scriptEngine = "freemarker",
             position = 100)
-    @NbBundle.Messages(value = "repo_displayName=Repository interface")
+    @NbBundle.Messages(value = "repo_displayName=Repository Interface")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> repository() {
         return JavaTemplates.createJavaTemplateIterator();
     }
