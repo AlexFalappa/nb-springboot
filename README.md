@@ -5,13 +5,11 @@ NetBeans IDE plugin supporting programming with [Spring Boot](http://projects.sp
 
 ## Requirements and Installation
 
-This plugin requires **NetBeans 8.1** running on **JDK 7** or above.
+This plugin requires **NetBeans 8.1** or above running on **JDK 7** or above.
 
-Download the `nbm` package from https://github.com/AlexFalappa/nb-springboot/releases.
+The plugin is available in the *Plugin Portal Update Center* thus it can be downloaded and installed trough *Tools > Plugins > Available Plugins*.
 
-In NetBeans go to _Tools_ > _Plugins_ > _Downloaded_ and click on _Add Plugins..._ button.
-
-Choose the downloaded `nbm` package file then click _Install_.
+Alternatively download the desired `nbm` package from https://github.com/AlexFalappa/nb-springboot/releases , go to *Tools > Plugins > Downloaded* and click on *Add Plugins...* button. Choose the downloaded `nbm` package file then click *Install*.
 
 ## Features
 
@@ -64,5 +62,18 @@ Template and code generator were inspired by those found on [Spring Boot Tools 4
 
 
 ## Changelog
+
+* __1.2__ (??? 2016): WIP.
+    * ???
+
+* __1.1__ (Jun 2016): Refinement release, available on NetBeans Plugin Portal Update Center.
+    * Fix: Added missing `@Component` annotation to CommandLineRunner and ApplicationRunner file templates
+    * Issue #14: No more implementation dependencies (this should allow the plugin to be available from the NetBeans plugin portal)
+    * Issue #10: Improvements to New project wizard _Spring Boot project (from Initializr)_:
+        * Asynchronous querying of the web service
+        * More paramenter validation
+        * Filtering of dependencies
+        * Show required boot version in tooltips of disabled dependencies
+        * Options to remove the maven wrapper, add the spring configuration processor dependency and run/debug trough the maven spring plugin
 
 * __1.0__ (May 2016): Initial public release.
