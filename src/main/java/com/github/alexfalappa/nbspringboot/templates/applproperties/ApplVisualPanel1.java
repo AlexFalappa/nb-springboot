@@ -31,8 +31,8 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 
-import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplConstants.WIZ_BASE_NAME;
-import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplConstants.WIZ_PROFILE;
+import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplWizardIterator.WIZ_BASE_NAME;
+import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplWizardIterator.WIZ_PROFILE;
 
 public final class ApplVisualPanel1 extends JPanel implements DocumentListener {
 
@@ -74,13 +74,13 @@ public final class ApplVisualPanel1 extends JPanel implements DocumentListener {
                 }
             }
         }
-        String baseName = (String) wd.getProperty(WIZ_BASE_NAME);
+        String baseName = (String) wd.getProperty(ApplWizardIterator.WIZ_BASE_NAME);
         if (baseName == null) {
             baseName = "application";
         }
         this.txBaseName.setText(baseName);
         this.txBaseName.selectAll();
-        this.txProfile.setText((String) wd.getProperty(WIZ_PROFILE));
+        this.txProfile.setText((String) wd.getProperty(ApplWizardIterator.WIZ_PROFILE));
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this

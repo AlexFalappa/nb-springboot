@@ -32,8 +32,6 @@ import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle.Messages;
 
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_BOOT;
-import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplConstants.WIZ_BASE_NAME;
-import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplConstants.WIZ_PROFILE;
 
 @TemplateRegistration(
         folder = FOLDER_SPRING_BOOT,
@@ -45,6 +43,9 @@ import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplC
         position = 400)
 @Messages(value = "applicprop_displayName=Application Properties")
 public final class ApplWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
+
+    public static final String WIZ_BASE_NAME = "base.name";
+    public static final String WIZ_PROFILE = "profile";
 
     private WizardDescriptor wizard;
     private ApplWizardPanel1 panel;

@@ -19,10 +19,10 @@ import javax.swing.JPanel;
 
 import org.openide.WizardDescriptor;
 
-import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS;
-import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS_PROVIDERS;
-import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS_VALUES;
-import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_PROPS;
+import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataWizardIterator.WIZ_SECT_HINTS;
+import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataWizardIterator.WIZ_SECT_HINTS_PROVIDERS;
+import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataWizardIterator.WIZ_SECT_HINTS_VALUES;
+import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataWizardIterator.WIZ_SECT_PROPS;
 
 public final class MetadataVisualPanel1 extends JPanel {
 

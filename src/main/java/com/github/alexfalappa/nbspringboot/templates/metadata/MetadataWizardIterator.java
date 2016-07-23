@@ -40,10 +40,6 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_BOOT;
-import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS;
-import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS_PROVIDERS;
-import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS_VALUES;
-import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_PROPS;
 
 @TemplateRegistration(
         folder = FOLDER_SPRING_BOOT,
@@ -55,6 +51,11 @@ import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataCon
         position = 500)
 @Messages(value = "addmetadata_displayName=Additional Properties Metadata")
 public final class MetadataWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
+
+    public static final String WIZ_SECT_PROPS = "properties";
+    public static final String WIZ_SECT_HINTS = "hints";
+    public static final String WIZ_SECT_HINTS_VALUES = "hintsValues";
+    public static final String WIZ_SECT_HINTS_PROVIDERS = "hintsProviders";
 
     private WizardDescriptor wizard;
     private MetadataWizardPanel1 panel;

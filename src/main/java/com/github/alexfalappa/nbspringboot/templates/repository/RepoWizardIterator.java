@@ -38,9 +38,6 @@ import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
 
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_DATA;
-import static com.github.alexfalappa.nbspringboot.templates.repository.RepoConstants.WIZ_BASE_INTERF;
-import static com.github.alexfalappa.nbspringboot.templates.repository.RepoConstants.WIZ_ENTITY_CLASS;
-import static com.github.alexfalappa.nbspringboot.templates.repository.RepoConstants.WIZ_ID_CLASS;
 
 @TemplateRegistration(
         folder = FOLDER_SPRING_DATA,
@@ -52,6 +49,10 @@ import static com.github.alexfalappa.nbspringboot.templates.repository.RepoConst
         position = 100)
 @NbBundle.Messages(value = "repos_displayName=Repository Interface")
 public final class RepoWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
+
+    public static final String WIZ_BASE_INTERF = "baseInterface";
+    public static final String WIZ_ENTITY_CLASS = "entityClass";
+    public static final String WIZ_ID_CLASS = "idClass";
 
     private WizardDescriptor wizard;
     private WizardDescriptor.Panel<WizardDescriptor> panel;

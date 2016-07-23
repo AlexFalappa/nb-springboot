@@ -31,10 +31,12 @@ public class FileTemplates {
     public static final String FOLDER_SPRING_MVC = "Spring MVC";
     public static final String FOLDER_SPRING_DATA = "Spring Data";
     public static final String FOLDER_SPRING_BOOT = "Spring Boot";
+    public static final String ICON_BOOT_CLASS = "com/github/alexfalappa/nbspringboot/templates/boot-class.png";
+    public static final String ICON_SPRING_CLASS = "com/github/alexfalappa/nbspringboot/templates/spring-class.png";
 
     @TemplateRegistration(
             folder = FOLDER_SPRING_BOOT,
-            iconBase = "com/github/alexfalappa/nbspringboot/templates/boot-class.png",
+            iconBase = ICON_BOOT_CLASS,
             displayName = "#cfgprops_displayName",
             content = "CfgProperties.java.template",
             description = "CfgProperties.html",
@@ -47,7 +49,7 @@ public class FileTemplates {
 
     @TemplateRegistration(
             folder = FOLDER_SPRING_BOOT,
-            iconBase = "com/github/alexfalappa/nbspringboot/templates/boot-class.png",
+            iconBase = ICON_BOOT_CLASS,
             displayName = "#cmdlinerunner_displayName",
             content = "CmdLineRunner.java.template",
             description = "CmdLineRunner.html",
@@ -60,7 +62,7 @@ public class FileTemplates {
 
     @TemplateRegistration(
             folder = FOLDER_SPRING_BOOT,
-            iconBase = "com/github/alexfalappa/nbspringboot/templates/boot-class.png",
+            iconBase = ICON_BOOT_CLASS,
             displayName = "#applrunner_displayName",
             content = "ApplRunner.java.template",
             description = "ApplRunner.html",
@@ -73,7 +75,7 @@ public class FileTemplates {
 
     @TemplateRegistration(
             folder = FOLDER_SPRING,
-            iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-class.png",
+            iconBase = ICON_SPRING_CLASS,
             displayName = "#config_displayName",
             content = "Configuration.java.template",
             description = "Configuration.html",
@@ -86,7 +88,7 @@ public class FileTemplates {
 
     @TemplateRegistration(
             folder = FOLDER_SPRING,
-            iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-class.png",
+            iconBase = ICON_SPRING_CLASS,
             displayName = "#component_displayName",
             content = "Component.java.template",
             description = "Component.html",
@@ -99,7 +101,7 @@ public class FileTemplates {
 
     @TemplateRegistration(
             folder = FOLDER_SPRING,
-            iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-class.png",
+            iconBase = ICON_SPRING_CLASS,
             displayName = "#service_displayName",
             content = "Service.java.template",
             description = "Service.html",
@@ -112,7 +114,7 @@ public class FileTemplates {
 
     @TemplateRegistration(
             folder = FOLDER_SPRING_MVC,
-            iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-class.png",
+            iconBase = ICON_SPRING_CLASS,
             displayName = "#controller_displayName",
             content = "Controller.java.template",
             description = "Controller.html",
@@ -125,7 +127,7 @@ public class FileTemplates {
 
     @TemplateRegistration(
             folder = FOLDER_SPRING_MVC,
-            iconBase = "com/github/alexfalappa/nbspringboot/templates/spring-class.png",
+            iconBase = ICON_SPRING_CLASS,
             displayName = "#rest_displayName",
             content = "RestController.java.template",
             description = "RestController.html",

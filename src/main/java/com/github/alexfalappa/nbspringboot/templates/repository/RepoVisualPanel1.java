@@ -15,18 +15,19 @@
  */
 package com.github.alexfalappa.nbspringboot.templates.repository;
 
-import java.io.File;
-
 import javax.swing.JPanel;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.openide.WizardDescriptor;
 
+import static com.github.alexfalappa.nbspringboot.templates.repository.RepoWizardIterator.WIZ_BASE_INTERF;
+import static com.github.alexfalappa.nbspringboot.templates.repository.RepoWizardIterator.WIZ_ENTITY_CLASS;
+import static com.github.alexfalappa.nbspringboot.templates.repository.RepoWizardIterator.WIZ_ID_CLASS;
+
 public final class RepoVisualPanel1 extends JPanel implements DocumentListener {
 
     private final RepoWizardPanel1 panel;
-    private File resourceFolder = new File(System.getProperty("user.dir"));
 
     @SuppressWarnings("LeakingThisInConstructor")
     public RepoVisualPanel1(RepoWizardPanel1 panel) {
@@ -40,15 +41,15 @@ public final class RepoVisualPanel1 extends JPanel implements DocumentListener {
     void store(WizardDescriptor wd) {
         String entityClass = txEntityClass.getText().trim();
         String idClass = txIdClass.getText().trim();
-        wd.putProperty(RepoConstants.WIZ_BASE_INTERF, cbBaseInterface.getSelectedItem());
-        wd.putProperty(RepoConstants.WIZ_ENTITY_CLASS, entityClass);
-        wd.putProperty(RepoConstants.WIZ_ID_CLASS, idClass);
+        wd.putProperty(WIZ_BASE_INTERF, cbBaseInterface.getSelectedItem());
+        wd.putProperty(WIZ_ENTITY_CLASS, entityClass);
+        wd.putProperty(WIZ_ID_CLASS, idClass);
     }
 
     void read(WizardDescriptor wd) {
-        cbBaseInterface.setSelectedItem(wd.getProperty(RepoConstants.WIZ_BASE_INTERF));
-        txEntityClass.setText((String) wd.getProperty(RepoConstants.WIZ_ENTITY_CLASS));
-        txIdClass.setText((String) wd.getProperty(RepoConstants.WIZ_ID_CLASS));
+        cbBaseInterface.setSelectedItem(wd.getProperty(WIZ_BASE_INTERF));
+        txEntityClass.setText((String) wd.getProperty(WIZ_ENTITY_CLASS));
+        txIdClass.setText((String) wd.getProperty(WIZ_ID_CLASS));
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
