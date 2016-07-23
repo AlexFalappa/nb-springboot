@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 
 import org.netbeans.api.java.project.JavaProjectConstants;
@@ -36,6 +37,8 @@ import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle;
+
+import com.github.alexfalappa.nbspringboot.templates.TemplateUtils;
 
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_DATA;
 
@@ -85,7 +88,9 @@ public final class RepoWizardIterator implements WizardDescriptor.InstantiatingI
         SourceGroup[] groups = src.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
         panel = JavaTemplates.createPackageChooser(project, groups, new RepoWizardPanel1(), true);
         // force creation of visual part
-        panel.getComponent();
+        JComponent cmp = (JComponent) panel.getComponent();
+        cmp.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(0));
+        cmp.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, TemplateUtils.createSteps(wizard, new String[]{cmp.getName()}));
     }
 
     @Override

@@ -31,6 +31,8 @@ import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle.Messages;
 
+import com.github.alexfalappa.nbspringboot.templates.TemplateUtils;
+
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_BOOT;
 
 @TemplateRegistration(
@@ -71,7 +73,10 @@ public final class ApplWizardIterator implements WizardDescriptor.InstantiatingI
         this.wizard = wizard;
         panel = new ApplWizardPanel1();
         // force creation of visual part
-        panel.getComponent();
+        ApplVisualPanel1 cmp = panel.getComponent();
+        // Make sure list of steps is accurate.
+        cmp.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(0));
+        cmp.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, TemplateUtils.createSteps(wizard, new String[]{cmp.getName()}));
     }
 
     @Override
