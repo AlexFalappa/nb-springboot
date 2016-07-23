@@ -39,13 +39,14 @@ import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 
+import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_BOOT;
 import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS;
 import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS_PROVIDERS;
 import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_HINTS_VALUES;
 import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataConstants.WIZ_SECT_PROPS;
 
 @TemplateRegistration(
-        folder = "Spring Boot",
+        folder = FOLDER_SPRING_BOOT,
         iconBase = "com/github/alexfalappa/nbspringboot/templates/metadata/boot-json.png",
         displayName = "#addmetadata_displayName",
         content = "additional-spring-configuration-metadata.json.template",
@@ -106,14 +107,14 @@ public final class MetadataWizardIterator implements WizardDescriptor.Instantiat
 
     @Override
     public void initialize(WizardDescriptor wizard) {
-        this.wizard = wizard;
-        panel = new MetadataWizardPanel1();
-        // force creation of visual part
-        panel.getComponent();
         wizard.putProperty(WIZ_SECT_PROPS, false);
         wizard.putProperty(WIZ_SECT_HINTS, true);
         wizard.putProperty(WIZ_SECT_HINTS_VALUES, true);
         wizard.putProperty(WIZ_SECT_HINTS_PROVIDERS, false);
+        this.wizard = wizard;
+        panel = new MetadataWizardPanel1();
+        // force creation of visual part
+        panel.getComponent();
     }
 
     @Override

@@ -13,29 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.templates.applproperties;
+package com.github.alexfalappa.nbspringboot.templates.repository;
 
 import javax.swing.event.ChangeListener;
 
 import org.openide.WizardDescriptor;
 import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
-import org.openide.util.NbBundle;
 
-public class ApplWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor>, WizardDescriptor.FinishablePanel<WizardDescriptor> {
+public class RepoWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor> {
 
     private WizardDescriptor wizardDescriptor;
-    private ApplVisualPanel1 component;
+    private RepoVisualPanel1 component;
 
     // Get the visual component for the panel. In this template, the component
     // is kept separate. This can be more efficient: if the wizard is created
     // but never displayed, or not all panels are displayed, it is better to
     // create only those which really need to be visible.
     @Override
-    public ApplVisualPanel1 getComponent() {
+    public RepoVisualPanel1 getComponent() {
         if (component == null) {
-            component = new ApplVisualPanel1(this);
-            component.setName(NbBundle.getMessage(ApplWizardPanel1.class, "LBL_FileNameStep"));
+            component = new RepoVisualPanel1(this);
         }
         return component;
     }
@@ -50,7 +48,11 @@ public class ApplWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor
 
     @Override
     public boolean isValid() {
-        return getComponent().valid(wizardDescriptor);
+        if (wizardDescriptor == null) {
+            return true;
+        } else {
+            return getComponent().valid(wizardDescriptor);
+        }
     }
 
     private final ChangeSupport chgSupport = new ChangeSupport(this);
@@ -75,6 +77,10 @@ public class ApplWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
+        System.out.println("com.github.alexfalappa.nbspringboot.templates.repository.RepoWizardPanel1.readSettings()");
+        if (wiz == null) {
+            System.out.println("Wiz NULL in readSettings!!!!");
+        }
         wizardDescriptor = wiz;
         getComponent().read(wiz);
     }
@@ -83,11 +89,6 @@ public class ApplWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor
     public void storeSettings(WizardDescriptor wiz) {
         wizardDescriptor = wiz;
         getComponent().store(wiz);
-    }
-
-    @Override
-    public boolean isFinishPanel() {
-        return true;
     }
 
 }

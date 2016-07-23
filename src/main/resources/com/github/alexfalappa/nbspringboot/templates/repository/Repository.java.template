@@ -1,0 +1,21 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "../Licenses/license-${project.license}.txt">
+<#if package?? && package != "">
+package ${package};
+
+</#if>
+<#if baseInterface != "JpaRepository">
+import org.springframework.data.repository.${baseInterface};
+<#else>
+import org.springframework.data.jpa.repository.${baseInterface};
+</#if>
+
+/**
+ *
+ * @author ${user}
+ */
+public interface ${name} extends ${baseInterface}<${entityClass}, ${idClass}> {
+
+}

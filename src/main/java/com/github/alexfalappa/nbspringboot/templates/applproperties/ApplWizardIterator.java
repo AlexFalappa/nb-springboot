@@ -31,11 +31,12 @@ import org.openide.loaders.DataFolder;
 import org.openide.loaders.DataObject;
 import org.openide.util.NbBundle.Messages;
 
+import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_BOOT;
 import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplConstants.WIZ_BASE_NAME;
 import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplConstants.WIZ_PROFILE;
 
 @TemplateRegistration(
-        folder = "Spring Boot",
+        folder = FOLDER_SPRING_BOOT,
         iconBase = "com/github/alexfalappa/nbspringboot/templates/applproperties/boot-properties.png",
         displayName = "#applicprop_displayName",
         content = "application.properties.template",
@@ -68,6 +69,7 @@ public final class ApplWizardIterator implements WizardDescriptor.InstantiatingI
     public void initialize(WizardDescriptor wizard) {
         this.wizard = wizard;
         panel = new ApplWizardPanel1();
+        // force creation of visual part
         panel.getComponent();
     }
 

@@ -95,12 +95,12 @@ public class MetadataWizardPanel1 implements WizardDescriptor.Panel<WizardDescri
         } catch (Exception ex) {
             Exceptions.printStackTrace(Exceptions.attachSeverity(ex, Level.WARNING));
         }
-        component.read(wiz);
+        getComponent().read(wiz);
     }
 
     @Override
     public void storeSettings(WizardDescriptor wiz) {
-        component.store(wiz);
+        getComponent().store(wiz);
     }
 
     @Override

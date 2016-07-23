@@ -136,17 +136,4 @@ public class FileTemplates {
         return JavaTemplates.createJavaTemplateIterator();
     }
 
-    @TemplateRegistration(
-            folder = FOLDER_SPRING_DATA,
-            iconBase = "com/github/alexfalappa/nbspringboot/templates/repository-interface.png",
-            displayName = "#repo_displayName",
-            content = "Repository.java.template",
-            description = "Repository.html",
-            scriptEngine = "freemarker",
-            position = 100)
-    @NbBundle.Messages(value = "repo_displayName=Repository Interface")
-    public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> repository() {
-        return JavaTemplates.createJavaTemplateIterator();
-    }
-
 }
