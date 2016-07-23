@@ -62,13 +62,10 @@ public final class MetadataVisualPanel1 extends JPanel {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        lSections = new javax.swing.JLabel();
         chProperties = new javax.swing.JCheckBox();
         chHints = new javax.swing.JCheckBox();
         chHintsValues = new javax.swing.JCheckBox();
         chHintsProviders = new javax.swing.JCheckBox();
-
-        org.openide.awt.Mnemonics.setLocalizedText(lSections, org.openide.util.NbBundle.getBundle(MetadataVisualPanel1.class).getString("MetadataVisualPanel1.lSections.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(chProperties, org.openide.util.NbBundle.getBundle(MetadataVisualPanel1.class).getString("MetadataVisualPanel1.chProperties.text")); // NOI18N
 
@@ -90,25 +87,19 @@ public final class MetadataVisualPanel1 extends JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lSections)
+                    .addComponent(chProperties)
+                    .addComponent(chHints)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
+                        .addGap(19, 19, 19)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(chProperties)
-                            .addComponent(chHints)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(19, 19, 19)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(chHintsValues)
-                                    .addComponent(chHintsProviders))))))
+                            .addComponent(chHintsValues)
+                            .addComponent(chHintsProviders))))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lSections)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chProperties)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chHints)
@@ -130,7 +121,6 @@ public final class MetadataVisualPanel1 extends JPanel {
     private javax.swing.JCheckBox chHintsProviders;
     private javax.swing.JCheckBox chHintsValues;
     private javax.swing.JCheckBox chProperties;
-    private javax.swing.JLabel lSections;
     // End of variables declaration//GEN-END:variables
 
 }
