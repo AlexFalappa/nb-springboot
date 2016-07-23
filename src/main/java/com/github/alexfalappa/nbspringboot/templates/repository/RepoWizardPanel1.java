@@ -77,10 +77,6 @@ public class RepoWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor
 
     @Override
     public void readSettings(WizardDescriptor wiz) {
-        System.out.println("com.github.alexfalappa.nbspringboot.templates.repository.RepoWizardPanel1.readSettings()");
-        if (wiz == null) {
-            System.out.println("Wiz NULL in readSettings!!!!");
-        }
         wizardDescriptor = wiz;
         getComponent().read(wiz);
     }
