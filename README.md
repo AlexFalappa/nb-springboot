@@ -63,17 +63,22 @@ Template and code generator were inspired by those found on [Spring Boot Tools 4
 
 ## Changelog
 
-* __1.2__ (??? 2016): WIP.
-    * ???
+* __1.2__ (??? 2016): File templates improvements
+    * The file templates that generate Java classes make use of the standard NetBeans widgets (better name proposal, chooice of destination package).
+    * The templates for `application.properties` files, additional configuration metadata and Spring Data repository interfaces are now more specific and more up to the point.
+    * Devtools reload now works with the spring maven plugin
+    * Fixed some UI glitches
+    * [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/4?closed=1)
 
-* __1.1__ (Jun 2016): Refinement release, available on NetBeans Plugin Portal Update Center.
+* __1.1__ (Jun 2016): Refinement release, available on NetBeans Plugin Portal Update Center
     * Fix: Added missing `@Component` annotation to CommandLineRunner and ApplicationRunner file templates
-    * Issue #14: No more implementation dependencies (this should allow the plugin to be available from the NetBeans plugin portal)
-    * Issue #10: Improvements to New project wizard _Spring Boot project (from Initializr)_:
+    * No more NetBeans module implementation dependencies, this allows the plugin to be available from the Update Center
+    * Improvements to New project wizard _Spring Boot project (from Initializr)_:
         * Asynchronous querying of the web service
         * More paramenter validation
         * Filtering of dependencies
         * Show required boot version in tooltips of disabled dependencies
         * Options to remove the maven wrapper, add the spring configuration processor dependency and run/debug trough the maven spring plugin
+    * [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/3?closed=1)
 
-* __1.0__ (May 2016): Initial public release.
+* __1.0__ (May 2016): Initial public release
