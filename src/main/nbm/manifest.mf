@@ -1,4 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module-Install: com/github/alexfalappa/nbspringboot/Installer.class
+OpenIDE-Module-Layer: com/github/alexfalappa/nbspringboot/layer.xml
 OpenIDE-Module-Localizing-Bundle: com/github/alexfalappa/nbspringboot/Bundle.properties
 

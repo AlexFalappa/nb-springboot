@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2016 Alessandro Falappa.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+
+<!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+
+<filesystem>
+    <folder name="Templates">
+        <folder name="springboot">
+            <attr name="displayName" stringvalue="Spring Boot"/>
+            <attr name="position" intvalue="800"/>
+        </folder>
+        <folder name="spring">
+            <attr name="displayName" stringvalue="Spring"/>
+            <attr name="position" intvalue="805"/>
+        </folder>
+        <folder name="springmvc">
+            <attr name="displayName" stringvalue="Spring MVC"/>
+            <attr name="position" intvalue="810"/>
+        </folder>
+        <folder name="springdata">
+            <attr name="displayName" stringvalue="Spring Data"/>
+            <attr name="position" intvalue="815"/>
+        </folder>
+    </folder>
+</filesystem>
