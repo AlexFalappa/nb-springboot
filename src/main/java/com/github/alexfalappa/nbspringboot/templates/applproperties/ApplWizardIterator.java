@@ -42,6 +42,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER
         content = "application.properties.template",
         description = "description.html",
         scriptEngine = "freemarker",
+        category = {"java-classes"},
         position = 400)
 @Messages(value = "applicprop_displayName=Application Properties")
 public final class ApplWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {

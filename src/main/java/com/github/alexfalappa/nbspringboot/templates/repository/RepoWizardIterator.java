@@ -49,6 +49,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER
         content = "Repository.java.template",
         description = "Repository.html",
         scriptEngine = "freemarker",
+        category = {"java-classes"},
         position = 100)
 @NbBundle.Messages(value = "repos_displayName=Repository Interface")
 public final class RepoWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {

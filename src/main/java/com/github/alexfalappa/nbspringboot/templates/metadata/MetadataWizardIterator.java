@@ -50,6 +50,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER
         content = "additional-spring-configuration-metadata.json.template",
         description = "description.html",
         scriptEngine = "freemarker",
+        category = {"java-classes"},
         position = 500)
 @Messages(value = "addmetadata_displayName=Additional Properties Metadata")
 public final class MetadataWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
