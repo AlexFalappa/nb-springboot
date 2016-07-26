@@ -33,6 +33,7 @@ import org.openide.util.NbBundle.Messages;
 
 import com.github.alexfalappa.nbspringboot.templates.TemplateUtils;
 
+import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_BOOT;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_BOOT;
 
 @TemplateRegistration(
@@ -42,7 +43,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER
         content = "application.properties.template",
         description = "description.html",
         scriptEngine = "freemarker",
-        category = {"java-classes"},
+        category = {CATEGORY_SPRING_BOOT},
         position = 400)
 @Messages(value = "applicprop_displayName=Application Properties")
 public final class ApplWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {

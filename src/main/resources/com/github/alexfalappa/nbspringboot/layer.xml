@@ -21,15 +21,15 @@ limitations under the License.
     <folder name="Templates">
         <folder name="springboot">
             <attr name="displayName" stringvalue="Spring Boot"/>
-            <attr name="position" intvalue="800"/>
+            <attr name="position" intvalue="805"/>
         </folder>
         <folder name="spring">
             <attr name="displayName" stringvalue="Spring"/>
-            <attr name="position" intvalue="805"/>
+            <attr name="position" intvalue="809"/>
         </folder>
         <folder name="springmvc">
             <attr name="displayName" stringvalue="Spring MVC"/>
-            <attr name="position" intvalue="810"/>
+            <attr name="position" intvalue="812"/>
         </folder>
         <folder name="springdata">
             <attr name="displayName" stringvalue="Spring Data"/>

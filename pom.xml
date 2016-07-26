@@ -91,6 +91,11 @@
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-projectuiapi-base</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-projectapi</artifactId>
             <version>${netbeans.api.version}</version>
         </dependency>

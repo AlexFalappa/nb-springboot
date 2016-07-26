@@ -20,13 +20,21 @@ import org.netbeans.spi.java.project.support.ui.templates.JavaTemplates;
 import org.openide.WizardDescriptor;
 import org.openide.util.NbBundle;
 
+import com.github.alexfalappa.nbspringboot.projects.BootRecommendedTemplates;
+
 /**
  * Spring and Spring Boot related file templates.
+ * <p>
+ * Templates are categorized and grouped in folder for display.
  *
+ * @see BootRecommendedTemplates
  * @author Alessandro Falappa
  */
 public class FileTemplates {
 
+    public static final String CATEGORY_SPRING_BOOT = "spring-boot-types";
+    public static final String CATEGORY_SPRING_MVC = "spring-mvc-types";
+    public static final String CATEGORY_SPRING_DATA = "spring-data-types";
     public static final String FOLDER_SPRING = "spring";
     public static final String FOLDER_SPRING_MVC = "springmvc";
     public static final String FOLDER_SPRING_DATA = "springdata";
@@ -41,7 +49,7 @@ public class FileTemplates {
             content = "CfgProperties.java.template",
             description = "CfgProperties.html",
             scriptEngine = "freemarker",
-            category = {"java-classes"},
+            category = {CATEGORY_SPRING_BOOT},
             position = 100)
     @NbBundle.Messages(value = "cfgprops_displayName=Configuration Properties Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> cfgProperties() {
@@ -55,7 +63,7 @@ public class FileTemplates {
             content = "CmdLineRunner.java.template",
             description = "CmdLineRunner.html",
             scriptEngine = "freemarker",
-            category = {"java-classes"},
+            category = {CATEGORY_SPRING_BOOT},
             position = 200)
     @NbBundle.Messages(value = "cmdlinerunner_displayName=CommandLineRunner Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> cmdLineRunner() {
@@ -69,7 +77,7 @@ public class FileTemplates {
             content = "ApplRunner.java.template",
             description = "ApplRunner.html",
             scriptEngine = "freemarker",
-            category = {"java-classes"},
+            category = {CATEGORY_SPRING_BOOT},
             position = 300)
     @NbBundle.Messages(value = "applrunner_displayName=ApplicationRunner Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> applicationRunner() {
@@ -83,7 +91,7 @@ public class FileTemplates {
             content = "Configuration.java.template",
             description = "Configuration.html",
             scriptEngine = "freemarker",
-            category = {"java-classes"},
+            category = {CATEGORY_SPRING_BOOT},
             position = 100)
     @NbBundle.Messages(value = "config_displayName=Configuration Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> configuration() {
@@ -97,7 +105,7 @@ public class FileTemplates {
             content = "Component.java.template",
             description = "Component.html",
             scriptEngine = "freemarker",
-            category = {"java-classes"},
+            category = {CATEGORY_SPRING_BOOT},
             position = 200)
     @NbBundle.Messages(value = "component_displayName=Component Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> component() {
@@ -111,7 +119,7 @@ public class FileTemplates {
             content = "Service.java.template",
             description = "Service.html",
             scriptEngine = "freemarker",
-            category = {"java-classes"},
+            category = {CATEGORY_SPRING_BOOT},
             position = 300)
     @NbBundle.Messages(value = "service_displayName=Service Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> service() {
@@ -125,7 +133,7 @@ public class FileTemplates {
             content = "Controller.java.template",
             description = "Controller.html",
             scriptEngine = "freemarker",
-            category = {"java-classes"},
+            category = {CATEGORY_SPRING_MVC},
             position = 100)
     @NbBundle.Messages(value = "controller_displayName=Controller Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> controller() {
@@ -139,7 +147,7 @@ public class FileTemplates {
             content = "RestController.java.template",
             description = "RestController.html",
             scriptEngine = "freemarker",
-            category = {"java-classes"},
+            category = {CATEGORY_SPRING_MVC},
             position = 200)
     @NbBundle.Messages(value = "rest_displayName=REST Controller Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> restController() {

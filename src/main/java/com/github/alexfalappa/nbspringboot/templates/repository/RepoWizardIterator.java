@@ -40,6 +40,7 @@ import org.openide.util.NbBundle;
 
 import com.github.alexfalappa.nbspringboot.templates.TemplateUtils;
 
+import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_DATA;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_DATA;
 
 @TemplateRegistration(
@@ -49,7 +50,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER
         content = "Repository.java.template",
         description = "Repository.html",
         scriptEngine = "freemarker",
-        category = {"java-classes"},
+        category = {CATEGORY_SPRING_DATA},
         position = 100)
 @NbBundle.Messages(value = "repos_displayName=Repository Interface")
 public final class RepoWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
