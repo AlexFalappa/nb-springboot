@@ -75,6 +75,7 @@ import static org.springframework.boot.configurationprocessor.metadata.ItemMetad
 public class BootConfigurationCompletionProvider implements CompletionProvider {
 
     private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
+    public static final int LOG_COMPLETION_TRESH = 50;
     private static final Logger logger = Logger.getLogger(BootConfigurationCompletionProvider.class.getName());
     private static final Pattern PATTERN_PROP_NAME = Pattern.compile("[^=\\s]+");
     private final JsonMarshaller jsonMarsaller = new JsonMarshaller();
@@ -173,7 +174,10 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
                 }
             }
         }
-        logger.log(INFO, "Property completion of ''{0}'' took: {1} msecs", new Object[]{filter, System.currentTimeMillis() - mark});
+        final long elapsed = System.currentTimeMillis() - mark;
+        if (elapsed > LOG_COMPLETION_TRESH) {
+            logger.log(INFO, "Property completion of ''{0}'' took: {1} msecs", new Object[]{filter, elapsed});
+        }
     }
 
     // Create a completion result list of properties values based on a property name, filter string, classpath and document offsets.
@@ -192,8 +196,10 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
                 }
             }
         }
-        logger.log(INFO, "Value completion of ''{0}'' on ''{1}'' took: {2} msecs",
-                new Object[]{filter, propName, System.currentTimeMillis() - mark});
+        final long elapsed = System.currentTimeMillis() - mark;
+        if (elapsed > LOG_COMPLETION_TRESH) {
+            logger.log(INFO, "Value completion of ''{0}'' on ''{1}'' took: {2} msecs", new Object[]{filter, propName, elapsed});
+        }
     }
 
     // Update internal caches and maps from the given classpath.
