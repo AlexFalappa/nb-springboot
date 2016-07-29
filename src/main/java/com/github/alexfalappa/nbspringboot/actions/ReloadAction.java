@@ -22,13 +22,14 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
-import org.netbeans.spi.project.AuxiliaryConfiguration;
+import org.netbeans.modules.maven.api.NbMavenProject;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
-import org.w3c.dom.Element;
 
 import static org.netbeans.api.project.Sources.TYPE_GENERIC;
 
@@ -48,29 +49,38 @@ import static org.netbeans.api.project.Sources.TYPE_GENERIC;
 @Messages("CTL_ReloadAction=S&pring Boot Reload")
 public final class ReloadAction implements ActionListener {
 
-    private final Project context;
-
-    public ReloadAction(Project context) {
-        this.context = context;
-    }
-
     @Override
     public void actionPerformed(ActionEvent e) {
-        System.out.println("ReloadAction!!!");
-        System.out.println(context.getProjectDirectory().getName());
-        AuxiliaryConfiguration aux = ProjectUtils.getAuxiliaryConfiguration(context);
-        if (aux != null) {
-            Element el = aux.getConfigurationFragment("netbeans.hint.license", "http://www.netbeans.org/ns/maven-properties-data/1", true);
-            System.out.println(el.getTextContent());
-        }
-        Sources src = ProjectUtils.getSources(context);
-        if (src != null) {
-            SourceGroup[] gr = src.getSourceGroups(TYPE_GENERIC);
-            for (SourceGroup g : gr) {
-                System.out.println(g.getName());
-                System.out.println(g.getRootFolder().toString());
-            }
+        // TODO implementare ContextGlobalProvider per tracciare l'ultimo Project selezionato
+        // altrimenti l'azione non funziona sempre (stesso pattern di abilitazione di quando
+        // ha un Project come parametro del costruttore)
+        // vedi https://blogs.oracle.com/geertjan/entry/org_openide_util_contextglobalprovider
+        System.out.println("\n\nReloadAction!!!");
+        Lookup lkp = org.openide.util.Utilities.actionsGlobalContext();
+        Project proj = lkp.lookup(Project.class);
+        if (proj != null) {
+            System.out.print("Project dir: ");
+            System.out.println(proj.getProjectDirectory().getName());
+            Sources src = ProjectUtils.getSources(proj);
+            if (src != null) {
+                SourceGroup[] gr = src.getSourceGroups(TYPE_GENERIC);
+                System.out.println("Source groups");
+                for (SourceGroup g : gr) {
+                    System.out.print("  Group ");
+                    System.out.print(g.getName());
+                    System.out.print("  folder ");
+                    System.out.println(FileUtil.getFileDisplayName(g.getRootFolder()));
+                }
 
+            }
+            NbMavenProject mvnProj = proj.getLookup().lookup(NbMavenProject.class);
+            if (mvnProj != null) {
+                System.out.println("Maven project");
+                System.out.print("Packaging ");
+                System.out.println(mvnProj.getPackagingType());
+                System.out.print("Output dir ");
+                System.out.println(mvnProj.getOutputDirectory(false).getAbsolutePath());
+            }
         }
     }
 }
