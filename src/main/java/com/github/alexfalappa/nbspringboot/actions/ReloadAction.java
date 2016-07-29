@@ -18,34 +18,59 @@ package com.github.alexfalappa.nbspringboot.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.api.project.SourceGroup;
+import org.netbeans.api.project.Sources;
+import org.netbeans.spi.project.AuxiliaryConfiguration;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.NbBundle.Messages;
+import org.w3c.dom.Element;
+
+import static org.netbeans.api.project.Sources.TYPE_GENERIC;
 
 @ActionID(
         category = "Build",
-        id = "com.github.alexfalappa.nbspringboot.ReloadAction"
+        id = "com.github.alexfalappa.nbspringboot.actions.ReloadAction"
 )
 @ActionRegistration(
         iconBase = "com/github/alexfalappa/nbspringboot/actions/springboot-logo.png",
-        iconInMenu = true,
         displayName = "#CTL_ReloadAction"
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/BuildProject", position = 58),
-    @ActionReference(path = "Toolbars/Build", position = 600),
-    @ActionReference(path = "Shortcuts", name = "D-L")
+    @ActionReference(path = "Menu/BuildProject", position = 57),
+    @ActionReference(path = "Toolbars/Build", position = 500),
+    @ActionReference(path = "Shortcuts", name = "DS-L")
 })
-@Messages("CTL_ReloadAction=Spring &Boot Reload")
+@Messages("CTL_ReloadAction=S&pring Boot Reload")
 public final class ReloadAction implements ActionListener {
 
-    public ReloadAction() {
+    private final Project context;
+
+    public ReloadAction(Project context) {
+        this.context = context;
     }
 
     @Override
-    public void actionPerformed(ActionEvent ev) {
-        System.out.println("Reload!!!");
+    public void actionPerformed(ActionEvent e) {
+        System.out.println("ReloadAction!!!");
+        System.out.println(context.getProjectDirectory().getName());
+        AuxiliaryConfiguration aux = ProjectUtils.getAuxiliaryConfiguration(context);
+        if (aux != null) {
+            Element el = aux.getConfigurationFragment("netbeans.hint.license", "http://www.netbeans.org/ns/maven-properties-data/1", true);
+            System.out.println(el.getTextContent());
+        }
+        Sources src = ProjectUtils.getSources(context);
+        if (src != null) {
+            SourceGroup[] gr = src.getSourceGroups(TYPE_GENERIC);
+            for (SourceGroup g : gr) {
+                System.out.println(g.getName());
+                System.out.println(g.getRootFolder().toString());
+            }
+
+        }
     }
 }
