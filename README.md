@@ -65,10 +65,10 @@ Template and code generator were inspired by those found on [Spring Boot Tools 4
 
 * __1.2__ (Ago 2016): File templates improvements
     * Upgrade to Spring Boot version 1.4
-    * The file templates wizards that generate Java classes now use the standard NetBeans widgets (better name proposal, chooice of source/test location and destination package)
+    * The file templates wizards that generate Java classes now use the standard NetBeans widgets (better name proposal, choice of source/test location and destination package)
     * The wizards for `application.properties` files, additional configuration metadata and Spring Data repository interfaces now offer specific customization options
     * The file templates are now shown only if the relevant dependencies are present (e.g. REST Controller Class is shown only if there is a dependency on spring-boot-starter-web)
-    * Devtools restart and reload now work when the project is run/debugded trough the spring maven plugin
+    * Devtools restart and reload now work when the project is run/debugged trough the spring maven plugin
     * Fixed some UI glitches
     * Enhanced Controller and RestController templates
     * [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/4?closed=1)
