@@ -15,15 +15,57 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.customizer;
 
+import java.io.File;
+
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+
+import org.netbeans.modules.maven.api.customizer.ModelHandle2;
+
 /**
  *
  * @author Alessandro Falappa
  */
-public class BootPanel extends javax.swing.JPanel {
+public class BootPanel extends javax.swing.JPanel implements DocumentListener {
+
+    private static final String PROP_TRIGGER_ENABLED = "com.github.alexfalappa.nbspringboot.reloadtrigger.enabled";
+    private static final String PROP_TRIGGER_FILE = "com.github.alexfalappa.nbspringboot.reloadtrigger.file";
+    private ModelHandle2 mh2;
 
     /** Creates new form BootPanel */
     public BootPanel() {
         initComponents();
+    }
+
+    public void setModelHandle(ModelHandle2 mh2) {
+        this.mh2 = mh2;
+        String file = mh2.getRawAuxiliaryProperty(PROP_TRIGGER_FILE, true);
+        if (file != null) {
+            txTrigFile.setText(file);
+        } else {
+            txTrigFile.setText(System.getProperty("java.io.tmpdir") + File.pathSeparator + ".nbReloadTrigger");
+        }
+        txTrigFile.getDocument().addDocumentListener(this);
+        String enabled = mh2.getRawAuxiliaryProperty(PROP_TRIGGER_ENABLED, true);
+        if (enabled != null) {
+            chDevtools.setSelected(Boolean.valueOf(enabled));
+            trgFileWidgetsState();
+        }
+    }
+
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        updateModel();
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        updateModel();
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        updateModel();
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -88,8 +130,9 @@ public class BootPanel extends javax.swing.JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void chDevtoolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDevtoolsActionPerformed
-        lTrigFile.setEnabled(chDevtools.isSelected());
-        txTrigFile.setEnabled(chDevtools.isSelected());
+        mh2.setRawAuxiliaryProperty(PROP_TRIGGER_ENABLED, String.valueOf(chDevtools.isSelected()), true);
+        mh2.markConfigurationsAsModified();
+        trgFileWidgetsState();
     }//GEN-LAST:event_chDevtoolsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -98,4 +141,14 @@ public class BootPanel extends javax.swing.JPanel {
     private javax.swing.JLabel lTrigFile;
     private javax.swing.JTextField txTrigFile;
     // End of variables declaration//GEN-END:variables
+
+    private void updateModel() {
+        mh2.setRawAuxiliaryProperty(PROP_TRIGGER_FILE, txTrigFile.getText(), true);
+        mh2.markConfigurationsAsModified();
+    }
+
+    private void trgFileWidgetsState() {
+        lTrigFile.setEnabled(chDevtools.isSelected());
+        txTrigFile.setEnabled(chDevtools.isSelected());
+    }
 }
