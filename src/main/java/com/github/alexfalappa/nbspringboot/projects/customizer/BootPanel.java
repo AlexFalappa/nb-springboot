@@ -35,10 +35,23 @@ public class BootPanel extends javax.swing.JPanel {
 
         lDevtools = new javax.swing.JLabel();
         chDevtools = new javax.swing.JCheckBox();
+        lTrigFile = new javax.swing.JLabel();
+        txTrigFile = new javax.swing.JTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(lDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDevtools.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(chDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.chDevtools.text")); // NOI18N
+        chDevtools.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chDevtoolsActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(lTrigFile, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lTrigFile.text")); // NOI18N
+        lTrigFile.setEnabled(false);
+
+        txTrigFile.setColumns(15);
+        txTrigFile.setEnabled(false);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -47,11 +60,17 @@ public class BootPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(lDevtools)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addComponent(chDevtools))
-                    .addComponent(lDevtools))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(19, 19, 19)
+                                .addComponent(lTrigFile)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txTrigFile))
+                            .addComponent(chDevtools))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -60,12 +79,23 @@ public class BootPanel extends javax.swing.JPanel {
                 .addComponent(lDevtools)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chDevtools)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lTrigFile)
+                    .addComponent(txTrigFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void chDevtoolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDevtoolsActionPerformed
+        lTrigFile.setEnabled(chDevtools.isSelected());
+        txTrigFile.setEnabled(chDevtools.isSelected());
+    }//GEN-LAST:event_chDevtoolsActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox chDevtools;
     private javax.swing.JLabel lDevtools;
+    private javax.swing.JLabel lTrigFile;
+    private javax.swing.JTextField txTrigFile;
     // End of variables declaration//GEN-END:variables
 }
