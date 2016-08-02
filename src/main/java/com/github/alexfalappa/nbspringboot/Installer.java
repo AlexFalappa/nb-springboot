@@ -35,7 +35,8 @@ public class Installer extends Yenta {
         return new HashSet<>(Arrays.asList(
                 "org.netbeans.modules.maven",
                 "org.netbeans.modules.maven.embedder",
-                "org.netbeans.modules.maven.model"
+                "org.netbeans.modules.maven.model"//,
+        //                "org.openide.windows"
         ));
     }
 
