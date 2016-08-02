@@ -29,7 +29,7 @@ import org.openide.util.Lookup;
  *
  * @author Alessandro Falappa
  */
-@ProjectCustomizer.CompositeCategoryProvider.Registration(projectType = "org-netbeans-modules-maven", position = 1200)
+@ProjectCustomizer.CompositeCategoryProvider.Registration(projectType = "org-netbeans-modules-maven", position = 1300)
 public class BootPanelProvider implements ProjectCustomizer.CompositeCategoryProvider {
 
     @Override
