@@ -33,10 +33,16 @@ public class Installer extends Yenta {
     @Override
     protected Set<String> friends() {
         return new HashSet<>(Arrays.asList(
-                "org.netbeans.modules.maven",
                 "org.netbeans.modules.maven.embedder",
-                "org.netbeans.modules.maven.model"//,
-        //                "org.openide.windows"
+                "org.netbeans.modules.maven.model"
+        ));
+    }
+
+    @Override
+    protected Set<String> siblings() {
+        return new HashSet<>(Arrays.asList(
+                "org.netbeans.modules.maven",
+                "org.openide.windows"
         ));
     }
 

@@ -17,21 +17,25 @@ package com.github.alexfalappa.nbspringboot.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.util.Date;
+import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 
-import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.api.project.SourceGroup;
-import org.netbeans.api.project.Sources;
-import org.netbeans.modules.maven.api.NbMavenProject;
+import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
-import org.openide.filesystems.FileUtil;
-import org.openide.util.Lookup;
+import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 
-import static org.netbeans.api.project.Sources.TYPE_GENERIC;
+import static com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel.PROP_TRG_ENABLED;
+import static com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel.PROP_TRG_FILE;
+import static java.lang.Boolean.valueOf;
 
 @ActionID(
         category = "Build",
@@ -49,38 +53,33 @@ import static org.netbeans.api.project.Sources.TYPE_GENERIC;
 @Messages("CTL_ReloadAction=S&pring Boot Reload")
 public final class ReloadAction implements ActionListener {
 
+    private static final Logger logger = Logger.getLogger(ReloadAction.class.getName());
+    private final NbMavenProjectImpl proj;
+
+    public ReloadAction(NbMavenProjectImpl context) {
+        this.proj = context;
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        // TODO implementare ContextGlobalProvider per tracciare l'ultimo Project selezionato
-        // altrimenti l'azione non funziona sempre (stesso pattern di abilitazione di quando
-        // ha un Project come parametro del costruttore)
-        // vedi https://blogs.oracle.com/geertjan/entry/org_openide_util_contextglobalprovider
-        System.out.println("\n\nReloadAction!!!");
-        Lookup lkp = org.openide.util.Utilities.actionsGlobalContext();
-        Project proj = lkp.lookup(Project.class);
-        if (proj != null) {
-            System.out.print("Project dir: ");
-            System.out.println(proj.getProjectDirectory().getName());
-            Sources src = ProjectUtils.getSources(proj);
-            if (src != null) {
-                SourceGroup[] gr = src.getSourceGroups(TYPE_GENERIC);
-                System.out.println("Source groups");
-                for (SourceGroup g : gr) {
-                    System.out.print("  Group ");
-                    System.out.print(g.getName());
-                    System.out.print("  folder ");
-                    System.out.println(FileUtil.getFileDisplayName(g.getRootFolder()));
+        Preferences prefs = ProjectUtils.getPreferences(proj, ReloadAction.class, true);
+        if (prefs != null) {
+            boolean enabled = valueOf(prefs.get(PROP_TRG_ENABLED, "false"));
+            String strFile = prefs.get(PROP_TRG_FILE, null);
+            if (enabled && strFile != null) {
+                File f = new File(strFile);
+                try (PrintWriter pw = new PrintWriter(f)) {
+                    pw.printf("%1$tF %1$tT", new Date());
+                    pw.close();
+                    logger.info(String.format("Timestamp written in %s", f.getAbsolutePath()));
+                } catch (FileNotFoundException ex) {
+                    Exceptions.printStackTrace(ex);
                 }
-
+            } else {
+                logger.info("Reload disabled!");
             }
-            NbMavenProject mvnProj = proj.getLookup().lookup(NbMavenProject.class);
-            if (mvnProj != null) {
-                System.out.println("Maven project");
-                System.out.print("Packaging ");
-                System.out.println(mvnProj.getPackagingType());
-                System.out.print("Output dir ");
-                System.out.println(mvnProj.getOutputDirectory(false).getAbsolutePath());
-            }
+        } else {
+            logger.warning("No reloading preferences found!");
         }
     }
 }
