@@ -16,6 +16,7 @@
 package com.github.alexfalappa.nbspringboot.projects.customizer;
 
 import java.io.File;
+import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
 import javax.swing.event.DocumentEvent;
@@ -33,6 +34,7 @@ import com.github.alexfalappa.nbspringboot.actions.ReloadAction;
  */
 public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
+    private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     public static final String PROP_TRG_ENABLED = "reloadtrigger.enabled";
     public static final String PROP_TRG_FILE = "reloadtrigger.file";
     private Preferences prefs;
@@ -133,8 +135,18 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     }// </editor-fold>//GEN-END:initComponents
 
     private void chDevtoolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDevtoolsActionPerformed
-        prefs.put(PROP_TRG_ENABLED, String.valueOf(chDevtools.isSelected()));
+        final boolean flag = chDevtools.isSelected();
+        prefs.put(PROP_TRG_ENABLED, String.valueOf(flag));
         trgFileWidgetsState();
+        if (flag) {
+            File f = new File(txTrigFile.getText());
+            if (f.canWrite()) {
+                boolean deleted = f.delete();
+                if (deleted) {
+                    logger.info(String.format("Deleted previous trigger file %s", f.getAbsolutePath()));
+                }
+            }
+        }
     }//GEN-LAST:event_chDevtoolsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
