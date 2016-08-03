@@ -22,6 +22,7 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
 
 import com.github.alexfalappa.nbspringboot.actions.ReloadAction;
@@ -43,13 +44,14 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
     public void setProject(Project prj) {
         prefs = ProjectUtils.getPreferences(prj, ReloadAction.class, true);
+        ProjectInformation pInfo = ProjectUtils.getInformation(prj);
         chDevtools.setSelected(Boolean.valueOf(prefs.get(PROP_TRG_ENABLED, "false")));
         trgFileWidgetsState();
         String file = prefs.get(PROP_TRG_FILE, null);
         if (file != null) {
             txTrigFile.setText(file);
         } else {
-            txTrigFile.setText(System.getProperty("java.io.tmpdir") + File.separator + ".nbReloadTrigger");
+            txTrigFile.setText(System.getProperty("java.io.tmpdir") + File.separator + ".nbReloadTrigger-" + pInfo.getName());
         }
         txTrigFile.getDocument().addDocumentListener(this);
     }
