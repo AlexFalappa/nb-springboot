@@ -16,11 +16,15 @@
 package com.github.alexfalappa.nbspringboot.projects.customizer;
 
 import java.io.File;
+import java.util.prefs.Preferences;
 
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.netbeans.modules.maven.api.customizer.ModelHandle2;
+import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ProjectUtils;
+
+import com.github.alexfalappa.nbspringboot.actions.ReloadAction;
 
 /**
  *
@@ -28,29 +32,26 @@ import org.netbeans.modules.maven.api.customizer.ModelHandle2;
  */
 public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
-    private static final String PROP_TRIGGER_ENABLED = "com.github.alexfalappa.nbspringboot.reloadtrigger.enabled";
-    private static final String PROP_TRIGGER_FILE = "com.github.alexfalappa.nbspringboot.reloadtrigger.file";
-    private ModelHandle2 mh2;
+    public static final String PROP_TRG_ENABLED = "reloadtrigger.enabled";
+    public static final String PROP_TRG_FILE = "reloadtrigger.file";
+    private Preferences prefs;
 
     /** Creates new form BootPanel */
     public BootPanel() {
         initComponents();
     }
 
-    public void setModelHandle(ModelHandle2 mh2) {
-        this.mh2 = mh2;
-        String file = mh2.getRawAuxiliaryProperty(PROP_TRIGGER_FILE, true);
+    public void setProject(Project prj) {
+        prefs = ProjectUtils.getPreferences(prj, ReloadAction.class, true);
+        chDevtools.setSelected(Boolean.valueOf(prefs.get(PROP_TRG_ENABLED, "false")));
+        trgFileWidgetsState();
+        String file = prefs.get(PROP_TRG_FILE, null);
         if (file != null) {
             txTrigFile.setText(file);
         } else {
-            txTrigFile.setText(System.getProperty("java.io.tmpdir") + File.pathSeparator + ".nbReloadTrigger");
+            txTrigFile.setText(System.getProperty("java.io.tmpdir") + File.separator + ".nbReloadTrigger");
         }
         txTrigFile.getDocument().addDocumentListener(this);
-        String enabled = mh2.getRawAuxiliaryProperty(PROP_TRIGGER_ENABLED, true);
-        if (enabled != null) {
-            chDevtools.setSelected(Boolean.valueOf(enabled));
-            trgFileWidgetsState();
-        }
     }
 
     @Override
@@ -130,8 +131,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     }// </editor-fold>//GEN-END:initComponents
 
     private void chDevtoolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDevtoolsActionPerformed
-        mh2.setRawAuxiliaryProperty(PROP_TRIGGER_ENABLED, String.valueOf(chDevtools.isSelected()), true);
-        mh2.markConfigurationsAsModified();
+        prefs.put(PROP_TRG_ENABLED, String.valueOf(chDevtools.isSelected()));
         trgFileWidgetsState();
     }//GEN-LAST:event_chDevtoolsActionPerformed
 
@@ -143,8 +143,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     // End of variables declaration//GEN-END:variables
 
     private void updateModel() {
-        mh2.setRawAuxiliaryProperty(PROP_TRIGGER_FILE, txTrigFile.getText(), true);
-        mh2.markConfigurationsAsModified();
+        prefs.put(PROP_TRG_FILE, txTrigFile.getText());
     }
 
     private void trgFileWidgetsState() {
