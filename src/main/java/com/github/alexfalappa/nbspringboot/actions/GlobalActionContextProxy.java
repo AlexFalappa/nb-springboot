@@ -45,8 +45,10 @@ import org.openide.windows.WindowManager;
  * This class proxies the original ContextGlobalProvider and ensures the current project remains in the GlobalContext regardless of the
  * TopComponent selection. The class also ensures that when a child node is selected within the in Projects tab, the parent Project will be
  * in the lookup.
- *
+ * <p>
  * To use this class you must have an implementation dependency on org.openide.windows module.
+ * <p>
+ * Taken from http://wiki.netbeans.org/DevFaqAddGlobalContext
  *
  * @see ContextGlobalProvider
  * @see GlobalActionContextImpl
@@ -80,37 +82,29 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
     public static final String PROJECT_FILE_TAB_ID = "projectTab_tc";
 
     public GlobalActionContextProxy() {
-        logger.info("GlobalActionContextProxy constructor");
         try {
-            System.out.println("1");
             this.content = new InstanceContent();
-            System.out.println("2");
             // The default GlobalContextProvider
             this.globalContextProvider = new GlobalActionContextImpl();
-            System.out.println("3");
             this.globalContextLookup = this.globalContextProvider.createGlobalContext();
-            System.out.println("4");
             // Monitor the activation of the Projects Tab TopComponent
             TopComponent.getRegistry().addPropertyChangeListener(this.registryListener);
-            System.out.println("5");
             // Monitor the existance of a Project in the principle lookup
             this.resultProjects = globalContextLookup.lookupResult(Project.class);
-            System.out.println("6");
             this.resultProjects.addLookupListener(this.resultListener);
-            System.out.println("7");
         } catch (Exception e) {
             e.printStackTrace();
         }
-//        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
-//            @Override
-//            public void run() {
-//                // Hack to force the current Project selection when the application starts up
-//                TopComponent tc = WindowManager.getDefault().findTopComponent(PROJECT_LOGICAL_TAB_ID);
-//                if (tc != null) {
-//                    tc.requestActive();
-//                }
-//            }
-//        });
+        WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
+            @Override
+            public void run() {
+                // Hack to force the current Project selection when the application starts up
+                TopComponent tc = WindowManager.getDefault().findTopComponent(PROJECT_LOGICAL_TAB_ID);
+                if (tc != null) {
+                    tc.requestActive();
+                }
+            }
+        });
     }
 
     /**
@@ -138,8 +132,6 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
 
         @Override
         public void propertyChange(PropertyChangeEvent event) {
-            System.out.println(
-                    "com.github.alexfalappa.nbspringboot.actions.GlobalActionContextProxy.RegistryPropertyChangeListener.propertyChange()");
             if (event.getPropertyName().equals(TopComponent.Registry.PROP_ACTIVATED_NODES)
                     || event.getPropertyName().equals(TopComponent.Registry.PROP_ACTIVATED)) {
                 // Get a reference to the Projects window
@@ -155,10 +147,10 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
                 Node[] nodes = null;
                 TopComponent activated = TopComponent.getRegistry().getActivated();
                 if (activated != null && activated.equals(projectsTab)) {
-                    logger.info("propertyChange: processing activated nodes");
+                    logger.finer("propertyChange: processing activated nodes");
                     nodes = projectsTab.getActivatedNodes();
                 } else if (lastProject == null) {
-                    logger.info("propertyChange: processing selected nodes");
+                    logger.finer("propertyChange: processing selected nodes");
                     ExplorerManager em = ((ExplorerManager.Provider) projectsTab).getExplorerManager();
                     nodes = em.getSelectedNodes();
                 }
@@ -172,7 +164,7 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
                                 lastProject = project;
                                 // Add this project to the proxy if it's not in the global lookup
                                 if (!resultProjects.allInstances().contains(lastProject)) {
-                                    logger.info(String.format("propertyChange: Found project [%s] that owns current node.",
+                                    logger.finer(String.format("propertyChange: Found project [%s] that owns current node.",
                                             ProjectUtils.getInformation(lastProject).getDisplayName()));
                                     updateProjectLookup(lastProject);
                                 }
@@ -193,7 +185,7 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
 
         @Override
         public void resultChanged(LookupEvent event) {
-            logger.info("resultChanged: Entered...");
+            logger.finer("resultChanged: Entered...");
             synchronized (lock) {
                 // First, handle projects in the principle lookup
                 if (resultProjects.allInstances().size() > 0) {
@@ -201,7 +193,7 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
                     // Note: not handling multiple selection of projects.
                     clearProjectLookup();
                     lastProject = resultProjects.allInstances().iterator().next();
-                    logger.info(String.format("resultChanged: Found project [%s] in the normal lookup.",
+                    logger.finer(String.format("resultChanged: Found project [%s] in the normal lookup.",
                             ProjectUtils.getInformation(lastProject).getDisplayName()));
                 } else if (OpenProjects.getDefault().getOpenProjects().length == 0) {
                     clearProjectLookup();
@@ -213,7 +205,7 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
                         Project project = findProjectThatOwnsNode(currrentNode);
                         if (project != null) {
                             lastProject = project;
-                            logger.info(String.format("resultChanged: Found project [%s] that owns current node.",
+                            logger.finer(String.format("resultChanged: Found project [%s] that owns current node.",
                                     ProjectUtils.getInformation(lastProject).getDisplayName()));
                         }
                     }
