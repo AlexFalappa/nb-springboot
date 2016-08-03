@@ -142,8 +142,11 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             File f = new File(txTrigFile.getText());
             if (f.canWrite()) {
                 boolean deleted = f.delete();
+                final String absolutePath = f.getAbsolutePath();
                 if (deleted) {
-                    logger.info(String.format("Deleted previous trigger file %s", f.getAbsolutePath()));
+                    logger.info(String.format("Deleted previous trigger file %s", absolutePath));
+                } else {
+                    logger.warning(String.format("Couldn't delete previous trigger file %s", absolutePath));
                 }
             }
         }
