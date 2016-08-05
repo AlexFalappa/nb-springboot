@@ -34,8 +34,6 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 
 import static com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel.PROP_TRG_ENABLED;
-import static com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel.PROP_TRG_FILE;
-import static java.lang.Boolean.valueOf;
 
 @ActionID(
         category = "Build",
@@ -54,6 +52,7 @@ import static java.lang.Boolean.valueOf;
 public final class ReloadAction implements ActionListener {
 
     private static final Logger logger = Logger.getLogger(ReloadAction.class.getName());
+    public static final String TRIGGER_FILE = ".nbReloadTrigger";
     private final NbMavenProjectImpl proj;
 
     public ReloadAction(NbMavenProjectImpl context) {
@@ -63,18 +62,23 @@ public final class ReloadAction implements ActionListener {
     @Override
     public void actionPerformed(ActionEvent e) {
         Preferences prefs = ProjectUtils.getPreferences(proj, ReloadAction.class, true);
+        File outDir = proj.getProjectWatcher().getOutputDirectory(false);
         if (prefs != null) {
-            boolean enabled = valueOf(prefs.get(PROP_TRG_ENABLED, "false"));
-            String strFile = prefs.get(PROP_TRG_FILE, null);
-            if (enabled && strFile != null) {
-                // TODO seems that the trigger file must be in <proj_dir>/target/classes for devtools to monitor
-                File f = new File(strFile);
-                try (PrintWriter pw = new PrintWriter(f)) {
-                    pw.printf("%1$tF %1$tT", new Date());
-                    pw.close();
-                    logger.info(String.format("Timestamp written in %s", f.getAbsolutePath()));
-                } catch (FileNotFoundException ex) {
-                    Exceptions.printStackTrace(ex);
+            boolean enabled = Boolean.valueOf(prefs.get(PROP_TRG_ENABLED, "false"));
+            System.out.format("enabled %b%n", enabled);
+            if (enabled) {
+                File f = new File(outDir, TRIGGER_FILE);
+                if (outDir.exists()) {
+                    try (PrintWriter pw = new PrintWriter(f)) {
+                        pw.printf("%1$tF %1$tT", new Date());
+                        pw.close();
+                        logger.info(String.format("Spring Boot reload triggered"));
+                        logger.fine(String.format("Timestamp written in %s", f.getAbsolutePath()));
+                    } catch (FileNotFoundException ex) {
+                        Exceptions.printStackTrace(ex);
+                    }
+                } else {
+                    logger.warning("No output directory found! Build the project.");
                 }
             } else {
                 logger.info("Reload disabled!");

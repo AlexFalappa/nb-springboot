@@ -19,9 +19,6 @@ import java.io.File;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.maven.api.customizer.ModelHandle2;
@@ -35,11 +32,10 @@ import com.github.alexfalappa.nbspringboot.actions.ReloadAction;
  *
  * @author Alessandro Falappa
  */
-public class BootPanel extends javax.swing.JPanel implements DocumentListener {
+public class BootPanel extends javax.swing.JPanel {
 
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     public static final String PROP_TRG_ENABLED = "reloadtrigger.enabled";
-    public static final String PROP_TRG_FILE = "reloadtrigger.file";
     private Preferences prefs;
     private ModelHandle2 mh2;
 
@@ -51,36 +47,12 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     public void setProject(Project prj) {
         prefs = ProjectUtils.getPreferences(prj, ReloadAction.class, true);
         chDevtools.setSelected(Boolean.valueOf(prefs.get(PROP_TRG_ENABLED, "false")));
-        trgFileWidgetsState();
-        // TODO consider using a fixed name
-        String file = prefs.get(PROP_TRG_FILE, null);
-        if (file != null) {
-            txTrigFile.setText(file);
-        } else {
-            txTrigFile.setText(".nbReloadTrigger");
-        }
-        txTrigFile.getDocument().addDocumentListener(this);
         chDevtools.setEnabled(prefs != null && mh2 != null);
     }
 
     void setModelHandle(ModelHandle2 mh2) {
         this.mh2 = mh2;
         chDevtools.setEnabled(prefs != null && mh2 != null);
-    }
-
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        updateModel();
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        updateModel();
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        updateModel();
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -92,8 +64,6 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
         lDevtools = new javax.swing.JLabel();
         chDevtools = new javax.swing.JCheckBox();
-        lTrigFile = new javax.swing.JLabel();
-        txTrigFile = new javax.swing.JTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(lDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDevtools.text")); // NOI18N
 
@@ -105,12 +75,6 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(lTrigFile, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lTrigFile.text")); // NOI18N
-        lTrigFile.setEnabled(false);
-
-        txTrigFile.setColumns(15);
-        txTrigFile.setEnabled(false);
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -121,14 +85,8 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                     .addComponent(lDevtools)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(19, 19, 19)
-                                .addComponent(lTrigFile)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txTrigFile))
-                            .addComponent(chDevtools))))
-                .addContainerGap())
+                        .addComponent(chDevtools)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -137,10 +95,6 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                 .addComponent(lDevtools)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chDevtools)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lTrigFile)
-                    .addComponent(txTrigFile, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -148,9 +102,8 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     private void chDevtoolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDevtoolsActionPerformed
         final boolean flag = chDevtools.isSelected();
         prefs.put(PROP_TRG_ENABLED, String.valueOf(flag));
-        trgFileWidgetsState();
         if (flag) {
-            File f = new File(txTrigFile.getText());
+            File f = new File(ReloadAction.TRIGGER_FILE);
             if (f.canWrite()) {
                 boolean deleted = f.delete();
                 final String absolutePath = f.getAbsolutePath();
@@ -165,12 +118,12 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             for (NetbeansActionMapping map : mapps.getActions()) {
                 if (map.getActionName().equals(ActionProvider.COMMAND_RUN)) {
                     // TODO the run.arguments property may already exist, manage addition/removal of the single argument
-                    map.addProperty("run.arguments", "--spring.devtools.restart.trigger-file=" + txTrigFile.getText());
+                    map.addProperty("run.arguments", "--spring.devtools.restart.trigger-file=" + ReloadAction.TRIGGER_FILE);
                     mh2.markAsModified(mapps);
                 }
             }
         } else {
-            // TODO remove command line option form maven actions
+            // remove command line option form maven actions
             ActionToGoalMapping mapps = mh2.getActionMappings();
             for (NetbeansActionMapping map : mapps.getActions()) {
                 if (map.getActionName().equals(ActionProvider.COMMAND_RUN)) {
@@ -185,16 +138,6 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox chDevtools;
     private javax.swing.JLabel lDevtools;
-    private javax.swing.JLabel lTrigFile;
-    private javax.swing.JTextField txTrigFile;
     // End of variables declaration//GEN-END:variables
 
-    private void updateModel() {
-        prefs.put(PROP_TRG_FILE, txTrigFile.getText());
-    }
-
-    private void trgFileWidgetsState() {
-        lTrigFile.setEnabled(chDevtools.isSelected());
-        txTrigFile.setEnabled(chDevtools.isSelected());
-    }
 }
