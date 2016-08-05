@@ -15,7 +15,6 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.customizer;
 
-import java.io.File;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
@@ -103,16 +102,6 @@ public class BootPanel extends javax.swing.JPanel {
         final boolean flag = chDevtools.isSelected();
         prefs.put(PROP_TRG_ENABLED, String.valueOf(flag));
         if (flag) {
-            File f = new File(ReloadAction.TRIGGER_FILE);
-            if (f.canWrite()) {
-                boolean deleted = f.delete();
-                final String absolutePath = f.getAbsolutePath();
-                if (deleted) {
-                    logger.info(String.format("Deleted previous trigger file %s", absolutePath));
-                } else {
-                    logger.warning(String.format("Couldn't delete previous trigger file %s", absolutePath));
-                }
-            }
             // add command line option to maven actions
             ActionToGoalMapping mapps = mh2.getActionMappings();
             for (NetbeansActionMapping map : mapps.getActions()) {
