@@ -67,6 +67,7 @@ public final class ReloadAction implements ActionListener {
             boolean enabled = valueOf(prefs.get(PROP_TRG_ENABLED, "false"));
             String strFile = prefs.get(PROP_TRG_FILE, null);
             if (enabled && strFile != null) {
+                // TODO seems that the trigger file must be in <proj_dir>/target/classes for devtools to monitor
                 File f = new File(strFile);
                 try (PrintWriter pw = new PrintWriter(f)) {
                     pw.printf("%1$tF %1$tT", new Date());

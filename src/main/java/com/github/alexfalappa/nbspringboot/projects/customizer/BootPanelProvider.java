@@ -21,6 +21,7 @@ import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.maven.api.NbMavenProject;
+import org.netbeans.modules.maven.api.customizer.ModelHandle2;
 import org.netbeans.spi.project.ui.support.ProjectCustomizer;
 import org.openide.util.Lookup;
 
@@ -52,8 +53,10 @@ public class BootPanelProvider implements ProjectCustomizer.CompositeCategoryPro
     @Override
     public JComponent createComponent(ProjectCustomizer.Category category, Lookup context) {
         Project prj = context.lookup(Project.class);
+        ModelHandle2 mh2 = context.lookup(ModelHandle2.class);
         final BootPanel bootPanel = new BootPanel();
         bootPanel.setProject(prj);
+        bootPanel.setModelHandle(mh2);
         return bootPanel;
     }
 

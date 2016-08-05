@@ -23,8 +23,11 @@ import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
 import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.modules.maven.api.customizer.ModelHandle2;
+import org.netbeans.modules.maven.execute.model.ActionToGoalMapping;
+import org.netbeans.modules.maven.execute.model.NetbeansActionMapping;
+import org.netbeans.spi.project.ActionProvider;
 
 import com.github.alexfalappa.nbspringboot.actions.ReloadAction;
 
@@ -38,6 +41,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     public static final String PROP_TRG_ENABLED = "reloadtrigger.enabled";
     public static final String PROP_TRG_FILE = "reloadtrigger.file";
     private Preferences prefs;
+    private ModelHandle2 mh2;
 
     /** Creates new form BootPanel */
     public BootPanel() {
@@ -46,16 +50,22 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
     public void setProject(Project prj) {
         prefs = ProjectUtils.getPreferences(prj, ReloadAction.class, true);
-        ProjectInformation pInfo = ProjectUtils.getInformation(prj);
         chDevtools.setSelected(Boolean.valueOf(prefs.get(PROP_TRG_ENABLED, "false")));
         trgFileWidgetsState();
+        // TODO consider using a fixed name
         String file = prefs.get(PROP_TRG_FILE, null);
         if (file != null) {
             txTrigFile.setText(file);
         } else {
-            txTrigFile.setText(System.getProperty("java.io.tmpdir") + File.separator + ".nbReloadTrigger-" + pInfo.getName());
+            txTrigFile.setText(".nbReloadTrigger");
         }
         txTrigFile.getDocument().addDocumentListener(this);
+        chDevtools.setEnabled(prefs != null && mh2 != null);
+    }
+
+    void setModelHandle(ModelHandle2 mh2) {
+        this.mh2 = mh2;
+        chDevtools.setEnabled(prefs != null && mh2 != null);
     }
 
     @Override
@@ -88,6 +98,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         org.openide.awt.Mnemonics.setLocalizedText(lDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDevtools.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(chDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.chDevtools.text")); // NOI18N
+        chDevtools.setEnabled(false);
         chDevtools.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 chDevtoolsActionPerformed(evt);
@@ -147,6 +158,25 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                     logger.info(String.format("Deleted previous trigger file %s", absolutePath));
                 } else {
                     logger.warning(String.format("Couldn't delete previous trigger file %s", absolutePath));
+                }
+            }
+            // add command line option to maven actions
+            ActionToGoalMapping mapps = mh2.getActionMappings();
+            for (NetbeansActionMapping map : mapps.getActions()) {
+                if (map.getActionName().equals(ActionProvider.COMMAND_RUN)) {
+                    // TODO the run.arguments property may already exist, manage addition/removal of the single argument
+                    map.addProperty("run.arguments", "--spring.devtools.restart.trigger-file=" + txTrigFile.getText());
+                    mh2.markAsModified(mapps);
+                }
+            }
+        } else {
+            // TODO remove command line option form maven actions
+            ActionToGoalMapping mapps = mh2.getActionMappings();
+            for (NetbeansActionMapping map : mapps.getActions()) {
+                if (map.getActionName().equals(ActionProvider.COMMAND_RUN)) {
+                    // TODO the run.arguments property may already exist, manage addition/removal of the single argument
+                    map.getProperties().remove("run.arguments");
+                    mh2.markAsModified(mapps);
                 }
             }
         }
