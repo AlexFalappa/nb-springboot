@@ -26,6 +26,7 @@ import org.netbeans.spi.project.ui.support.ProjectCustomizer;
 import org.openide.util.Lookup;
 
 /**
+ * Creates the Spring Boot customizer panel when maven projects have a dependency on dev tools.
  *
  * @author Alessandro Falappa
  */
@@ -52,10 +53,8 @@ public class BootPanelProvider implements ProjectCustomizer.CompositeCategoryPro
 
     @Override
     public JComponent createComponent(ProjectCustomizer.Category category, Lookup context) {
-        Project prj = context.lookup(Project.class);
         ModelHandle2 mh2 = context.lookup(ModelHandle2.class);
         final BootPanel bootPanel = new BootPanel();
-        bootPanel.setProject(prj);
         bootPanel.setModelHandle(mh2);
         return bootPanel;
     }

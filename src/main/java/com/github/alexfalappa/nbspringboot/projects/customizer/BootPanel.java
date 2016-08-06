@@ -15,11 +15,9 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.customizer;
 
+import java.util.Objects;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
-import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.maven.api.customizer.ModelHandle2;
 import org.netbeans.modules.maven.execute.model.ActionToGoalMapping;
 import org.netbeans.modules.maven.execute.model.NetbeansActionMapping;
@@ -27,31 +25,40 @@ import org.netbeans.spi.project.ActionProvider;
 
 import com.github.alexfalappa.nbspringboot.actions.ReloadAction;
 
+import static com.github.alexfalappa.nbspringboot.actions.ReloadAction.PROP_RUN_ARGS;
+import static com.github.alexfalappa.nbspringboot.actions.ReloadAction.TRIGGER_FILE;
+
 /**
+ * Customizer panel for maven projects with spring boot devtools dependency.
  *
  * @author Alessandro Falappa
  */
 public class BootPanel extends javax.swing.JPanel {
 
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
-    public static final String PROP_TRG_ENABLED = "reloadtrigger.enabled";
-    private Preferences prefs;
     private ModelHandle2 mh2;
+    private NetbeansActionMapping namRun;
+    private NetbeansActionMapping namDebug;
 
     /** Creates new form BootPanel */
     public BootPanel() {
         initComponents();
     }
 
-    public void setProject(Project prj) {
-        prefs = ProjectUtils.getPreferences(prj, ReloadAction.class, true);
-        chDevtools.setSelected(Boolean.valueOf(prefs.get(PROP_TRG_ENABLED, "false")));
-        chDevtools.setEnabled(prefs != null && mh2 != null);
-    }
-
     void setModelHandle(ModelHandle2 mh2) {
+        Objects.requireNonNull(mh2);
         this.mh2 = mh2;
-        chDevtools.setEnabled(prefs != null && mh2 != null);
+        ActionToGoalMapping mapps = mh2.getActionMappings();
+        for (NetbeansActionMapping map : mapps.getActions()) {
+            if (map.getActionName().equals(ActionProvider.COMMAND_RUN)) {
+                this.namRun = map;
+                chDevtools.setSelected(namRun.getProperties().containsKey(PROP_RUN_ARGS)
+                        && namRun.getProperties().get(PROP_RUN_ARGS).contains(TRIGGER_FILE));
+            } else if (map.getActionName().equals(ActionProvider.COMMAND_DEBUG)) {
+                this.namDebug = map;
+            }
+        }
+        chDevtools.setEnabled(true);
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -100,27 +107,18 @@ public class BootPanel extends javax.swing.JPanel {
 
     private void chDevtoolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDevtoolsActionPerformed
         final boolean flag = chDevtools.isSelected();
-        prefs.put(PROP_TRG_ENABLED, String.valueOf(flag));
         if (flag) {
-            // add command line option to maven actions
-            ActionToGoalMapping mapps = mh2.getActionMappings();
-            for (NetbeansActionMapping map : mapps.getActions()) {
-                if (map.getActionName().equals(ActionProvider.COMMAND_RUN)) {
-                    // TODO the run.arguments property may already exist, manage addition/removal of the single argument
-                    map.addProperty("run.arguments", "--spring.devtools.restart.trigger-file=" + ReloadAction.TRIGGER_FILE);
-                    mh2.markAsModified(mapps);
-                }
-            }
+            // add command line option to maven run action
+            // TODO the run.arguments property may already exist, manage addition/removal of the single argument
+            namRun.addProperty("run.arguments", "--spring.devtools.restart.trigger-file=" + ReloadAction.TRIGGER_FILE);
+            namDebug.addProperty("run.arguments", "--spring.devtools.restart.trigger-file=" + ReloadAction.TRIGGER_FILE);
+            mh2.markAsModified(mh2.getActionMappings());
         } else {
             // remove command line option form maven actions
-            ActionToGoalMapping mapps = mh2.getActionMappings();
-            for (NetbeansActionMapping map : mapps.getActions()) {
-                if (map.getActionName().equals(ActionProvider.COMMAND_RUN)) {
-                    // TODO the run.arguments property may already exist, manage addition/removal of the single argument
-                    map.getProperties().remove("run.arguments");
-                    mh2.markAsModified(mapps);
-                }
-            }
+            // TODO the run.arguments property may already exist, manage addition/removal of the single argument
+            namRun.getProperties().remove("run.arguments");
+            namDebug.getProperties().remove("run.arguments");
+            mh2.markAsModified(mh2.getActionMappings());
         }
     }//GEN-LAST:event_chDevtoolsActionPerformed
 

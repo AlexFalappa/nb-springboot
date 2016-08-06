@@ -21,19 +21,20 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.Date;
+import java.util.List;
 import java.util.logging.Logger;
-import java.util.prefs.Preferences;
 
-import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.maven.NbMavenProjectImpl;
+import org.netbeans.modules.maven.configurations.M2ConfigProvider;
+import org.netbeans.modules.maven.configurations.M2Configuration;
+import org.netbeans.modules.maven.execute.model.NetbeansActionMapping;
+import org.netbeans.spi.project.ActionProvider;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
-
-import static com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel.PROP_TRG_ENABLED;
 
 @ActionID(
         category = "Build",
@@ -51,8 +52,9 @@ import static com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel.
 @Messages("CTL_ReloadAction=S&pring Boot Reload")
 public final class ReloadAction implements ActionListener {
 
-    private static final Logger logger = Logger.getLogger(ReloadAction.class.getName());
     public static final String TRIGGER_FILE = ".nbReloadTrigger";
+    public static final String PROP_RUN_ARGS = "run.arguments";
+    private static final Logger logger = Logger.getLogger(ReloadAction.class.getName());
     private final NbMavenProjectImpl proj;
 
     public ReloadAction(NbMavenProjectImpl context) {
@@ -61,11 +63,21 @@ public final class ReloadAction implements ActionListener {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        Preferences prefs = ProjectUtils.getPreferences(proj, ReloadAction.class, true);
         File outDir = proj.getProjectWatcher().getOutputDirectory(false);
-        if (prefs != null) {
-            boolean enabled = Boolean.valueOf(prefs.get(PROP_TRG_ENABLED, "false"));
-            System.out.format("enabled %b%n", enabled);
+        M2ConfigProvider cp = proj.getLookup().lookup(M2ConfigProvider.class);
+        boolean enabled = false;
+        if (cp != null) {
+            M2Configuration m2 = cp.getActiveConfiguration();
+            List<NetbeansActionMapping> nams = m2.getRawMappings().getActions();
+            if (!nams.isEmpty()) {
+                for (NetbeansActionMapping nam : nams) {
+                    System.out.format("%s (%s): %s%n", nam.getDisplayName(), nam.getActionName(), nam.getProperties());
+                    if (nam.getActionName().equals(ActionProvider.COMMAND_RUN)) {
+                        enabled = nam.getProperties().containsKey(PROP_RUN_ARGS) && nam.getProperties().get(PROP_RUN_ARGS).contains(
+                                TRIGGER_FILE);
+                    }
+                }
+            }
             if (enabled) {
                 File f = new File(outDir, TRIGGER_FILE);
                 if (outDir.exists()) {
