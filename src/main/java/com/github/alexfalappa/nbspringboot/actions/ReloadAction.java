@@ -71,7 +71,6 @@ public final class ReloadAction implements ActionListener {
             List<NetbeansActionMapping> nams = m2.getRawMappings().getActions();
             if (!nams.isEmpty()) {
                 for (NetbeansActionMapping nam : nams) {
-                    System.out.format("%s (%s): %s%n", nam.getDisplayName(), nam.getActionName(), nam.getProperties());
                     if (nam.getActionName().equals(ActionProvider.COMMAND_RUN)) {
                         enabled = nam.getProperties().containsKey(PROP_RUN_ARGS) && nam.getProperties().get(PROP_RUN_ARGS).contains(
                                 TRIGGER_FILE);
