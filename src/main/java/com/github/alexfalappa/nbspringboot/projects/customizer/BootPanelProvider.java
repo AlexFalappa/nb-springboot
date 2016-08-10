@@ -35,18 +35,8 @@ public class BootPanelProvider implements ProjectCustomizer.CompositeCategoryPro
 
     @Override
     public ProjectCustomizer.Category createCategory(Lookup context) {
-        Project prj = context.lookup(Project.class);
-        if (prj != null) {
-            NbMavenProject nbMvn = prj.getLookup().lookup(NbMavenProject.class);
-            if (nbMvn != null) {
-                MavenProject mvnPrj = nbMvn.getMavenProject();
-                for (Object o : mvnPrj.getDependencies()) {
-                    Dependency d = (Dependency) o;
-                    if (d.getArtifactId().contains("devtools")) {
-                        return ProjectCustomizer.Category.create("boot", "Spring Boot", null);
-                    }
-                }
-            }
+        if (prjHasDepContaining(context, "spring-boot")) {
+            return ProjectCustomizer.Category.create("boot", "Spring Boot", null);
         }
         return null;
     }
@@ -56,7 +46,24 @@ public class BootPanelProvider implements ProjectCustomizer.CompositeCategoryPro
         ModelHandle2 mh2 = context.lookup(ModelHandle2.class);
         final BootPanel bootPanel = new BootPanel();
         bootPanel.setModelHandle(mh2);
+        bootPanel.setDevToolsVisible(prjHasDepContaining(context, "devtools"));
         return bootPanel;
     }
 
+    private boolean prjHasDepContaining(Lookup context, String txt) {
+        Project prj = context.lookup(Project.class);
+        if (prj != null) {
+            NbMavenProject nbMvn = prj.getLookup().lookup(NbMavenProject.class);
+            if (nbMvn != null) {
+                MavenProject mvnPrj = nbMvn.getMavenProject();
+                for (Object o : mvnPrj.getDependencies()) {
+                    Dependency d = (Dependency) o;
+                    if (d.getArtifactId().contains(txt)) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
 }
