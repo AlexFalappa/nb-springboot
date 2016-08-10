@@ -15,6 +15,9 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.customizer;
 
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -22,6 +25,7 @@ import java.util.logging.Logger;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import org.apache.commons.lang.StringUtils;
 import org.netbeans.modules.maven.api.customizer.ModelHandle2;
 import org.netbeans.modules.maven.execute.model.ActionToGoalMapping;
 import org.netbeans.modules.maven.execute.model.NetbeansActionMapping;
@@ -39,10 +43,10 @@ import static com.github.alexfalappa.nbspringboot.actions.ReloadAction.TRIGGER_F
  */
 public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
-    public static final String PROP_CMDLINEARGS = "run.arguments";
     public static final String CMDLINE_RELOAD = "--spring.devtools.restart.trigger-file=" + ReloadAction.TRIGGER_FILE;
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
+    private List<String> args = new LinkedList<>();
     private Map<String, String> runProps;
     private Map<String, String> debugProps;
 
@@ -51,19 +55,40 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         initComponents();
     }
 
+    void setDevToolsVisible(boolean visible) {
+        lDevtools.setVisible(visible);
+        chDevtools.setVisible(visible);
+    }
+
     void setModelHandle(ModelHandle2 mh2) {
         Objects.requireNonNull(mh2);
-        // store reference to project properties model and to maven actions for run/debug
+        // store reference to project properties model and to properties of maven actions for run/debug
         this.mh2 = mh2;
         ActionToGoalMapping mapps = mh2.getActionMappings();
         for (NetbeansActionMapping map : mapps.getActions()) {
             if (map.getActionName().equals(ActionProvider.COMMAND_RUN)) {
                 this.runProps = map.getProperties();
-                chDevtools.setSelected(runProps.containsKey(PROP_RUN_ARGS) && runProps.get(PROP_RUN_ARGS).contains(TRIGGER_FILE));
             } else if (map.getActionName().equals(ActionProvider.COMMAND_DEBUG)) {
                 this.debugProps = map.getProperties();
             }
         }
+        // prepare the set of cmd line args
+        if (runProps.containsKey(PROP_RUN_ARGS)) {
+            args.addAll(Arrays.asList(runProps.get(PROP_RUN_ARGS).split(",")));
+        }
+        // make the widget reflect the existing cmd line args
+        StringBuilder sb = new StringBuilder();
+        for (String arg : args) {
+            if (arg.contains(TRIGGER_FILE)) {
+                chDevtools.setSelected(true);
+            } else {
+                sb.append(arg).append(' ');
+            }
+        }
+        if (sb.length() > 0) {
+            sb.setLength(sb.length() - 1);
+        }
+        txArgs.setText(sb.toString());
         // hook up to command line arguments textfield
         txArgs.getDocument().addDocumentListener(this);
         // enable widgets
@@ -131,31 +156,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     }// </editor-fold>//GEN-END:initComponents
 
     private void chDevtoolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDevtoolsActionPerformed
-        final boolean flag = chDevtools.isSelected();
-        if (flag) {
-            // add command line option to maven actions as first option
-            final String newVal;
-            if (runProps.containsKey(PROP_CMDLINEARGS)) {
-                newVal = CMDLINE_RELOAD + "," + runProps.get(PROP_CMDLINEARGS);
-            } else {
-                newVal = CMDLINE_RELOAD;
-            }
-            runProps.put(PROP_CMDLINEARGS, newVal);
-            debugProps.put(PROP_CMDLINEARGS, newVal);
-        } else {
-            // remove first command line option form maven actions
-            String prev = runProps.get(PROP_CMDLINEARGS);
-            if (prev.equals(CMDLINE_RELOAD)) {
-                runProps.remove(PROP_CMDLINEARGS);
-                debugProps.remove(PROP_CMDLINEARGS);
-            } else {
-                final String newVal = prev.substring(prev.indexOf(','));
-                runProps.put(PROP_CMDLINEARGS, newVal);
-                debugProps.put(PROP_CMDLINEARGS, newVal);
-            }
-        }
-        mh2.markAsModified(mh2.getActionMappings());
-        logger.info(String.format("Command line args: %s", runProps.get(PROP_CMDLINEARGS)));
+        updateCmdLineArgs();
     }//GEN-LAST:event_chDevtoolsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -181,23 +182,24 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     }
 
     private void updateCmdLineArgs() {
-        final String newVal;
-        if (runProps.containsKey(PROP_CMDLINEARGS)) {
-            final String prev = runProps.get(PROP_CMDLINEARGS);
-            if (prev.startsWith(CMDLINE_RELOAD)) {
-                newVal = CMDLINE_RELOAD + "," + txArgs.getText();
-            } else {
-                newVal = txArgs.getText();
-            }
-            runProps.put(PROP_CMDLINEARGS, newVal);
-            debugProps.put(PROP_CMDLINEARGS, newVal);
-        } else {
-            newVal = txArgs.getText();
+        args.clear();
+        if (chDevtools.isSelected()) {
+            args.add(CMDLINE_RELOAD);
         }
-        runProps.put(PROP_CMDLINEARGS, newVal);
-        debugProps.put(PROP_CMDLINEARGS, newVal);
+        final String txt = txArgs.getText().trim();
+        if (!txt.isEmpty()) {
+            args.addAll(Arrays.asList(txt.split("\\s+")));
+        }
+        if (args.isEmpty()) {
+            runProps.remove(PROP_RUN_ARGS);
+            debugProps.remove(PROP_RUN_ARGS);
+        } else {
+            final String newVal = StringUtils.join(args, ',');
+            runProps.put(PROP_RUN_ARGS, newVal);
+            debugProps.put(PROP_RUN_ARGS, newVal);
+        }
         mh2.markAsModified(mh2.getActionMappings());
-        logger.info(String.format("Command line args: %s", runProps.get(PROP_CMDLINEARGS)));
+        logger.info(String.format("Command line args: %s", runProps.get(PROP_RUN_ARGS)));
     }
 
 }
