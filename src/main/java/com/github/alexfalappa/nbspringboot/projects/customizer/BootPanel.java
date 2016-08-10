@@ -15,8 +15,12 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.customizer;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
+
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 
 import org.netbeans.modules.maven.api.customizer.ModelHandle2;
 import org.netbeans.modules.maven.execute.model.ActionToGoalMapping;
@@ -33,12 +37,14 @@ import static com.github.alexfalappa.nbspringboot.actions.ReloadAction.TRIGGER_F
  *
  * @author Alessandro Falappa
  */
-public class BootPanel extends javax.swing.JPanel {
+public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
+    public static final String PROP_CMDLINEARGS = "run.arguments";
+    public static final String CMDLINE_RELOAD = "--spring.devtools.restart.trigger-file=" + ReloadAction.TRIGGER_FILE;
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
-    private NetbeansActionMapping namRun;
-    private NetbeansActionMapping namDebug;
+    private Map<String, String> runProps;
+    private Map<String, String> debugProps;
 
     /** Creates new form BootPanel */
     public BootPanel() {
@@ -47,18 +53,22 @@ public class BootPanel extends javax.swing.JPanel {
 
     void setModelHandle(ModelHandle2 mh2) {
         Objects.requireNonNull(mh2);
+        // store reference to project properties model and to maven actions for run/debug
         this.mh2 = mh2;
         ActionToGoalMapping mapps = mh2.getActionMappings();
         for (NetbeansActionMapping map : mapps.getActions()) {
             if (map.getActionName().equals(ActionProvider.COMMAND_RUN)) {
-                this.namRun = map;
-                chDevtools.setSelected(namRun.getProperties().containsKey(PROP_RUN_ARGS)
-                        && namRun.getProperties().get(PROP_RUN_ARGS).contains(TRIGGER_FILE));
+                this.runProps = map.getProperties();
+                chDevtools.setSelected(runProps.containsKey(PROP_RUN_ARGS) && runProps.get(PROP_RUN_ARGS).contains(TRIGGER_FILE));
             } else if (map.getActionName().equals(ActionProvider.COMMAND_DEBUG)) {
-                this.namDebug = map;
+                this.debugProps = map.getProperties();
             }
         }
+        // hook up to command line arguments textfield
+        txArgs.getDocument().addDocumentListener(this);
+        // enable widgets
         chDevtools.setEnabled(true);
+        txArgs.setEnabled(true);
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -70,6 +80,8 @@ public class BootPanel extends javax.swing.JPanel {
 
         lDevtools = new javax.swing.JLabel();
         chDevtools = new javax.swing.JCheckBox();
+        lArgs = new javax.swing.JLabel();
+        txArgs = new javax.swing.JTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(lDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDevtools.text")); // NOI18N
 
@@ -81,6 +93,11 @@ public class BootPanel extends javax.swing.JPanel {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(lArgs, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lArgs.text")); // NOI18N
+
+        txArgs.setColumns(15);
+        txArgs.setEnabled(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -89,18 +106,26 @@ public class BootPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lDevtools)
+                    .addComponent(lArgs))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(chDevtools)))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(chDevtools)
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(txArgs))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lDevtools)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lArgs)
+                    .addComponent(txArgs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chDevtools)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lDevtools)
+                    .addComponent(chDevtools))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -108,23 +133,71 @@ public class BootPanel extends javax.swing.JPanel {
     private void chDevtoolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDevtoolsActionPerformed
         final boolean flag = chDevtools.isSelected();
         if (flag) {
-            // add command line option to maven run action
-            // TODO the run.arguments property may already exist, manage addition/removal of the single argument
-            namRun.addProperty("run.arguments", "--spring.devtools.restart.trigger-file=" + ReloadAction.TRIGGER_FILE);
-            namDebug.addProperty("run.arguments", "--spring.devtools.restart.trigger-file=" + ReloadAction.TRIGGER_FILE);
-            mh2.markAsModified(mh2.getActionMappings());
+            // add command line option to maven actions as first option
+            final String newVal;
+            if (runProps.containsKey(PROP_CMDLINEARGS)) {
+                newVal = CMDLINE_RELOAD + "," + runProps.get(PROP_CMDLINEARGS);
+            } else {
+                newVal = CMDLINE_RELOAD;
+            }
+            runProps.put(PROP_CMDLINEARGS, newVal);
+            debugProps.put(PROP_CMDLINEARGS, newVal);
         } else {
-            // remove command line option form maven actions
-            // TODO the run.arguments property may already exist, manage addition/removal of the single argument
-            namRun.getProperties().remove("run.arguments");
-            namDebug.getProperties().remove("run.arguments");
-            mh2.markAsModified(mh2.getActionMappings());
+            // remove first command line option form maven actions
+            String prev = runProps.get(PROP_CMDLINEARGS);
+            if (prev.equals(CMDLINE_RELOAD)) {
+                runProps.remove(PROP_CMDLINEARGS);
+                debugProps.remove(PROP_CMDLINEARGS);
+            } else {
+                final String newVal = prev.substring(prev.indexOf(','));
+                runProps.put(PROP_CMDLINEARGS, newVal);
+                debugProps.put(PROP_CMDLINEARGS, newVal);
+            }
         }
+        mh2.markAsModified(mh2.getActionMappings());
+        logger.info(String.format("Command line args: %s", runProps.get(PROP_CMDLINEARGS)));
     }//GEN-LAST:event_chDevtoolsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox chDevtools;
+    private javax.swing.JLabel lArgs;
     private javax.swing.JLabel lDevtools;
+    private javax.swing.JTextField txArgs;
     // End of variables declaration//GEN-END:variables
+
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        updateCmdLineArgs();
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        updateCmdLineArgs();
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        updateCmdLineArgs();
+    }
+
+    private void updateCmdLineArgs() {
+        final String newVal;
+        if (runProps.containsKey(PROP_CMDLINEARGS)) {
+            final String prev = runProps.get(PROP_CMDLINEARGS);
+            if (prev.startsWith(CMDLINE_RELOAD)) {
+                newVal = CMDLINE_RELOAD + "," + txArgs.getText();
+            } else {
+                newVal = txArgs.getText();
+            }
+            runProps.put(PROP_CMDLINEARGS, newVal);
+            debugProps.put(PROP_CMDLINEARGS, newVal);
+        } else {
+            newVal = txArgs.getText();
+        }
+        runProps.put(PROP_CMDLINEARGS, newVal);
+        debugProps.put(PROP_CMDLINEARGS, newVal);
+        mh2.markAsModified(mh2.getActionMappings());
+        logger.info(String.format("Command line args: %s", runProps.get(PROP_CMDLINEARGS)));
+    }
 
 }
