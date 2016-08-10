@@ -185,6 +185,11 @@
             <version>${netbeans.api.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-openide-explorer</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.netbeans.contrib.yenta</groupId>
             <artifactId>api</artifactId>
             <version>1.1</version>
