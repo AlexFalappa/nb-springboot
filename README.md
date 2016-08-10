@@ -63,6 +63,10 @@ Template and code generator were inspired by those found on [Spring Boot Tools 4
 
 ## Changelog
 
+* __1.3__ (??? 2016): Work in progress
+    * Spring boot dedicated panel in project properties dialog for specifying command line arguments and enabling devtools reload trigger
+    * Action to trigger devtools reload (trough toolbar button or `Ctrl + Shift + L` keyboard shortcut) 
+
 * __1.2__ (Ago 2016): File templates improvements
     * Upgrade to Spring Boot version 1.4
     * The file templates wizards that generate Java classes now use the standard NetBeans widgets (better name proposal, choice of source/test location and destination package)
