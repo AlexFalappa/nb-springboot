@@ -198,6 +198,22 @@
     </dependencies>
 
     <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <excludes>
+                    <exclude>**/initializr/Bundle.properties</exclude>
+                </excludes>
+            </resource>
+            <resource>
+                <!--filter the Bundle.properties in the initializr subdir for maven props-->
+                <filtering>true</filtering>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/initializr/Bundle.properties</include>
+                </includes>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <!-- Keep pom.xml sorted -->

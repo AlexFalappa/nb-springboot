@@ -15,6 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
+import org.openide.util.NbBundle;
+
 /**
  * Global constants
  *
@@ -43,5 +45,5 @@ public class InitializrProjectProps {
     public static final String PREF_INITIALIZR_URL = "nbspringboot.initializr.url";
     public static final String PREF_INITIALIZR_TIMEOUT = "nbspringboot.initializr.timeout";
 
-    public static final String REST_USER_AGENT = "nb-springboot-plugin/0.1";
+    public static final String REST_USER_AGENT = NbBundle.getMessage(InitializrProjectProps.class, "InitializrProjectProps.REST_USER_AGENT");
 }

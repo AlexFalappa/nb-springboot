@@ -63,6 +63,7 @@ public class InitializrService {
                 .build();
         // connect
         logger.log(Level.INFO, "Getting Spring Initializr metadata from: {0}", serviceUrl);
+        logger.log(Level.INFO, "Asking metadata as: {0}", REST_USER_AGENT);
         long start = System.currentTimeMillis();
         ResponseEntity<String> respEntity = rt.exchange(req, String.class);
         // analyze response
