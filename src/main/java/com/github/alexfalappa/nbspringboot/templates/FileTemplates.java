@@ -35,9 +35,7 @@ public class FileTemplates {
     public static final String CATEGORY_SPRING_BOOT = "spring-boot-types";
     public static final String CATEGORY_SPRING_MVC = "spring-mvc-types";
     public static final String CATEGORY_SPRING_DATA = "spring-data-types";
-    public static final String FOLDER_SPRING = "spring";
-    public static final String FOLDER_SPRING_MVC = "springmvc";
-    public static final String FOLDER_SPRING_DATA = "springdata";
+    public static final String FOLDER_SPRING_FRAMEWORK = "SpringFramework";
     public static final String FOLDER_SPRING_BOOT = "springboot";
     public static final String ICON_BOOT_CLASS = "com/github/alexfalappa/nbspringboot/templates/boot-class.png";
     public static final String ICON_SPRING_CLASS = "com/github/alexfalappa/nbspringboot/templates/spring-class.png";
@@ -85,70 +83,70 @@ public class FileTemplates {
     }
 
     @TemplateRegistration(
-            folder = FOLDER_SPRING,
+            folder = FOLDER_SPRING_FRAMEWORK,
             iconBase = ICON_SPRING_CLASS,
             displayName = "#config_displayName",
             content = "Configuration.java.template",
             description = "Configuration.html",
             scriptEngine = "freemarker",
             category = {CATEGORY_SPRING_BOOT},
-            position = 100)
+            position = 400)
     @NbBundle.Messages(value = "config_displayName=Configuration Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> configuration() {
         return JavaTemplates.createJavaTemplateIterator();
     }
 
     @TemplateRegistration(
-            folder = FOLDER_SPRING,
+            folder = FOLDER_SPRING_FRAMEWORK,
             iconBase = ICON_SPRING_CLASS,
             displayName = "#component_displayName",
             content = "Component.java.template",
             description = "Component.html",
             scriptEngine = "freemarker",
             category = {CATEGORY_SPRING_BOOT},
-            position = 200)
+            position = 500)
     @NbBundle.Messages(value = "component_displayName=Component Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> component() {
         return JavaTemplates.createJavaTemplateIterator();
     }
 
     @TemplateRegistration(
-            folder = FOLDER_SPRING,
+            folder = FOLDER_SPRING_FRAMEWORK,
             iconBase = ICON_SPRING_CLASS,
             displayName = "#service_displayName",
             content = "Service.java.template",
             description = "Service.html",
             scriptEngine = "freemarker",
             category = {CATEGORY_SPRING_BOOT},
-            position = 300)
+            position = 600)
     @NbBundle.Messages(value = "service_displayName=Service Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> service() {
         return JavaTemplates.createJavaTemplateIterator();
     }
 
     @TemplateRegistration(
-            folder = FOLDER_SPRING_MVC,
+            folder = FOLDER_SPRING_FRAMEWORK,
             iconBase = ICON_SPRING_CLASS,
             displayName = "#controller_displayName",
             content = "Controller.java.template",
             description = "Controller.html",
             scriptEngine = "freemarker",
             category = {CATEGORY_SPRING_MVC},
-            position = 100)
+            position = 700)
     @NbBundle.Messages(value = "controller_displayName=Controller Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> controller() {
         return JavaTemplates.createJavaTemplateIterator();
     }
 
     @TemplateRegistration(
-            folder = FOLDER_SPRING_MVC,
+            folder = FOLDER_SPRING_FRAMEWORK,
             iconBase = ICON_SPRING_CLASS,
             displayName = "#rest_displayName",
             content = "RestController.java.template",
             description = "RestController.html",
             scriptEngine = "freemarker",
             category = {CATEGORY_SPRING_MVC},
-            position = 200)
+            position = 800)
     @NbBundle.Messages(value = "rest_displayName=REST Controller Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> restController() {
         return JavaTemplates.createJavaTemplateIterator();

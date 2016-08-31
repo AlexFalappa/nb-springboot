@@ -25,15 +25,13 @@ Alternatively download the desired `nbm` package from https://github.com/AlexFal
     * `application.properties` files
     * `ConfigurationProperties` annotated classes
     * `additional-spring-configuration-metadata.json` files
-* _Spring_ file templates:
+* New _Spring Framework_ file templates:
     * `Component` annotated classes
     * `Configuration` annotated classes
     * `Service` annotated classes
-* _Spring MVC_ file templates:
-    * `Controller` annotated classes
-    * `RestController` annotated classes
-* _Spring Data_ file templates:
-    * interfaces extending `Repository`
+    * `Controller` annotated classes (Spring MVC)
+    * `RestController` annotated classes (Spring MVC)
+    * interfaces extending `Repository` (Spring Data)
 * Code generators in `pom.xml` files:
     * Add spring configuration processor dependency
     * Add `spring-devtools` dependency
@@ -65,7 +63,8 @@ Template and code generator were inspired by those found on [Spring Boot Tools 4
 
 * __1.3__ (??? 2016): Work in progress
     * Spring boot dedicated panel in project properties dialog for specifying command line arguments and enabling devtools reload trigger
-    * Action to trigger devtools reload (trough toolbar button or `Ctrl + Shift + L` keyboard shortcut) 
+    * Action to trigger devtools reload (trough toolbar button or `Ctrl + Shift + L` keyboard shortcut)
+    * Some new file templates are now in the default *Spring Framework* category
 
 * __1.2__ (Ago 2016): File templates improvements
     * Upgrade to Spring Boot version 1.4

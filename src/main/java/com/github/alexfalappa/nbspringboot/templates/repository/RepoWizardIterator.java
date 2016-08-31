@@ -41,17 +41,17 @@ import org.openide.util.NbBundle;
 import com.github.alexfalappa.nbspringboot.templates.TemplateUtils;
 
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_DATA;
-import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_DATA;
+import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_FRAMEWORK;
 
 @TemplateRegistration(
-        folder = FOLDER_SPRING_DATA,
+        folder = FOLDER_SPRING_FRAMEWORK,
         iconBase = "com/github/alexfalappa/nbspringboot/templates/repository/springdata-interface.png",
         displayName = "#repos_displayName",
         content = "Repository.java.template",
         description = "Repository.html",
         scriptEngine = "freemarker",
         category = {CATEGORY_SPRING_DATA},
-        position = 100)
+        position = 900)
 @NbBundle.Messages(value = "repos_displayName=Repository Interface")
 public final class RepoWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 
