@@ -57,8 +57,8 @@ import org.xml.sax.InputSource;
         content = "BasicSpringbootProjectProject.zip",
         position = 255
 )
-@Messages("BasicSpringbootProject_displayName=Spring Boot project (basic)")
-public class BasicProjectWizardIterator implements WizardDescriptor./*Progress*/InstantiatingIterator {
+@Messages("BasicSpringbootProject_displayName=Spring Boot basic project")
+public class BasicProjectWizardIterator implements WizardDescriptor.InstantiatingIterator {
 
     private int index;
     private WizardDescriptor.Panel[] panels;
@@ -84,7 +84,7 @@ public class BasicProjectWizardIterator implements WizardDescriptor./*Progress*/
     }
 
     @Override
-    public Set/*<FileObject>*/ instantiate(/*ProgressHandle handle*/) throws IOException {
+    public Set<FileObject> instantiate() throws IOException {
         Set<FileObject> resultSet = new LinkedHashSet<>();
         File dirF = FileUtil.normalizeFile((File) wiz.getProperty("projdir"));
         dirF.mkdirs();

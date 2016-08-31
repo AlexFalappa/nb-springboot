@@ -79,7 +79,7 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
         iconBase = "com/github/alexfalappa/nbspringboot/projects/initializr/InitializrSpringbootProject.png",
         position = 256
 )
-@Messages("InitializrSpringbootProject_displayName=Spring Boot project (from Spring Initializr)")
+@Messages("InitializrSpringbootProject_displayName=Spring Boot Initializr project")
 public class InitializrProjectWizardIterator implements WizardDescriptor.InstantiatingIterator {
 
     private int index;
