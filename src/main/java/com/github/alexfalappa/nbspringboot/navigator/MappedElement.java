@@ -16,6 +16,8 @@
 package com.github.alexfalappa.nbspringboot.navigator;
 
 import javax.lang.model.element.Element;
+import org.netbeans.api.java.source.ElementHandle;
+import org.openide.filesystems.FileObject;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
@@ -26,27 +28,41 @@ import org.springframework.web.bind.annotation.RequestMethod;
  */
 public final class MappedElement {
 
-    private final Element element;
+    private final FileObject fileObject;
+    
+    private final ElementHandle<Element> handle;
 
-    private final String url;
+    private final String handlerMethod;
+    
+    private final String resourceUrl;
 
-    private final RequestMethod method;
+    private final RequestMethod requestMethod;       
 
-    public MappedElement(Element element, String url, RequestMethod method) {
-        this.element = element;
-        this.url = url;
-        this.method = method;
+    public MappedElement(final FileObject fileObject, final Element element, final String url, final RequestMethod method) {
+        this.fileObject = fileObject;
+        this.handle = ElementHandle.create(element);
+        this.handlerMethod = element.toString();        
+        this.resourceUrl = url;
+        this.requestMethod = method;
     }
 
-    public Element getElement() {
-        return element;
+    public FileObject getFileObject() {
+        return fileObject;
+    }
+    
+    public ElementHandle<Element> getHandle() {
+        return handle;
     }
 
-    public String getUrl() {
-        return url;
+    public String getHandlerMethod() {
+        return handlerMethod;
+    }
+    
+    public String getResourceUrl() {
+        return resourceUrl;
     }
 
-    public RequestMethod getMethod() {
-        return method;
+    public RequestMethod getRequestMethod() {
+        return requestMethod;
     }
 }

@@ -66,13 +66,13 @@ public class MappedElementsModel extends AbstractTableModel {
         Object rv;
         switch (columnIndex) {
             case 0:
-                rv = mappedElement.getUrl();
+                rv = mappedElement.getResourceUrl();
                 break;
             case 1:
-                rv = mappedElement.getMethod();
+                rv = mappedElement.getRequestMethod();
                 break;
             case 2:
-                rv = mappedElement.getElement().toString();
+                rv = mappedElement.getHandlerMethod();
                 break;
             default:
                 rv = null;

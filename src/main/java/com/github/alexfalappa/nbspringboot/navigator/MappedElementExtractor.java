@@ -27,6 +27,7 @@ import java.util.Map;
 import java.util.TreeMap;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+import org.openide.filesystems.FileObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
 import org.springframework.util.PathMatcher;
@@ -56,17 +57,19 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
      * then do this my own.
      */
     private final PathMatcher pathMatcher = new AntPathMatcher();
+    private final FileObject fileObject;
     private final CompilationUnitTree compilationUnitTree;
     private final Trees trees;
     private final TreePath rootPath;
-    private volatile boolean canceled = false;
+    private volatile boolean canceled = false;    
 
-    public MappedElementExtractor(CompilationUnitTree compilationUnitTree, Trees trees, TreePath rootPath) {
+    public MappedElementExtractor(final FileObject fileObject, final CompilationUnitTree compilationUnitTree, final Trees trees, final  TreePath rootPath) {
+        this.fileObject = fileObject;
         this.compilationUnitTree = compilationUnitTree;
         this.trees = trees;
         this.rootPath = rootPath;
     }
-
+    
     @Override
     public List<MappedElement> reduce(final List<MappedElement> r1, final List<MappedElement> r2) {
         final List<MappedElement> rv = new ArrayList<>();
@@ -138,7 +141,7 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
                     }
 
                     for (RequestMethod effectiveMethod : effectiveMethods) {
-                        mappedElements.add(new MappedElement(enclosedElement, url, effectiveMethod));
+                        mappedElements.add(new MappedElement(this.fileObject, enclosedElement, url, effectiveMethod));
                     }
                 }
             }

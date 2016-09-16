@@ -68,19 +68,19 @@ public class ElementScanningTaskFactory extends LookupBasedJavaSourceTaskFactory
             final CompilationUnitTree compilationUnitTree = p.getCompilationUnit();
             final TreePath rootPath = new TreePath(compilationUnitTree);
 
-            this.mappedElementExtractor = new MappedElementExtractor(compilationUnitTree, p.getTrees(), rootPath);
+            this.mappedElementExtractor = new MappedElementExtractor(p.getFileObject(), compilationUnitTree, p.getTrees(), rootPath);
             final List<MappedElement> mappedElements = compilationUnitTree.accept(this.mappedElementExtractor, null);
             Collections.sort(mappedElements, new Comparator<MappedElement>() {
                 @Override
                 public int compare(MappedElement o1, MappedElement o2) {
-                    int rv = o1.getUrl().compareTo(o2.getUrl());
+                    int rv = o1.getResourceUrl().compareTo(o2.getResourceUrl());
                     if (rv == 0) {
-                        if (o1.getMethod() == null) {
+                        if (o1.getRequestMethod() == null) {
                             rv = -1;
-                        } else if (o2.getMethod() == null) {
+                        } else if (o2.getRequestMethod() == null) {
                             rv = 1;
                         } else {
-                            rv = o1.getMethod().compareTo(o2.getMethod());
+                            rv = o1.getRequestMethod().compareTo(o2.getRequestMethod());
                         }
 
                     }
