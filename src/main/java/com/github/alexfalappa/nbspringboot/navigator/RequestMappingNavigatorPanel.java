@@ -16,12 +16,19 @@
 package com.github.alexfalappa.nbspringboot.navigator;
 
 import java.awt.BorderLayout;
+import java.io.IOException;
 import javax.swing.JComponent;
+import javax.swing.JEditorPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import org.netbeans.api.java.source.ui.ElementOpen;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanel.Registration;
+import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
@@ -42,15 +49,11 @@ import org.openide.util.NbBundle.Messages;
 public class RequestMappingNavigatorPanel implements NavigatorPanel {
 
     /**
-     * template for finding data in given context. Object used as example,
-     * replace with your own data source, for example JavaDataObject etc
-     */
-    private static final Lookup.Template MY_DATA = new Lookup.Template(DataObject.class);
-
-    /**
      * holds UI of this panel.
      */
     private final JComponent component;
+
+    private final MappedElementsModel mappedElementsModel;
 
     private final ElementScanningTaskFactory mappedElementGatheringTaskFactory;
 
@@ -58,13 +61,38 @@ public class RequestMappingNavigatorPanel implements NavigatorPanel {
      * public no arg constructor needed for system to instantiate provider well
      */
     public RequestMappingNavigatorPanel() {
-        final MappedElementsModel mappedElementsModel = new MappedElementsModel();
+        this.mappedElementsModel = new MappedElementsModel();
         this.mappedElementGatheringTaskFactory = new ElementScanningTaskFactory(mappedElementsModel);
         final JTable table = new JTable(mappedElementsModel);
         final JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
         panel.add(new JScrollPane(table), BorderLayout.CENTER);
         this.component = panel;
+
+        table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+            @Override
+            public void valueChanged(ListSelectionEvent event) {
+                final int selectedRow = ((ListSelectionModel) event.getSource()).getMinSelectionIndex();
+                if (event.getValueIsAdjusting() || selectedRow < 0) {
+                    return;
+                }
+                final MappedElement mappedElement = mappedElementsModel.getElementAt(selectedRow);
+                ElementOpen.open(mappedElement.getFileObject(), mappedElement.getHandle());
+                try {
+                    final DataObject dataObject = DataObject.find(mappedElement.getFileObject());
+                    final EditorCookie editorCookie = dataObject.getLookup().lookup(EditorCookie.class);
+                    if (editorCookie != null) {
+                        editorCookie.openDocument();
+                        JEditorPane[] p = editorCookie.getOpenedPanes();
+                        if (p.length > 0) {
+                            p[0].requestFocus();
+                        }
+                    }
+                } catch (IOException e) {
+                }
+            }
+        });
     }
 
     @Override
