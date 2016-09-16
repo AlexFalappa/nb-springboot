@@ -31,6 +31,8 @@ import org.netbeans.spi.navigator.NavigatorPanel.Registration;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
 import org.openide.util.Lookup;
+import org.openide.util.LookupEvent;
+import org.openide.util.LookupListener;
 import org.openide.util.NbBundle.Messages;
 
 /**
@@ -48,11 +50,19 @@ import org.openide.util.NbBundle.Messages;
 @Registration(mimeType = "text/x-java", displayName = "#displayName")
 public class RequestMappingNavigatorPanel implements NavigatorPanel {
 
+    /** Object used as example, replace with your own data source, for example JavaDataObject etc */
+    private static final Lookup.Template MY_DATA = new Lookup.Template(DataObject.class);
+    
     /**
      * holds UI of this panel.
      */
     private final JComponent component;
 
+    /** current context to work on. */
+    private Lookup.Result currentContext;
+    
+    private final LookupListener contextListener;
+    
     private final MappedElementsModel mappedElementsModel;
 
     private final ElementScanningTaskFactory mappedElementGatheringTaskFactory;
@@ -93,6 +103,12 @@ public class RequestMappingNavigatorPanel implements NavigatorPanel {
                 }
             }
         });
+        
+        this.contextListener = new LookupListener() {
+            @Override
+            public void resultChanged(LookupEvent le) {                
+            }            
+        };
     }
 
     @Override
@@ -112,12 +128,16 @@ public class RequestMappingNavigatorPanel implements NavigatorPanel {
 
     @Override
     public void panelActivated(Lookup context) {
+        this.currentContext = context.lookup(MY_DATA);
+        this.currentContext.addLookupListener(this.contextListener);
         this.mappedElementGatheringTaskFactory.activate();
     }
 
     @Override
     public void panelDeactivated() {
         this.mappedElementGatheringTaskFactory.deactivate();
+        this.currentContext.removeLookupListener(this.contextListener);
+        this.currentContext = null;
     }
 
     @Override
