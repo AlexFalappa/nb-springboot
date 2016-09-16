@@ -17,6 +17,7 @@ package com.github.alexfalappa.nbspringboot.navigator;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
@@ -81,9 +82,26 @@ public class MappedElementsModel extends AbstractTableModel {
         return rv;
     }
 
-    void refresh(final List<MappedElement> newData) {
+    void refresh(final List<MappedElement> newData) {        
         this.data.clear();
         this.data.addAll(newData);
+        Collections.sort(this.data, new Comparator<MappedElement>() {
+            @Override
+            public int compare(MappedElement o1, MappedElement o2) {
+                int rv = o1.getResourceUrl().compareTo(o2.getResourceUrl());
+                if (rv == 0) {
+                    if (o1.getRequestMethod()== null) {
+                        rv = -1;
+                    } else if (o2.getRequestMethod() == null) {
+                        rv = 1;
+                    } else {
+                        rv = o1.getRequestMethod().compareTo(o2.getRequestMethod());
+                    }
+
+                }
+                return rv;
+            }
+        });
         this.fireTableDataChanged();
     }
 }
