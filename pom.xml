@@ -190,6 +190,16 @@
             <version>${netbeans.api.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-java-source</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-java-source-base</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.netbeans.contrib.yenta</groupId>
             <artifactId>api</artifactId>
             <version>1.1</version>
