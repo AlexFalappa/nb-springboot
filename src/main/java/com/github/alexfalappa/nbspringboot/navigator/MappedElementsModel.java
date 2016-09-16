@@ -36,13 +36,13 @@ public class MappedElementsModel extends AbstractTableModel {
         String rv;
         switch (column) {
             case 0:
-                rv = "Resource URL";
+                rv = Bundle.resourceUrl();
                 break;
             case 1:
-                rv = "Request Method";
+                rv = Bundle.requestMethod();
                 break;
             case 2:
-                rv = "Handler Method";
+                rv = Bundle.handlerMethod();
                 break;
             default:
                 rv = null;
