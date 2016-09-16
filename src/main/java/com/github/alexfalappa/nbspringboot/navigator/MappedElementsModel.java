@@ -82,6 +82,10 @@ public class MappedElementsModel extends AbstractTableModel {
 
         return rv;
     }
+    
+    public MappedElement getElementAt(final int rowIndex) {
+        return this.data.get(rowIndex);
+    }
 
     void refresh(final List<MappedElement> newData) {
         final Runnable r = new Runnable() {
