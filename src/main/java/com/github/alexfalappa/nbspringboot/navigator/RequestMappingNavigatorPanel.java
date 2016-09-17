@@ -44,10 +44,7 @@ import org.openide.util.NbBundle.Messages;
  */
 @Messages({
     "displayName=Request Mappings",
-    "displayHint=Displays all @RequestMappings of the current *Controller",
-    "resourceUrl=Resource URL",
-    "requestMethod=Request Method",
-    "handlerMethod=Handler Method"
+    "displayHint=Displays all @RequestMappings of the current *Controller"
 })
 @Registration(mimeType = "text/x-java", displayName = "#displayName", position = 200)
 public class RequestMappingNavigatorPanel implements NavigatorPanel {

@@ -23,11 +23,18 @@ import java.util.List;
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
+import org.openide.util.NbBundle;
+
 /**
  * A super simple table model for the navigator UI.
  *
  * @author Michael J. Simons, 2016-09-16
  */
+@NbBundle.Messages({
+    "resourceUrl=URL",
+    "requestMethod=Method",
+    "handlerMethod=Handler"
+})
 public class MappedElementsModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 5870247061989235811L;
@@ -80,7 +87,6 @@ public class MappedElementsModel extends AbstractTableModel {
             default:
                 rv = null;
         }
-
         return rv;
     }
 
