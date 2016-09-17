@@ -15,8 +15,6 @@
  */
 package com.github.alexfalappa.nbspringboot.navigator;
 
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.util.TreePath;
 import org.netbeans.api.java.source.CancellableTask;
 import org.netbeans.api.java.source.CompilationInfo;
 import org.netbeans.api.java.source.JavaSource;
@@ -25,17 +23,19 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 import org.openide.util.Utilities;
 
+import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.util.TreePath;
+
 /**
- * This factory triggers the scanning of compilation units. If it is active, it
- * uses the {@link ElementScanningTask}, otherwise an empty task.
+ * This factory triggers the scanning of compilation units. If it is active, it uses the {@link ElementScanningTask}, otherwise an empty
+ * task.
  *
  * @author Michael J. Simons, 2016-09-16
  */
 public class ElementScanningTaskFactory extends LookupBasedJavaSourceTaskFactory {
 
     /**
-     * This task uses the {@link MappedElementExtractor} to scan the current
-     * compilation unit for mapped elements.
+     * This task uses the {@link MappedElementExtractor} to scan the current compilation unit for mapped elements.
      *
      * @author Michael J. Simons, 2016-09-16
      */

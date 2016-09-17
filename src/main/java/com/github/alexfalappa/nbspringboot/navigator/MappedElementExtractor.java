@@ -15,18 +15,15 @@
  */
 package com.github.alexfalappa.nbspringboot.navigator;
 
-import com.sun.source.tree.ClassTree;
-import com.sun.source.tree.CompilationUnitTree;
-import com.sun.source.util.TreePath;
-import com.sun.source.util.TreeScanner;
-import com.sun.source.util.Trees;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
+
 import org.openide.filesystems.FileObject;
 import org.springframework.stereotype.Controller;
 import org.springframework.util.AntPathMatcher;
@@ -40,36 +37,39 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sun.source.tree.ClassTree;
+import com.sun.source.tree.CompilationUnitTree;
+import com.sun.source.util.TreePath;
+import com.sun.source.util.TreeScanner;
+import com.sun.source.util.Trees;
+
 /**
- * This scanner does the heavy lifting of extracting methods that have been
- * mapped to URLs.
+ * This scanner does the heavy lifting of extracting methods that have been mapped to URLs.
  *
- * I reassambled the Spring way as much at is possible without firing up a
- * context: {@link RequestMapping} at type level does - if present - restrict
- * all other mappings.
+ * I reassambled the Spring way as much at is possible without firing up a context: {@link RequestMapping} at type level does - if present -
+ * restrict all other mappings.
  *
  * @author Michael J. Simons, 2016-09-16
  */
 public final class MappedElementExtractor extends TreeScanner<List<MappedElement>, Void> {
 
     /**
-     * Needed for combining paths... I'd rather resort to the Spring facilities
-     * then do this my own.
+     * Needed for combining paths... I'd rather resort to the Spring facilities then do this my own.
      */
     private final PathMatcher pathMatcher = new AntPathMatcher();
     private final FileObject fileObject;
     private final CompilationUnitTree compilationUnitTree;
     private final Trees trees;
     private final TreePath rootPath;
-    private volatile boolean canceled = false;    
+    private volatile boolean canceled = false;
 
-    public MappedElementExtractor(final FileObject fileObject, final CompilationUnitTree compilationUnitTree, final Trees trees, final  TreePath rootPath) {
+    public MappedElementExtractor(final FileObject fileObject, final CompilationUnitTree compilationUnitTree, final Trees trees, final TreePath rootPath) {
         this.fileObject = fileObject;
         this.compilationUnitTree = compilationUnitTree;
         this.trees = trees;
         this.rootPath = rootPath;
     }
-    
+
     @Override
     public List<MappedElement> reduce(final List<MappedElement> r1, final List<MappedElement> r2) {
         final List<MappedElement> rv = new ArrayList<>();
@@ -108,23 +108,28 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
             }
             final DeleteMapping deleteMapping = enclosedElement.getAnnotation(DeleteMapping.class);
             if (deleteMapping != null) {
-                extractMethodLevelMappings(elementUrls, concatValues(deleteMapping.value(), deleteMapping.path()), new RequestMethod[]{RequestMethod.DELETE});
+                extractMethodLevelMappings(elementUrls, concatValues(deleteMapping.value(), deleteMapping.path()),
+                        new RequestMethod[]{RequestMethod.DELETE});
             }
             final GetMapping getMapping = enclosedElement.getAnnotation(GetMapping.class);
             if (getMapping != null) {
-                extractMethodLevelMappings(elementUrls, concatValues(getMapping.value(), getMapping.path()), new RequestMethod[]{RequestMethod.GET});
+                extractMethodLevelMappings(elementUrls, concatValues(getMapping.value(), getMapping.path()),
+                        new RequestMethod[]{RequestMethod.GET});
             }
             final PatchMapping patchMapping = enclosedElement.getAnnotation(PatchMapping.class);
             if (patchMapping != null) {
-                extractMethodLevelMappings(elementUrls, concatValues(patchMapping.value(), patchMapping.path()), new RequestMethod[]{RequestMethod.PATCH});
+                extractMethodLevelMappings(elementUrls, concatValues(patchMapping.value(), patchMapping.path()),
+                        new RequestMethod[]{RequestMethod.PATCH});
             }
             final PostMapping postMapping = enclosedElement.getAnnotation(PostMapping.class);
             if (postMapping != null) {
-                extractMethodLevelMappings(elementUrls, concatValues(postMapping.value(), postMapping.path()), new RequestMethod[]{RequestMethod.POST});
+                extractMethodLevelMappings(elementUrls, concatValues(postMapping.value(), postMapping.path()),
+                        new RequestMethod[]{RequestMethod.POST});
             }
             final PutMapping putMapping = enclosedElement.getAnnotation(PutMapping.class);
             if (putMapping != null) {
-                extractMethodLevelMappings(elementUrls, concatValues(putMapping.value(), putMapping.path()), new RequestMethod[]{RequestMethod.PUT});
+                extractMethodLevelMappings(elementUrls, concatValues(putMapping.value(), putMapping.path()),
+                        new RequestMethod[]{RequestMethod.PUT});
             }
 
             for (Map.Entry<String, List<RequestMethod>> methodLevelMapping : elementUrls.entrySet()) {
@@ -158,8 +163,7 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
      *
      * @param <T>
      * @param data
-     * @return A list with the elements of the arrays in <code>data</code>
-     * concatenated
+     * @return A list with the elements of the arrays in <code>data</code> concatenated
      */
     <T> List<T> concatValues(final T[]... data) {
         final List<T> rv = new ArrayList<>();
@@ -170,8 +174,7 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
     }
 
     /**
-     * Extracts the type level mapping if any. Makes sure that at least "/" is
-     * mapped and restricted to the given methods, if there any.
+     * Extracts the type level mapping if any. Makes sure that at least "/" is mapped and restricted to the given methods, if there any.
      *
      * @param parentRequestMapping
      * @return

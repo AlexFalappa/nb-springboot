@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+
 import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
@@ -82,7 +83,7 @@ public class MappedElementsModel extends AbstractTableModel {
 
         return rv;
     }
-    
+
     public MappedElement getElementAt(final int rowIndex) {
         return this.data.get(rowIndex);
     }
