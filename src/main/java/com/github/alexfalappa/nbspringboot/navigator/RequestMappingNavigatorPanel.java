@@ -17,6 +17,7 @@ package com.github.alexfalappa.nbspringboot.navigator;
 
 import java.awt.BorderLayout;
 import java.io.IOException;
+
 import javax.swing.JComponent;
 import javax.swing.JEditorPane;
 import javax.swing.JPanel;
@@ -25,6 +26,7 @@ import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+
 import org.netbeans.api.java.source.ui.ElementOpen;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanel.Registration;
@@ -47,12 +49,12 @@ import org.openide.util.NbBundle.Messages;
     "requestMethod=Request Method",
     "handlerMethod=Handler Method"
 })
-@Registration(mimeType = "text/x-java", displayName = "#displayName")
+@Registration(mimeType = "text/x-java", displayName = "#displayName", position = 200)
 public class RequestMappingNavigatorPanel implements NavigatorPanel {
 
     /** Object used as example, replace with your own data source, for example JavaDataObject etc */
     private static final Lookup.Template MY_DATA = new Lookup.Template(DataObject.class);
-    
+
     /**
      * holds UI of this panel.
      */
@@ -60,9 +62,9 @@ public class RequestMappingNavigatorPanel implements NavigatorPanel {
 
     /** current context to work on. */
     private Lookup.Result currentContext;
-    
+
     private final LookupListener contextListener;
-    
+
     private final MappedElementsModel mappedElementsModel;
 
     private final ElementScanningTaskFactory mappedElementGatheringTaskFactory;
@@ -103,11 +105,11 @@ public class RequestMappingNavigatorPanel implements NavigatorPanel {
                 }
             }
         });
-        
+
         this.contextListener = new LookupListener() {
             @Override
-            public void resultChanged(LookupEvent le) {                
-            }            
+            public void resultChanged(LookupEvent le) {
+            }
         };
     }
 
