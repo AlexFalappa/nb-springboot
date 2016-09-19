@@ -24,6 +24,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.netbeans.api.project.ProjectInformation;
+import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.modules.maven.configurations.M2ConfigProvider;
 import org.netbeans.modules.maven.configurations.M2Configuration;
@@ -33,6 +35,7 @@ import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
+import org.openide.awt.StatusDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 
@@ -77,22 +80,31 @@ public final class ReloadAction implements ActionListener {
                     }
                 }
             }
+            ProjectInformation prjInfo = ProjectUtils.getInformation(proj);
+            final StatusDisplayer stDisp = StatusDisplayer.getDefault();
+            StringBuilder sb = new StringBuilder("Project [").append(prjInfo.getDisplayName()).append("]: ");
             if (enabled) {
                 File f = new File(outDir, TRIGGER_FILE);
                 if (outDir.exists()) {
                     try (PrintWriter pw = new PrintWriter(f)) {
                         pw.printf("%1$tF %1$tT", new Date());
                         pw.close();
-                        logger.info(String.format("Spring Boot reload triggered"));
+                        sb.append("Spring Boot reload triggered");
+                        stDisp.setStatusText(sb.toString());
+                        logger.info(sb.toString());
                         logger.fine(String.format("Timestamp written in %s", f.getAbsolutePath()));
                     } catch (FileNotFoundException ex) {
                         Exceptions.printStackTrace(ex);
                     }
                 } else {
-                    logger.warning("No output directory found! Build the project.");
+                    sb.append("No output directory found! Build the project.");
+                    stDisp.setStatusText(sb.toString(), StatusDisplayer.IMPORTANCE_ERROR_HIGHLIGHT);
+                    logger.warning(sb.toString());
                 }
             } else {
-                logger.info("Reload disabled!");
+                sb.append("Reload disabled or not applicable!");
+                stDisp.setStatusText(sb.toString(), StatusDisplayer.IMPORTANCE_ERROR_HIGHLIGHT);
+                logger.info(sb.toString());
             }
         } else {
             logger.warning("No reloading preferences found!");
