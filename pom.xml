@@ -275,6 +275,7 @@
                     <keystore>keystore.jks</keystore>
                     <keystorealias>AlexFalappa</keystorealias>
                     <verifyRuntime>warn</verifyRuntime>
+                    <requiresRestart>true</requiresRestart>
                 </configuration>
             </plugin>
             <plugin>

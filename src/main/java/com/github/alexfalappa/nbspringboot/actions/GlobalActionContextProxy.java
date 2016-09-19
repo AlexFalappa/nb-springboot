@@ -29,6 +29,7 @@ import org.openide.explorer.ExplorerManager;
 import org.openide.loaders.DataObject;
 import org.openide.nodes.Node;
 import org.openide.util.ContextGlobalProvider;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.Lookup.Result;
 import org.openide.util.Lookup.Template;
@@ -93,7 +94,7 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
             this.resultProjects = globalContextLookup.lookupResult(Project.class);
             this.resultProjects.addLookupListener(this.resultListener);
         } catch (Exception e) {
-            e.printStackTrace();
+            Exceptions.printStackTrace(e);
         }
         WindowManager.getDefault().invokeWhenUIReady(new Runnable() {
             @Override
@@ -222,9 +223,11 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
      * Unconditionally clears the project lookup.
      */
     private void clearProjectLookup() {
-        Collection<? extends Project> projects = projectLookup.lookupAll(Project.class);
-        for (Project project : projects) {
-            content.remove(project);
+        if (projectLookup != null) {
+            Collection<? extends Project> projects = projectLookup.lookupAll(Project.class);
+            for (Project project : projects) {
+                content.remove(project);
+            }
         }
     }
 
@@ -239,7 +242,7 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
         }
         // Add the project if an instance of it is not already in the lookup
         Template<Project> template = new Template<>(Project.class, null, project);
-        if (projectLookup.lookupItem(template) == null) {
+        if (projectLookup != null && projectLookup.lookupItem(template) == null) {
             clearProjectLookup();
             content.add(project);
             logger.fine(String.format("updateProjectLookup: added [%s] to the proxy lookup.",
