@@ -31,10 +31,10 @@ import org.netbeans.modules.maven.execute.model.ActionToGoalMapping;
 import org.netbeans.modules.maven.execute.model.NetbeansActionMapping;
 import org.netbeans.spi.project.ActionProvider;
 
-import com.github.alexfalappa.nbspringboot.actions.ReloadAction;
+import com.github.alexfalappa.nbspringboot.actions.RestartAction;
 
-import static com.github.alexfalappa.nbspringboot.actions.ReloadAction.PROP_RUN_ARGS;
-import static com.github.alexfalappa.nbspringboot.actions.ReloadAction.TRIGGER_FILE;
+import static com.github.alexfalappa.nbspringboot.actions.RestartAction.PROP_RUN_ARGS;
+import static com.github.alexfalappa.nbspringboot.actions.RestartAction.TRIGGER_FILE;
 
 /**
  * Customizer panel for maven projects with spring boot devtools dependency.
@@ -43,7 +43,7 @@ import static com.github.alexfalappa.nbspringboot.actions.ReloadAction.TRIGGER_F
  */
 public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
-    public static final String CMDLINE_RELOAD = "--spring.devtools.restart.trigger-file=" + ReloadAction.TRIGGER_FILE;
+    public static final String CMDLINE_RESTART = "--spring.devtools.restart.trigger-file=" + RestartAction.TRIGGER_FILE;
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
     private List<String> args = new LinkedList<>();
@@ -184,7 +184,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     private void updateCmdLineArgs() {
         args.clear();
         if (chDevtools.isSelected()) {
-            args.add(CMDLINE_RELOAD);
+            args.add(CMDLINE_RESTART);
         }
         final String txt = txArgs.getText().trim();
         if (!txt.isEmpty()) {

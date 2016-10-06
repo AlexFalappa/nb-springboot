@@ -41,26 +41,26 @@ import org.openide.util.NbBundle.Messages;
 
 @ActionID(
         category = "Build",
-        id = "com.github.alexfalappa.nbspringboot.actions.ReloadAction"
+        id = "com.github.alexfalappa.nbspringboot.actions.RestartAction"
 )
 @ActionRegistration(
         iconBase = "com/github/alexfalappa/nbspringboot/actions/springboot-logo.png",
-        displayName = "#CTL_ReloadAction"
+        displayName = "#CTL_RestartAction"
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/BuildProject", position = 57),
-    @ActionReference(path = "Toolbars/Build", position = 500),
-    @ActionReference(path = "Shortcuts", name = "DS-L")
+    @ActionReference(path = "Menu/BuildProject", position = 57)
+    ,@ActionReference(path = "Toolbars/Build", position = 500)
+    ,@ActionReference(path = "Shortcuts", name = "DS-L")
 })
-@Messages("CTL_ReloadAction=S&pring Boot Reload")
-public final class ReloadAction implements ActionListener {
+@Messages("CTL_RestartAction=S&pring Boot Restart")
+public final class RestartAction implements ActionListener {
 
-    public static final String TRIGGER_FILE = ".nbReloadTrigger";
+    public static final String TRIGGER_FILE = ".nbRestartTrigger";
     public static final String PROP_RUN_ARGS = "run.arguments";
-    private static final Logger logger = Logger.getLogger(ReloadAction.class.getName());
+    private static final Logger logger = Logger.getLogger(RestartAction.class.getName());
     private final NbMavenProjectImpl proj;
 
-    public ReloadAction(NbMavenProjectImpl context) {
+    public RestartAction(NbMavenProjectImpl context) {
         this.proj = context;
     }
 
@@ -89,7 +89,7 @@ public final class ReloadAction implements ActionListener {
                     try (PrintWriter pw = new PrintWriter(f)) {
                         pw.printf("%1$tF %1$tT", new Date());
                         pw.close();
-                        sb.append("Spring Boot reload triggered");
+                        sb.append("Spring Boot application restart triggered");
                         stDisp.setStatusText(sb.toString());
                         logger.info(sb.toString());
                         logger.fine(String.format("Timestamp written in %s", f.getAbsolutePath()));
@@ -102,12 +102,12 @@ public final class ReloadAction implements ActionListener {
                     logger.warning(sb.toString());
                 }
             } else {
-                sb.append("Reload disabled or not applicable!");
+                sb.append("Application restart disabled or not applicable!");
                 stDisp.setStatusText(sb.toString(), StatusDisplayer.IMPORTANCE_ERROR_HIGHLIGHT);
                 logger.info(sb.toString());
             }
         } else {
-            logger.warning("No reloading preferences found!");
+            logger.warning("No application restart preferences found!");
         }
     }
 }
