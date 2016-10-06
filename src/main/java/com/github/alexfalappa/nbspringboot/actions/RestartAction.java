@@ -50,7 +50,7 @@ import org.openide.util.NbBundle.Messages;
 @ActionReferences({
     @ActionReference(path = "Menu/BuildProject", position = 57)
     ,@ActionReference(path = "Toolbars/Build", position = 500)
-    ,@ActionReference(path = "Shortcuts", name = "DS-L")
+    ,@ActionReference(path = "Shortcuts", name = "DS-A")
 })
 @Messages("CTL_RestartAction=S&pring Boot Restart")
 public final class RestartAction implements ActionListener {
