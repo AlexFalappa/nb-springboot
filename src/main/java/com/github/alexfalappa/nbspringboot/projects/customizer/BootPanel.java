@@ -199,7 +199,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             debugProps.put(PROP_RUN_ARGS, newVal);
         }
         mh2.markAsModified(mh2.getActionMappings());
-        logger.info(String.format("Command line args: %s", runProps.get(PROP_RUN_ARGS)));
+        logger.finer(String.format("Command line args: %s", runProps.get(PROP_RUN_ARGS)));
     }
 
 }
