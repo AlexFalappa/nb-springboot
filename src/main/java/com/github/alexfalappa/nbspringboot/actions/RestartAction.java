@@ -98,12 +98,12 @@ public final class RestartAction implements ActionListener {
                     }
                 } else {
                     sb.append("No output directory found! Build the project.");
-                    stDisp.setStatusText(sb.toString(), StatusDisplayer.IMPORTANCE_ERROR_HIGHLIGHT);
+                    stDisp.setStatusText(sb.toString());
                     logger.warning(sb.toString());
                 }
             } else {
                 sb.append("Application restart disabled or not applicable!");
-                stDisp.setStatusText(sb.toString(), StatusDisplayer.IMPORTANCE_ERROR_HIGHLIGHT);
+                stDisp.setStatusText(sb.toString());
                 logger.info(sb.toString());
             }
         } else {
