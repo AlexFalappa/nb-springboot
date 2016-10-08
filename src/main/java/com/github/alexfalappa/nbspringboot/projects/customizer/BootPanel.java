@@ -58,6 +58,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     void setDevToolsVisible(boolean visible) {
         lDevtools.setVisible(visible);
         chDevtools.setVisible(visible);
+        lDevtoolsWarning.setVisible(visible);
     }
 
     void setModelHandle(ModelHandle2 mh2) {
@@ -107,6 +108,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         chDevtools = new javax.swing.JCheckBox();
         lArgs = new javax.swing.JLabel();
         txArgs = new javax.swing.JTextField();
+        lDevtoolsWarning = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(lDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDevtools.text")); // NOI18N
 
@@ -123,6 +125,9 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         txArgs.setColumns(15);
         txArgs.setEnabled(false);
 
+        lDevtoolsWarning.setFont(lDevtoolsWarning.getFont().deriveFont(lDevtoolsWarning.getFont().getSize()-2f));
+        org.openide.awt.Mnemonics.setLocalizedText(lDevtoolsWarning, org.openide.util.NbBundle.getMessage(BootPanel.class, "BootPanel.lDevtoolsWarning.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -135,10 +140,16 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(chDevtools)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(txArgs))
-                .addContainerGap())
+                        .addGap(19, 19, 19)
+                        .addComponent(lDevtoolsWarning)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(chDevtools)
+                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(txArgs))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -151,7 +162,9 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lDevtools)
                     .addComponent(chDevtools))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(lDevtoolsWarning)
+                .addContainerGap(51, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
 
@@ -163,6 +176,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     private javax.swing.JCheckBox chDevtools;
     private javax.swing.JLabel lArgs;
     private javax.swing.JLabel lDevtools;
+    private javax.swing.JLabel lDevtoolsWarning;
     private javax.swing.JTextField txArgs;
     // End of variables declaration//GEN-END:variables
 
