@@ -30,6 +30,7 @@ import javax.swing.event.ListSelectionListener;
 import org.netbeans.api.java.source.ui.ElementOpen;
 import org.netbeans.spi.navigator.NavigatorPanel;
 import org.netbeans.spi.navigator.NavigatorPanel.Registration;
+import org.netbeans.swing.etable.ETable;
 import org.openide.cookies.EditorCookie;
 import org.openide.loaders.DataObject;
 import org.openide.util.Lookup;
@@ -41,6 +42,7 @@ import org.openide.util.NbBundle.Messages;
  * The actual navigator UI.
  *
  * @author Michael J. Simons, 2016-09-14
+ * @author Alessandro Falappa
  */
 @Messages({
     "displayName=Request Mappings",
@@ -62,6 +64,7 @@ public class RequestMappingNavigatorPanel implements NavigatorPanel {
 
     private final LookupListener contextListener;
 
+    private final ETable table;
     private final MappedElementsModel mappedElementsModel;
 
     private final ElementScanningTaskFactory mappedElementGatheringTaskFactory;
@@ -70,15 +73,13 @@ public class RequestMappingNavigatorPanel implements NavigatorPanel {
      * public no arg constructor needed for system to instantiate provider well
      */
     public RequestMappingNavigatorPanel() {
-        this.mappedElementsModel = new MappedElementsModel();
-        this.mappedElementGatheringTaskFactory = new ElementScanningTaskFactory(mappedElementsModel);
-        final JTable table = new JTable(mappedElementsModel);
-        final JPanel panel = new JPanel();
-        panel.setLayout(new BorderLayout());
-        panel.add(new JScrollPane(table), BorderLayout.CENTER);
-        this.component = panel;
-
-        table.getSelectionModel().setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        table = new ETable();
+        mappedElementsModel = new MappedElementsModel();
+        mappedElementGatheringTaskFactory = new ElementScanningTaskFactory(table, mappedElementsModel);
+        table.setModel(mappedElementsModel);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.setColumnSorted(0, true, 1);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent event) {
@@ -86,7 +87,7 @@ public class RequestMappingNavigatorPanel implements NavigatorPanel {
                 if (event.getValueIsAdjusting() || selectedRow < 0) {
                     return;
                 }
-                final MappedElement mappedElement = mappedElementsModel.getElementAt(selectedRow);
+                final MappedElement mappedElement = mappedElementsModel.getElementAt(table.convertRowIndexToModel(selectedRow));
                 ElementOpen.open(mappedElement.getFileObject(), mappedElement.getHandle());
                 try {
                     final DataObject dataObject = DataObject.find(mappedElement.getFileObject());
@@ -102,7 +103,9 @@ public class RequestMappingNavigatorPanel implements NavigatorPanel {
                 }
             }
         });
-
+        final JPanel panel = new JPanel(new BorderLayout());
+        panel.add(new JScrollPane(table), BorderLayout.CENTER);
+        this.component = panel;
         this.contextListener = new LookupListener() {
             @Override
             public void resultChanged(LookupEvent le) {

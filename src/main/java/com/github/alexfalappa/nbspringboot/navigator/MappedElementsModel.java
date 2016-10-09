@@ -17,10 +17,8 @@ package com.github.alexfalappa.nbspringboot.navigator;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 
-import javax.swing.SwingUtilities;
 import javax.swing.table.AbstractTableModel;
 
 import org.openide.util.NbBundle;
@@ -29,6 +27,7 @@ import org.openide.util.NbBundle;
  * A super simple table model for the navigator UI.
  *
  * @author Michael J. Simons, 2016-09-16
+ * @author Alessandro Falappa
  */
 @NbBundle.Messages({
     "resourceUrl=URL",
@@ -38,26 +37,20 @@ import org.openide.util.NbBundle;
 public class MappedElementsModel extends AbstractTableModel {
 
     private static final long serialVersionUID = 5870247061989235811L;
-
     private final List<MappedElement> data = Collections.synchronizedList(new ArrayList<MappedElement>());
 
     @Override
     public String getColumnName(int column) {
-        String rv;
         switch (column) {
             case 0:
-                rv = Bundle.resourceUrl();
-                break;
+                return Bundle.resourceUrl();
             case 1:
-                rv = Bundle.requestMethod();
-                break;
+                return Bundle.requestMethod();
             case 2:
-                rv = Bundle.handlerMethod();
-                break;
+                return Bundle.handlerMethod();
             default:
-                rv = null;
+                return null;
         }
-        return rv;
     }
 
     @Override
@@ -73,52 +66,26 @@ public class MappedElementsModel extends AbstractTableModel {
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         final MappedElement mappedElement = this.data.get(rowIndex);
-        Object rv;
         switch (columnIndex) {
             case 0:
-                rv = mappedElement.getResourceUrl();
-                break;
+                return mappedElement.getResourceUrl();
             case 1:
-                rv = mappedElement.getRequestMethod();
-                break;
+                return mappedElement.getRequestMethod();
             case 2:
-                rv = mappedElement.getHandlerMethod();
-                break;
+                return mappedElement.getHandlerMethod();
             default:
-                rv = null;
+                return null;
         }
-        return rv;
     }
 
     public MappedElement getElementAt(final int rowIndex) {
         return this.data.get(rowIndex);
     }
 
+    // Note: this method must be called on the Swing Event Dispatch Thread
     void refresh(final List<MappedElement> newData) {
-        final Runnable r = new Runnable() {
-            @Override
-            public void run() {
-                data.clear();
-                data.addAll(newData);
-                Collections.sort(data, new Comparator<MappedElement>() {
-                    @Override
-                    public int compare(MappedElement o1, MappedElement o2) {
-                        int rv = o1.getResourceUrl().compareTo(o2.getResourceUrl());
-                        if (rv == 0) {
-                            if (o1.getRequestMethod() == null) {
-                                rv = -1;
-                            } else if (o2.getRequestMethod() == null) {
-                                rv = 1;
-                            } else {
-                                rv = o1.getRequestMethod().compareTo(o2.getRequestMethod());
-                            }
-                        }
-                        return rv;
-                    }
-                });
-                fireTableDataChanged();
-            }
-        };
-        SwingUtilities.invokeLater(r);
+        data.clear();
+        data.addAll(newData);
+        fireTableDataChanged();
     }
 }

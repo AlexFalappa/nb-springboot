@@ -15,10 +15,13 @@
  */
 package com.github.alexfalappa.nbspringboot.navigator;
 
+import javax.swing.SwingUtilities;
+
 import org.netbeans.api.java.source.CancellableTask;
 import org.netbeans.api.java.source.CompilationInfo;
 import org.netbeans.api.java.source.JavaSource;
 import org.netbeans.api.java.source.support.LookupBasedJavaSourceTaskFactory;
+import org.netbeans.swing.etable.ETable;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 import org.openide.util.Utilities;
@@ -31,6 +34,7 @@ import com.sun.source.util.TreePath;
  * task.
  *
  * @author Michael J. Simons, 2016-09-16
+ * @author Alessandro Falappa
  */
 public class ElementScanningTaskFactory extends LookupBasedJavaSourceTaskFactory {
 
@@ -41,32 +45,38 @@ public class ElementScanningTaskFactory extends LookupBasedJavaSourceTaskFactory
      */
     static class ElementScanningTask implements CancellableTask<CompilationInfo> {
 
+        private final ETable table;
         private final MappedElementsModel targetModel;
         private MappedElementExtractor mappedElementExtractor;
         private volatile boolean canceled;
 
-        public ElementScanningTask(MappedElementsModel targetModel) {
+        public ElementScanningTask(ETable table, MappedElementsModel targetModel) {
+            this.table = table;
             this.targetModel = targetModel;
         }
 
         @Override
         public void cancel() {
-            this.canceled = true;
-            if (this.mappedElementExtractor != null) {
-                this.mappedElementExtractor.cancel();
-                this.mappedElementExtractor = null;
+            canceled = true;
+            if (mappedElementExtractor != null) {
+                mappedElementExtractor.cancel();
+                mappedElementExtractor = null;
             }
         }
 
         @Override
         public void run(CompilationInfo p) throws Exception {
-            this.canceled = false;
-
+            canceled = false;
             final CompilationUnitTree compilationUnitTree = p.getCompilationUnit();
             final TreePath rootPath = new TreePath(compilationUnitTree);
-
-            this.mappedElementExtractor = new MappedElementExtractor(p.getFileObject(), compilationUnitTree, p.getTrees(), rootPath);
-            this.targetModel.refresh(compilationUnitTree.accept(this.mappedElementExtractor, null));
+            mappedElementExtractor = new MappedElementExtractor(p.getFileObject(), compilationUnitTree, p.getTrees(), rootPath);
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    targetModel.refresh(compilationUnitTree.accept(mappedElementExtractor, null));
+                    table.setModel(targetModel);
+                }
+            });
         }
     }
 
@@ -79,27 +89,28 @@ public class ElementScanningTaskFactory extends LookupBasedJavaSourceTaskFactory
         public void run(CompilationInfo parameter) throws Exception {
         }
     };
-
+    private final ETable table;
     private final MappedElementsModel mappedElementsModel;
     private volatile boolean active = false;
 
-    public ElementScanningTaskFactory(final MappedElementsModel mappedElementsModel) {
+    public ElementScanningTaskFactory(final ETable table, final MappedElementsModel mappedElementsModel) {
         super(JavaSource.Phase.PARSED, JavaSource.Priority.NORMAL);
+        this.table = table;
         this.mappedElementsModel = mappedElementsModel;
     }
 
     public void activate() {
-        this.active = true;
-        this.setLookup(Utilities.actionsGlobalContext());
+        active = true;
+        setLookup(Utilities.actionsGlobalContext());
     }
 
     public void deactivate() {
-        this.active = false;
-        this.setLookup(Lookup.EMPTY);
+        active = false;
+        setLookup(Lookup.EMPTY);
     }
 
     @Override
     protected CancellableTask<CompilationInfo> createTask(final FileObject fo) {
-        return this.active ? new ElementScanningTask(this.mappedElementsModel) : EMPTY_TASK;
+        return active ? new ElementScanningTask(table, mappedElementsModel) : EMPTY_TASK;
     }
 }
