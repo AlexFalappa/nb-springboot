@@ -16,10 +16,16 @@
 package com.github.alexfalappa.nbspringboot.navigator;
 
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.VariableElement;
 
+import org.apache.commons.collections4.SetValuedMap;
+import org.apache.commons.collections4.multimap.HashSetValuedHashMap;
 import org.netbeans.api.java.source.ElementHandle;
 import org.openide.filesystems.FileObject;
 import org.springframework.web.bind.annotation.RequestMethod;
+
+import com.github.alexfalappa.nbspringboot.cfgeditor.Utils;
 
 /**
  * This is a source code element of kind METHOD which is mapped by {@code @RequestMapping} or derivations thereof.
@@ -41,7 +47,7 @@ public final class MappedElement {
     public MappedElement(final FileObject fileObject, final Element element, final String url, final RequestMethod method) {
         this.fileObject = fileObject;
         this.handle = ElementHandle.create(element);
-        this.handlerMethod = element.toString();
+        this.handlerMethod = computeHandlerSignature(element);
         this.resourceUrl = url;
         this.requestMethod = method;
     }
@@ -56,6 +62,37 @@ public final class MappedElement {
 
     public String getHandlerMethod() {
         return handlerMethod;
+    }
+
+    private static String computeHandlerSignature(Element element) {
+        StringBuilder sb = new StringBuilder(element.getSimpleName());
+        if (element instanceof ExecutableElement) {
+            // store arguments with same unqualified type name
+            ExecutableElement eel = (ExecutableElement) element;
+            SetValuedMap<String, String> mm = new HashSetValuedHashMap<>();
+            for (VariableElement var : eel.getParameters()) {
+                String fullType = var.asType().toString();
+                mm.put(Utils.shortenJavaType(fullType), fullType);
+            }
+            // build up argument list
+            sb.append('(');
+            for (int i = 0; i < eel.getParameters().size(); i++) {
+                VariableElement var = eel.getParameters().get(i);
+                String fullType = var.asType().toString();
+                final String shortType = Utils.shortenJavaType(fullType);
+                if (mm.get(shortType).size() > 1) {
+                    sb.append(fullType);
+                } else {
+                    sb.append(shortType);
+                }
+                if (i < eel.getParameters().size() - 1) {
+                    sb.append(", ");
+                }
+            }
+            sb.append(") : ");
+            sb.append(Utils.shortenJavaType(eel.getReturnType().toString()));
+        }
+        return sb.toString();
     }
 
     public String getResourceUrl() {
