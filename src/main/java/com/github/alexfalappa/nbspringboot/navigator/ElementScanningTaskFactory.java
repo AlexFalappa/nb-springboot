@@ -48,7 +48,6 @@ public class ElementScanningTaskFactory extends LookupBasedJavaSourceTaskFactory
         private final ETable table;
         private final MappedElementsModel targetModel;
         private MappedElementExtractor mappedElementExtractor;
-        private volatile boolean canceled;
 
         public ElementScanningTask(ETable table, MappedElementsModel targetModel) {
             this.table = table;
@@ -57,7 +56,6 @@ public class ElementScanningTaskFactory extends LookupBasedJavaSourceTaskFactory
 
         @Override
         public void cancel() {
-            canceled = true;
             if (mappedElementExtractor != null) {
                 mappedElementExtractor.cancel();
                 mappedElementExtractor = null;
@@ -66,7 +64,6 @@ public class ElementScanningTaskFactory extends LookupBasedJavaSourceTaskFactory
 
         @Override
         public void run(CompilationInfo p) throws Exception {
-            canceled = false;
             final CompilationUnitTree compilationUnitTree = p.getCompilationUnit();
             final TreePath rootPath = new TreePath(compilationUnitTree);
             mappedElementExtractor = new MappedElementExtractor(p.getFileObject(), compilationUnitTree, p.getTrees(), rootPath);
