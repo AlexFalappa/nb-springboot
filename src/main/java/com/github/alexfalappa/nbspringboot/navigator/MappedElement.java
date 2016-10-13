@@ -31,17 +31,14 @@ import com.github.alexfalappa.nbspringboot.cfgeditor.Utils;
  * This is a source code element of kind METHOD which is mapped by {@code @RequestMapping} or derivations thereof.
  *
  * @author Michael J. Simons, 2016-09-16
+ * @author Alessandro Falappa
  */
 public final class MappedElement {
 
     private final FileObject fileObject;
-
     private final ElementHandle<Element> handle;
-
     private final String handlerMethod;
-
     private final String resourceUrl;
-
     private final RequestMethod requestMethod;
 
     public MappedElement(final FileObject fileObject, final Element element, final String url, final RequestMethod method) {
@@ -64,7 +61,15 @@ public final class MappedElement {
         return handlerMethod;
     }
 
-    private static String computeHandlerSignature(Element element) {
+    public String getResourceUrl() {
+        return resourceUrl;
+    }
+
+    public RequestMethod getRequestMethod() {
+        return requestMethod;
+    }
+
+    private final String computeHandlerSignature(Element element) {
         StringBuilder sb = new StringBuilder(element.getSimpleName());
         if (element instanceof ExecutableElement) {
             // store arguments with same unqualified type name
@@ -93,13 +98,5 @@ public final class MappedElement {
             sb.append(Utils.shortenJavaType(eel.getReturnType().toString()));
         }
         return sb.toString();
-    }
-
-    public String getResourceUrl() {
-        return resourceUrl;
-    }
-
-    public RequestMethod getRequestMethod() {
-        return requestMethod;
     }
 }

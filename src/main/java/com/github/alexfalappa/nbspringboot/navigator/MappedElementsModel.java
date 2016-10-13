@@ -22,6 +22,7 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 import org.openide.util.NbBundle;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * A super simple table model for the navigator UI.
@@ -48,6 +49,19 @@ public class MappedElementsModel extends AbstractTableModel {
                 return Bundle.requestMethod();
             case 2:
                 return Bundle.handlerMethod();
+            default:
+                return null;
+        }
+    }
+
+    @Override
+    public Class<?> getColumnClass(int column) {
+        switch (column) {
+            case 0:
+            case 2:
+                return String.class;
+            case 1:
+                return RequestMethod.class;
             default:
                 return null;
         }
