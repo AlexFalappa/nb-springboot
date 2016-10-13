@@ -93,7 +93,10 @@ public class RequestMethodCellRenderer extends DefaultTableCellRenderer {
     public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
         super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
         if (!isSelected) {
-            if (value instanceof RequestMethod) {
+            if (value == null) {
+                setForeground(table.getForeground());
+                setBackground(table.getBackground());
+            } else if (value instanceof RequestMethod) {
                 final RequestMethod reqMethod = (RequestMethod) value;
                 setForeground(fgColors.get(reqMethod));
                 setBackground(bgColors.get(reqMethod));

@@ -37,6 +37,7 @@ import org.openide.util.Lookup;
 import org.openide.util.LookupEvent;
 import org.openide.util.LookupListener;
 import org.openide.util.NbBundle.Messages;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 /**
  * The actual navigator UI.
@@ -79,6 +80,7 @@ public class RequestMappingNavigatorPanel implements NavigatorPanel {
         table.setModel(mappedElementsModel);
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
         table.setColumnSorted(0, true, 1);
+        table.setDefaultRenderer(RequestMethod.class, new RequestMethodCellRenderer());
         table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         table.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
