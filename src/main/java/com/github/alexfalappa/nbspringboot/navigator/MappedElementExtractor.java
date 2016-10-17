@@ -15,6 +15,7 @@
  */
 package com.github.alexfalappa.nbspringboot.navigator;
 
+import java.lang.annotation.IncompleteAnnotationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -50,6 +51,7 @@ import com.sun.source.util.Trees;
  * restrict all other mappings.
  *
  * @author Michael J. Simons, 2016-09-16
+ * @author Alessandro Falappa
  */
 public final class MappedElementExtractor extends TreeScanner<List<MappedElement>, Void> {
 
@@ -88,15 +90,12 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
         if (canceled || node == null) {
             return mappedElements;
         }
-
         final Element clazz = trees.getElement(new TreePath(rootPath, node));
         if (clazz == null || (clazz.getAnnotation(Controller.class) == null && clazz.getAnnotation(RestController.class) == null)) {
             return mappedElements;
         }
-
         final RequestMapping parentRequestMapping = clazz.getAnnotation(RequestMapping.class);
         final Map<String, List<RequestMethod>> parentUrls = extractTypeLevelMappings(parentRequestMapping);
-
         for (Element enclosedElement : clazz.getEnclosedElements()) {
             if (enclosedElement.getKind() != ElementKind.METHOD) {
                 continue;
@@ -181,14 +180,16 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
      */
     Map<String, List<RequestMethod>> extractTypeLevelMappings(final RequestMapping parentRequestMapping) {
         final Map<String, List<RequestMethod>> parentUrls = new TreeMap<>();
-
         List<String> urls = new ArrayList<>();
         List<RequestMethod> methods = new ArrayList<>();
         if (parentRequestMapping != null) {
-            urls = concatValues(parentRequestMapping.value(), parentRequestMapping.path());
-            methods = Arrays.asList(parentRequestMapping.method());
+            try {
+                urls = concatValues(parentRequestMapping.value(), parentRequestMapping.path());
+                methods = Arrays.asList(parentRequestMapping.method());
+            } catch (IncompleteAnnotationException ex) {
+                // ignore as may be thrown while typing annotations
+            }
         }
-
         final List<String> usedUrls = urls.isEmpty() ? Arrays.asList("/") : urls;
         for (final String url : usedUrls) {
             final String usedUrl = url.startsWith("/") ? url : "/" + url;
