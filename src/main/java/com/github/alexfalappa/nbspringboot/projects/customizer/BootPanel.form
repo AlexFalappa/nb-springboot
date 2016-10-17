@@ -19,17 +19,13 @@
           <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="lDevtools" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lArgs" alignment="0" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lDevtoolsWarning" max="32767" attributes="0"/>
                   <Group type="102" attributes="0">
-                      <EmptySpace min="19" pref="19" max="-2" attributes="0"/>
-                      <Component id="lDevtoolsWarning" min="-2" max="-2" attributes="0"/>
-                      <EmptySpace max="32767" attributes="0"/>
-                  </Group>
-                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="lDevtools" alignment="0" min="-2" max="-2" attributes="0"/>
+                          <Component id="lArgs" alignment="0" min="-2" max="-2" attributes="0"/>
+                      </Group>
+                      <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="chDevtools" min="-2" max="-2" attributes="0"/>
@@ -37,9 +33,9 @@
                           </Group>
                           <Component id="txArgs" alignment="0" max="32767" attributes="0"/>
                       </Group>
-                      <EmptySpace min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -56,9 +52,9 @@
                   <Component id="lDevtools" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="chDevtools" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="-2" attributes="0"/>
+              <EmptySpace type="separate" max="32767" attributes="0"/>
               <Component id="lDevtoolsWarning" min="-2" max="-2" attributes="0"/>
-              <EmptySpace pref="51" max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
