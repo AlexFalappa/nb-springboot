@@ -15,6 +15,7 @@
  */
 package com.github.alexfalappa.nbspringboot.navigator;
 
+import java.lang.annotation.IncompleteAnnotationException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -185,10 +186,8 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
             try {
                 urls = concatValues(parentRequestMapping.value(), parentRequestMapping.path());
                 methods = Arrays.asList(parentRequestMapping.method());
-            } catch (Exception ex) {
-                System.out.println(ex.getClass().getName());
-                System.out.println(ex.getMessage());
-                // java.lang.annotation.IncompleteAnnotationException may be thrown while typing annotations
+            } catch (IncompleteAnnotationException ex) {
+                // ignore as may be thrown while typing annotations
             }
         }
         final List<String> usedUrls = urls.isEmpty() ? Arrays.asList("/") : urls;
