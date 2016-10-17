@@ -74,7 +74,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             }
         }
         // prepare the set of cmd line args
-        if (runProps.containsKey(PROP_RUN_ARGS)) {
+        if (runProps.containsKey(PROP_RUN_ARGS) && runProps.get(PROP_RUN_ARGS) != null) {
             args.addAll(Arrays.asList(runProps.get(PROP_RUN_ARGS).split(",")));
         }
         // make the widget reflect the existing cmd line args
@@ -209,8 +209,10 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             debugProps.remove(PROP_RUN_ARGS);
         } else {
             final String newVal = StringUtils.join(args, ',');
-            runProps.put(PROP_RUN_ARGS, newVal);
-            debugProps.put(PROP_RUN_ARGS, newVal);
+            if (newVal != null) {
+                runProps.put(PROP_RUN_ARGS, newVal);
+                debugProps.put(PROP_RUN_ARGS, newVal);
+            }
         }
         mh2.markAsModified(mh2.getActionMappings());
         logger.finer(String.format("Command line args: %s", runProps.get(PROP_RUN_ARGS)));
