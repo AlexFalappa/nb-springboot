@@ -46,9 +46,9 @@ import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.shortenJavaTyp
 import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEscape;
 
 /**
- * The Spring Boot Configuration implementation of CompletionItem.
- *
- * It utilizes an ItemMetadata and the project classpath to render the completion item and support the documentation.
+ * The Spring Boot configuration property names implementation of {@code CompletionItem}.
+ * <p>
+ * It utilizes an {@code ItemMetadata} and the project classpath to render the completion item and spawn the documentation display.
  *
  * @author Aggelos Karalias
  * @author Alessandro Falappa

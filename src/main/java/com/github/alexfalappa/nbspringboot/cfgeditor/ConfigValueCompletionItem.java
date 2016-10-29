@@ -41,6 +41,10 @@ import org.openide.util.ImageUtilities;
 import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 
 /**
+ * The Spring Boot configuration property values implementation of {@code CompletionItem}.
+ * <p>
+ * It utilizes an {@code ItemHint} and the project classpath to render the completion item and spawn the documentation display.
+ *
  * @author Alessandro Falappa
  */
 public class ConfigValueCompletionItem implements CompletionItem {

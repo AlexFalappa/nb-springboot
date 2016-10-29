@@ -57,12 +57,12 @@ import static org.springframework.boot.configurationprocessor.metadata.ItemMetad
 import static org.springframework.boot.configurationprocessor.metadata.ItemMetadata.ItemType.PROPERTY;
 
 /**
- * The Spring Boot Configuration implementation of CompletionProvider.
+ * The Spring Boot Configuration implementation of {@code CompletionProvider}.
  * <p>
  * The entry point of completion support. This provider is registered for text/x-properties files and is enabled if spring-boot is available
  * on the classpath.
  * <p>
- * It scans the classpath for {@code META-INF/spring-configuration-metadata.json} files, then unmarshalls the files into the corresponding {@link
+ * It scans the classpath for {@code META-INF/spring-configuration-metadata.json} files, then unmarshals the files into the corresponding {@link
  * ConfigurationMetadata} classes and later in the query task scans for items and fills the {@link CompletionResultSet}.
  * <p>
  * The provider organizes properties, groups and hints in maps indexed by name. It also maintains a cache of configuration metadata parsed
