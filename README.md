@@ -68,6 +68,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
     * File templates ignored a per project custom license
     * Reload action renamed to restart and shorcut changed to avoid conflict with new *Paste as Lines* command in editor multicaret
     * Visual improvements to request mappings navigator panel
+    * Properly handle `Ctrl + Enter` configuration properties completion to overwrite the current property name
 
 * __1.3__ (October 2016): Devtools and request mappings
     * Upgrade to Spring Boot version 1.4.1
