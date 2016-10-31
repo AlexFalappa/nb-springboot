@@ -26,6 +26,7 @@ import javax.swing.JToolTip;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
@@ -62,14 +63,16 @@ public class ConfigPropertyCompletionItem implements CompletionItem {
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgeditor/springboot-property.png"));
     private final int caretOffset;
-    private final int dotOffset;
+    private final int propStartOffset;
+    private boolean overwrite;
 
-    public ConfigPropertyCompletionItem(ItemMetadata configurationItem, ItemHint hint, ClassPath classPath, int dotOffset,
+    public ConfigPropertyCompletionItem(ItemMetadata configurationItem, ItemHint hint, ClassPath classPath, int propStartOffset,
             int caretOffset) {
+        this.overwrite = false;
         this.configurationItem = configurationItem;
         this.hint = hint;
         this.classPath = classPath;
-        this.dotOffset = dotOffset;
+        this.propStartOffset = propStartOffset;
         this.caretOffset = caretOffset;
     }
 
@@ -101,11 +104,27 @@ public class ConfigPropertyCompletionItem implements CompletionItem {
     public void defaultAction(JTextComponent jtc) {
         try {
             StyledDocument doc = (StyledDocument) jtc.getDocument();
-            //Here we remove the characters starting at the start offset
-            //and ending at the point where the caret is currently found:
-            doc.remove(dotOffset, caretOffset - dotOffset);
-            doc.insertString(dotOffset, getText(), null);
-            //This statement will close the code completion box:
+            // calculate the amount of chars to remove (by default from property start up to caret position)
+            int lenToRemove = caretOffset - propStartOffset;
+            if (overwrite) {
+                // NOTE: the editor removes by itself the word at caret when ctrl + enter is pressed
+                // the document state here is different from when the completion was invoked thus we have to
+                // find again the offset of the equal sign in the line
+                Element lineElement = doc.getParagraphElement(caretOffset);
+                String line = doc.getText(lineElement.getStartOffset(), lineElement.getEndOffset() - lineElement.getStartOffset());
+                int equalSignIndex = line.indexOf('=');
+                if (equalSignIndex >= 0) {
+                    // from property start to equal sign
+                    lenToRemove = lineElement.getStartOffset() + equalSignIndex - propStartOffset;
+                } else {
+                    // from property start to end of line (except line terminator)
+                    lenToRemove = lineElement.getEndOffset() - 1 - propStartOffset;
+                }
+            }
+            // remove characters from the property name start offset
+            doc.remove(propStartOffset, lenToRemove);
+            doc.insertString(propStartOffset, getText(), null);
+            // close the code completion box
             Completion.get().hideAll();
         } catch (BadLocationException ex) {
             Exceptions.printStackTrace(ex);
@@ -114,6 +133,8 @@ public class ConfigPropertyCompletionItem implements CompletionItem {
 
     @Override
     public void processKeyEvent(KeyEvent evt) {
+        // detect if Ctrl + Enter is pressed
+        overwrite = evt.getKeyCode() == KeyEvent.VK_ENTER && (evt.getModifiers() & KeyEvent.CTRL_MASK) != 0;
     }
 
     @Override
