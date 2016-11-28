@@ -73,28 +73,31 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                 this.debugProps = map.getProperties();
             }
         }
-        // prepare the set of cmd line args
-        if (runProps.containsKey(PROP_RUN_ARGS) && runProps.get(PROP_RUN_ARGS) != null) {
-            args.addAll(Arrays.asList(runProps.get(PROP_RUN_ARGS).split(",")));
-        }
-        // make the widget reflect the existing cmd line args
-        StringBuilder sb = new StringBuilder();
-        for (String arg : args) {
-            if (arg.contains(TRIGGER_FILE)) {
-                chDevtools.setSelected(true);
-            } else {
-                sb.append(arg).append(' ');
+        //
+        if (runProps != null && debugProps != null) {
+            // prepare the set of cmd line args
+            if (runProps.containsKey(PROP_RUN_ARGS) && runProps.get(PROP_RUN_ARGS) != null) {
+                args.addAll(Arrays.asList(runProps.get(PROP_RUN_ARGS).split(",")));
             }
+            // make the widget reflect the existing cmd line args
+            StringBuilder sb = new StringBuilder();
+            for (String arg : args) {
+                if (arg.contains(TRIGGER_FILE)) {
+                    chDevtools.setSelected(true);
+                } else {
+                    sb.append(arg).append(' ');
+                }
+            }
+            if (sb.length() > 0) {
+                sb.setLength(sb.length() - 1);
+            }
+            txArgs.setText(sb.toString());
+            // hook up to command line arguments textfield
+            txArgs.getDocument().addDocumentListener(this);
+            // enable widgets
+            chDevtools.setEnabled(true);
+            txArgs.setEnabled(true);
         }
-        if (sb.length() > 0) {
-            sb.setLength(sb.length() - 1);
-        }
-        txArgs.setText(sb.toString());
-        // hook up to command line arguments textfield
-        txArgs.getDocument().addDocumentListener(this);
-        // enable widgets
-        chDevtools.setEnabled(true);
-        txArgs.setEnabled(true);
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
