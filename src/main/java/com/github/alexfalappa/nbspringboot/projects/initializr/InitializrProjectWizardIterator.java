@@ -165,7 +165,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
         this.wiz = wiz;
         index = 0;
         // set other defaults
-        this.wiz.putProperty(WIZ_USE_SB_MVN_PLUGIN, false);
+        this.wiz.putProperty(WIZ_USE_SB_MVN_PLUGIN, true);
         this.wiz.putProperty(WIZ_REMOVE_MVN_WRAPPER, true);
         // create the wizard panels
         panels = new WizardDescriptor.Panel[]{

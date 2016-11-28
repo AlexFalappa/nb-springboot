@@ -69,7 +69,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
     * Reload action renamed to restart and shorcut changed to avoid conflict with new *Paste as Lines* command in editor multicaret
     * Visual improvements to request mappings navigator panel
     * Properly handle `Ctrl + Enter` configuration properties completion to overwrite the current property name
-    * Removed option to add Spring Boot configuration processor in Initializr project wizard as now it can be chosen in the Dependencies page
+    * Initializr project wizard: removed option to add Spring Boot configuration processor as now it can be chosen in the Dependencies page and checked by default the 'Run/Debug with spring boot maven plugin' option
 
 * __1.3__ (October 2016): Devtools and request mappings
     * Upgrade to Spring Boot version 1.4.1
