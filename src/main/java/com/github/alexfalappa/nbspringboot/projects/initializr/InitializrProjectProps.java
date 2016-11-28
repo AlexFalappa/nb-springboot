@@ -40,7 +40,6 @@ public class InitializrProjectProps {
     public static final String WIZ_PROJ_LOCATION = "project.location";
     public static final String WIZ_USE_SB_MVN_PLUGIN = "use.sbmavenplugin";
     public static final String WIZ_REMOVE_MVN_WRAPPER = "remove.mavenwrapper";
-    public static final String WIZ_ADD_SB_CFGPROCESSOR = "add.config.processor";
 
     public static final String PREF_INITIALIZR_URL = "nbspringboot.initializr.url";
     public static final String PREF_INITIALIZR_TIMEOUT = "nbspringboot.initializr.timeout";

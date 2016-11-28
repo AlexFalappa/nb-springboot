@@ -38,7 +38,6 @@
                       <Group type="103" groupAlignment="0" attributes="0">
                           <Component id="chUseSBMavenPlugin" min="-2" max="-2" attributes="0"/>
                           <Component id="chRemoveWrapper" alignment="0" min="-2" max="-2" attributes="0"/>
-                          <Component id="chConfigProcessor" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                       <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
                   </Group>
@@ -70,8 +69,6 @@
               <Component id="chUseSBMavenPlugin" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Component id="chRemoveWrapper" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
-              <Component id="chConfigProcessor" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -147,13 +144,6 @@
       <Properties>
         <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
           <ResourceString bundle="com/github/alexfalappa/nbspringboot/projects/initializr/Bundle.properties" key="InitializrProjectPanelVisual3.chRemoveWrapper.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
-        </Property>
-      </Properties>
-    </Component>
-    <Component class="javax.swing.JCheckBox" name="chConfigProcessor">
-      <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/github/alexfalappa/nbspringboot/projects/initializr/Bundle.properties" key="InitializrProjectPanelVisual3.chConfigProcessor.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
         </Property>
       </Properties>
     </Component>

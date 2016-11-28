@@ -56,7 +56,6 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
-import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ADD_SB_CFGPROCESSOR;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ARTIFACT;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_BOOT_VERSION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DEPENDENCIES;
@@ -130,11 +129,6 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
                 pomConfigMvnPlugin(pomDoc);
                 pomModified = true;
             }
-            // manage addition of spring boot configuration processor
-            if ((boolean) wiz.getProperty(WIZ_ADD_SB_CFGPROCESSOR)) {
-                pomAddConfigProc(pomDoc);
-                pomModified = true;
-            }
             // tweak dev tools dependency if present
             if (deps.contains("devtools")) {
                 pomDevTools(pomDoc);
@@ -173,7 +167,6 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
         // set other defaults
         this.wiz.putProperty(WIZ_USE_SB_MVN_PLUGIN, false);
         this.wiz.putProperty(WIZ_REMOVE_MVN_WRAPPER, true);
-        this.wiz.putProperty(WIZ_ADD_SB_CFGPROCESSOR, false);
         // create the wizard panels
         panels = new WizardDescriptor.Panel[]{
             new InitializrProjectWizardPanel1(initializrService),
@@ -222,7 +215,6 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
         this.wiz.putProperty(WIZ_PROJ_LOCATION, null);
         this.wiz.putProperty(WIZ_USE_SB_MVN_PLUGIN, null);
         this.wiz.putProperty(WIZ_REMOVE_MVN_WRAPPER, null);
-        this.wiz.putProperty(WIZ_ADD_SB_CFGPROCESSOR, null);
         panels = null;
     }
 
@@ -345,27 +337,6 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
                 for (String line; (line = br.readLine()) != null;) {
                     out.println(line.replace("$mainclass$", mainClass));
                 }
-            }
-        }
-    }
-
-    private void pomAddConfigProc(Document doc) throws DOMException, SAXException, IOException {
-        // modify pom.xml content and add cfg dependency snippet
-        NodeList nl = doc.getElementsByTagName("dependencies");
-        if (nl != null && nl.getLength() > 0) {
-            Element el = (Element) nl.item(0);
-            if ("dependencies".equals(el.getNodeName())) {
-                Node dep = doc.createElement("dependency");
-                Node grp = doc.createElement("groupId");
-                grp.setTextContent("org.springframework.boot");
-                dep.appendChild(grp);
-                Node art = doc.createElement("artifactId");
-                art.setTextContent("spring-boot-configuration-processor");
-                dep.appendChild(art);
-                Node opt = doc.createElement("optional");
-                opt.setTextContent("true");
-                dep.appendChild(opt);
-                el.appendChild(dep);
             }
         }
     }

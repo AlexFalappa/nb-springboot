@@ -28,7 +28,6 @@ import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.filesystems.FileUtil;
 
-import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ADD_SB_CFGPROCESSOR;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PROJ_LOCATION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PROJ_NAME;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_REMOVE_MVN_WRAPPER;
@@ -67,7 +66,6 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
         createdFolderTextField = new javax.swing.JTextField();
         chUseSBMavenPlugin = new javax.swing.JCheckBox();
         chRemoveWrapper = new javax.swing.JCheckBox();
-        chConfigProcessor = new javax.swing.JCheckBox();
 
         projectNameLabel.setLabelFor(projectNameTextField);
         org.openide.awt.Mnemonics.setLocalizedText(projectNameLabel, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual3.class, "InitializrProjectPanelVisual3.projectNameLabel.text")); // NOI18N
@@ -92,8 +90,6 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
 
         org.openide.awt.Mnemonics.setLocalizedText(chRemoveWrapper, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual3.class, "InitializrProjectPanelVisual3.chRemoveWrapper.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(chConfigProcessor, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual3.class, "InitializrProjectPanelVisual3.chConfigProcessor.text")); // NOI18N
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -116,8 +112,7 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chUseSBMavenPlugin)
-                            .addComponent(chRemoveWrapper)
-                            .addComponent(chConfigProcessor))
+                            .addComponent(chRemoveWrapper))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
         );
@@ -141,8 +136,6 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
                 .addComponent(chUseSBMavenPlugin)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chRemoveWrapper)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chConfigProcessor)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -170,7 +163,6 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton browseButton;
-    private javax.swing.JCheckBox chConfigProcessor;
     private javax.swing.JCheckBox chRemoveWrapper;
     private javax.swing.JCheckBox chUseSBMavenPlugin;
     private javax.swing.JLabel createdFolderLabel;
@@ -229,7 +221,6 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
         d.putProperty(WIZ_PROJ_LOCATION, new File(folder));
         d.putProperty(WIZ_USE_SB_MVN_PLUGIN, chUseSBMavenPlugin.isSelected());
         d.putProperty(WIZ_REMOVE_MVN_WRAPPER, chRemoveWrapper.isSelected());
-        d.putProperty(WIZ_ADD_SB_CFGPROCESSOR, chConfigProcessor.isSelected());
     }
 
     void read(WizardDescriptor settings) {
@@ -248,7 +239,6 @@ public class InitializrProjectPanelVisual3 extends JPanel implements DocumentLis
         this.projectNameTextField.selectAll();
         this.chUseSBMavenPlugin.setSelected((boolean) settings.getProperty(WIZ_USE_SB_MVN_PLUGIN));
         this.chRemoveWrapper.setSelected((boolean) settings.getProperty(WIZ_REMOVE_MVN_WRAPPER));
-        this.chConfigProcessor.setSelected((boolean) settings.getProperty(WIZ_ADD_SB_CFGPROCESSOR));
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {
