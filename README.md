@@ -64,12 +64,13 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 ## Changelog
 
-* __WIP__ (??? 2016): Work in Progress
+* __1.3.1__ (November 2016): General fixes
     * File templates ignored a per project custom license
     * Reload action renamed to restart and shorcut changed to avoid conflict with new *Paste as Lines* command in editor multicaret
     * Visual improvements to request mappings navigator panel
     * Properly handle `Ctrl + Enter` configuration properties completion to overwrite the current property name
     * Initializr project wizard: removed option to add Spring Boot configuration processor as now it can be chosen in the Dependencies page and checked by default the 'Run/Debug with spring boot maven plugin' option
+    * [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/7?closed=1)
 
 * __1.3__ (October 2016): Devtools and request mappings
     * Upgrade to Spring Boot version 1.4.1
