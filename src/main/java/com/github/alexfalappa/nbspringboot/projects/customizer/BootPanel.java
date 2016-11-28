@@ -30,6 +30,7 @@ import org.netbeans.modules.maven.api.customizer.ModelHandle2;
 import org.netbeans.modules.maven.execute.model.ActionToGoalMapping;
 import org.netbeans.modules.maven.execute.model.NetbeansActionMapping;
 import org.netbeans.spi.project.ActionProvider;
+import org.openide.util.NbBundle;
 
 import com.github.alexfalappa.nbspringboot.actions.RestartAction;
 
@@ -37,7 +38,7 @@ import static com.github.alexfalappa.nbspringboot.actions.RestartAction.PROP_RUN
 import static com.github.alexfalappa.nbspringboot.actions.RestartAction.TRIGGER_FILE;
 
 /**
- * Customizer panel for maven projects with spring boot devtools dependency.
+ * Customizer panel for maven projects with spring boot dependencies.
  *
  * @author Alessandro Falappa
  */
@@ -49,32 +50,36 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     private List<String> args = new LinkedList<>();
     private Map<String, String> runProps;
     private Map<String, String> debugProps;
+    private boolean active = false;
 
     /** Creates new form BootPanel */
     public BootPanel() {
         initComponents();
     }
 
-    void setDevToolsVisible(boolean visible) {
-        lDevtools.setVisible(visible);
-        chDevtools.setVisible(visible);
-        lDevtoolsWarning.setVisible(visible);
+    void setDevToolsEnabled(boolean enabled) {
+        if (active) {
+            lDevtools.setEnabled(enabled);
+            chDevtools.setEnabled(enabled);
+        }
     }
 
     void setModelHandle(ModelHandle2 mh2) {
         Objects.requireNonNull(mh2);
         // store reference to project properties model and to properties of maven actions for run/debug
         this.mh2 = mh2;
+        boolean sbRun = false;
         ActionToGoalMapping mapps = mh2.getActionMappings();
         for (NetbeansActionMapping map : mapps.getActions()) {
             if (map.getActionName().equals(ActionProvider.COMMAND_RUN)) {
+                sbRun = map.getGoals().contains("spring-boot:run");
                 this.runProps = map.getProperties();
             } else if (map.getActionName().equals(ActionProvider.COMMAND_DEBUG)) {
                 this.debugProps = map.getProperties();
             }
         }
-        //
-        if (runProps != null && debugProps != null) {
+        // if run trough the maven spring boot plugin
+        if (sbRun) {
             // prepare the set of cmd line args
             if (runProps.containsKey(PROP_RUN_ARGS) && runProps.get(PROP_RUN_ARGS) != null) {
                 args.addAll(Arrays.asList(runProps.get(PROP_RUN_ARGS).split(",")));
@@ -95,8 +100,14 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             // hook up to command line arguments textfield
             txArgs.getDocument().addDocumentListener(this);
             // enable widgets
+            lDevtools.setEnabled(true);
             chDevtools.setEnabled(true);
+            lArgs.setEnabled(true);
             txArgs.setEnabled(true);
+            // turn on active flag
+            active = true;
+        } else {
+            lWarning.setText(NbBundle.getMessage(BootPanel.class, "BootPanel.lWarning.panelinactive.text")); // NOI18N
         }
     }
 
@@ -111,9 +122,10 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         chDevtools = new javax.swing.JCheckBox();
         lArgs = new javax.swing.JLabel();
         txArgs = new javax.swing.JTextField();
-        lDevtoolsWarning = new javax.swing.JLabel();
+        lWarning = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(lDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDevtools.text")); // NOI18N
+        lDevtools.setEnabled(false);
 
         org.openide.awt.Mnemonics.setLocalizedText(chDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.chDevtools.text")); // NOI18N
         chDevtools.setEnabled(false);
@@ -124,12 +136,13 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         });
 
         org.openide.awt.Mnemonics.setLocalizedText(lArgs, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lArgs.text")); // NOI18N
+        lArgs.setEnabled(false);
 
         txArgs.setColumns(15);
         txArgs.setEnabled(false);
 
-        lDevtoolsWarning.setFont(lDevtoolsWarning.getFont().deriveFont(lDevtoolsWarning.getFont().getSize()-2f));
-        org.openide.awt.Mnemonics.setLocalizedText(lDevtoolsWarning, org.openide.util.NbBundle.getMessage(BootPanel.class, "BootPanel.lDevtoolsWarning.text")); // NOI18N
+        lWarning.setFont(lWarning.getFont().deriveFont(lWarning.getFont().getSize()-2f));
+        org.openide.awt.Mnemonics.setLocalizedText(lWarning, org.openide.util.NbBundle.getMessage(BootPanel.class, "BootPanel.lWarning.relaunch.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -138,7 +151,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lDevtoolsWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lDevtools)
@@ -163,7 +176,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                     .addComponent(lDevtools)
                     .addComponent(chDevtools))
                 .addGap(18, 18, Short.MAX_VALUE)
-                .addComponent(lDevtoolsWarning)
+                .addComponent(lWarning)
                 .addContainerGap())
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -176,7 +189,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     private javax.swing.JCheckBox chDevtools;
     private javax.swing.JLabel lArgs;
     private javax.swing.JLabel lDevtools;
-    private javax.swing.JLabel lDevtoolsWarning;
+    private javax.swing.JLabel lWarning;
     private javax.swing.JTextField txArgs;
     // End of variables declaration//GEN-END:variables
 
