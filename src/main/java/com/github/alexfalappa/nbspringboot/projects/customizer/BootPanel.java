@@ -15,9 +15,6 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.customizer;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
@@ -25,16 +22,13 @@ import java.util.logging.Logger;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
-import org.apache.commons.lang.StringUtils;
 import org.netbeans.modules.maven.api.customizer.ModelHandle2;
 import org.netbeans.modules.maven.execute.model.ActionToGoalMapping;
 import org.netbeans.modules.maven.execute.model.NetbeansActionMapping;
 import org.netbeans.spi.project.ActionProvider;
 import org.openide.util.NbBundle;
 
-import com.github.alexfalappa.nbspringboot.actions.RestartAction;
-
-import static com.github.alexfalappa.nbspringboot.actions.RestartAction.PROP_RUN_ARGS;
+import static com.github.alexfalappa.nbspringboot.actions.RestartAction.PROP_RESTART;
 import static com.github.alexfalappa.nbspringboot.actions.RestartAction.TRIGGER_FILE;
 
 /**
@@ -44,10 +38,9 @@ import static com.github.alexfalappa.nbspringboot.actions.RestartAction.TRIGGER_
  */
 public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
-    public static final String CMDLINE_RESTART = "--spring.devtools.restart.trigger-file=" + RestartAction.TRIGGER_FILE;
+    public static final String PROP_RUN_ARGS = "run.arguments";
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
-    private List<String> args = new LinkedList<>();
     private Map<String, String> runProps;
     private Map<String, String> debugProps;
     private boolean active = false;
@@ -80,23 +73,11 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         }
         // if run trough the maven spring boot plugin
         if (sbRun) {
-            // prepare the set of cmd line args
-            if (runProps.containsKey(PROP_RUN_ARGS) && runProps.get(PROP_RUN_ARGS) != null) {
-                args.addAll(Arrays.asList(runProps.get(PROP_RUN_ARGS).split(",")));
-            }
             // make the widget reflect the existing cmd line args
-            StringBuilder sb = new StringBuilder();
-            for (String arg : args) {
-                if (arg.contains(TRIGGER_FILE)) {
-                    chDevtools.setSelected(true);
-                } else {
-                    sb.append(arg).append(' ');
-                }
+            if (runProps.containsKey(PROP_RUN_ARGS) && runProps.get(PROP_RUN_ARGS) != null) {
+                txArgs.setText(runProps.get(PROP_RUN_ARGS).replace(',', ' '));
             }
-            if (sb.length() > 0) {
-                sb.setLength(sb.length() - 1);
-            }
-            txArgs.setText(sb.toString());
+            chDevtools.setSelected(runProps.containsKey(PROP_RESTART));
             // hook up to command line arguments textfield
             txArgs.getDocument().addDocumentListener(this);
             // enable widgets
@@ -182,7 +163,14 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     }// </editor-fold>//GEN-END:initComponents
 
     private void chDevtoolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDevtoolsActionPerformed
-        updateCmdLineArgs();
+        if (chDevtools.isSelected()) {
+            runProps.put(PROP_RESTART, TRIGGER_FILE);
+            debugProps.put(PROP_RESTART, TRIGGER_FILE);
+        } else {
+            runProps.remove(PROP_RESTART);
+            debugProps.remove(PROP_RESTART);
+        }
+        mh2.markAsModified(mh2.getActionMappings());
     }//GEN-LAST:event_chDevtoolsActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
@@ -209,23 +197,14 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     }
 
     private void updateCmdLineArgs() {
-        args.clear();
-        if (chDevtools.isSelected()) {
-            args.add(CMDLINE_RESTART);
-        }
         final String txt = txArgs.getText().trim();
-        if (!txt.isEmpty()) {
-            args.addAll(Arrays.asList(txt.split("\\s+")));
-        }
-        if (args.isEmpty()) {
+        if (txt.isEmpty()) {
             runProps.remove(PROP_RUN_ARGS);
             debugProps.remove(PROP_RUN_ARGS);
         } else {
-            final String newVal = StringUtils.join(args, ',');
-            if (newVal != null) {
-                runProps.put(PROP_RUN_ARGS, newVal);
-                debugProps.put(PROP_RUN_ARGS, newVal);
-            }
+            final String csv = txt.replace(' ', ',');
+            runProps.put(PROP_RUN_ARGS, csv);
+            debugProps.put(PROP_RUN_ARGS, csv);
         }
         mh2.markAsModified(mh2.getActionMappings());
         logger.finer(String.format("Command line args: %s", runProps.get(PROP_RUN_ARGS)));

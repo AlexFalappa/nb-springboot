@@ -70,6 +70,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
     * Visual improvements to request mappings navigator panel
     * Properly handle `Ctrl + Enter` configuration properties completion to overwrite the current property name
     * Initializr project wizard: removed option to add Spring Boot configuration processor as now it can be chosen in the Dependencies page and checked by default the 'Run/Debug with spring boot maven plugin' option
+    * Restart action now exploits an environment variable instead of a command line argument. You may see an unexpected `--spring.devtools.restart.trigger-file` argument on old projects after upgrade
     * [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/7?closed=1)
 
 * __1.3__ (October 2016): Devtools and request mappings

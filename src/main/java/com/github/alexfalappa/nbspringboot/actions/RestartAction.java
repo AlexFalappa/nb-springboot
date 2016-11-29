@@ -56,7 +56,7 @@ import org.openide.util.NbBundle.Messages;
 public final class RestartAction implements ActionListener {
 
     public static final String TRIGGER_FILE = ".nbRestartTrigger";
-    public static final String PROP_RUN_ARGS = "run.arguments";
+    public static final String PROP_RESTART = "Env.SPRING_DEVTOOLS_RESTART_TRIGGER_FILE";
     private static final Logger logger = Logger.getLogger(RestartAction.class.getName());
     private final NbMavenProjectImpl proj;
 
@@ -75,8 +75,8 @@ public final class RestartAction implements ActionListener {
             if (!nams.isEmpty()) {
                 for (NetbeansActionMapping nam : nams) {
                     if (nam.getActionName().equals(ActionProvider.COMMAND_RUN)) {
-                        enabled = nam.getProperties().containsKey(PROP_RUN_ARGS) && nam.getProperties().get(PROP_RUN_ARGS).contains(
-                                TRIGGER_FILE);
+                        enabled = nam.getProperties().containsKey(PROP_RESTART);
+                        break;
                     }
                 }
             }
