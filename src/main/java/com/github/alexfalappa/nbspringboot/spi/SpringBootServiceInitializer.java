@@ -15,35 +15,50 @@
  */
 package com.github.alexfalappa.nbspringboot.spi;
 
+import java.util.logging.Logger;
+
 import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.spi.project.ProjectServiceProvider;
+import org.netbeans.spi.project.ui.ProjectOpenedHook;
 
-import com.github.alexfalappa.nbspringboot.api.TestService;
+import com.github.alexfalappa.nbspringboot.api.SpringBootService;
 
 /**
+ * {@code ProjectOpenedHook} to initialize a {@link SpringBootService} implementation on opening of maven projects.
+ * <p>
+ * It is registered as a project service.
  *
  * @author Alessandro Falappa
  */
 @ProjectServiceProvider(
-        service = TestService.class,
+        service = ProjectOpenedHook.class,
         projectType = {
             "org-netbeans-modules-maven/" + NbMavenProject.TYPE_JAR,
             "org-netbeans-modules-maven/" + NbMavenProject.TYPE_WAR
         }
 )
-public class TestServiceImpl implements TestService {
+public class SpringBootServiceInitializer extends ProjectOpenedHook {
 
-    private final Project p;
+    private static final Logger logger = Logger.getLogger(SpringBootServiceInitializer.class.getName());
+    private final Project prj;
 
-    public TestServiceImpl(Project p) {
-        this.p = p;
+    public SpringBootServiceInitializer(Project p) {
+        this.prj = p;
     }
 
     @Override
-    public String something() {
-        return ProjectUtils.getInformation(p).getDisplayName();
+    protected void projectOpened() {
+        final SpringBootService bootService = prj.getLookup().lookup(SpringBootService.class);
+        if (bootService == null) {
+            logger.info("No Spring Boot service implementations to initialize");
+        } else {
+            bootService.init();
+        }
+    }
+
+    @Override
+    protected void projectClosed() {
     }
 
 }

@@ -18,15 +18,19 @@ package com.github.alexfalappa.nbspringboot.actions;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.Project;
-import org.openide.DialogDisplayer;
-import org.openide.NotifyDescriptor;
+import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.api.project.SourceGroup;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.Utilities;
 
-import com.github.alexfalappa.nbspringboot.api.TestService;
+import com.github.alexfalappa.nbspringboot.api.SpringBootService;
 
 @ActionID(
         category = "Build",
@@ -40,23 +44,35 @@ import com.github.alexfalappa.nbspringboot.api.TestService;
 @Messages("CTL_ProjectAction=Project Action")
 public final class ProjectAction implements ActionListener {
 
-    private final Project prj;
-
     public ProjectAction(Project project) {
-        this.prj = project;
     }
 
     @Override
     public void actionPerformed(ActionEvent ev) {
-        TestService ts = prj.getLookup().lookup(TestService.class);
-        NotifyDescriptor.Message message;
-        if (ts != null) {
-            message = new NotifyDescriptor.Message(String.format("TestService containing '%s'", ts.something()));
-            message.setMessageType(NotifyDescriptor.INFORMATION_MESSAGE);
-        } else {
-            message = new NotifyDescriptor.Message("No TestService in project lookup");
-            message.setMessageType(NotifyDescriptor.WARNING_MESSAGE);
+        Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
+        if (prj != null) {
+            SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
+            if (sbs != null) {
+                System.out.println("Found BootConfigurationPropertiesService in Project lookup got via actions global lookup");
+            }
+            SourceGroup[] groups = ProjectUtils.getSources(prj).getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
+            for (SourceGroup group : groups) {
+                System.out.println("---");
+                System.out.printf("[%s] %s: %s%n", group.getName(), group.getDisplayName(), FileUtil.getFileDisplayName(group
+                        .getRootFolder()));
+                ClassPath cpSrc = ClassPath.getClassPath(group.getRootFolder(), ClassPath.SOURCE);
+                if (cpSrc != null) {
+                    System.out.printf("Source classpath:%n\t%s%n", cpSrc.toString().replace(":", "\n\t"));
+                }
+                ClassPath cpExec = ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
+                if (cpExec != null) {
+                    System.out.printf("Execute classpath:%n\t%s%n", cpExec.toString().replace(":", "\n\t"));
+                }
+                ClassPath cpCompile = ClassPath.getClassPath(group.getRootFolder(), ClassPath.COMPILE);
+                if (cpCompile != null) {
+                    System.out.printf("Compile classpath:%n\t%s%n", cpCompile.toString().replace(":", "\n\t"));
+                }
+            }
         }
-        DialogDisplayer.getDefault().notify(message);
     }
 }
