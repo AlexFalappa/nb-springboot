@@ -23,12 +23,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
 
+import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
+import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.project.ProjectServiceProvider;
@@ -72,23 +75,35 @@ public class SpringBootServiceImpl implements SpringBootService {
     private static final Logger logger = Logger.getLogger(SpringBootServiceImpl.class.getName());
     private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
     public static final int LOG_COMPLETION_TRESH = 50;
-    private final Project prj;
-    private ClassPath cpExec = null;
     private final JsonMarshaller jsonMarsaller = new JsonMarshaller();
     private final Map<String, ConfigurationMetadata> cfgMetasInJars = new HashMap<>();
     private final MultiValueMap<String, ItemMetadata> properties = new LinkedMultiValueMap<>();
     private final MultiValueMap<String, ItemMetadata> groups = new LinkedMultiValueMap<>();
     private final Map<String, ItemHint> hints = new HashMap<>();
+    private boolean noSpringBoot = true;
+    private boolean cfgPropsCompletionAvailable = false;
+    private NbMavenProjectImpl mvnPrj;
+    private ClassPath cpExec;
 
     public SpringBootServiceImpl(Project p) {
-        this.prj = p;
+        if (p instanceof NbMavenProjectImpl) {
+            this.mvnPrj = (NbMavenProjectImpl) p;
+        }
     }
 
     @Override
     public void init() {
-        logger.log(INFO, "Initializing SpringBootService for project {0}", new Object[]{prj.toString()});
+        if (mvnPrj == null) {
+            return;
+        }
+        // check the maven project has a dependency on one of the spring boot libraries
+        noSpringBoot = !containsDependency(mvnPrj.getProjectWatcher(), "spring-boot");
+        if (noSpringBoot) {
+            return;
+        }
+        logger.log(INFO, "Initializing SpringBootService for project {0}", new Object[]{mvnPrj.toString()});
         // set up a reference to the execute classpath object
-        Sources srcs = ProjectUtils.getSources(prj);
+        Sources srcs = ProjectUtils.getSources(mvnPrj);
         SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
         for (SourceGroup group : srcGroups) {
             if (group.getName().toLowerCase().contains("source")) {
@@ -96,32 +111,40 @@ public class SpringBootServiceImpl implements SpringBootService {
                 break;
             }
         }
-        // listen for classpath changes
+        // listen for classpath and pom changes
         cpExec.addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
                 System.out.println(evt.toString());
             }
         });
+        mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.out.println(evt.toString());
+            }
+        });
+        // check completion of configuration properties is possible
+        try {
+            cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
+            cfgPropsCompletionAvailable = true;
+        } catch (ClassNotFoundException ex) {
+            cfgPropsCompletionAvailable = false;
+        }
         // build configuration properties maps
         updateCacheMaps();
     }
 
     @Override
     public boolean cfgPropsCompletionEnabled() {
-        if (cpExec == null) {
-            return false;
-        }
-        try {
-            cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
-            return true;
-        } catch (ClassNotFoundException ex) {
-            return false;
-        }
+        return cfgPropsCompletionAvailable;
     }
 
     @Override
     public void completePropName(CompletionResultSet completionResultSet, String filter, int startOffset, int caretOffset) {
+        if (noSpringBoot) {
+            return;
+        }
         long mark = System.currentTimeMillis();
         updateCacheMaps();
         for (String propName : properties.keySet()) {
@@ -140,6 +163,9 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public void completePropValue(CompletionResultSet completionResultSet, String propName, String filter, int startOffset, int caretOffset) {
+        if (noSpringBoot) {
+            return;
+        }
         long mark = System.currentTimeMillis();
         updateCacheMaps();
         if (hints.containsKey(propName)) {
@@ -205,4 +231,14 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
     }
 
+    private boolean containsDependency(NbMavenProject nbMvn, String artifactId) {
+        MavenProject mvnPrj = nbMvn.getMavenProject();
+        for (Object o : mvnPrj.getDependencies()) {
+            Dependency d = (Dependency) o;
+            if (d.getArtifactId().contains(artifactId)) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
