@@ -80,7 +80,7 @@ public class SpringBootServiceImpl implements SpringBootService {
     private final MultiValueMap<String, ItemMetadata> properties = new LinkedMultiValueMap<>();
     private final MultiValueMap<String, ItemMetadata> groups = new LinkedMultiValueMap<>();
     private final Map<String, ItemHint> hints = new HashMap<>();
-    private boolean noSpringBoot = true;
+    private boolean springBootAvailable = false;
     private boolean cfgPropsCompletionAvailable = false;
     private NbMavenProjectImpl mvnPrj;
     private ClassPath cpExec;
@@ -96,9 +96,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         if (mvnPrj == null) {
             return;
         }
-        // check the maven project has a dependency on one of the spring boot libraries
-        noSpringBoot = !containsDependency(mvnPrj.getProjectWatcher(), "spring-boot");
-        if (noSpringBoot) {
+        if (!isSpringBootAvailable()) {
             return;
         }
         logger.log(INFO, "Initializing SpringBootService for project {0}", new Object[]{mvnPrj.toString()});
@@ -111,28 +109,39 @@ public class SpringBootServiceImpl implements SpringBootService {
                 break;
             }
         }
-        // listen for classpath and pom changes
-        cpExec.addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                System.out.println(evt.toString());
-            }
-        });
+        // listen for pom changes
         mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
             @Override
             public void propertyChange(PropertyChangeEvent evt) {
-                System.out.println(evt.toString());
+                logger.fine("Maven pom change");
+                logger.finer(evt.toString());
+                isSpringBootAvailable();
+                isCdfPropsCompletionAvailable();
             }
         });
-        // check completion of configuration properties is possible
+        isCdfPropsCompletionAvailable();
+        // build configuration properties maps
+        updateCacheMaps();
+    }
+
+    // check completion of configuration properties is possible
+    // updates cfgPropsCompletionAvailable flag
+    private boolean isCdfPropsCompletionAvailable() {
         try {
+            logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
             cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
             cfgPropsCompletionAvailable = true;
         } catch (ClassNotFoundException ex) {
             cfgPropsCompletionAvailable = false;
         }
-        // build configuration properties maps
-        updateCacheMaps();
+        return cfgPropsCompletionAvailable;
+    }
+
+    // check one of the the maven project dependency has an artifact id starting with 'spring-boot'
+    // updates springBootAvailable flag
+    private boolean isSpringBootAvailable() {
+        logger.fine("Checking maven project has a spring boot dependency");
+        return springBootAvailable = dependecyArtifactContains(mvnPrj.getProjectWatcher(), "spring-boot");
     }
 
     @Override
@@ -142,7 +151,7 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public void completePropName(CompletionResultSet completionResultSet, String filter, int startOffset, int caretOffset) {
-        if (noSpringBoot) {
+        if (!springBootAvailable) {
             return;
         }
         long mark = System.currentTimeMillis();
@@ -163,7 +172,7 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public void completePropValue(CompletionResultSet completionResultSet, String propName, String filter, int startOffset, int caretOffset) {
-        if (noSpringBoot) {
+        if (!springBootAvailable) {
             return;
         }
         long mark = System.currentTimeMillis();
@@ -231,9 +240,9 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
     }
 
-    private boolean containsDependency(NbMavenProject nbMvn, String artifactId) {
-        MavenProject mvnPrj = nbMvn.getMavenProject();
-        for (Object o : mvnPrj.getDependencies()) {
+    private boolean dependecyArtifactContains(NbMavenProject nbMvn, String artifactId) {
+        MavenProject mPrj = nbMvn.getMavenProject();
+        for (Object o : mPrj.getDependencies()) {
             Dependency d = (Dependency) o;
             if (d.getArtifactId().contains(artifactId)) {
                 return true;
