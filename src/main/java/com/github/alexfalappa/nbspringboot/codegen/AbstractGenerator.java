@@ -16,7 +16,6 @@
 package com.github.alexfalappa.nbspringboot.codegen;
 
 import java.io.IOException;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.text.JTextComponent;
@@ -26,12 +25,17 @@ import org.netbeans.modules.xml.xam.dom.AbstractDocumentModel;
 import org.netbeans.spi.editor.codegen.CodeGenerator;
 import org.openide.awt.StatusDisplayer;
 
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Logger.getLogger;
+
 /**
+ * Base class for Maven POM code generators.
  *
  * @author Alessandro Falappa
  */
 public abstract class AbstractGenerator<T extends AbstractDocumentModel> implements CodeGenerator {
 
+    protected final Logger logger = getLogger(getClass().getName());
     protected final JTextComponent component;
     protected final T model;
 
@@ -47,8 +51,7 @@ public abstract class AbstractGenerator<T extends AbstractDocumentModel> impleme
         try {
             model.sync();
         } catch (IOException ex) {
-            Logger.getLogger(AbstractGenerator.class.getName()).log(Level.INFO,
-                    "Error while syncing the editor document with model for pom.xml file", ex); //NOI18N
+            logger.log(INFO, "Error while syncing the editor document with model for pom.xml file", ex); //NOI18N
         }
         if (!model.getState().equals(Model.State.VALID)) {
             StatusDisplayer.getDefault().setStatusText("Cannot parse document. Unable to generate content.");
