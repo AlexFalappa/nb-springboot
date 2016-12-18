@@ -45,10 +45,11 @@ import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 import com.github.alexfalappa.nbspringboot.cfgeditor.ConfigPropertyCompletionItem;
 import com.github.alexfalappa.nbspringboot.cfgeditor.ConfigValueCompletionItem;
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
+import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
 import static org.springframework.boot.configurationprocessor.metadata.ItemMetadata.ItemType.GROUP;
@@ -124,7 +125,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         updateCacheMaps();
     }
 
-    // check completion of configuration properties is possible
+    // check if completion of configuration properties is possible
     // updates cfgPropsCompletionAvailable flag
     private boolean isCdfPropsCompletionAvailable() {
         try {
@@ -156,6 +157,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
         long mark = System.currentTimeMillis();
         updateCacheMaps();
+        logger.log(FINER, "Completing property name: {0}", filter);
         for (String propName : properties.keySet()) {
             if (filter == null || propName.contains(filter)) {
                 for (ItemMetadata item : properties.get(propName)) {
@@ -177,6 +179,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
         long mark = System.currentTimeMillis();
         updateCacheMaps();
+        logger.log(FINER, "Completing property value: {0}", filter);
         if (hints.containsKey(propName)) {
             ItemHint hint = hints.get(propName);
             final List<ItemHint.ValueHint> values = hint.getValues();
@@ -196,6 +199,7 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     // Update internal caches and maps from the given classpath.
     private void updateCacheMaps() {
+        logger.fine("Updating cache maps");
         this.properties.clear();
         this.hints.clear();
         this.groups.clear();
@@ -204,6 +208,7 @@ public class SpringBootServiceImpl implements SpringBootService {
             try {
                 ConfigurationMetadata meta;
                 FileObject archiveFo = FileUtil.getArchiveFile(fo);
+                logger.log(FINER, "Considering metadata file: {0}", FileUtil.getFileDisplayName(archiveFo));
                 if (archiveFo != null) {
                     // parse and cache configuration metadata from JSON file in jar
                     String archivePath = archiveFo.getPath();

@@ -18,7 +18,6 @@ package com.github.alexfalappa.nbspringboot.projects.initializr;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.openide.util.NbPreferences;
@@ -36,6 +35,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.PREF_INITIALIZR_TIMEOUT;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.PREF_INITIALIZR_URL;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.REST_USER_AGENT;
+import static java.util.logging.Level.INFO;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
@@ -62,8 +62,8 @@ public class InitializrService {
                 .header("User-Agent", REST_USER_AGENT)
                 .build();
         // connect
-        logger.log(Level.INFO, "Getting Spring Initializr metadata from: {0}", serviceUrl);
-        logger.log(Level.INFO, "Asking metadata as: {0}", REST_USER_AGENT);
+        logger.log(INFO, "Getting Spring Initializr metadata from: {0}", serviceUrl);
+        logger.log(INFO, "Asking metadata as: {0}", REST_USER_AGENT);
         long start = System.currentTimeMillis();
         ResponseEntity<String> respEntity = rt.exchange(req, String.class);
         // analyze response
@@ -71,7 +71,7 @@ public class InitializrService {
         if (statusCode == OK) {
             ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
             final JsonNode json = mapper.readTree(respEntity.getBody());
-            logger.log(Level.INFO, "Retrieved Spring Initializr service metadata. Took {0} msec", System.currentTimeMillis() - start);
+            logger.log(INFO, "Retrieved Spring Initializr service metadata. Took {0} msec", System.currentTimeMillis() - start);
             return json;
         } else {
             // log status code
@@ -111,14 +111,14 @@ public class InitializrService {
                 .build();
         // connect
         logger.info("Getting Spring Initializr project\n");
-        logger.log(Level.INFO, "service url: {0}", uri.toString());
+        logger.log(INFO, "service url: {0}", uri.toString());
         long start = System.currentTimeMillis();
         ResponseEntity<byte[]> respEntity = rt.exchange(req, byte[].class);
         // analyze response outcome
         final HttpStatus statusCode = respEntity.getStatusCode();
         if (statusCode == OK) {
             final ByteArrayInputStream stream = new ByteArrayInputStream(respEntity.getBody());
-            logger.log(Level.INFO, "Retrieved archived project from Spring Initializr service. Took {0} msec",
+            logger.log(INFO, "Retrieved archived project from Spring Initializr service. Took {0} msec",
                     System.currentTimeMillis() - start);
             return stream;
         } else {

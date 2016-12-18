@@ -16,6 +16,7 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgeditor;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -76,6 +77,7 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
         if (!bcps.cfgPropsCompletionEnabled()) {
             return null;
         }
+        logger.fine("Creating completion task");
         return new AsyncCompletionTask(new AsyncCompletionQuery() {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int caretOffset) {
@@ -84,6 +86,7 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
                 int lineStartOffset = lineElement.getStartOffset();
                 try {
                     String lineToCaret = styDoc.getText(lineStartOffset, caretOffset - lineStartOffset);
+                    logger.log(Level.FINER, "Completion query on line: {0}", lineToCaret);
                     if (!lineToCaret.contains("#")) {
                         String[] parts = lineToCaret.split("=");
                         //property name extraction from part before =
