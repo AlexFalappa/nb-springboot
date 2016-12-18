@@ -37,7 +37,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationprocessor.metadata.ConfigurationMetadata;
 
-import com.github.alexfalappa.nbspringboot.api.SpringBootService;
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 /**
  * The Spring Boot Configuration implementation of {@code CompletionProvider}.

@@ -30,7 +30,7 @@ import org.openide.filesystems.FileUtil;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.Utilities;
 
-import com.github.alexfalappa.nbspringboot.api.SpringBootService;
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 @ActionID(
         category = "Build",

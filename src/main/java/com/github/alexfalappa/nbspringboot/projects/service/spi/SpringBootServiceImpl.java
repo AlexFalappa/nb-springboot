@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.spi;
+package com.github.alexfalappa.nbspringboot.projects.service.spi;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -45,7 +45,7 @@ import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.github.alexfalappa.nbspringboot.api.SpringBootService;
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 import com.github.alexfalappa.nbspringboot.cfgeditor.ConfigPropertyCompletionItem;
 import com.github.alexfalappa.nbspringboot.cfgeditor.ConfigValueCompletionItem;
 

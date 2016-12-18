@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.spi;
+package com.github.alexfalappa.nbspringboot.projects.service.spi;
 
 import java.util.logging.Logger;
 
@@ -22,7 +22,7 @@ import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.spi.project.ProjectServiceProvider;
 import org.netbeans.spi.project.ui.ProjectOpenedHook;
 
-import com.github.alexfalappa.nbspringboot.api.SpringBootService;
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 /**
  * {@code ProjectOpenedHook} to initialize a {@link SpringBootService} implementation on opening of maven projects.
