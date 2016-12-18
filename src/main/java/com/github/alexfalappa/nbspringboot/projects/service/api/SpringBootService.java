@@ -15,7 +15,11 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.api;
 
-import org.netbeans.spi.editor.completion.CompletionResultSet;
+import java.util.List;
+
+import org.netbeans.api.java.classpath.ClassPath;
+import org.springframework.boot.configurationprocessor.metadata.ItemHint;
+import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 
 /**
  * Service API for implementing support of Spring Boot related functionalities.
@@ -30,24 +34,13 @@ public interface SpringBootService {
 
     boolean cfgPropsCompletionEnabled();
 
-    /**
-     * Create a completion result list of properties values based on a property name, filter string, classpath and document offsets.
-     *
-     * @param completionResultSet
-     * @param propPrefix
-     * @param valPrefix
-     * @param i
-     * @param caretOffset
-     */
-    void completePropValue(CompletionResultSet completionResultSet, String propPrefix, String valPrefix, int i, int caretOffset);
+    public ItemHint getHintMetadata(String propertyName);
 
-    /**
-     * Create a completion result list of config properties based on a filter string, classpath and document offsets.
-     *
-     * @param completionResultSet
-     * @param propPrefix
-     * @param i
-     * @param caretOffset
-     */
-    void completePropName(CompletionResultSet completionResultSet, String propPrefix, int i, int caretOffset);
+    public List<ItemHint.ValueHint> queryHintMetadata(String propertyName, String filter);
+
+    public List<ItemMetadata> getPropertyMetadata(String propertyName);
+
+    public List<ItemMetadata> queryPropertyMetadata(String filter);
+
+    public ClassPath getManagedClassPath();
 }

@@ -36,6 +36,8 @@ import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationprocessor.metadata.ConfigurationMetadata;
+import org.springframework.boot.configurationprocessor.metadata.ItemHint;
+import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
@@ -71,11 +73,11 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
         if (prj == null) {
             return null;
         }
-        final SpringBootService bcps = prj.getLookup().lookup(SpringBootService.class);
-        if (bcps == null) {
+        final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
+        if (sbs == null) {
             return null;
         }
-        if (!bcps.cfgPropsCompletionEnabled()) {
+        if (!sbs.cfgPropsCompletionEnabled()) {
             return null;
         }
         logger.fine("Creating completion task");
@@ -103,15 +105,15 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
                         if (parts.length > 1) {
                             //value completion
                             String valPrefix = parts[1].trim();
-                            bcps.completePropValue(completionResultSet, propPrefix, valPrefix, lineStartOffset + lineToCaret.indexOf(
+                            completePropValue(sbs, completionResultSet, propPrefix, valPrefix, lineStartOffset + lineToCaret.indexOf(
                                     valPrefix), caretOffset);
                         } else if (equalSignOffset >= 0) {
                             //value completion with empty filter
-                            bcps.completePropValue(completionResultSet, propPrefix, null, lineStartOffset + equalSignOffset + 1,
+                            completePropValue(sbs, completionResultSet, propPrefix, null, lineStartOffset + equalSignOffset + 1,
                                     caretOffset);
                         } else {
                             // property completion
-                            bcps.completePropName(completionResultSet, propPrefix, lineStartOffset + propPrefixOffset, caretOffset);
+                            completePropName(sbs, completionResultSet, propPrefix, lineStartOffset + propPrefixOffset, caretOffset);
                         }
                     }
                 } catch (BadLocationException ex) {
@@ -125,6 +127,28 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
     @Override
     public int getAutoQueryTypes(JTextComponent jtc, String string) {
         return 0;
+    }
+
+    // Create a completion result list of config properties based on a filter string, classpath and document offsets.
+    private void completePropName(SpringBootService sbs, CompletionResultSet completionResultSet, String filter, int startOffset, int caretOffset) {
+        long mark = System.currentTimeMillis();
+        logger.log(FINER, "Completing property name: {0}", filter);
+        for (ItemMetadata item : sbs.queryPropertyMetadata(filter)) {
+            completionResultSet.addItem(new ConfigPropertyCompletionItem(item, sbs, startOffset, caretOffset));
+        }
+        final long elapsed = System.currentTimeMillis() - mark;
+        logger.log(FINER, "Property completion of ''{0}'' took: {1} msecs", new Object[]{filter, elapsed});
+    }
+
+    // Create a completion result list of properties values based on a property name, filter string, classpath and document offsets.
+    public void completePropValue(SpringBootService sbs, CompletionResultSet completionResultSet, String propName, String filter, int startOffset, int caretOffset) {
+        long mark = System.currentTimeMillis();
+        logger.log(FINER, "Completing property value: {0}", filter);
+        for (ItemHint.ValueHint hint : sbs.queryHintMetadata(propName, filter)) {
+            completionResultSet.addItem(new ConfigValueCompletionItem(hint, startOffset, caretOffset));
+        }
+        final long elapsed = System.currentTimeMillis() - mark;
+        logger.log(FINER, "Value completion of ''{0}'' on ''{1}'' took: {2} msecs", new Object[]{filter, propName, elapsed});
     }
 
 }

@@ -19,6 +19,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Logger;
@@ -33,7 +34,6 @@ import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
 import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.modules.maven.api.NbMavenProject;
-import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.project.ProjectServiceProvider;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -45,8 +45,6 @@ import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 
-import com.github.alexfalappa.nbspringboot.cfgeditor.ConfigPropertyCompletionItem;
-import com.github.alexfalappa.nbspringboot.cfgeditor.ConfigValueCompletionItem;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static java.util.logging.Level.FINER;
@@ -75,8 +73,7 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     private static final Logger logger = Logger.getLogger(SpringBootServiceImpl.class.getName());
     private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
-    public static final int LOG_COMPLETION_TRESH = 50;
-    private final JsonMarshaller jsonMarsaller = new JsonMarshaller();
+    private final JsonMarshaller jsonMarshaller = new JsonMarshaller();
     private final Map<String, ConfigurationMetadata> cfgMetasInJars = new HashMap<>();
     private final MultiValueMap<String, ItemMetadata> properties = new LinkedMultiValueMap<>();
     private final MultiValueMap<String, ItemMetadata> groups = new LinkedMultiValueMap<>();
@@ -89,6 +86,15 @@ public class SpringBootServiceImpl implements SpringBootService {
     public SpringBootServiceImpl(Project p) {
         if (p instanceof NbMavenProjectImpl) {
             this.mvnPrj = (NbMavenProjectImpl) p;
+            // listen for pom changes
+            mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    logger.fine("Maven pom change");
+                    logger.finer(evt.toString());
+                    init();
+                }
+            });
         }
     }
 
@@ -97,7 +103,11 @@ public class SpringBootServiceImpl implements SpringBootService {
         if (mvnPrj == null) {
             return;
         }
-        if (!isSpringBootAvailable()) {
+        // check maven project has a dependency starting with 'spring-boot'
+        logger.fine("Checking maven project has a spring boot dependency");
+        springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
+        // early exit if no spring boot dependency detected
+        if (!springBootAvailable) {
             return;
         }
         logger.log(INFO, "Initializing SpringBootService for project {0}", new Object[]{mvnPrj.toString()});
@@ -110,24 +120,7 @@ public class SpringBootServiceImpl implements SpringBootService {
                 break;
             }
         }
-        // listen for pom changes
-        mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                logger.fine("Maven pom change");
-                logger.finer(evt.toString());
-                isSpringBootAvailable();
-                isCdfPropsCompletionAvailable();
-            }
-        });
-        isCdfPropsCompletionAvailable();
-        // build configuration properties maps
-        updateCacheMaps();
-    }
-
-    // check if completion of configuration properties is possible
-    // updates cfgPropsCompletionAvailable flag
-    private boolean isCdfPropsCompletionAvailable() {
+        // check if completion of configuration properties is possible
         try {
             logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
             cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
@@ -135,14 +128,13 @@ public class SpringBootServiceImpl implements SpringBootService {
         } catch (ClassNotFoundException ex) {
             cfgPropsCompletionAvailable = false;
         }
-        return cfgPropsCompletionAvailable;
+        // build configuration properties maps
+        updateCacheMaps();
     }
 
-    // check one of the the maven project dependency has an artifact id starting with 'spring-boot'
-    // updates springBootAvailable flag
-    private boolean isSpringBootAvailable() {
-        logger.fine("Checking maven project has a spring boot dependency");
-        return springBootAvailable = dependecyArtifactContains(mvnPrj.getProjectWatcher(), "spring-boot");
+    @Override
+    public ClassPath getManagedClassPath() {
+        return cpExec;
     }
 
     @Override
@@ -151,50 +143,43 @@ public class SpringBootServiceImpl implements SpringBootService {
     }
 
     @Override
-    public void completePropName(CompletionResultSet completionResultSet, String filter, int startOffset, int caretOffset) {
-        if (!springBootAvailable) {
-            return;
-        }
-        long mark = System.currentTimeMillis();
-        updateCacheMaps();
-        logger.log(FINER, "Completing property name: {0}", filter);
-        for (String propName : properties.keySet()) {
-            if (filter == null || propName.contains(filter)) {
-                for (ItemMetadata item : properties.get(propName)) {
-                    completionResultSet.addItem(new ConfigPropertyCompletionItem(item, hints.get(propName), cpExec, startOffset,
-                            caretOffset));
-                }
-            }
-        }
-        final long elapsed = System.currentTimeMillis() - mark;
-        if (elapsed > LOG_COMPLETION_TRESH) {
-            logger.log(INFO, "Property completion of ''{0}'' took: {1} msecs", new Object[]{filter, elapsed});
-        }
+    public List<ItemMetadata> getPropertyMetadata(String propertyName) {
+        return properties.get(propertyName);
     }
 
     @Override
-    public void completePropValue(CompletionResultSet completionResultSet, String propName, String filter, int startOffset, int caretOffset) {
-        if (!springBootAvailable) {
-            return;
-        }
-        long mark = System.currentTimeMillis();
+    public List<ItemMetadata> queryPropertyMetadata(String filter) {
+        List<ItemMetadata> ret = new LinkedList<>();
         updateCacheMaps();
-        logger.log(FINER, "Completing property value: {0}", filter);
-        if (hints.containsKey(propName)) {
-            ItemHint hint = hints.get(propName);
+        for (String propName : properties.keySet()) {
+            if (filter == null || propName.contains(filter)) {
+                ret.addAll(properties.get(propName));
+            }
+        }
+        return ret;
+    }
+
+    @Override
+    public ItemHint getHintMetadata(String propertyName) {
+        return hints.get(propertyName);
+    }
+
+    @Override
+    public List<ItemHint.ValueHint> queryHintMetadata(String propertyName, String filter) {
+        List<ItemHint.ValueHint> ret = new LinkedList<>();
+        updateCacheMaps();
+        if (hints.containsKey(propertyName)) {
+            ItemHint hint = hints.get(propertyName);
             final List<ItemHint.ValueHint> values = hint.getValues();
             if (values != null) {
                 for (ItemHint.ValueHint valHint : values) {
-                    if (filter == null || valHint.getValue().toString().startsWith(filter)) {
-                        completionResultSet.addItem(new ConfigValueCompletionItem(valHint, cpExec, startOffset, caretOffset));
+                    if (filter == null || valHint.getValue().toString().contains(filter)) {
+                        ret.add(valHint);
                     }
                 }
             }
         }
-        final long elapsed = System.currentTimeMillis() - mark;
-        if (elapsed > LOG_COMPLETION_TRESH) {
-            logger.log(INFO, "Value completion of ''{0}'' on ''{1}'' took: {2} msecs", new Object[]{filter, propName, elapsed});
-        }
+        return ret;
     }
 
     // Update internal caches and maps from the given classpath.
@@ -208,19 +193,20 @@ public class SpringBootServiceImpl implements SpringBootService {
             try {
                 ConfigurationMetadata meta;
                 FileObject archiveFo = FileUtil.getArchiveFile(fo);
-                logger.log(FINER, "Considering metadata file: {0}", FileUtil.getFileDisplayName(archiveFo));
                 if (archiveFo != null) {
+                    logger.log(FINER, "Considering metadata file in archive: {0}", FileUtil.getFileDisplayName(archiveFo));
                     // parse and cache configuration metadata from JSON file in jar
                     String archivePath = archiveFo.getPath();
                     if (!cfgMetasInJars.containsKey(archivePath)) {
                         logger.log(INFO, "Unmarshalling configuration metadata from {0}", FileUtil.getFileDisplayName(fo));
-                        cfgMetasInJars.put(archivePath, jsonMarsaller.read(fo.getInputStream()));
+                        cfgMetasInJars.put(archivePath, jsonMarshaller.read(fo.getInputStream()));
                     }
                     meta = cfgMetasInJars.get(archivePath);
                 } else {
+                    logger.log(FINER, "Considering metadata file: {0}", FileUtil.getFileDisplayName(fo));
                     // parse configuration metadata from JSON file (usually produced by spring configuration processor)
                     logger.log(INFO, "Unmarshalling configuration metadata from {0}", FileUtil.getFileDisplayName(fo));
-                    meta = jsonMarsaller.read(fo.getInputStream());
+                    meta = jsonMarshaller.read(fo.getInputStream());
                 }
                 // update property and groups maps
                 for (ItemMetadata item : meta.getItems()) {
@@ -245,7 +231,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
     }
 
-    private boolean dependecyArtifactContains(NbMavenProject nbMvn, String artifactId) {
+    private boolean dependencyArtifactIdContains(NbMavenProject nbMvn, String artifactId) {
         MavenProject mPrj = nbMvn.getMavenProject();
         for (Object o : mPrj.getDependencies()) {
             Dependency d = (Dependency) o;
