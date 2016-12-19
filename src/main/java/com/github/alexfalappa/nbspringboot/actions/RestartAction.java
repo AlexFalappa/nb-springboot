@@ -39,6 +39,8 @@ import org.openide.awt.StatusDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 
+import static java.util.logging.Level.FINE;
+
 @ActionID(
         category = "Build",
         id = "com.github.alexfalappa.nbspringboot.actions.RestartAction"
@@ -92,7 +94,7 @@ public final class RestartAction implements ActionListener {
                         sb.append("Spring Boot application restart triggered");
                         stDisp.setStatusText(sb.toString());
                         logger.info(sb.toString());
-                        logger.fine(String.format("Timestamp written in %s", f.getAbsolutePath()));
+                        logger.log(FINE, "Timestamp written in {0}", f.getAbsolutePath());
                     } catch (FileNotFoundException ex) {
                         Exceptions.printStackTrace(ex);
                     }

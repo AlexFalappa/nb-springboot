@@ -34,6 +34,8 @@ import org.springframework.boot.configurationprocessor.metadata.ItemDeprecation;
 import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
+
 import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEscape;
 
 /**
@@ -48,9 +50,11 @@ import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEsca
 public class ConfigPropertyCompletionDocumentation implements CompletionDocumentation {
 
     private final ConfigPropertyCompletionItem item;
+    private final SpringBootService bootService;
 
-    public ConfigPropertyCompletionDocumentation(ConfigPropertyCompletionItem item) {
+    public ConfigPropertyCompletionDocumentation(ConfigPropertyCompletionItem item, SpringBootService sbs) {
         this.item = item;
+        this.bootService = sbs;
     }
 
     @Override
@@ -91,7 +95,7 @@ public class ConfigPropertyCompletionDocumentation implements CompletionDocument
             sb.append("<br/><br/>").append(description);
         }
         // list of values (optional)
-        ItemHint hint = item.getHint();
+        ItemHint hint = bootService.getHintMetadata(item.getConfigurationItem().getName());
         if (hint != null) {
             List<ItemHint.ValueHint> values = hint.getValues();
             if (values != null && !values.isEmpty()) {
@@ -127,7 +131,7 @@ public class ConfigPropertyCompletionDocumentation implements CompletionDocument
         if (sourceType == null) {
             return null;
         }
-        final FileObject fo = item.getClassPath().findResource(sourceType.replaceAll("\\.", "/").concat(".class"));
+        final FileObject fo = bootService.getManagedClassPath().findResource(sourceType.replaceAll("\\.", "/").concat(".class"));
         if (fo == null) {
             return null;
         }

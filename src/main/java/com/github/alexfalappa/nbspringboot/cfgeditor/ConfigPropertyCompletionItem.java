@@ -31,7 +31,6 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
 import org.netbeans.api.editor.completion.Completion;
-import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.editor.completion.CompletionTask;
@@ -40,8 +39,9 @@ import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
-import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
+
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.shortenJavaType;
 import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEscape;
@@ -56,36 +56,24 @@ import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEsca
  */
 public class ConfigPropertyCompletionItem implements CompletionItem {
 
-    private final ItemMetadata configurationItem;
-    // may be null
-    private final ItemHint hint;
-    private final ClassPath classPath;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgeditor/springboot-property.png"));
+    private final ItemMetadata configurationItem;
+    private final SpringBootService bootService;
     private final int caretOffset;
     private final int propStartOffset;
     private boolean overwrite;
 
-    public ConfigPropertyCompletionItem(ItemMetadata configurationItem, ItemHint hint, ClassPath classPath, int propStartOffset,
-            int caretOffset) {
+    public ConfigPropertyCompletionItem(ItemMetadata configurationItem, SpringBootService bootService, int propStartOffset, int caretOffset) {
         this.overwrite = false;
         this.configurationItem = configurationItem;
-        this.hint = hint;
-        this.classPath = classPath;
+        this.bootService = bootService;
         this.propStartOffset = propStartOffset;
         this.caretOffset = caretOffset;
     }
 
     public ItemMetadata getConfigurationItem() {
         return configurationItem;
-    }
-
-    public ItemHint getHint() {
-        return hint;
-    }
-
-    public ClassPath getClassPath() {
-        return classPath;
     }
 
     public String getText() {
@@ -158,7 +146,7 @@ public class ConfigPropertyCompletionItem implements CompletionItem {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int i) {
                 completionResultSet
-                        .setDocumentation(new ConfigPropertyCompletionDocumentation(ConfigPropertyCompletionItem.this));
+                        .setDocumentation(new ConfigPropertyCompletionDocumentation(ConfigPropertyCompletionItem.this, bootService));
                 completionResultSet.finish();
             }
         });

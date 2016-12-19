@@ -30,6 +30,7 @@ import org.openide.util.NbBundle;
 
 import static com.github.alexfalappa.nbspringboot.actions.RestartAction.PROP_RESTART;
 import static com.github.alexfalappa.nbspringboot.actions.RestartAction.TRIGGER_FILE;
+import static java.util.logging.Level.FINER;
 
 /**
  * Customizer panel for maven projects with spring boot dependencies.
@@ -207,7 +208,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             debugProps.put(PROP_RUN_ARGS, csv);
         }
         mh2.markAsModified(mh2.getActionMappings());
-        logger.finer(String.format("Command line args: %s", runProps.get(PROP_RUN_ARGS)));
+        logger.log(FINER, "Command line args: {0}", runProps.get(PROP_RUN_ARGS));
     }
 
 }

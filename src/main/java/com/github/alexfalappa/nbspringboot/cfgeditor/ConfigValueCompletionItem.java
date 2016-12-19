@@ -29,7 +29,6 @@ import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
 import org.netbeans.api.editor.completion.Completion;
-import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.editor.completion.CompletionTask;
@@ -50,25 +49,19 @@ import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 public class ConfigValueCompletionItem implements CompletionItem {
 
     private final ItemHint.ValueHint hint;
-    private final ClassPath classPath;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgeditor/springboot-value.png"));
     private final int caretOffset;
     private final int dotOffset;
 
-    public ConfigValueCompletionItem(ItemHint.ValueHint hint, ClassPath classPath, int dotOffset, int caretOffset) {
+    public ConfigValueCompletionItem(ItemHint.ValueHint hint, int dotOffset, int caretOffset) {
         this.hint = hint;
-        this.classPath = classPath;
         this.dotOffset = dotOffset;
         this.caretOffset = caretOffset;
     }
 
     public ItemHint.ValueHint getHint() {
         return hint;
-    }
-
-    public ClassPath getClassPath() {
-        return classPath;
     }
 
     public String getText() {

@@ -42,6 +42,10 @@ import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.SEVERE;
+
 /**
  * This class proxies the original ContextGlobalProvider and ensures the current project remains in the GlobalContext regardless of the
  * TopComponent selection. The class also ensures that when a child node is selected within the in Projects tab, the parent Project will be
@@ -139,7 +143,7 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
                 if (projectsTab == null) {
                     projectsTab = WindowManager.getDefault().findTopComponent(PROJECT_LOGICAL_TAB_ID);
                     if (projectsTab == null) {
-                        logger.severe(String.format("propertyChange: cannot find the Projects logical window (%s)", PROJECT_LOGICAL_TAB_ID));
+                        logger.log(SEVERE, "propertyChange: cannot find the Projects logical window ({0})", PROJECT_LOGICAL_TAB_ID);
                         return;
                     }
                 }
@@ -165,8 +169,8 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
                                 lastProject = project;
                                 // Add this project to the proxy if it's not in the global lookup
                                 if (!resultProjects.allInstances().contains(lastProject)) {
-                                    logger.finer(String.format("propertyChange: Found project [%s] that owns current node.",
-                                            ProjectUtils.getInformation(lastProject).getDisplayName()));
+                                    logger.log(FINER, "propertyChange: Found project [{0}] that owns current node.",
+                                            ProjectUtils.getInformation(lastProject).getDisplayName());
                                     updateProjectLookup(lastProject);
                                 }
                             }
@@ -194,8 +198,8 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
                     // Note: not handling multiple selection of projects.
                     clearProjectLookup();
                     lastProject = resultProjects.allInstances().iterator().next();
-                    logger.finer(String.format("resultChanged: Found project [%s] in the normal lookup.",
-                            ProjectUtils.getInformation(lastProject).getDisplayName()));
+                    logger.log(FINER, "resultChanged: Found project [{0}] in the normal lookup.",
+                            ProjectUtils.getInformation(lastProject).getDisplayName());
                 } else if (OpenProjects.getDefault().getOpenProjects().length == 0) {
                     clearProjectLookup();
                     lastProject = null;
@@ -206,8 +210,8 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
                         Project project = findProjectThatOwnsNode(currrentNode);
                         if (project != null) {
                             lastProject = project;
-                            logger.finer(String.format("resultChanged: Found project [%s] that owns current node.",
-                                    ProjectUtils.getInformation(lastProject).getDisplayName()));
+                            logger.log(FINER, "resultChanged: Found project [{0}] that owns current node.",
+                                    ProjectUtils.getInformation(lastProject).getDisplayName());
                         }
                     }
                     // Add the last used project to our internal lookup
@@ -245,8 +249,8 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
         if (projectLookup != null && projectLookup.lookupItem(template) == null) {
             clearProjectLookup();
             content.add(project);
-            logger.fine(String.format("updateProjectLookup: added [%s] to the proxy lookup.",
-                    ProjectUtils.getInformation(lastProject).getDisplayName()));
+            logger.log(FINE, "updateProjectLookup: added [{0}] to the proxy lookup.",
+                    ProjectUtils.getInformation(lastProject).getDisplayName());
         }
     }
 
