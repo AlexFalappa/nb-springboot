@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import org.apache.maven.model.Dependency;
@@ -140,6 +141,11 @@ public class SpringBootServiceImpl implements SpringBootService {
     @Override
     public boolean cfgPropsCompletionEnabled() {
         return cfgPropsCompletionAvailable;
+    }
+
+    @Override
+    public Set<String> getPropertyNames() {
+        return properties.keySet();
     }
 
     @Override

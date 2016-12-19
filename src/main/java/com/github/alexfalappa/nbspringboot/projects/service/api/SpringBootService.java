@@ -16,6 +16,7 @@
 package com.github.alexfalappa.nbspringboot.projects.service.api;
 
 import java.util.List;
+import java.util.Set;
 
 import org.netbeans.api.java.classpath.ClassPath;
 import org.springframework.boot.configurationprocessor.metadata.ItemHint;
@@ -32,15 +33,17 @@ public interface SpringBootService {
 
     void init();
 
+    ClassPath getManagedClassPath();
+
     boolean cfgPropsCompletionEnabled();
 
-    public ItemHint getHintMetadata(String propertyName);
+    Set<String> getPropertyNames();
 
-    public List<ItemHint.ValueHint> queryHintMetadata(String propertyName, String filter);
+    List<ItemMetadata> getPropertyMetadata(String propertyName);
 
-    public List<ItemMetadata> getPropertyMetadata(String propertyName);
+    List<ItemMetadata> queryPropertyMetadata(String filter);
 
-    public List<ItemMetadata> queryPropertyMetadata(String filter);
+    ItemHint getHintMetadata(String propertyName);
 
-    public ClassPath getManagedClassPath();
+    List<ItemHint.ValueHint> queryHintMetadata(String propertyName, String filter);
 }
