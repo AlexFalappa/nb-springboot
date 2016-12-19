@@ -56,16 +56,15 @@ import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEsca
  */
 public class ConfigPropertyCompletionItem implements CompletionItem {
 
-    private final ItemMetadata configurationItem;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgeditor/springboot-property.png"));
-    private final int caretOffset;
+    private final ItemMetadata configurationItem;
     private final SpringBootService bootService;
+    private final int caretOffset;
     private final int propStartOffset;
     private boolean overwrite;
 
-    public ConfigPropertyCompletionItem(ItemMetadata configurationItem, SpringBootService bootService, int propStartOffset,
-            int caretOffset) {
+    public ConfigPropertyCompletionItem(ItemMetadata configurationItem, SpringBootService bootService, int propStartOffset, int caretOffset) {
         this.overwrite = false;
         this.configurationItem = configurationItem;
         this.bootService = bootService;

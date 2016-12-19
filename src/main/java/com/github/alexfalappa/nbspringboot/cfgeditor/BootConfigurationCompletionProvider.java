@@ -88,8 +88,9 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
                 Element lineElement = styDoc.getParagraphElement(caretOffset);
                 int lineStartOffset = lineElement.getStartOffset();
                 try {
+                    logger.log(FINER, "Completion on line: {0}", styDoc.getText(lineStartOffset,
+                            lineElement.getEndOffset() - lineStartOffset));
                     String lineToCaret = styDoc.getText(lineStartOffset, caretOffset - lineStartOffset);
-                    logger.log(FINER, "Completion query on line: {0}", lineToCaret);
                     if (!lineToCaret.contains("#")) {
                         String[] parts = lineToCaret.split("=");
                         //property name extraction from part before =
