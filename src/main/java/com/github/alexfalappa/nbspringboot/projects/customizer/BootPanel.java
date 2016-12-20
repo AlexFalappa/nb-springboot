@@ -15,18 +15,24 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.customizer;
 
+import java.awt.Container;
+import java.awt.Dialog;
 import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.TableColumn;
 
 import org.netbeans.modules.maven.api.customizer.ModelHandle2;
 import org.netbeans.modules.maven.execute.model.ActionToGoalMapping;
 import org.netbeans.modules.maven.execute.model.NetbeansActionMapping;
 import org.netbeans.spi.project.ActionProvider;
 import org.openide.util.NbBundle;
+
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.actions.RestartAction.PROP_RESTART;
 import static com.github.alexfalappa.nbspringboot.actions.RestartAction.TRIGGER_FILE;
@@ -45,10 +51,20 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     private Map<String, String> runProps;
     private Map<String, String> debugProps;
     private boolean active = false;
+    private final CfgParamsTableModel tmOverrides = new CfgParamsTableModel();
+    private SpringBootService bootService;
 
     /** Creates new form BootPanel */
     public BootPanel() {
         initComponents();
+        // adjust and fix size of first column
+        final TableColumn firstCol = tbCfgOverrides.getColumnModel().getColumn(0);
+        firstCol.setMaxWidth(30);
+        firstCol.setResizable(false);
+    }
+
+    public void setSpringBootService(SpringBootService sbs) {
+        this.bootService = sbs;
     }
 
     void setDevToolsEnabled(boolean enabled) {
@@ -86,6 +102,10 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             chDevtools.setEnabled(true);
             lArgs.setEnabled(true);
             txArgs.setEnabled(true);
+            lCfgOverrides.setEnabled(true);
+            bAdd.setEnabled(true);
+            bDel.setEnabled(true);
+            tbCfgOverrides.setEnabled(true);
             // turn on active flag
             active = true;
         } else {
@@ -105,6 +125,11 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         lArgs = new javax.swing.JLabel();
         txArgs = new javax.swing.JTextField();
         lWarning = new javax.swing.JLabel();
+        lCfgOverrides = new javax.swing.JLabel();
+        scroller = new javax.swing.JScrollPane();
+        tbCfgOverrides = new javax.swing.JTable();
+        bDel = new javax.swing.JButton();
+        bAdd = new javax.swing.JButton();
 
         org.openide.awt.Mnemonics.setLocalizedText(lDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDevtools.text")); // NOI18N
         lDevtools.setEnabled(false);
@@ -126,6 +151,30 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         lWarning.setFont(lWarning.getFont().deriveFont(lWarning.getFont().getSize()-2f));
         org.openide.awt.Mnemonics.setLocalizedText(lWarning, org.openide.util.NbBundle.getMessage(BootPanel.class, "BootPanel.lWarning.relaunch.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(lCfgOverrides, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lCfgOverrides.text")); // NOI18N
+        lCfgOverrides.setEnabled(false);
+
+        tbCfgOverrides.setModel(tmOverrides);
+        tbCfgOverrides.setEnabled(false);
+        tbCfgOverrides.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        scroller.setViewportView(tbCfgOverrides);
+
+        org.openide.awt.Mnemonics.setLocalizedText(bDel, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.bDel.text")); // NOI18N
+        bDel.setEnabled(false);
+        bDel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bDelActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(bAdd, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.bAdd.text")); // NOI18N
+        bAdd.setEnabled(false);
+        bAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bAddActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -135,14 +184,19 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
+                        .addComponent(lCfgOverrides)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(bAdd)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(bDel))
+                    .addComponent(scroller)
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(lDevtools)
                             .addComponent(lArgs))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addComponent(chDevtools)
-                                .addGap(0, 0, Short.MAX_VALUE))
+                            .addComponent(chDevtools)
                             .addComponent(txArgs))))
                 .addContainerGap())
         );
@@ -151,13 +205,20 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lDevtools)
+                    .addComponent(chDevtools))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lArgs)
                     .addComponent(txArgs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lDevtools)
-                    .addComponent(chDevtools))
-                .addGap(18, 18, Short.MAX_VALUE)
+                    .addComponent(lCfgOverrides)
+                    .addComponent(bDel)
+                    .addComponent(bAdd))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
+                .addGap(18, 18, 18)
                 .addComponent(lWarning)
                 .addContainerGap())
         );
@@ -174,11 +235,40 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         mh2.markAsModified(mh2.getActionMappings());
     }//GEN-LAST:event_chDevtoolsActionPerformed
 
+    private void bAddActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bAddActionPerformed
+        Container parentDialog = SwingUtilities.getAncestorOfClass(Dialog.class, this);
+        CfgPropsDialog dialog = new CfgPropsDialog((Dialog) parentDialog);
+        dialog.loadCfgProps(bootService);
+        dialog.setLocationRelativeTo(scroller);
+        dialog.setVisible(true);
+        if (dialog.okPressed()) {
+            CfgParamsTableModel.CfgOverride override = new CfgParamsTableModel.CfgOverride();
+            override.enabled = true;
+            override.name = dialog.getSelectedPropName();
+            tmOverrides.addOverride(override);
+            final int addedIndex = tbCfgOverrides.getRowCount() - 1;
+            tbCfgOverrides.changeSelection(addedIndex, 2, false, false);
+            tbCfgOverrides.requestFocus();
+        }
+    }//GEN-LAST:event_bAddActionPerformed
+
+    private void bDelActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_bDelActionPerformed
+        final int selRow = tbCfgOverrides.getSelectedRow();
+        if (selRow >= 0) {
+            tmOverrides.removeOverride(selRow);
+        }
+    }//GEN-LAST:event_bDelActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton bAdd;
+    private javax.swing.JButton bDel;
     private javax.swing.JCheckBox chDevtools;
     private javax.swing.JLabel lArgs;
+    private javax.swing.JLabel lCfgOverrides;
     private javax.swing.JLabel lDevtools;
     private javax.swing.JLabel lWarning;
+    private javax.swing.JScrollPane scroller;
+    private javax.swing.JTable tbCfgOverrides;
     private javax.swing.JTextField txArgs;
     // End of variables declaration//GEN-END:variables
 

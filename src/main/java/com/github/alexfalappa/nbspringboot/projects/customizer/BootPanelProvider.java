@@ -25,6 +25,8 @@ import org.netbeans.modules.maven.api.customizer.ModelHandle2;
 import org.netbeans.spi.project.ui.support.ProjectCustomizer;
 import org.openide.util.Lookup;
 
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
+
 /**
  * Creates the Spring Boot customizer panel when maven projects have a dependency named 'spring-boot-####'.
  *
@@ -47,7 +49,16 @@ public class BootPanelProvider implements ProjectCustomizer.CompositeCategoryPro
         final BootPanel bootPanel = new BootPanel();
         bootPanel.setModelHandle(mh2);
         bootPanel.setDevToolsEnabled(prjHasDepContaining(context, "devtools"));
+        bootPanel.setSpringBootService(prjBootService(context));
         return bootPanel;
+    }
+
+    private SpringBootService prjBootService(Lookup context) {
+        Project prj = context.lookup(Project.class);
+        if (prj != null) {
+            return prj.getLookup().lookup(SpringBootService.class);
+        }
+        return null;
     }
 
     private boolean prjHasDepContaining(Lookup context, String txt) {
