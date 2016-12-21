@@ -21,25 +21,15 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 /**
+ * An editable {@link JTable} model holding {@link CfgOverride} objects.
+ * <p>
+ * Backed by a {@link LinkedList}.
  *
  * @author Alessandro Falappa
  */
 public class CfgParamsTableModel extends AbstractTableModel {
 
     List<CfgOverride> overrides = new LinkedList<>();
-
-    public static class CfgOverride {
-
-        boolean enabled = false;
-        String name = "";
-        String value = "";
-
-        @Override
-        public String toString() {
-            return String.format("[%s] %s = %s", enabled ? "X" : " ", name, value);
-        }
-
-    }
 
     @Override
     public int getRowCount() {
@@ -147,9 +137,16 @@ public class CfgParamsTableModel extends AbstractTableModel {
         fireTableRowsInserted(numOverrides - 1, numOverrides - 1);
     }
 
-    CfgOverride removeOverride(int selRow) {
+    public CfgOverride removeOverride(int selRow) {
+        final CfgOverride removed = overrides.remove(selRow);
         fireTableRowsDeleted(selRow, selRow);
-        return overrides.remove(selRow);
+        return removed;
+    }
+
+    public void removeAllOverrides() {
+        int oldSize = overrides.size();
+        overrides.clear();
+        fireTableRowsDeleted(0, oldSize - 1);
     }
 
 }

@@ -74,14 +74,14 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         this.bootService = sbs;
     }
 
-    void setDevToolsEnabled(boolean enabled) {
+    public void setDevToolsEnabled(boolean enabled) {
         if (active) {
             lDevtools.setEnabled(enabled);
             chDevtools.setEnabled(enabled);
         }
     }
 
-    void setModelHandle(ModelHandle2 mh2) {
+    public void setModelHandle(ModelHandle2 mh2) {
         Objects.requireNonNull(mh2);
         // store reference to project properties model and to properties of maven actions for run/debug
         this.mh2 = mh2;
@@ -122,6 +122,22 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         } else {
             lWarning.setText(NbBundle.getMessage(BootPanel.class, "BootPanel.lWarning.panelinactive.text")); // NOI18N
         }
+    }
+
+    // implementation of DocumentListener interface
+    @Override
+    public void insertUpdate(DocumentEvent e) {
+        updateCmdLineArgs();
+    }
+
+    @Override
+    public void removeUpdate(DocumentEvent e) {
+        updateCmdLineArgs();
+    }
+
+    @Override
+    public void changedUpdate(DocumentEvent e) {
+        updateCmdLineArgs();
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -253,7 +269,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         dialog.setLocationRelativeTo(scroller);
         dialog.setVisible(true);
         if (dialog.okPressed()) {
-            CfgParamsTableModel.CfgOverride override = new CfgParamsTableModel.CfgOverride();
+            CfgOverride override = new CfgOverride();
             override.enabled = true;
             override.name = dialog.getSelectedPropName();
             tmOverrides.addOverride(override);
@@ -283,25 +299,10 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     private javax.swing.JTextField txArgs;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        updateCmdLineArgs();
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        updateCmdLineArgs();
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        updateCmdLineArgs();
-    }
-
     private void updateCmdLineArgs() {
         final StringBuilder sbEnabled = new StringBuilder(txArgs.getText());
         final StringBuilder sbDisabled = new StringBuilder();
-        for (CfgParamsTableModel.CfgOverride ovr : tmOverrides.getOverrides()) {
+        for (CfgOverride ovr : tmOverrides.getOverrides()) {
             if (ovr.enabled) {
                 sbEnabled.append(" --").append(ovr.name);
                 if (!ovr.value.isEmpty()) {
@@ -351,7 +352,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             if (arg.startsWith("--")) {
                 // configuration properties override
                 String[] parts = arg.substring(2).split("=");
-                CfgParamsTableModel.CfgOverride ovr = new CfgParamsTableModel.CfgOverride();
+                CfgOverride ovr = new CfgOverride();
                 ovr.enabled = enabled;
                 switch (parts.length) {
                     case 2:

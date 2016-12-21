@@ -30,6 +30,9 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 import static java.awt.event.MouseEvent.BUTTON1;
 
 /**
+ * Dialog for choosing one Spring Boot configuration property in an ordered list of those available in the project.
+ * <p>
+ * Queries a {@link SpringBootService} for the configuration properties names.
  *
  * @author Alessandro Falappa
  */
