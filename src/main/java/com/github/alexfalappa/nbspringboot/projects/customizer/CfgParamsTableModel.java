@@ -33,6 +33,12 @@ public class CfgParamsTableModel extends AbstractTableModel {
         boolean enabled = false;
         String name = "";
         String value = "";
+
+        @Override
+        public String toString() {
+            return String.format("[%s] %s = %s", enabled ? "X" : " ", name, value);
+        }
+
     }
 
     @Override
@@ -121,15 +127,29 @@ public class CfgParamsTableModel extends AbstractTableModel {
         return overrides;
     }
 
+    public List<CfgOverride> getEnabledOverrides() {
+        List<CfgOverride> ret = new LinkedList<>();
+        for (CfgOverride ov : overrides) {
+            if (ov.enabled) {
+                ret.add(ov);
+            }
+        }
+        return ret;
+    }
+
+    public CfgOverride getOverrideAt(int idx) {
+        return overrides.get(idx);
+    }
+
     public void addOverride(CfgOverride override) {
         overrides.add(override);
         final int numOverrides = overrides.size();
         fireTableRowsInserted(numOverrides - 1, numOverrides - 1);
     }
 
-    void removeOverride(int selRow) {
-        overrides.remove(selRow);
+    CfgOverride removeOverride(int selRow) {
         fireTableRowsDeleted(selRow, selRow);
+        return overrides.remove(selRow);
     }
 
 }

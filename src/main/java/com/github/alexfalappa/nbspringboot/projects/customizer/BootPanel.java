@@ -24,6 +24,8 @@ import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.event.TableModelEvent;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.TableColumn;
 
 import org.netbeans.modules.maven.api.customizer.ModelHandle2;
@@ -36,7 +38,9 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 
 import static com.github.alexfalappa.nbspringboot.actions.RestartAction.PROP_RESTART;
 import static com.github.alexfalappa.nbspringboot.actions.RestartAction.TRIGGER_FILE;
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.WARNING;
 
 /**
  * Customizer panel for maven projects with spring boot dependencies.
@@ -46,6 +50,7 @@ import static java.util.logging.Level.FINER;
 public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
     public static final String PROP_RUN_ARGS = "run.arguments";
+    public static final String PROP_DISABLED_OVERRIDES = "disabled.overrides";
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
     private Map<String, String> runProps;
@@ -61,6 +66,8 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         final TableColumn firstCol = tbCfgOverrides.getColumnModel().getColumn(0);
         firstCol.setMaxWidth(30);
         firstCol.setResizable(false);
+        // disable column reordering
+        tbCfgOverrides.getTableHeader().setReorderingAllowed(false);
     }
 
     public void setSpringBootService(SpringBootService sbs) {
@@ -90,13 +97,17 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         }
         // if run trough the maven spring boot plugin
         if (sbRun) {
-            // make the widget reflect the existing cmd line args
-            if (runProps.containsKey(PROP_RUN_ARGS) && runProps.get(PROP_RUN_ARGS) != null) {
-                txArgs.setText(runProps.get(PROP_RUN_ARGS).replace(',', ' '));
-            }
+            // make the widgets reflect the existing cmd line args
+            parseCmdLineArgs();
             chDevtools.setSelected(runProps.containsKey(PROP_RESTART));
-            // hook up to command line arguments textfield
+            // listen to widget changes
             txArgs.getDocument().addDocumentListener(this);
+            tmOverrides.addTableModelListener(new TableModelListener() {
+                @Override
+                public void tableChanged(TableModelEvent e) {
+                    updateCmdLineArgs();
+                }
+            });
             // enable widgets
             lDevtools.setEnabled(true);
             chDevtools.setEnabled(true);
@@ -217,7 +228,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                     .addComponent(bDel)
                     .addComponent(bAdd))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, 24, Short.MAX_VALUE)
+                .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(lWarning)
                 .addContainerGap())
@@ -288,17 +299,77 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     }
 
     private void updateCmdLineArgs() {
-        final String txt = txArgs.getText().trim();
-        if (txt.isEmpty()) {
-            runProps.remove(PROP_RUN_ARGS);
-            debugProps.remove(PROP_RUN_ARGS);
-        } else {
-            final String csv = txt.replace(' ', ',');
+        final StringBuilder sbEnabled = new StringBuilder(txArgs.getText());
+        final StringBuilder sbDisabled = new StringBuilder();
+        for (CfgParamsTableModel.CfgOverride ovr : tmOverrides.getOverrides()) {
+            if (ovr.enabled) {
+                sbEnabled.append(" --").append(ovr.name);
+                if (!ovr.value.isEmpty()) {
+                    sbEnabled.append('=').append(ovr.value);
+                }
+            } else {
+                sbDisabled.append(" --").append(ovr.name);
+                if (!ovr.value.isEmpty()) {
+                    sbDisabled.append('=').append(ovr.value);
+                }
+            }
+        }
+        if (sbEnabled.length() > 0) {
+            final String csv = sbEnabled.toString().trim().replaceAll("\\s+", ",");
             runProps.put(PROP_RUN_ARGS, csv);
             debugProps.put(PROP_RUN_ARGS, csv);
+        } else {
+            runProps.remove(PROP_RUN_ARGS);
+            debugProps.remove(PROP_RUN_ARGS);
+        }
+        if (sbDisabled.length() > 0) {
+            final String csv = sbDisabled.toString().trim().replaceAll("\\s+", ",");
+            runProps.put(PROP_DISABLED_OVERRIDES, csv);
+            debugProps.put(PROP_DISABLED_OVERRIDES, csv);
+        } else {
+            runProps.remove(PROP_DISABLED_OVERRIDES);
+            debugProps.remove(PROP_DISABLED_OVERRIDES);
         }
         mh2.markAsModified(mh2.getActionMappings());
         logger.log(FINER, "Command line args: {0}", runProps.get(PROP_RUN_ARGS));
+    }
+
+    private void parseCmdLineArgs() {
+        if (runProps.containsKey(PROP_RUN_ARGS) && runProps.get(PROP_RUN_ARGS) != null) {
+            StringBuilder sb = new StringBuilder();
+            parseProperty(sb, runProps.get(PROP_RUN_ARGS), true);
+            txArgs.setText(sb.toString());
+        }
+        if (runProps.containsKey(PROP_DISABLED_OVERRIDES) && runProps.get(PROP_DISABLED_OVERRIDES) != null) {
+            parseProperty(new StringBuilder(), runProps.get(PROP_DISABLED_OVERRIDES), false);
+        }
+    }
+
+    private void parseProperty(StringBuilder sb, String prop, boolean enabled) {
+        logger.log(FINE, "Parsing project property: {0}", prop);
+        for (String arg : prop.split(",")) {
+            if (arg.startsWith("--")) {
+                // configuration properties override
+                String[] parts = arg.substring(2).split("=");
+                CfgParamsTableModel.CfgOverride ovr = new CfgParamsTableModel.CfgOverride();
+                ovr.enabled = enabled;
+                switch (parts.length) {
+                    case 2:
+                        ovr.value = parts[1];
+                    case 1:
+                        ovr.name = parts[0];
+                        tmOverrides.addOverride(ovr);
+                        logger.log(FINER, "Overridden cfg property: {0}", ovr);
+                        break;
+                    default:
+                        logger.log(WARNING, "Couldn't reparse command line argument: {0}", arg);
+                }
+            } else {
+                // other command line arg
+                sb.append(arg).append(' ');
+                logger.log(FINE, "Command line arg: {0}", arg);
+            }
+        }
     }
 
 }
