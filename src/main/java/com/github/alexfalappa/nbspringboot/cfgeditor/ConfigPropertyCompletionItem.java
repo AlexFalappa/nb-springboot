@@ -63,10 +63,16 @@ public class ConfigPropertyCompletionItem implements CompletionItem {
     private final int caretOffset;
     private final int propStartOffset;
     private boolean overwrite;
+    private final String type;
 
     public ConfigPropertyCompletionItem(ItemMetadata configurationItem, SpringBootService bootService, int propStartOffset, int caretOffset) {
         this.overwrite = false;
         this.configurationItem = configurationItem;
+        if (configurationItem.getType() != null) {
+            type = simpleHtmlEscape(shortenJavaType(configurationItem.getType()));
+        } else {
+            type = null;
+        }
         this.bootService = bootService;
         this.propStartOffset = propStartOffset;
         this.caretOffset = caretOffset;
@@ -81,11 +87,7 @@ public class ConfigPropertyCompletionItem implements CompletionItem {
     }
 
     public String getTextRight() {
-        String type = configurationItem.getType();
-        if (type == null) {
-            return null;
-        }
-        return simpleHtmlEscape(shortenJavaType(type));
+        return type;
     }
 
     @Override
