@@ -43,8 +43,8 @@ import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
-import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.shortenJavaType;
-import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEscape;
+import static com.github.alexfalappa.nbspringboot.Utils.shortenJavaType;
+import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 
 /**
  * The Spring Boot configuration property names implementation of {@code CompletionItem}.

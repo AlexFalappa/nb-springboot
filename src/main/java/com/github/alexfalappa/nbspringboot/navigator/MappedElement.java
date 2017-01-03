@@ -25,7 +25,7 @@ import org.netbeans.api.java.source.ElementHandle;
 import org.openide.filesystems.FileObject;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import com.github.alexfalappa.nbspringboot.cfgeditor.Utils;
+import com.github.alexfalappa.nbspringboot.Utils;
 
 /**
  * This is a source code element of kind METHOD which is mapped by {@code @RequestMapping} or derivations thereof.
