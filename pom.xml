@@ -13,8 +13,8 @@
     <properties>
         <netbeans.api.version>RELEASE81</netbeans.api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <spring.version>4.3.4.RELEASE</spring.version>
-        <springboot.version>1.4.2.RELEASE</springboot.version>
+        <spring.version>4.3.5.RELEASE</spring.version>
+        <springboot.version>1.4.3.RELEASE</springboot.version>
     </properties>
 
     <dependencies>
