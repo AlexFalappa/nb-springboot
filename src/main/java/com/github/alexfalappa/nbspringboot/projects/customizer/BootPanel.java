@@ -186,7 +186,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         tbCfgOverrides.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         scroller.setViewportView(tbCfgOverrides);
 
-        org.openide.awt.Mnemonics.setLocalizedText(bDel, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.bDel.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(bDel, "\u2212");
         bDel.setEnabled(false);
         bDel.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -194,7 +194,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(bAdd, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.bAdd.text")); // NOI18N
+        org.openide.awt.Mnemonics.setLocalizedText(bAdd, "\u002B");
         bAdd.setEnabled(false);
         bAdd.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -227,6 +227,9 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                             .addComponent(txArgs))))
                 .addContainerGap())
         );
+
+        layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {bAdd, bDel});
+
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
@@ -283,6 +286,9 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         final int selRow = tbCfgOverrides.getSelectedRow();
         if (selRow >= 0) {
             tmOverrides.removeOverride(selRow);
+            if (selRow < tmOverrides.getRowCount()) {
+                tbCfgOverrides.setRowSelectionInterval(selRow, selRow);
+            }
         }
     }//GEN-LAST:event_bDelActionPerformed
 

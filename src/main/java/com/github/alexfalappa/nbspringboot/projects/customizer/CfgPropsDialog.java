@@ -18,6 +18,7 @@ package com.github.alexfalappa.nbspringboot.projects.customizer;
 import java.awt.Component;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Comparator;
 import java.util.TreeSet;
@@ -26,7 +27,10 @@ import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
+import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.html.HTMLEditorKit;
@@ -48,18 +52,23 @@ import static java.awt.event.MouseEvent.BUTTON1;
 public class CfgPropsDialog extends javax.swing.JDialog {
 
     private boolean okPressed = false;
+    private TreeSet<ItemMetadata> sortedProps = new TreeSet<>(new ItemMetadataNameComparator());
 
     /** Creates new form CfgPropsDialog */
     public CfgPropsDialog(java.awt.Dialog parent) {
         super(parent, true);
         initComponents();
+        // setup property list
         lCfgProps.setCellRenderer(new ItemMetadataCellRenderer());
         lCfgProps.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
-                    tpDetails.setText(Utils.cfgPropDetailsHtml(lCfgProps.getSelectedValue()));
-                    tpDetails.setCaretPosition(0);
+                    final ItemMetadata selectedValue = lCfgProps.getSelectedValue();
+                    if (selectedValue != null) {
+                        tpDetails.setText(Utils.cfgPropDetailsHtml(selectedValue));
+                        tpDetails.setCaretPosition(0);
+                    }
                 }
             }
         });
@@ -76,26 +85,21 @@ public class CfgPropsDialog extends javax.swing.JDialog {
     }
 
     public void loadCfgProps(SpringBootService bootService) {
-        DefaultListModel<ItemMetadata> dlmCfgProps = new DefaultListModel<>();
-        if (bootService != null) {
-            TreeSet<ItemMetadata> sorted = new TreeSet<>(new ItemMetadataNameComparator());
-            sorted.addAll(bootService.queryPropertyMetadata(null));
-            for (ItemMetadata item : sorted) {
-                dlmCfgProps.addElement(item);
-            }
+        if (bootService == null) {
+            return;
         }
-        lCfgProps.setModel(dlmCfgProps);
-        if (!dlmCfgProps.isEmpty()) {
-            lCfgProps.setSelectedIndex(0);
-        }
+        sortedProps.addAll(bootService.queryPropertyMetadata(null));
+        filterProps(null);
+        // setup filtering
+        new ListFilterer(txFilter);
         pack();
     }
 
-    boolean okPressed() {
+    public boolean okPressed() {
         return okPressed;
     }
 
-    String getSelectedPropName() {
+    public String getSelectedPropName() {
         return lCfgProps.getSelectedValue().getName();
     }
 
@@ -113,6 +117,8 @@ public class CfgPropsDialog extends javax.swing.JDialog {
         lCfgProps = new javax.swing.JList<>();
         scroller2 = new javax.swing.JScrollPane();
         tpDetails = new javax.swing.JTextPane();
+        txFilter = new javax.swing.JTextField();
+        lFilter = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle(org.openide.util.NbBundle.getBundle(CfgPropsDialog.class).getString("CfgPropsDialog.title")); // NOI18N
@@ -131,9 +137,11 @@ public class CfgPropsDialog extends javax.swing.JDialog {
             }
         });
 
+        splitter.setBorder(null);
         splitter.setOrientation(javax.swing.JSplitPane.VERTICAL_SPLIT);
         splitter.setContinuousLayout(true);
 
+        lCfgProps.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
         lCfgProps.setVisibleRowCount(16);
         lCfgProps.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -152,19 +160,29 @@ public class CfgPropsDialog extends javax.swing.JDialog {
 
         splitter.setRightComponent(scroller2);
 
+        txFilter.setColumns(25);
+        txFilter.setText(org.openide.util.NbBundle.getMessage(CfgPropsDialog.class, "CfgPropsDialog.txFilter.text")); // NOI18N
+        txFilter.setToolTipText(org.openide.util.NbBundle.getMessage(CfgPropsDialog.class, "CfgPropsDialog.txFilter.toolTipText")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(lFilter, org.openide.util.NbBundle.getMessage(CfgPropsDialog.class, "CfgPropsDialog.lFilter.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(splitter)
-                    .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(splitter, javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGap(0, 0, Short.MAX_VALUE)
                         .addComponent(bCancel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bOk)))
+                        .addComponent(bOk))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(lFilter)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(txFilter)))
                 .addContainerGap())
         );
 
@@ -174,6 +192,10 @@ public class CfgPropsDialog extends javax.swing.JDialog {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(txFilter, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addComponent(lFilter))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(splitter)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -204,11 +226,26 @@ public class CfgPropsDialog extends javax.swing.JDialog {
     private javax.swing.JButton bCancel;
     private javax.swing.JButton bOk;
     private javax.swing.JList<ItemMetadata> lCfgProps;
+    private javax.swing.JLabel lFilter;
     private javax.swing.JScrollPane scroller1;
     private javax.swing.JScrollPane scroller2;
     private javax.swing.JSplitPane splitter;
     private javax.swing.JTextPane tpDetails;
+    private javax.swing.JTextField txFilter;
     // End of variables declaration//GEN-END:variables
+
+    private void filterProps(String filter) {
+        DefaultListModel<ItemMetadata> dlmCfgProps = new DefaultListModel<>();
+        for (ItemMetadata item : sortedProps) {
+            if (filter == null || item.getName().contains(filter)) {
+                dlmCfgProps.addElement(item);
+            }
+        }
+        lCfgProps.setModel(dlmCfgProps);
+        if (!dlmCfgProps.isEmpty()) {
+            lCfgProps.setSelectedIndex(0);
+        }
+    }
 
     private static class ItemMetadataCellRenderer extends DefaultListCellRenderer {
 
@@ -229,6 +266,50 @@ public class CfgPropsDialog extends javax.swing.JDialog {
         @Override
         public int compare(ItemMetadata o1, ItemMetadata o2) {
             return o1.getName().compareTo(o2.getName());
+        }
+
+    }
+
+    private class ListFilterer extends KeyAdapter implements DocumentListener {
+
+        private final JTextField txtField;
+
+        public ListFilterer(JTextField txtField) {
+            this.txtField = txtField;
+            txtField.getDocument().addDocumentListener(this);
+            txtField.addKeyListener(this);
+        }
+
+        @Override
+        public void changedUpdate(DocumentEvent e) {
+            doFilter();
+        }
+
+        @Override
+        public void insertUpdate(DocumentEvent e) {
+            doFilter();
+        }
+
+        @Override
+        public void removeUpdate(DocumentEvent e) {
+            doFilter();
+        }
+
+        @Override
+        public void keyPressed(KeyEvent e) {
+            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
+                txtField.setText(null);
+                e.consume();
+            }
+        }
+
+        private void doFilter() {
+            String text = txFilter.getText().toLowerCase();
+            if (!text.isEmpty()) {
+                filterProps(text);
+            } else {
+                filterProps(null);
+            }
         }
 
     }

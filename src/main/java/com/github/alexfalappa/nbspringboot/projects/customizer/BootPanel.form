@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 
-<Form version="1.6" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
+<Form version="1.8" maxVersion="1.9" type="org.netbeans.modules.form.forminfo.JPanelFormInfo">
   <AuxValues>
     <AuxValue name="FormSettings_autoResourcing" type="java.lang.Integer" value="1"/>
     <AuxValue name="FormSettings_autoSetComponentName" type="java.lang.Boolean" value="false"/>
@@ -23,9 +23,9 @@
                   <Group type="102" attributes="0">
                       <Component id="lCfgOverrides" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="32767" attributes="0"/>
-                      <Component id="bAdd" min="-2" max="-2" attributes="0"/>
+                      <Component id="bAdd" linkSize="1" min="-2" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
-                      <Component id="bDel" min="-2" max="-2" attributes="0"/>
+                      <Component id="bDel" linkSize="1" min="-2" max="-2" attributes="0"/>
                   </Group>
                   <Component id="scroller" alignment="0" max="32767" attributes="0"/>
                   <Group type="102" alignment="0" attributes="0">
@@ -148,8 +148,8 @@
     </Container>
     <Component class="javax.swing.JButton" name="bDel">
       <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/github/alexfalappa/nbspringboot/projects/customizer/Bundle.properties" key="BootPanel.bDel.text" replaceFormat="org.openide.util.NbBundle.getBundle({sourceFileName}.class).getString(&quot;{key}&quot;)"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="&quot;\u2212&quot;" type="code"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
@@ -159,8 +159,8 @@
     </Component>
     <Component class="javax.swing.JButton" name="bAdd">
       <Properties>
-        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
-          <ResourceString bundle="com/github/alexfalappa/nbspringboot/projects/customizer/Bundle.properties" key="BootPanel.bAdd.text" replaceFormat="org.openide.util.NbBundle.getBundle({sourceFileName}.class).getString(&quot;{key}&quot;)"/>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="&quot;\u002B&quot;" type="code"/>
         </Property>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
