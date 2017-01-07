@@ -22,7 +22,7 @@ import javax.swing.Action;
 import org.netbeans.spi.editor.completion.CompletionDocumentation;
 import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 
-import static com.github.alexfalappa.nbspringboot.cfgeditor.Utils.simpleHtmlEscape;
+import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 
 /**
  * @author Alessandro Falappa
