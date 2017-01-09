@@ -50,7 +50,7 @@ import static java.util.logging.Level.WARNING;
 public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
     public static final String PROP_RUN_ARGS = "run.arguments";
-    public static final String PROP_DISABLED_OVERRIDES = "disabled.overrides";
+    public static final String PROP_DISABLED_OVERRIDES = "run.disabledArguments";
     public static final String PROP_DEBUG_MODE = "Env.DEBUG";
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
