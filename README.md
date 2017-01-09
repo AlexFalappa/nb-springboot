@@ -65,7 +65,9 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 ## Changelog
 
 * __???__ (??? 2017): Work in progress
-    * Override of Spring Boot configuration properties at application launch in project properties panel
+    * Improved project properties panel:
+        * Override of Spring Boot configuration properties at application launch
+        * Enable debug mode
 
 * __1.3.1__ (November 2016): General fixes
     * File templates ignored a per project custom license

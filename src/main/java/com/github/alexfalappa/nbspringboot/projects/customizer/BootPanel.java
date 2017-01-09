@@ -51,6 +51,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
 
     public static final String PROP_RUN_ARGS = "run.arguments";
     public static final String PROP_DISABLED_OVERRIDES = "disabled.overrides";
+    public static final String PROP_DEBUG_MODE = "Env.DEBUG";
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
     private Map<String, String> runProps;
@@ -99,6 +100,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         if (sbRun) {
             // make the widgets reflect the existing cmd line args
             parseCmdLineArgs();
+            chDebugMode.setSelected(runProps.containsKey(PROP_DEBUG_MODE));
             chDevtools.setSelected(runProps.containsKey(PROP_RESTART));
             // listen to widget changes
             txArgs.getDocument().addDocumentListener(this);
@@ -109,6 +111,8 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                 }
             });
             // enable widgets
+            lDebugMode.setEnabled(true);
+            chDebugMode.setEnabled(true);
             lDevtools.setEnabled(true);
             chDevtools.setEnabled(true);
             lArgs.setEnabled(true);
@@ -157,6 +161,8 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         tbCfgOverrides = new javax.swing.JTable();
         bDel = new javax.swing.JButton();
         bAdd = new javax.swing.JButton();
+        lDebugMode = new javax.swing.JLabel();
+        chDebugMode = new javax.swing.JCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(lDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDevtools.text")); // NOI18N
         lDevtools.setEnabled(false);
@@ -202,6 +208,17 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(lDebugMode, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDebugMode.text")); // NOI18N
+        lDebugMode.setEnabled(false);
+
+        org.openide.awt.Mnemonics.setLocalizedText(chDebugMode, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.chDebugMode.text")); // NOI18N
+        chDebugMode.setEnabled(false);
+        chDebugMode.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chDebugModeActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -209,22 +226,33 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(lDevtools)
+                    .addComponent(lDebugMode)
+                    .addComponent(lArgs))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(txArgs)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lCfgOverrides)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .addComponent(bAdd)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(bDel))
-                    .addComponent(scroller)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lDevtools)
-                            .addComponent(lArgs))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chDevtools)
-                            .addComponent(txArgs))))
+                            .addComponent(chDebugMode))
+                        .addGap(0, 0, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(lCfgOverrides)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(bAdd)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(bDel)
+                .addGap(6, 6, 6))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(lWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(6, 6, 6))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scroller)
                 .addContainerGap())
         );
 
@@ -234,6 +262,10 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lDebugMode)
+                    .addComponent(chDebugMode))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lDevtools)
                     .addComponent(chDevtools))
@@ -247,7 +279,7 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                     .addComponent(bDel)
                     .addComponent(bAdd))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, 100, Short.MAX_VALUE)
+                .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(lWarning)
                 .addContainerGap())
@@ -292,12 +324,25 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         }
     }//GEN-LAST:event_bDelActionPerformed
 
+    private void chDebugModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDebugModeActionPerformed
+        if (chDebugMode.isSelected()) {
+            runProps.put(PROP_DEBUG_MODE, "true");
+            debugProps.put(PROP_RESTART, "true");
+        } else {
+            runProps.remove(PROP_RESTART);
+            debugProps.remove(PROP_RESTART);
+        }
+        mh2.markAsModified(mh2.getActionMappings());
+    }//GEN-LAST:event_chDebugModeActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bAdd;
     private javax.swing.JButton bDel;
+    private javax.swing.JCheckBox chDebugMode;
     private javax.swing.JCheckBox chDevtools;
     private javax.swing.JLabel lArgs;
     private javax.swing.JLabel lCfgOverrides;
+    private javax.swing.JLabel lDebugMode;
     private javax.swing.JLabel lDevtools;
     private javax.swing.JLabel lWarning;
     private javax.swing.JScrollPane scroller;
