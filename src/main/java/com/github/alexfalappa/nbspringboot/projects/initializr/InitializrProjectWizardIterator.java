@@ -336,8 +336,8 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
         // substitute placeholders in template
         FileObject fo = FileUtil.createData(dir, "nbactions.xml");
         try (PrintWriter out = new PrintWriter(fo.getOutputStream())) {
-            try (BufferedReader br = new BufferedReader(
-                    new InputStreamReader(getClass().getResourceAsStream("nbactions.tmpl"), "UTF8"))) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(
+                    "/com/github/alexfalappa/nbspringboot/projects/nbactions.tmpl"), "UTF8"))) {
                 for (String line; (line = br.readLine()) != null;) {
                     if (line.contains("SPRING_OUTPUT_ANSI_ENABLED")) {
                         // don't print force color property if not enabled

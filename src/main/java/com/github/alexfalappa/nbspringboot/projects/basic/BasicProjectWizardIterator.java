@@ -16,12 +16,13 @@
 package com.github.alexfalappa.nbspringboot.projects.basic;
 
 import java.awt.Component;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
@@ -40,21 +41,20 @@ import org.netbeans.spi.project.ui.templates.support.Templates;
 import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
-import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
-import org.openide.xml.XMLUtil;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
+import org.openide.util.NbPreferences;
+
+import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectWizardIterator;
+
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
 
 @TemplateRegistration(
         folder = "Project/Maven2",
         displayName = "#BasicSpringbootProject_displayName",
         description = "BasicSpringbootProjectDescription.html",
         iconBase = "com/github/alexfalappa/nbspringboot/projects/basic/BasicSpringbootProject.png",
-        content = "BasicSpringbootProjectProject.zip",
+        content = "BasicSpringbootProject.zip",
         position = 255
 )
 @Messages("BasicSpringbootProject_displayName=Spring Boot basic project")
@@ -91,6 +91,8 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
         FileObject dir = FileUtil.toFileObject(dirF);
         FileObject template = Templates.getTemplate(wiz);
         unZipFile(template.getInputStream(), dir);
+        // create nbactions.xml file
+        createNbActions("com.example.BasicApplication", dir);
         // Always open top dir as a project:
         resultSet.add(dir);
         // Look for nested projects to open as well:
@@ -195,12 +197,7 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
                     FileUtil.createFolder(projectRoot, entry.getName());
                 } else {
                     FileObject fo = FileUtil.createData(projectRoot, entry.getName());
-                    if ("nbproject/project.xml".equals(entry.getName())) {
-                        // Special handling for setting name of Ant-based projects; customize as needed:
-                        filterProjectXML(fo, str, projectRoot.getName());
-                    } else {
-                        writeFile(str, fo);
-                    }
+                    writeFile(str, fo);
                 }
             }
         } finally {
@@ -214,32 +211,26 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
         }
     }
 
-    private static void filterProjectXML(FileObject fo, ZipInputStream str, String name) throws IOException {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            FileUtil.copy(str, baos);
-            Document doc = XMLUtil.parse(new InputSource(new ByteArrayInputStream(baos.toByteArray())), false, false, null, null);
-            NodeList nl = doc.getDocumentElement().getElementsByTagName("name");
-            if (nl != null) {
-                for (int i = 0; i < nl.getLength(); i++) {
-                    Element el = (Element) nl.item(i);
-                    if (el.getParentNode() != null && "data".equals(el.getParentNode().getNodeName())) {
-                        NodeList nl2 = el.getChildNodes();
-                        if (nl2.getLength() > 0) {
-                            nl2.item(0).setNodeValue(name);
+    private void createNbActions(String mainClass, FileObject dir) throws IOException {
+        // retrieve boolean flag from prefs
+        final boolean bForceColor = NbPreferences.forModule(InitializrProjectWizardIterator.class).getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
+        // substitute placeholders in template
+        FileObject fo = FileUtil.createData(dir, "nbactions.xml");
+        try (PrintWriter out = new PrintWriter(fo.getOutputStream())) {
+            try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(
+                    "/com/github/alexfalappa/nbspringboot/projects/nbactions.tmpl"), "UTF8"))) {
+                for (String line; (line = br.readLine()) != null;) {
+                    if (line.contains("SPRING_OUTPUT_ANSI_ENABLED")) {
+                        // don't print force color property if not enabled
+                        if (bForceColor) {
+                            out.println(line);
                         }
-                        break;
+                    } else {
+                        out.println(line.replace("$mainclass$", mainClass));
                     }
                 }
             }
-            try (OutputStream out = fo.getOutputStream()) {
-                XMLUtil.write(doc, out, "UTF-8");
-            }
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
-            writeFile(str, fo);
         }
-
     }
 
 }
