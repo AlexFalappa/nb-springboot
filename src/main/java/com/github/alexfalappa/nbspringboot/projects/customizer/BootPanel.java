@@ -47,10 +47,11 @@ import static java.util.logging.Level.WARNING;
  *
  * @author Alessandro Falappa
  */
-public class BootPanel extends javax.swing.JPanel implements DocumentListener {
+public class BootPanel extends javax.swing.JPanel {
 
     public static final String PROP_RUN_ARGS = "run.arguments";
     public static final String PROP_DISABLED_OVERRIDES = "run.disabledArguments";
+    public static final String PROP_RUN_VMOPTIONS = "run.jvmArguments";
     public static final String PROP_DEBUG_MODE = "Env.DEBUG";
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
@@ -100,10 +101,42 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         if (sbRun) {
             // make the widgets reflect the existing cmd line args
             parseCmdLineArgs();
+            parseVmOptions();
             chDebugMode.setSelected(runProps.containsKey(PROP_DEBUG_MODE));
             chDevtools.setSelected(runProps.containsKey(PROP_RESTART));
             // listen to widget changes
-            txArgs.getDocument().addDocumentListener(this);
+            txArgs.getDocument().addDocumentListener(new DocumentListener() {
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    updateCmdLineArgs();
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    updateCmdLineArgs();
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    updateCmdLineArgs();
+                }
+            });
+            txVmOpts.getDocument().addDocumentListener(new DocumentListener() {
+                @Override
+                public void insertUpdate(DocumentEvent e) {
+                    updateVmOptions();
+                }
+
+                @Override
+                public void removeUpdate(DocumentEvent e) {
+                    updateVmOptions();
+                }
+
+                @Override
+                public void changedUpdate(DocumentEvent e) {
+                    updateVmOptions();
+                }
+            });
             tmOverrides.addTableModelListener(new TableModelListener() {
                 @Override
                 public void tableChanged(TableModelEvent e) {
@@ -117,6 +150,8 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             chDevtools.setEnabled(true);
             lArgs.setEnabled(true);
             txArgs.setEnabled(true);
+            lVmOpts.setEnabled(true);
+            txVmOpts.setEnabled(true);
             lCfgOverrides.setEnabled(true);
             bAdd.setEnabled(true);
             bDel.setEnabled(true);
@@ -126,22 +161,6 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         } else {
             lWarning.setText(NbBundle.getMessage(BootPanel.class, "BootPanel.lWarning.panelinactive.text")); // NOI18N
         }
-    }
-
-    // implementation of DocumentListener interface
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        updateCmdLineArgs();
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        updateCmdLineArgs();
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        updateCmdLineArgs();
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -163,6 +182,8 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
         bAdd = new javax.swing.JButton();
         lDebugMode = new javax.swing.JLabel();
         chDebugMode = new javax.swing.JCheckBox();
+        lVmOpts = new javax.swing.JLabel();
+        txVmOpts = new javax.swing.JTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(lDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDevtools.text")); // NOI18N
         lDevtools.setEnabled(false);
@@ -219,6 +240,12 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(lVmOpts, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lVmOpts.text")); // NOI18N
+        lVmOpts.setEnabled(false);
+
+        txVmOpts.setText(org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.txVmOpts.text")); // NOI18N
+        txVmOpts.setEnabled(false);
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -226,8 +253,9 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lDevtools)
                     .addComponent(lDebugMode)
+                    .addComponent(lDevtools)
+                    .addComponent(lVmOpts)
                     .addComponent(lArgs))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -236,8 +264,17 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chDevtools)
                             .addComponent(chDebugMode))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                        .addGap(0, 0, Short.MAX_VALUE))
+                    .addComponent(txVmOpts))
                 .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scroller)
+                .addContainerGap())
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(lWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(6, 6, 6))
             .addGroup(layout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addComponent(lCfgOverrides)
@@ -246,14 +283,6 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(bDel)
                 .addGap(6, 6, 6))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(lWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(6, 6, 6))
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(scroller)
-                .addContainerGap())
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {bAdd, bDel});
@@ -275,11 +304,15 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                     .addComponent(txArgs, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lVmOpts)
+                    .addComponent(txVmOpts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lCfgOverrides)
                     .addComponent(bDel)
                     .addComponent(bAdd))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, 161, Short.MAX_VALUE)
+                .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(lWarning)
                 .addContainerGap())
@@ -344,10 +377,12 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
     private javax.swing.JLabel lCfgOverrides;
     private javax.swing.JLabel lDebugMode;
     private javax.swing.JLabel lDevtools;
+    private javax.swing.JLabel lVmOpts;
     private javax.swing.JLabel lWarning;
     private javax.swing.JScrollPane scroller;
     private javax.swing.JTable tbCfgOverrides;
     private javax.swing.JTextField txArgs;
+    private javax.swing.JTextField txVmOpts;
     // End of variables declaration//GEN-END:variables
 
     private void updateCmdLineArgs() {
@@ -421,6 +456,25 @@ public class BootPanel extends javax.swing.JPanel implements DocumentListener {
                 sb.append(arg).append(' ');
                 logger.log(FINE, "Command line arg: {0}", arg);
             }
+        }
+    }
+
+    private void updateVmOptions() {
+        final String strVmOpts = txVmOpts.getText();
+        if (strVmOpts == null || strVmOpts.isEmpty()) {
+            runProps.remove(PROP_RUN_VMOPTIONS);
+            debugProps.remove(PROP_RUN_VMOPTIONS);
+        } else {
+            runProps.put(PROP_RUN_VMOPTIONS, strVmOpts);
+            debugProps.put(PROP_RUN_VMOPTIONS, strVmOpts);
+        }
+        mh2.markAsModified(mh2.getActionMappings());
+        logger.log(FINER, "VM options: {0}", runProps.get(PROP_RUN_VMOPTIONS));
+    }
+
+    private void parseVmOptions() {
+        if (runProps.containsKey(PROP_RUN_VMOPTIONS) && runProps.get(PROP_RUN_VMOPTIONS) != null) {
+            txVmOpts.setText(runProps.get(PROP_RUN_VMOPTIONS));
         }
     }
 
