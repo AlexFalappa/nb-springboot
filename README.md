@@ -67,7 +67,8 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 * __???__ (??? 2017): Work in progress
     * Improved project properties panel:
         * Override of Spring Boot configuration properties at application launch
-        * Enable debug mode
+        * Enable debug mode checkbox
+    * Global option to force color in Output window (newly created projects only)
 
 * __1.3.1__ (November 2016): General fixes
     * File templates ignored a per project custom license

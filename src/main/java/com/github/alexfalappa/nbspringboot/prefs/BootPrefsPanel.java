@@ -26,10 +26,8 @@ import javax.swing.event.DocumentListener;
 
 import org.openide.util.NbPreferences;
 
+import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService;
-
-import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.PREF_INITIALIZR_TIMEOUT;
-import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.PREF_INITIALIZR_URL;
 
 /**
  * Plugin options panel.
@@ -63,6 +61,8 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         lInitializrTimeout = new javax.swing.JLabel();
         spInitializrTimeout = new javax.swing.JSpinner();
         lSeconds = new javax.swing.JLabel();
+        lLaunch = new javax.swing.JLabel();
+        chColorOutput = new javax.swing.JCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(lInitializr, org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.lInitializr.text")); // NOI18N
 
@@ -76,6 +76,10 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
         org.openide.awt.Mnemonics.setLocalizedText(lSeconds, org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.lSeconds.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(lLaunch, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.lLaunch.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(chColorOutput, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.chColorOutput.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -84,22 +88,30 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(lInitializr)
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lInitializrTimeout)
-                            .addComponent(lInitializrUrl))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(chColorOutput)
+                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(spInitializrTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(6, 6, 6)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lInitializrTimeout)
+                                    .addComponent(lInitializrUrl))
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(lSeconds)
-                                .addGap(0, 0, Short.MAX_VALUE))
-                            .addComponent(txInitializrUrl))))
-                .addContainerGap())
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(spInitializrTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(lSeconds)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(txInitializrUrl)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(lInitializr)
+                                    .addComponent(lLaunch))
+                                .addGap(0, 0, Short.MAX_VALUE)))
+                        .addContainerGap())))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -115,6 +127,10 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                     .addComponent(lInitializrTimeout)
                     .addComponent(spInitializrTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lSeconds))
+                .addGap(18, 18, 18)
+                .addComponent(lLaunch)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chColorOutput)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -122,15 +138,17 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
     void load() {
         // read settings and initialize GUI
         final Preferences prefs = NbPreferences.forModule(InitializrService.class);
-        txInitializrUrl.setText(prefs.get(PREF_INITIALIZR_URL, "http://start.spring.io"));
-        spInitializrTimeout.setValue(prefs.getInt(PREF_INITIALIZR_TIMEOUT, 30));
+        txInitializrUrl.setText(prefs.get(PrefConstants.PREF_INITIALIZR_URL, "http://start.spring.io"));
+        spInitializrTimeout.setValue(prefs.getInt(PrefConstants.PREF_INITIALIZR_TIMEOUT, 30));
+        chColorOutput.setSelected(prefs.getBoolean(PrefConstants.PREF_FORCE_COLOR_OUTPUT, true));
     }
 
     void store() {
         // store modified settings
         final Preferences prefs = NbPreferences.forModule(InitializrService.class);
-        prefs.put(PREF_INITIALIZR_URL, txInitializrUrl.getText());
-        prefs.putInt(PREF_INITIALIZR_TIMEOUT, (int) spInitializrTimeout.getValue());
+        prefs.put(PrefConstants.PREF_INITIALIZR_URL, txInitializrUrl.getText());
+        prefs.putInt(PrefConstants.PREF_INITIALIZR_TIMEOUT, (int) spInitializrTimeout.getValue());
+        prefs.putBoolean(PrefConstants.PREF_FORCE_COLOR_OUTPUT, chColorOutput.isSelected());
     }
 
     boolean valid() {
@@ -145,9 +163,11 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JCheckBox chColorOutput;
     private javax.swing.JLabel lInitializr;
     private javax.swing.JLabel lInitializrTimeout;
     private javax.swing.JLabel lInitializrUrl;
+    private javax.swing.JLabel lLaunch;
     private javax.swing.JLabel lSeconds;
     private javax.swing.JSpinner spInitializrTimeout;
     private javax.swing.JTextField txInitializrUrl;

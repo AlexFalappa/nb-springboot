@@ -46,6 +46,7 @@ import org.openide.util.AsyncGUIJob;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
+import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
 import org.openide.xml.XMLUtil;
 import org.w3c.dom.DOMException;
@@ -56,6 +57,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ARTIFACT;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_BOOT_VERSION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DEPENDENCIES;
@@ -329,13 +331,22 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
         StringBuilder mainClass = new StringBuilder(pkg).append('.');
         mainClass.append(mvnName.substring(0, 1).toUpperCase()).append(mvnName.substring(1));
         mainClass.append("Application");
-        // substitute placeholder in template
+        // retrieve boolean flag from prefs
+        final boolean bForceColor = NbPreferences.forModule(InitializrProjectWizardIterator.class).getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
+        // substitute placeholders in template
         FileObject fo = FileUtil.createData(dir, "nbactions.xml");
         try (PrintWriter out = new PrintWriter(fo.getOutputStream())) {
             try (BufferedReader br = new BufferedReader(
                     new InputStreamReader(getClass().getResourceAsStream("nbactions.tmpl"), "UTF8"))) {
                 for (String line; (line = br.readLine()) != null;) {
-                    out.println(line.replace("$mainclass$", mainClass));
+                    if (line.contains("SPRING_OUTPUT_ANSI_ENABLED")) {
+                        // don't print force color property if not enabled
+                        if (bForceColor) {
+                            out.println(line);
+                        }
+                    } else {
+                        out.println(line.replace("$mainclass$", mainClass));
+                    }
                 }
             }
         }

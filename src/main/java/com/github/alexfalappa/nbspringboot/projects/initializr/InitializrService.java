@@ -32,8 +32,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.PREF_INITIALIZR_TIMEOUT;
-import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.PREF_INITIALIZR_URL;
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_INITIALIZR_TIMEOUT;
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_INITIALIZR_URL;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.REST_USER_AGENT;
 import static java.util.logging.Level.INFO;
 import static org.springframework.http.HttpStatus.OK;
