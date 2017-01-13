@@ -15,6 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.prefs;
 
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.prefs.Preferences;
@@ -36,17 +38,13 @@ import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService
  *
  * @author Alessandro Falappa
  */
-final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListener, ChangeListener {
+final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListener, ChangeListener, ActionListener {
 
     private final BootPrefsOptionsPanelController controller;
 
     BootPrefsPanel(BootPrefsOptionsPanelController controller) {
         this.controller = controller;
         initComponents();
-        // listen to changes in form fields and call controller.changed()
-        // Register listener on the textFields to detect changes
-        txInitializrUrl.getDocument().addDocumentListener(this);
-        spInitializrTimeout.addChangeListener(this);
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -63,6 +61,9 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         lSeconds = new javax.swing.JLabel();
         lLaunch = new javax.swing.JLabel();
         chColorOutput = new javax.swing.JCheckBox();
+        chDevtoolsTrigger = new javax.swing.JCheckBox();
+        lVmOpts = new javax.swing.JLabel();
+        txVmOpts = new javax.swing.JTextField();
 
         org.openide.awt.Mnemonics.setLocalizedText(lInitializr, org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.lInitializr.text")); // NOI18N
 
@@ -80,6 +81,10 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
         org.openide.awt.Mnemonics.setLocalizedText(chColorOutput, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.chColorOutput.text")); // NOI18N
 
+        org.openide.awt.Mnemonics.setLocalizedText(chDevtoolsTrigger, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.chDevtoolsTrigger.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(lVmOpts, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.lVmOpts.text")); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -88,13 +93,14 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(6, 6, 6)
-                        .addComponent(chColorOutput)
-                        .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lInitializr)
+                            .addComponent(lLaunch))
+                        .addGap(0, 0, Short.MAX_VALUE))
                     .addGroup(layout.createSequentialGroup()
+                        .addGap(6, 6, 6)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(6, 6, 6)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                     .addComponent(lInitializrTimeout)
                                     .addComponent(lInitializrUrl))
@@ -106,12 +112,13 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                                         .addComponent(lSeconds)
                                         .addGap(0, 0, Short.MAX_VALUE))
                                     .addComponent(txInitializrUrl)))
+                            .addComponent(chDevtoolsTrigger)
+                            .addComponent(chColorOutput)
                             .addGroup(layout.createSequentialGroup()
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lInitializr)
-                                    .addComponent(lLaunch))
-                                .addGap(0, 0, Short.MAX_VALUE)))
-                        .addContainerGap())))
+                                .addComponent(lVmOpts)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(txVmOpts)))))
+                .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -131,6 +138,12 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                 .addComponent(lLaunch)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chColorOutput)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chDevtoolsTrigger)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lVmOpts)
+                    .addComponent(txVmOpts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -139,16 +152,27 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         // read settings and initialize GUI
         final Preferences prefs = NbPreferences.forModule(InitializrService.class);
         txInitializrUrl.setText(prefs.get(PrefConstants.PREF_INITIALIZR_URL, "http://start.spring.io"));
+        txVmOpts.setText(prefs.get(PrefConstants.PREF_VM_OPTS, ""));
         spInitializrTimeout.setValue(prefs.getInt(PrefConstants.PREF_INITIALIZR_TIMEOUT, 30));
         chColorOutput.setSelected(prefs.getBoolean(PrefConstants.PREF_FORCE_COLOR_OUTPUT, true));
+        chDevtoolsTrigger.setSelected(prefs.getBoolean(PrefConstants.PREF_MANUAL_RESTART, false));
+        // listen to changes in form fields and call controller.changed()
+        // Register listener on the textFields to detect changes
+        txInitializrUrl.getDocument().addDocumentListener(this);
+        txVmOpts.getDocument().addDocumentListener(this);
+        spInitializrTimeout.addChangeListener(this);
+        chColorOutput.addActionListener(this);
+        chDevtoolsTrigger.addActionListener(this);
     }
 
     void store() {
         // store modified settings
         final Preferences prefs = NbPreferences.forModule(InitializrService.class);
         prefs.put(PrefConstants.PREF_INITIALIZR_URL, txInitializrUrl.getText());
+        prefs.put(PrefConstants.PREF_VM_OPTS, txVmOpts.getText());
         prefs.putInt(PrefConstants.PREF_INITIALIZR_TIMEOUT, (int) spInitializrTimeout.getValue());
         prefs.putBoolean(PrefConstants.PREF_FORCE_COLOR_OUTPUT, chColorOutput.isSelected());
+        prefs.putBoolean(PrefConstants.PREF_MANUAL_RESTART, chDevtoolsTrigger.isSelected());
     }
 
     boolean valid() {
@@ -164,13 +188,16 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox chColorOutput;
+    private javax.swing.JCheckBox chDevtoolsTrigger;
     private javax.swing.JLabel lInitializr;
     private javax.swing.JLabel lInitializrTimeout;
     private javax.swing.JLabel lInitializrUrl;
     private javax.swing.JLabel lLaunch;
     private javax.swing.JLabel lSeconds;
+    private javax.swing.JLabel lVmOpts;
     private javax.swing.JSpinner spInitializrTimeout;
     private javax.swing.JTextField txInitializrUrl;
+    private javax.swing.JTextField txVmOpts;
     // End of variables declaration//GEN-END:variables
 
     @Override
@@ -190,6 +217,11 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
     @Override
     public void stateChanged(ChangeEvent e) {
+        controller.changed();
+    }
+
+    @Override
+    public void actionPerformed(ActionEvent e) {
         controller.changed();
     }
 }

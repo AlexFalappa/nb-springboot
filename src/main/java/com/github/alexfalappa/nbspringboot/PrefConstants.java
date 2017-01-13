@@ -24,7 +24,9 @@ public final class PrefConstants {
 
     public static final String PREF_INITIALIZR_TIMEOUT = "nbspringboot.initializr.timeout";
     public static final String PREF_INITIALIZR_URL = "nbspringboot.initializr.url";
-    public static final String PREF_FORCE_COLOR_OUTPUT = "nbspringboot.output.force-color";
+    public static final String PREF_FORCE_COLOR_OUTPUT = "nbspringboot.defaultopts.force-color";
+    public static final String PREF_MANUAL_RESTART = "nbspringboot.defaultopts.manual-restart";
+    public static final String PREF_VM_OPTS = "nbspringboot.defaultopts.vm-options";
 
     // prevent instantiation
     private PrefConstants() {
