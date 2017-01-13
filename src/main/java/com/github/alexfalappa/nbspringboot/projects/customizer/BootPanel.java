@@ -53,6 +53,7 @@ public class BootPanel extends javax.swing.JPanel {
     public static final String PROP_DISABLED_OVERRIDES = "run.disabledArguments";
     public static final String PROP_RUN_VMOPTIONS = "run.jvmArguments";
     public static final String PROP_DEBUG_MODE = "Env.DEBUG";
+    public static final String PROP_FORCE_COLOR = "Env.SPRING_OUTPUT_ANSI_ENABLED";
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
     private Map<String, String> runProps;
@@ -103,6 +104,7 @@ public class BootPanel extends javax.swing.JPanel {
             parseCmdLineArgs();
             parseVmOptions();
             chDebugMode.setSelected(runProps.containsKey(PROP_DEBUG_MODE));
+            chForceColor.setSelected(runProps.containsKey(PROP_FORCE_COLOR));
             chDevtools.setSelected(runProps.containsKey(PROP_RESTART));
             // listen to widget changes
             txArgs.getDocument().addDocumentListener(new DocumentListener() {
@@ -144,8 +146,9 @@ public class BootPanel extends javax.swing.JPanel {
                 }
             });
             // enable widgets
-            lDebugMode.setEnabled(true);
+            lLaunchOpts.setEnabled(true);
             chDebugMode.setEnabled(true);
+            chForceColor.setEnabled(true);
             lDevtools.setEnabled(true);
             chDevtools.setEnabled(true);
             lArgs.setEnabled(true);
@@ -172,18 +175,19 @@ public class BootPanel extends javax.swing.JPanel {
 
         lDevtools = new javax.swing.JLabel();
         chDevtools = new javax.swing.JCheckBox();
+        lLaunchOpts = new javax.swing.JLabel();
+        chDebugMode = new javax.swing.JCheckBox();
+        chForceColor = new javax.swing.JCheckBox();
         lArgs = new javax.swing.JLabel();
         txArgs = new javax.swing.JTextField();
-        lWarning = new javax.swing.JLabel();
-        lCfgOverrides = new javax.swing.JLabel();
-        scroller = new javax.swing.JScrollPane();
-        tbCfgOverrides = new javax.swing.JTable();
-        bDel = new javax.swing.JButton();
-        bAdd = new javax.swing.JButton();
-        lDebugMode = new javax.swing.JLabel();
-        chDebugMode = new javax.swing.JCheckBox();
         lVmOpts = new javax.swing.JLabel();
         txVmOpts = new javax.swing.JTextField();
+        lCfgOverrides = new javax.swing.JLabel();
+        bAdd = new javax.swing.JButton();
+        bDel = new javax.swing.JButton();
+        scroller = new javax.swing.JScrollPane();
+        tbCfgOverrides = new javax.swing.JTable();
+        lWarning = new javax.swing.JLabel();
 
         org.openide.awt.Mnemonics.setLocalizedText(lDevtools, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDevtools.text")); // NOI18N
         lDevtools.setEnabled(false);
@@ -196,41 +200,8 @@ public class BootPanel extends javax.swing.JPanel {
             }
         });
 
-        org.openide.awt.Mnemonics.setLocalizedText(lArgs, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lArgs.text")); // NOI18N
-        lArgs.setEnabled(false);
-
-        txArgs.setColumns(15);
-        txArgs.setEnabled(false);
-
-        lWarning.setFont(lWarning.getFont().deriveFont(lWarning.getFont().getSize()-2f));
-        org.openide.awt.Mnemonics.setLocalizedText(lWarning, org.openide.util.NbBundle.getMessage(BootPanel.class, "BootPanel.lWarning.relaunch.text")); // NOI18N
-
-        org.openide.awt.Mnemonics.setLocalizedText(lCfgOverrides, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lCfgOverrides.text")); // NOI18N
-        lCfgOverrides.setEnabled(false);
-
-        tbCfgOverrides.setModel(tmOverrides);
-        tbCfgOverrides.setEnabled(false);
-        tbCfgOverrides.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
-        scroller.setViewportView(tbCfgOverrides);
-
-        org.openide.awt.Mnemonics.setLocalizedText(bDel, "\u2212");
-        bDel.setEnabled(false);
-        bDel.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bDelActionPerformed(evt);
-            }
-        });
-
-        org.openide.awt.Mnemonics.setLocalizedText(bAdd, "\u002B");
-        bAdd.setEnabled(false);
-        bAdd.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                bAddActionPerformed(evt);
-            }
-        });
-
-        org.openide.awt.Mnemonics.setLocalizedText(lDebugMode, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lDebugMode.text")); // NOI18N
-        lDebugMode.setEnabled(false);
+        org.openide.awt.Mnemonics.setLocalizedText(lLaunchOpts, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lLaunchOpts.text")); // NOI18N
+        lLaunchOpts.setEnabled(false);
 
         org.openide.awt.Mnemonics.setLocalizedText(chDebugMode, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.chDebugMode.text")); // NOI18N
         chDebugMode.setEnabled(false);
@@ -240,11 +211,51 @@ public class BootPanel extends javax.swing.JPanel {
             }
         });
 
+        org.openide.awt.Mnemonics.setLocalizedText(chForceColor, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.chForceColor.text")); // NOI18N
+        chForceColor.setEnabled(false);
+        chForceColor.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chForceColorActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(lArgs, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lArgs.text")); // NOI18N
+        lArgs.setEnabled(false);
+
+        txArgs.setColumns(15);
+        txArgs.setEnabled(false);
+
         org.openide.awt.Mnemonics.setLocalizedText(lVmOpts, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lVmOpts.text")); // NOI18N
         lVmOpts.setEnabled(false);
 
-        txVmOpts.setText(org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.txVmOpts.text")); // NOI18N
         txVmOpts.setEnabled(false);
+
+        org.openide.awt.Mnemonics.setLocalizedText(lCfgOverrides, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lCfgOverrides.text")); // NOI18N
+        lCfgOverrides.setEnabled(false);
+
+        org.openide.awt.Mnemonics.setLocalizedText(bAdd, "\u002B");
+        bAdd.setEnabled(false);
+        bAdd.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bAddActionPerformed(evt);
+            }
+        });
+
+        org.openide.awt.Mnemonics.setLocalizedText(bDel, "\u2212");
+        bDel.setEnabled(false);
+        bDel.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                bDelActionPerformed(evt);
+            }
+        });
+
+        tbCfgOverrides.setModel(tmOverrides);
+        tbCfgOverrides.setEnabled(false);
+        tbCfgOverrides.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        scroller.setViewportView(tbCfgOverrides);
+
+        lWarning.setFont(lWarning.getFont().deriveFont(lWarning.getFont().getSize()-2f));
+        org.openide.awt.Mnemonics.setLocalizedText(lWarning, org.openide.util.NbBundle.getMessage(BootPanel.class, "BootPanel.lWarning.relaunch.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -253,28 +264,23 @@ public class BootPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(lDebugMode)
                     .addComponent(lDevtools)
                     .addComponent(lVmOpts)
-                    .addComponent(lArgs))
+                    .addComponent(lArgs)
+                    .addComponent(lLaunchOpts))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(txArgs)
+                    .addComponent(txVmOpts)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(chDevtools)
-                            .addComponent(chDebugMode))
-                        .addGap(0, 0, Short.MAX_VALUE))
-                    .addComponent(txVmOpts))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(chDebugMode)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(chForceColor)))
+                        .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(scroller)
-                .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(lWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(6, 6, 6))
             .addGroup(layout.createSequentialGroup()
                 .addGap(6, 6, 6)
                 .addComponent(lCfgOverrides)
@@ -283,6 +289,14 @@ public class BootPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(bDel)
                 .addGap(6, 6, 6))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(lWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(6, 6, 6))
+            .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(scroller)
+                .addContainerGap())
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {bAdd, bDel});
@@ -292,12 +306,13 @@ public class BootPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(lDebugMode)
-                    .addComponent(chDebugMode))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lDevtools)
                     .addComponent(chDevtools))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lLaunchOpts)
+                    .addComponent(chDebugMode)
+                    .addComponent(chForceColor))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lArgs)
@@ -312,7 +327,7 @@ public class BootPanel extends javax.swing.JPanel {
                     .addComponent(bDel)
                     .addComponent(bAdd))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, 184, Short.MAX_VALUE)
+                .addComponent(scroller, javax.swing.GroupLayout.DEFAULT_SIZE, 200, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addComponent(lWarning)
                 .addContainerGap())
@@ -360,23 +375,35 @@ public class BootPanel extends javax.swing.JPanel {
     private void chDebugModeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDebugModeActionPerformed
         if (chDebugMode.isSelected()) {
             runProps.put(PROP_DEBUG_MODE, "true");
-            debugProps.put(PROP_RESTART, "true");
+            debugProps.put(PROP_DEBUG_MODE, "true");
         } else {
-            runProps.remove(PROP_RESTART);
-            debugProps.remove(PROP_RESTART);
+            runProps.remove(PROP_DEBUG_MODE);
+            debugProps.remove(PROP_DEBUG_MODE);
         }
         mh2.markAsModified(mh2.getActionMappings());
     }//GEN-LAST:event_chDebugModeActionPerformed
+
+    private void chForceColorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chForceColorActionPerformed
+        if (chForceColor.isSelected()) {
+            runProps.put(PROP_FORCE_COLOR, "always");
+            debugProps.put(PROP_FORCE_COLOR, "always");
+        } else {
+            runProps.remove(PROP_FORCE_COLOR);
+            debugProps.remove(PROP_FORCE_COLOR);
+        }
+        mh2.markAsModified(mh2.getActionMappings());
+    }//GEN-LAST:event_chForceColorActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bAdd;
     private javax.swing.JButton bDel;
     private javax.swing.JCheckBox chDebugMode;
     private javax.swing.JCheckBox chDevtools;
+    private javax.swing.JCheckBox chForceColor;
     private javax.swing.JLabel lArgs;
     private javax.swing.JLabel lCfgOverrides;
-    private javax.swing.JLabel lDebugMode;
     private javax.swing.JLabel lDevtools;
+    private javax.swing.JLabel lLaunchOpts;
     private javax.swing.JLabel lVmOpts;
     private javax.swing.JLabel lWarning;
     private javax.swing.JScrollPane scroller;
