@@ -16,15 +16,12 @@
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
 import java.awt.Component;
-import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
@@ -37,8 +34,10 @@ import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 
 import org.netbeans.api.project.ProjectManager;
+import org.netbeans.api.templates.FileBuilder;
 import org.netbeans.api.templates.TemplateRegistration;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
+import org.netbeans.spi.project.ui.templates.support.Templates;
 import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
@@ -58,6 +57,8 @@ import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_RESTART;
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ARTIFACT;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_BOOT_VERSION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DEPENDENCIES;
@@ -78,6 +79,8 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
         displayName = "#InitializrSpringbootProject_displayName",
         description = "InitializrSpringbootProjectDescription.html",
         iconBase = "com/github/alexfalappa/nbspringboot/projects/initializr/InitializrSpringbootProject.png",
+        content = "nbactions.xml.template",
+        scriptEngine = "freemarker",
         position = 256
 )
 @Messages("InitializrSpringbootProject_displayName=Spring Boot Initializr project")
@@ -326,25 +329,19 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
         StringBuilder mainClass = new StringBuilder(pkg).append('.');
         mainClass.append(mvnName.substring(0, 1).toUpperCase()).append(mvnName.substring(1));
         mainClass.append("Application");
-        // retrieve boolean flag from prefs
+        // retrieve default options from prefs
         final boolean bForceColor = NbPreferences.forModule(InitializrProjectWizardIterator.class).getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
-        // substitute placeholders in template
-        FileObject fo = FileUtil.createData(dir, "nbactions.xml");
-        try (PrintWriter out = new PrintWriter(fo.getOutputStream())) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(
-                    "/com/github/alexfalappa/nbspringboot/projects/nbactions.tmpl"), "UTF8"))) {
-                for (String line; (line = br.readLine()) != null;) {
-                    if (line.contains("SPRING_OUTPUT_ANSI_ENABLED")) {
-                        // don't print force color property if not enabled
-                        if (bForceColor) {
-                            out.println(line);
-                        }
-                    } else {
-                        out.println(line.replace("$mainclass$", mainClass));
-                    }
-                }
-            }
-        }
+        final boolean bManualRestart = NbPreferences.forModule(InitializrProjectWizardIterator.class).getBoolean(PREF_MANUAL_RESTART, false);
+        final String strVmOpts = NbPreferences.forModule(InitializrProjectWizardIterator.class).get(PREF_VM_OPTS, "");
+        // create nbactions.xml from template
+        FileObject foTmpl = Templates.getTemplate(wiz);
+        new FileBuilder(foTmpl, dir)
+                .name("nbactions")
+                .param("mainClass", mainClass.toString())
+                .param("forceColor", bForceColor)
+                .param("manualRestart", bManualRestart)
+                .param("vmOpts", strVmOpts)
+                .build();
     }
 
     private void pomConfigMvnPlugin(Document doc) throws DOMException, SAXException, IOException {
