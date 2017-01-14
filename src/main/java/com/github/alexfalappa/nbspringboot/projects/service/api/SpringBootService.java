@@ -33,6 +33,8 @@ public interface SpringBootService {
 
     void init();
 
+    void refresh();
+
     ClassPath getManagedClassPath();
 
     boolean cfgPropsCompletionEnabled();

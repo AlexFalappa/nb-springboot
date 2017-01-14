@@ -110,8 +110,8 @@ public class InitializrService {
                 .header("User-Agent", REST_USER_AGENT)
                 .build();
         // connect
-        logger.info("Getting Spring Initializr project\n");
-        logger.log(INFO, "service url: {0}", uri.toString());
+        logger.info("Getting Spring Initializr project");
+        logger.log(INFO, "Service URL: {0}", uri.toString());
         long start = System.currentTimeMillis();
         ResponseEntity<byte[]> respEntity = rt.exchange(req, byte[].class);
         // analyze response outcome

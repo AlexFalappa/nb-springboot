@@ -87,20 +87,12 @@ public class SpringBootServiceImpl implements SpringBootService {
     public SpringBootServiceImpl(Project p) {
         if (p instanceof NbMavenProjectImpl) {
             this.mvnPrj = (NbMavenProjectImpl) p;
-            // listen for pom changes
-            mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    logger.fine("Maven pom change");
-                    logger.finer(evt.toString());
-                    init();
-                }
-            });
         }
     }
 
     @Override
     public void init() {
+        logger.info("Initializing SpringBoot service");
         if (mvnPrj == null) {
             return;
         }
@@ -118,8 +110,54 @@ public class SpringBootServiceImpl implements SpringBootService {
         for (SourceGroup group : srcGroups) {
             if (group.getName().toLowerCase().contains("source")) {
                 cpExec = ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
+                logger.info("Adding classpath listener...");
+                cpExec.addPropertyChangeListener(new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        logger.fine("Execution classpath change");
+                        logger.finer(evt.toString());
+                        if (evt.getPropertyName().equalsIgnoreCase("entries")) {
+                            refresh();
+                        }
+                    }
+                });
+                // listen for pom changes
+                mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
+                    @Override
+                    public void propertyChange(PropertyChangeEvent evt) {
+                        logger.fine("Maven pom change");
+                        logger.finer(evt.toString());
+                    }
+                });
                 break;
             }
+        }
+        // check if completion of configuration properties is possible
+        try {
+            logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
+            cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
+            cfgPropsCompletionAvailable = true;
+        } catch (ClassNotFoundException ex) {
+            cfgPropsCompletionAvailable = false;
+        }
+        // build configuration properties maps
+        updateCacheMaps();
+    }
+
+    @Override
+    public void refresh() {
+        logger.info("Refreshing SpringBoot service");
+        // check maven project has a dependency starting with 'spring-boot'
+        logger.fine("Checking maven project has a spring boot dependency");
+        springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
+        // clear and exit if no spring boot dependency detected
+        if (!springBootAvailable) {
+            cfgPropsCompletionAvailable = false;
+            cfgMetasInJars.clear();
+            properties.clear();
+            hints.clear();
+            groups.clear();
+            return;
         }
         // check if completion of configuration properties is possible
         try {
@@ -191,9 +229,9 @@ public class SpringBootServiceImpl implements SpringBootService {
     // Update internal caches and maps from the given classpath.
     private void updateCacheMaps() {
         logger.fine("Updating cache maps");
-        this.properties.clear();
-        this.hints.clear();
-        this.groups.clear();
+        properties.clear();
+        hints.clear();
+        groups.clear();
         final List<FileObject> cfgMetaFiles = cpExec.findAllResources(METADATA_JSON);
         for (FileObject fo : cfgMetaFiles) {
             try {
