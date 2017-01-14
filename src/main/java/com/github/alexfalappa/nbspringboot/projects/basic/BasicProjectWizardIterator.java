@@ -16,16 +16,14 @@
 package com.github.alexfalappa.nbspringboot.projects.basic;
 
 import java.awt.Component;
-import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
-import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.zip.ZipEntry;
@@ -35,26 +33,29 @@ import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 
 import org.netbeans.api.project.ProjectManager;
+import org.netbeans.api.templates.FileBuilder;
 import org.netbeans.api.templates.TemplateRegistration;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
 import org.netbeans.spi.project.ui.templates.support.Templates;
 import org.openide.WizardDescriptor;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
+import org.openide.filesystems.URLMapper;
 import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 
-import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectWizardIterator;
-
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_RESTART;
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 
 @TemplateRegistration(
         folder = "Project/Maven2",
         displayName = "#BasicSpringbootProject_displayName",
         description = "BasicSpringbootProjectDescription.html",
         iconBase = "com/github/alexfalappa/nbspringboot/projects/basic/BasicSpringbootProject.png",
-        content = "BasicSpringbootProject.zip",
+        content = "basic-nbactions.xml.template",
+        scriptEngine = "freemarker",
         position = 255
 )
 @Messages("BasicSpringbootProject_displayName=Spring Boot basic project")
@@ -89,10 +90,10 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
         File dirF = FileUtil.normalizeFile((File) wiz.getProperty("projdir"));
         dirF.mkdirs();
         FileObject dir = FileUtil.toFileObject(dirF);
-        FileObject template = Templates.getTemplate(wiz);
+        FileObject template = URLMapper.findFileObject(getClass().getResource("BasicSpringbootProject.zip"));
         unZipFile(template.getInputStream(), dir);
         // create nbactions.xml file
-        createNbActions("com.example.BasicApplication", dir);
+        createNbActions(dir);
         // Always open top dir as a project:
         resultSet.add(dir);
         // Look for nested projects to open as well:
@@ -211,25 +212,21 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
         }
     }
 
-    private void createNbActions(String mainClass, FileObject dir) throws IOException {
-        // retrieve boolean flag from prefs
-        final boolean bForceColor = NbPreferences.forModule(InitializrProjectWizardIterator.class).getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
-        // substitute placeholders in template
-        FileObject fo = FileUtil.createData(dir, "nbactions.xml");
-        try (PrintWriter out = new PrintWriter(fo.getOutputStream())) {
-            try (BufferedReader br = new BufferedReader(new InputStreamReader(getClass().getResourceAsStream(
-                    "/com/github/alexfalappa/nbspringboot/projects/nbactions.tmpl"), "UTF8"))) {
-                for (String line; (line = br.readLine()) != null;) {
-                    if (line.contains("SPRING_OUTPUT_ANSI_ENABLED")) {
-                        // don't print force color property if not enabled
-                        if (bForceColor) {
-                            out.println(line);
-                        }
-                    } else {
-                        out.println(line.replace("$mainclass$", mainClass));
-                    }
-                }
-            }
+    private void createNbActions(FileObject dir) throws IOException {
+        // retrieve default options from prefs
+        final boolean bForceColor = NbPreferences.forModule(BasicProjectWizardIterator.class).getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
+        final boolean bManualRestart = NbPreferences.forModule(BasicProjectWizardIterator.class).getBoolean(PREF_MANUAL_RESTART, false);
+        final String strVmOpts = NbPreferences.forModule(BasicProjectWizardIterator.class).get(PREF_VM_OPTS, "");
+        // create nbactions.xml from template
+        FileObject foTmpl = Templates.getTemplate(wiz);
+        List<FileObject> list = new FileBuilder(foTmpl, dir)
+                .name("nbactions")
+                .param("forceColor", bForceColor)
+                .param("manualRestart", bManualRestart)
+                .param("vmOpts", strVmOpts)
+                .build();
+        if (!list.isEmpty()) {
+            System.out.println(FileUtil.getFileDisplayName(list.get(0)));
         }
     }
 

@@ -79,7 +79,7 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
         displayName = "#InitializrSpringbootProject_displayName",
         description = "InitializrSpringbootProjectDescription.html",
         iconBase = "com/github/alexfalappa/nbspringboot/projects/initializr/InitializrSpringbootProject.png",
-        content = "nbactions.xml.template",
+        content = "initializr-nbactions.xml.template",
         scriptEngine = "freemarker",
         position = 256
 )
