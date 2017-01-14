@@ -38,8 +38,10 @@ Alternatively download the desired `nbm` package from https://github.com/AlexFal
     * Add `spring-actuator` dependency
 * Toolbar button to trigger _Spring Boot_ devtools reload
 * Specific _Spring Boot_ project properties page to:
-    * Specify command line run arguments
-    * Enable/disable devtools reload trigger
+    * Specify command line run arguments and launch VM options
+    * Enable/disable manual devtools reload trigger
+    * Toggle debug mode and color output
+    * Assisted override of configuration properties at launch
 * Additional navigator panel to show request URL mappings of a `Controller` / `RestController` class
 
 ## Issues and Documentation
@@ -67,9 +69,9 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 * __???__ (??? 2017): Work in progress
     * Improved project properties panel:
         * Override of Spring Boot configuration properties at application launch
-        * Enable debug mode checkbox
+        * Checkboxes for enabling debug mode and toggling color output
         * Specify Java VM options
-    * Global option to force color in Output window (newly created projects only)
+    * Default launch options for newly created projects in global plugin settings
     * Updated project content for Basic Spring Boot project wizard
 
 * __1.3.1__ (November 2016): General fixes
