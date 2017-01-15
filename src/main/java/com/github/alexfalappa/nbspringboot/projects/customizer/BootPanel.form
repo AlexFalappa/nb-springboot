@@ -17,32 +17,6 @@
     <DimensionLayout dim="0">
       <Group type="103" groupAlignment="0" attributes="0">
           <Group type="102" attributes="0">
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="lDevtools" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lVmOpts" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lArgs" alignment="0" min="-2" max="-2" attributes="0"/>
-                  <Component id="lLaunchOpts" alignment="0" min="-2" max="-2" attributes="0"/>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-              <Group type="103" groupAlignment="0" attributes="0">
-                  <Component id="txArgs" alignment="0" max="32767" attributes="0"/>
-                  <Component id="txVmOpts" alignment="0" max="32767" attributes="0"/>
-                  <Group type="102" attributes="0">
-                      <Group type="103" groupAlignment="0" attributes="0">
-                          <Component id="chDevtools" min="-2" max="-2" attributes="0"/>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Component id="chDebugMode" min="-2" max="-2" attributes="0"/>
-                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                              <Component id="chForceColor" min="-2" max="-2" attributes="0"/>
-                          </Group>
-                      </Group>
-                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                  </Group>
-              </Group>
-              <EmptySpace max="-2" attributes="0"/>
-          </Group>
-          <Group type="102" attributes="0">
               <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
               <Component id="lCfgOverrides" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
@@ -56,7 +30,34 @@
               <Component id="lWarning" max="32767" attributes="0"/>
               <EmptySpace min="6" pref="6" max="-2" attributes="0"/>
           </Group>
-          <Group type="102" attributes="0">
+          <Group type="102" alignment="0" attributes="0">
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="lDevtools" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lVmOpts" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lArgs" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lLaunchOpts" alignment="0" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="0" attributes="0">
+                  <Component id="txArgs" alignment="0" max="32767" attributes="0"/>
+                  <Component id="txVmOpts" alignment="0" max="32767" attributes="0"/>
+                  <Group type="102" attributes="0">
+                      <Group type="103" groupAlignment="0" attributes="0">
+                          <Component id="chVmOptsLaunch" min="-2" max="-2" attributes="0"/>
+                          <Component id="chDevtools" min="-2" max="-2" attributes="0"/>
+                          <Group type="102" alignment="0" attributes="0">
+                              <Component id="chDebugMode" min="-2" max="-2" attributes="0"/>
+                              <EmptySpace type="unrelated" max="-2" attributes="0"/>
+                              <Component id="chForceColor" min="-2" max="-2" attributes="0"/>
+                          </Group>
+                      </Group>
+                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                  </Group>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+          </Group>
+          <Group type="102" alignment="0" attributes="0">
               <EmptySpace max="-2" attributes="0"/>
               <Component id="scroller" max="32767" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
@@ -87,7 +88,9 @@
                   <Component id="lVmOpts" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txVmOpts" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="chVmOptsLaunch" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lCfgOverrides" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="bDel" alignment="3" min="-2" max="-2" attributes="0"/>
@@ -178,6 +181,17 @@
       <Properties>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chVmOptsLaunch">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="com/github/alexfalappa/nbspringboot/projects/customizer/Bundle.properties" key="BootPanel.chVmOptsLaunch.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+        <Property name="enabled" type="boolean" value="false"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="chVmOptsLaunchActionPerformed"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JLabel" name="lCfgOverrides">
       <Properties>

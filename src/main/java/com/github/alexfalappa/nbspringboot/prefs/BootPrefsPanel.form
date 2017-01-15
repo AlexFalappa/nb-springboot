@@ -50,7 +50,13 @@
                           <Group type="102" alignment="0" attributes="0">
                               <Component id="lVmOpts" min="-2" max="-2" attributes="0"/>
                               <EmptySpace max="-2" attributes="0"/>
-                              <Component id="txVmOpts" max="32767" attributes="0"/>
+                              <Group type="103" groupAlignment="0" attributes="0">
+                                  <Group type="102" attributes="0">
+                                      <Component id="chVmOptsLaunch" min="-2" max="-2" attributes="0"/>
+                                      <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
+                                  </Group>
+                                  <Component id="txVmOpts" max="32767" attributes="0"/>
+                              </Group>
                           </Group>
                       </Group>
                   </Group>
@@ -78,14 +84,16 @@
               <EmptySpace type="separate" max="-2" attributes="0"/>
               <Component id="lLaunch" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="chColorOutput" min="-2" max="-2" attributes="0"/>
-              <EmptySpace max="-2" attributes="0"/>
               <Component id="chDevtoolsTrigger" min="-2" max="-2" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="chColorOutput" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lVmOpts" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txVmOpts" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Component id="chVmOptsLaunch" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
       </Group>
@@ -161,6 +169,13 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JTextField" name="txVmOpts">
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="chVmOptsLaunch">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="com/github/alexfalappa/nbspringboot/prefs/Bundle.properties" key="BootPrefsPanel.chVmOptsLaunch.text" replaceFormat="org.openide.util.NbBundle.getMessage({sourceFileName}.class, &quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
     </Component>
   </SubComponents>
 </Form>

@@ -56,9 +56,10 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.github.alexfalappa.nbspringboot.Utils;
+
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_RESTART;
-import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_ARTIFACT;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_BOOT_VERSION;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DEPENDENCIES;
@@ -337,7 +338,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
         // retrieve default options from prefs
         final boolean bForceColor = NbPreferences.forModule(InitializrProjectWizardIterator.class).getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
         final boolean bManualRestart = NbPreferences.forModule(InitializrProjectWizardIterator.class).getBoolean(PREF_MANUAL_RESTART, false);
-        final String strVmOpts = NbPreferences.forModule(InitializrProjectWizardIterator.class).get(PREF_VM_OPTS, "");
+        final String strVmOpts = Utils.vmOptsFromPrefs();
         // create nbactions.xml from template
         FileObject foTmpl = Templates.getTemplate(wiz);
         new FileBuilder(foTmpl, dir)

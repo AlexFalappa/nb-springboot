@@ -54,6 +54,7 @@ public class BootPanel extends javax.swing.JPanel {
     public static final String PROP_RUN_VMOPTIONS = "run.jvmArguments";
     public static final String PROP_DEBUG_MODE = "Env.DEBUG";
     public static final String PROP_FORCE_COLOR = "Env.SPRING_OUTPUT_ANSI_ENABLED";
+    public static final String VMOPTS_OPTIMIZE = "-noverify -XX:TieredStopAtLevel=1 ";
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
     private Map<String, String> runProps;
@@ -155,6 +156,7 @@ public class BootPanel extends javax.swing.JPanel {
             txArgs.setEnabled(true);
             lVmOpts.setEnabled(true);
             txVmOpts.setEnabled(true);
+            chVmOptsLaunch.setEnabled(true);
             lCfgOverrides.setEnabled(true);
             bAdd.setEnabled(true);
             bDel.setEnabled(true);
@@ -182,6 +184,7 @@ public class BootPanel extends javax.swing.JPanel {
         txArgs = new javax.swing.JTextField();
         lVmOpts = new javax.swing.JLabel();
         txVmOpts = new javax.swing.JTextField();
+        chVmOptsLaunch = new javax.swing.JCheckBox();
         lCfgOverrides = new javax.swing.JLabel();
         bAdd = new javax.swing.JButton();
         bDel = new javax.swing.JButton();
@@ -230,6 +233,14 @@ public class BootPanel extends javax.swing.JPanel {
 
         txVmOpts.setEnabled(false);
 
+        org.openide.awt.Mnemonics.setLocalizedText(chVmOptsLaunch, org.openide.util.NbBundle.getMessage(BootPanel.class, "BootPanel.chVmOptsLaunch.text")); // NOI18N
+        chVmOptsLaunch.setEnabled(false);
+        chVmOptsLaunch.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                chVmOptsLaunchActionPerformed(evt);
+            }
+        });
+
         org.openide.awt.Mnemonics.setLocalizedText(lCfgOverrides, org.openide.util.NbBundle.getBundle(BootPanel.class).getString("BootPanel.lCfgOverrides.text")); // NOI18N
         lCfgOverrides.setEnabled(false);
 
@@ -262,6 +273,18 @@ public class BootPanel extends javax.swing.JPanel {
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(lCfgOverrides)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addComponent(bAdd)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(bDel)
+                .addGap(6, 6, 6))
+            .addGroup(layout.createSequentialGroup()
+                .addGap(6, 6, 6)
+                .addComponent(lWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGap(6, 6, 6))
+            .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(lDevtools)
@@ -274,6 +297,7 @@ public class BootPanel extends javax.swing.JPanel {
                     .addComponent(txVmOpts)
                     .addGroup(layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(chVmOptsLaunch)
                             .addComponent(chDevtools)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(chDebugMode)
@@ -281,18 +305,6 @@ public class BootPanel extends javax.swing.JPanel {
                                 .addComponent(chForceColor)))
                         .addGap(0, 0, Short.MAX_VALUE)))
                 .addContainerGap())
-            .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(lCfgOverrides)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addComponent(bAdd)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(bDel)
-                .addGap(6, 6, 6))
-            .addGroup(layout.createSequentialGroup()
-                .addGap(6, 6, 6)
-                .addComponent(lWarning, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addGap(6, 6, 6))
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(scroller)
@@ -321,6 +333,8 @@ public class BootPanel extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lVmOpts)
                     .addComponent(txVmOpts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chVmOptsLaunch)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lCfgOverrides)
@@ -394,12 +408,17 @@ public class BootPanel extends javax.swing.JPanel {
         mh2.markAsModified(mh2.getActionMappings());
     }//GEN-LAST:event_chForceColorActionPerformed
 
+    private void chVmOptsLaunchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chVmOptsLaunchActionPerformed
+        updateVmOptions();
+    }//GEN-LAST:event_chVmOptsLaunchActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bAdd;
     private javax.swing.JButton bDel;
     private javax.swing.JCheckBox chDebugMode;
     private javax.swing.JCheckBox chDevtools;
     private javax.swing.JCheckBox chForceColor;
+    private javax.swing.JCheckBox chVmOptsLaunch;
     private javax.swing.JLabel lArgs;
     private javax.swing.JLabel lCfgOverrides;
     private javax.swing.JLabel lDevtools;
@@ -487,7 +506,12 @@ public class BootPanel extends javax.swing.JPanel {
     }
 
     private void updateVmOptions() {
-        final String strVmOpts = txVmOpts.getText();
+        StringBuilder sb = new StringBuilder();
+        if (chVmOptsLaunch.isSelected()) {
+            sb.append(VMOPTS_OPTIMIZE);
+        }
+        sb.append(txVmOpts.getText());
+        final String strVmOpts = sb.toString();
         if (strVmOpts == null || strVmOpts.isEmpty()) {
             runProps.remove(PROP_RUN_VMOPTIONS);
             debugProps.remove(PROP_RUN_VMOPTIONS);
@@ -501,7 +525,13 @@ public class BootPanel extends javax.swing.JPanel {
 
     private void parseVmOptions() {
         if (runProps.containsKey(PROP_RUN_VMOPTIONS) && runProps.get(PROP_RUN_VMOPTIONS) != null) {
-            txVmOpts.setText(runProps.get(PROP_RUN_VMOPTIONS));
+            boolean isVmOptsLaunch = runProps.get(PROP_RUN_VMOPTIONS).startsWith(VMOPTS_OPTIMIZE);
+            chVmOptsLaunch.setSelected(isVmOptsLaunch);
+            if (isVmOptsLaunch) {
+                txVmOpts.setText(runProps.get(PROP_RUN_VMOPTIONS).substring(VMOPTS_OPTIMIZE.length()));
+            } else {
+                txVmOpts.setText(runProps.get(PROP_RUN_VMOPTIONS));
+            }
         }
     }
 

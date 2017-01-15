@@ -64,6 +64,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         chDevtoolsTrigger = new javax.swing.JCheckBox();
         lVmOpts = new javax.swing.JLabel();
         txVmOpts = new javax.swing.JTextField();
+        chVmOptsLaunch = new javax.swing.JCheckBox();
 
         org.openide.awt.Mnemonics.setLocalizedText(lInitializr, org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.lInitializr.text")); // NOI18N
 
@@ -84,6 +85,8 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         org.openide.awt.Mnemonics.setLocalizedText(chDevtoolsTrigger, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.chDevtoolsTrigger.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(lVmOpts, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.lVmOpts.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(chVmOptsLaunch, org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.chVmOptsLaunch.text")); // NOI18N
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -117,7 +120,11 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(lVmOpts)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(txVmOpts)))))
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(chVmOptsLaunch)
+                                        .addGap(0, 0, Short.MAX_VALUE))
+                                    .addComponent(txVmOpts))))))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
@@ -137,13 +144,15 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                 .addGap(18, 18, 18)
                 .addComponent(lLaunch)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(chColorOutput)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chDevtoolsTrigger)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chColorOutput)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lVmOpts)
                     .addComponent(txVmOpts, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(chVmOptsLaunch)
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -156,6 +165,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         spInitializrTimeout.setValue(prefs.getInt(PrefConstants.PREF_INITIALIZR_TIMEOUT, 30));
         chColorOutput.setSelected(prefs.getBoolean(PrefConstants.PREF_FORCE_COLOR_OUTPUT, true));
         chDevtoolsTrigger.setSelected(prefs.getBoolean(PrefConstants.PREF_MANUAL_RESTART, false));
+        chVmOptsLaunch.setSelected(prefs.getBoolean(PrefConstants.PREF_VM_OPTS_LAUNCH, true));
         // listen to changes in form fields and call controller.changed()
         // Register listener on the textFields to detect changes
         txInitializrUrl.getDocument().addDocumentListener(this);
@@ -163,6 +173,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         spInitializrTimeout.addChangeListener(this);
         chColorOutput.addActionListener(this);
         chDevtoolsTrigger.addActionListener(this);
+        chVmOptsLaunch.addActionListener(this);
     }
 
     void store() {
@@ -173,6 +184,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         prefs.putInt(PrefConstants.PREF_INITIALIZR_TIMEOUT, (int) spInitializrTimeout.getValue());
         prefs.putBoolean(PrefConstants.PREF_FORCE_COLOR_OUTPUT, chColorOutput.isSelected());
         prefs.putBoolean(PrefConstants.PREF_MANUAL_RESTART, chDevtoolsTrigger.isSelected());
+        prefs.putBoolean(PrefConstants.PREF_VM_OPTS_LAUNCH, chVmOptsLaunch.isSelected());
     }
 
     boolean valid() {
@@ -189,6 +201,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JCheckBox chColorOutput;
     private javax.swing.JCheckBox chDevtoolsTrigger;
+    private javax.swing.JCheckBox chVmOptsLaunch;
     private javax.swing.JLabel lInitializr;
     private javax.swing.JLabel lInitializrTimeout;
     private javax.swing.JLabel lInitializrUrl;
@@ -200,26 +213,31 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
     private javax.swing.JTextField txVmOpts;
     // End of variables declaration//GEN-END:variables
 
+    // DocumentListener interface
     @Override
     public void insertUpdate(DocumentEvent e) {
         controller.changed();
     }
 
+    // DocumentListener interface
     @Override
     public void removeUpdate(DocumentEvent e) {
         controller.changed();
     }
 
+    // DocumentListener interface
     @Override
     public void changedUpdate(DocumentEvent e) {
         controller.changed();
     }
 
+    // ChangeListener interface
     @Override
     public void stateChanged(ChangeEvent e) {
         controller.changed();
     }
 
+    // Actionistener interface
     @Override
     public void actionPerformed(ActionEvent e) {
         controller.changed();

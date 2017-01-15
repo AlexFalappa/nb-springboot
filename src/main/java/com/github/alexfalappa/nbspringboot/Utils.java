@@ -17,9 +17,14 @@ package com.github.alexfalappa.nbspringboot;
 
 import java.util.regex.Pattern;
 
+import org.openide.util.NbPreferences;
 import org.springframework.boot.configurationprocessor.metadata.ItemDeprecation;
 import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 
+import com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel;
+
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
 import static java.util.regex.Pattern.compile;
 
 /**
@@ -92,4 +97,12 @@ public final class Utils {
         return sb.toString();
     }
 
+    public static String vmOptsFromPrefs() {
+        StringBuilder sb = new StringBuilder();
+        if (NbPreferences.forModule(Utils.class).getBoolean(PREF_VM_OPTS_LAUNCH, true)) {
+            sb.append(BootPanel.VMOPTS_OPTIMIZE);
+        }
+        sb.append(NbPreferences.forModule(Utils.class).get(PREF_VM_OPTS, ""));
+        return sb.toString();
+    }
 }

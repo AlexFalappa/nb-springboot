@@ -45,9 +45,10 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 
+import com.github.alexfalappa.nbspringboot.Utils;
+
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_RESTART;
-import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 
 @TemplateRegistration(
         folder = "Project/Maven2",
@@ -216,7 +217,7 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
         // retrieve default options from prefs
         final boolean bForceColor = NbPreferences.forModule(BasicProjectWizardIterator.class).getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
         final boolean bManualRestart = NbPreferences.forModule(BasicProjectWizardIterator.class).getBoolean(PREF_MANUAL_RESTART, false);
-        final String strVmOpts = NbPreferences.forModule(BasicProjectWizardIterator.class).get(PREF_VM_OPTS, "");
+        final String strVmOpts = Utils.vmOptsFromPrefs();
         // create nbactions.xml from template
         FileObject foTmpl = Templates.getTemplate(wiz);
         List<FileObject> list = new FileBuilder(foTmpl, dir)
