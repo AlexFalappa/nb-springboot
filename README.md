@@ -66,13 +66,14 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 ## Changelog
 
-* __1.4__ (??? 2017): Better application launch
+* __1.4__ (January 2017): Better application launch
     * Improved project properties panel:
         * Override of Spring Boot configuration properties at application launch
         * Checkboxes for enabling debug mode and toggling color output
         * Specify Java VM options and add launch optimizations
     * Default launch options for newly created projects in global plugin settings
     * Updated project content for Basic Spring Boot project wizard
+    * [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/6?closed=1)
 
 * __1.3.1__ (November 2016): General fixes
     * File templates ignored a per project custom license
