@@ -54,7 +54,7 @@ public class BootPanel extends javax.swing.JPanel {
     public static final String PROP_RUN_VMOPTIONS = "run.jvmArguments";
     public static final String PROP_DEBUG_MODE = "Env.DEBUG";
     public static final String PROP_FORCE_COLOR = "Env.SPRING_OUTPUT_ANSI_ENABLED";
-    public static final String VMOPTS_OPTIMIZE = "-noverify -XX:TieredStopAtLevel=1 ";
+    public static final String VMOPTS_OPTIMIZE = "-noverify -XX:TieredStopAtLevel=1";
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
     private Map<String, String> runProps;

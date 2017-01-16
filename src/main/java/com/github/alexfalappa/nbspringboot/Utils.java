@@ -102,6 +102,9 @@ public final class Utils {
         if (NbPreferences.forModule(Utils.class).getBoolean(PREF_VM_OPTS_LAUNCH, true)) {
             sb.append(BootPanel.VMOPTS_OPTIMIZE);
         }
+        if (sb.length() > 0) {
+            sb.append(' ');
+        }
         sb.append(NbPreferences.forModule(Utils.class).get(PREF_VM_OPTS, ""));
         return sb.toString();
     }
