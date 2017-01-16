@@ -54,14 +54,16 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
     private void initComponents() {
 
         lInitializr = new javax.swing.JLabel();
+        sep1 = new javax.swing.JSeparator();
         lInitializrUrl = new javax.swing.JLabel();
         txInitializrUrl = new javax.swing.JTextField();
         lInitializrTimeout = new javax.swing.JLabel();
         spInitializrTimeout = new javax.swing.JSpinner();
         lSeconds = new javax.swing.JLabel();
         lLaunch = new javax.swing.JLabel();
-        chColorOutput = new javax.swing.JCheckBox();
+        sep2 = new javax.swing.JSeparator();
         chDevtoolsTrigger = new javax.swing.JCheckBox();
+        chColorOutput = new javax.swing.JCheckBox();
         lVmOpts = new javax.swing.JLabel();
         txVmOpts = new javax.swing.JTextField();
         chVmOptsLaunch = new javax.swing.JCheckBox();
@@ -80,9 +82,9 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
         org.openide.awt.Mnemonics.setLocalizedText(lLaunch, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.lLaunch.text")); // NOI18N
 
-        org.openide.awt.Mnemonics.setLocalizedText(chColorOutput, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.chColorOutput.text")); // NOI18N
-
         org.openide.awt.Mnemonics.setLocalizedText(chDevtoolsTrigger, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.chDevtoolsTrigger.text")); // NOI18N
+
+        org.openide.awt.Mnemonics.setLocalizedText(chColorOutput, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.chColorOutput.text")); // NOI18N
 
         org.openide.awt.Mnemonics.setLocalizedText(lVmOpts, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.lVmOpts.text")); // NOI18N
 
@@ -96,10 +98,9 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(lInitializr)
-                            .addComponent(lLaunch))
-                        .addGap(0, 0, Short.MAX_VALUE))
+                        .addComponent(lLaunch)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sep2))
                     .addGroup(layout.createSequentialGroup()
                         .addGap(6, 6, 6)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -124,14 +125,20 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                                     .addGroup(layout.createSequentialGroup()
                                         .addComponent(chVmOptsLaunch)
                                         .addGap(0, 0, Short.MAX_VALUE))
-                                    .addComponent(txVmOpts))))))
+                                    .addComponent(txVmOpts)))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(lInitializr)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(sep1)))
                 .addContainerGap())
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(lInitializr)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lInitializr)
+                    .addComponent(sep1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lInitializrUrl)
@@ -142,7 +149,9 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                     .addComponent(spInitializrTimeout, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addComponent(lSeconds))
                 .addGap(18, 18, 18)
-                .addComponent(lLaunch)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(lLaunch)
+                    .addComponent(sep2, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(chDevtoolsTrigger)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -208,6 +217,8 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
     private javax.swing.JLabel lLaunch;
     private javax.swing.JLabel lSeconds;
     private javax.swing.JLabel lVmOpts;
+    private javax.swing.JSeparator sep1;
+    private javax.swing.JSeparator sep2;
     private javax.swing.JSpinner spInitializrTimeout;
     private javax.swing.JTextField txInitializrUrl;
     private javax.swing.JTextField txVmOpts;
