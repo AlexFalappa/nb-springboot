@@ -35,6 +35,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_INITIALIZR_TIMEOUT;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_INITIALIZR_URL;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.REST_USER_AGENT;
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -72,6 +73,9 @@ public class InitializrService {
             ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
             final JsonNode json = mapper.readTree(respEntity.getBody());
             logger.log(INFO, "Retrieved Spring Initializr service metadata. Took {0} msec", System.currentTimeMillis() - start);
+            if (logger.isLoggable(FINE)) {
+                logger.fine(mapper.writeValueAsString(json));
+            }
             return json;
         } else {
             // log status code
