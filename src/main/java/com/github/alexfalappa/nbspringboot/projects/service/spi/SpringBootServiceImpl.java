@@ -17,7 +17,6 @@ package com.github.alexfalappa.nbspringboot.projects.service.spi;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -269,7 +268,7 @@ public class SpringBootServiceImpl implements SpringBootService {
                         logger.log(WARNING, "Overwritten hint for property ''{0}''", old.toString());
                     }
                 }
-            } catch (IOException ex) {
+            } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
         }
