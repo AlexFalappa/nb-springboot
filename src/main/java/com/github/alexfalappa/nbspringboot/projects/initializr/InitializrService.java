@@ -22,6 +22,7 @@ import java.util.logging.Logger;
 
 import org.openide.util.NbPreferences;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
@@ -38,7 +39,6 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 import static org.springframework.http.HttpStatus.OK;
-import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
 /**
@@ -59,7 +59,7 @@ public class InitializrService {
         final String serviceUrl = NbPreferences.forModule(InitializrService.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
         RequestEntity<Void> req = RequestEntity
                 .get(new URI(serviceUrl))
-                .accept(APPLICATION_JSON)
+                .accept(MediaType.valueOf("application/vnd.initializr.v2.1+json"))
                 .header("User-Agent", REST_USER_AGENT)
                 .build();
         // connect
