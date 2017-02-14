@@ -65,7 +65,7 @@ public class DependencyToggleBox extends javax.swing.JPanel {
                 try {
                     UriTemplate template = new UriTemplate(urlTemplate.toString());
                     final URI uri = template.expand(currentBootVersion);
-                    HtmlBrowser.URLDisplayer.getDefault().showURLExternal(uri.toURL());
+                    HtmlBrowser.URLDisplayer.getDefault().showURL(uri.toURL());
                 } catch (MalformedURLException ex) {
                     Exceptions.printStackTrace(ex);
                 }
@@ -81,7 +81,7 @@ public class DependencyToggleBox extends javax.swing.JPanel {
                 try {
                     UriTemplate template = new UriTemplate(urlTemplate.toString());
                     final URI uri = template.expand(currentBootVersion);
-                    HtmlBrowser.URLDisplayer.getDefault().showURLExternal(uri.toURL());
+                    HtmlBrowser.URLDisplayer.getDefault().showURL(uri.toURL());
                 } catch (MalformedURLException ex) {
                     Exceptions.printStackTrace(ex);
                 }
