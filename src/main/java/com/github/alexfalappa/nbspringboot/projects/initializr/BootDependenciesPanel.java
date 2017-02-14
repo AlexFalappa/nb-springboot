@@ -20,6 +20,10 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.Insets;
 import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.net.MalformedURLException;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -28,11 +32,17 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBox;
+import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.Scrollable;
 
 import org.apache.commons.lang.WordUtils;
+import org.openide.awt.HtmlBrowser.URLDisplayer;
+import org.openide.util.Exceptions;
+import org.springframework.web.util.UriTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -41,7 +51,7 @@ import static javax.swing.SwingConstants.HORIZONTAL;
 /**
  * Specialized scrollable panel to manage a list of checkboxes groups each containing two columns of checkboxes.
  * <p>
- * The panel is dynamically filled processing a JSON tree received from the Spring Initializr rest service.
+ * The panel is dynamically filled processing a JSON tree received from the Spring Initializr REST service.
  *
  * @author Alessandro Falappa
  */
@@ -49,16 +59,37 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
 
     private static final String PROP_VERSION_RANGE = "versionRange";
     private static final String PROP_DESCRIPTION = "boot.description";
+    private static final String PROP_REFERENCE_TEMPLATE_URL = "boot.reference.template";
     private static final int OUTER_GAP = 4;
     private static final int INNER_GAP = 2;
     private static final int INDENT = 10;
     private static final int GROUP_SPACE = 16;
     private static final int TOOLTIP_WIDTH = 40;
+    private static final ImageIcon ICO_LGHT = new ImageIcon(BootDependenciesPanel.class.getResource("question_light.png"));
+    private static final ImageIcon ICO_MDM = new ImageIcon(BootDependenciesPanel.class.getResource("question_medium.png"));
+    private static final ImageIcon ICO_DRK = new ImageIcon(BootDependenciesPanel.class.getResource("question_dark.png"));
     private boolean initialized = false;
     private final Map<String, List<JCheckBox>> chkBoxesMap = new HashMap<>();
     private final List<JLabel> grpLabels = new ArrayList<>();
     private Integer unitIncrement = null;
     private Integer blockIncrement = null;
+    private String currentBootVersion = null;
+    private ActionListener linkActionListener = new ActionListener() {
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            JComponent c = (JComponent) e.getSource();
+            final Object urlTemplate = c.getClientProperty(PROP_REFERENCE_TEMPLATE_URL);
+            if (urlTemplate != null && currentBootVersion != null) {
+                try {
+                    UriTemplate template = new UriTemplate(urlTemplate.toString());
+                    final URI uri = template.expand(currentBootVersion);
+                    URLDisplayer.getDefault().showURLExternal(uri.toURL());
+                } catch (MalformedURLException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
+            }
+        }
+    };
 
     public BootDependenciesPanel() {
         initComponents();
@@ -86,10 +117,16 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
                 // first column
                 JsonNode dn = valArray.get(j);
                 this.add(checkBoxForNode(groupName, dn), constraintsForFirstColumnCheckbox());
+                if (dn.has("_links") && dn.path("_links").has("reference")) {
+                    this.add(linkForNode(dn), constraintsForFirstColumnLink());
+                }
                 // second column (optional)
                 if (++j < valArray.size()) {
                     dn = valArray.get(j);
                     this.add(checkBoxForNode(groupName, dn), constraintsForSecondColumnCheckbox());
+                    if (dn.has("_links") && dn.path("_links").has("reference")) {
+                        this.add(linkForNode(dn), constraintsForSecondColumnLink());
+                    }
                 }
             }
         }
@@ -204,22 +241,38 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         return ch;
     }
 
-    private GridBagConstraints constraintsForSecondColumnCheckbox() {
-        GridBagConstraints gbc;
-        gbc = new java.awt.GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
-        gbc.insets = new Insets(INNER_GAP, INDENT, 0, 0);
-        gbc.anchor = GridBagConstraints.LINE_START;
-        return gbc;
-    }
-
     private GridBagConstraints constraintsForFirstColumnCheckbox() {
         GridBagConstraints gbc;
         gbc = new java.awt.GridBagConstraints();
         gbc.gridx = 0;
         gbc.insets = new Insets(INNER_GAP, INDENT, 0, 0);
         gbc.anchor = GridBagConstraints.LINE_START;
+        return gbc;
+    }
+
+    private GridBagConstraints constraintsForFirstColumnLink() {
+        GridBagConstraints gbc;
+        gbc = new java.awt.GridBagConstraints();
+        gbc.gridx = 1;
+        gbc.insets = new Insets(INNER_GAP, 0, 0, 0);
+        return gbc;
+    }
+
+    private GridBagConstraints constraintsForSecondColumnCheckbox() {
+        GridBagConstraints gbc;
+        gbc = new java.awt.GridBagConstraints();
+        gbc.gridx = 2;
+        gbc.insets = new Insets(INNER_GAP, INDENT, 0, 0);
+        gbc.anchor = GridBagConstraints.LINE_START;
+        return gbc;
+    }
+
+    private GridBagConstraints constraintsForSecondColumnLink() {
+        GridBagConstraints gbc;
+        gbc = new java.awt.GridBagConstraints();
+        gbc.gridx = 3;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.insets = new Insets(INNER_GAP, 0, 0, 0);
         return gbc;
     }
 
@@ -253,6 +306,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     // End of variables declaration//GEN-END:variables
 
     void adaptToBootVersion(String bootVersion) {
+        currentBootVersion = bootVersion;
         for (List<JCheckBox> chList : chkBoxesMap.values()) {
             for (JCheckBox cb : chList) {
                 String verRange = (String) cb.getClientProperty(PROP_VERSION_RANGE);
@@ -301,12 +355,12 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         StringBuilder sb = new StringBuilder("<html>");
         sb.append(WordUtils.wrap(description, TOOLTIP_WIDTH, "<br/>", false));
         if (!allowable) {
-            sb.append("<br/><i>").append(decode(versRange)).append("</i>");
+            sb.append("<br/><i>").append(decodeVersRange(versRange)).append("</i>");
         }
         return sb.toString();
     }
 
-    private String decode(String verRange) {
+    private String decodeVersRange(String verRange) {
         StringBuilder sb = new StringBuilder();
         if (verRange != null && !verRange.isEmpty()) {
             if (verRange.indexOf('[') >= 0 || verRange.indexOf('(') >= 0
@@ -392,5 +446,18 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             }
         }
         return getPreferredSize().height / 8;
+    }
+
+    private JButton linkForNode(JsonNode dn) {
+        final JButton b = new JButton();
+        b.setIcon(ICO_LGHT);
+        b.setRolloverIcon(ICO_MDM);
+        b.setPressedIcon(ICO_DRK);
+        b.setOpaque(false);
+        b.setContentAreaFilled(false);
+        b.setBorderPainted(false);
+        b.putClientProperty(PROP_REFERENCE_TEMPLATE_URL, dn.path("_links").path("reference").path("href").asText());
+        b.addActionListener(linkActionListener);
+        return b;
     }
 }
