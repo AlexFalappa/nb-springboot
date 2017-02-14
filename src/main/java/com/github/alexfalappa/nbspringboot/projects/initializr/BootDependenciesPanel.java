@@ -28,11 +28,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.swing.JCheckBox;
 import javax.swing.JLabel;
 import javax.swing.Scrollable;
-
-import org.apache.commons.lang.WordUtils;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
@@ -41,21 +38,18 @@ import static javax.swing.SwingConstants.HORIZONTAL;
 /**
  * Specialized scrollable panel to manage a list of checkboxes groups each containing two columns of checkboxes.
  * <p>
- * The panel is dynamically filled processing a JSON tree received from the Spring Initializr rest service.
+ * The panel is dynamically filled processing a JSON tree received from the Spring Initializr REST service.
  *
  * @author Alessandro Falappa
  */
 public class BootDependenciesPanel extends javax.swing.JPanel implements Scrollable {
 
-    private static final String PROP_VERSION_RANGE = "versionRange";
-    private static final String PROP_DESCRIPTION = "boot.description";
     private static final int OUTER_GAP = 4;
     private static final int INNER_GAP = 2;
     private static final int INDENT = 10;
     private static final int GROUP_SPACE = 16;
-    private static final int TOOLTIP_WIDTH = 40;
     private boolean initialized = false;
-    private final Map<String, List<JCheckBox>> chkBoxesMap = new HashMap<>();
+    private final Map<String, List<DependencyToggleBox>> toggleBoxesMap = new HashMap<>();
     private final List<JLabel> grpLabels = new ArrayList<>();
     private Integer unitIncrement = null;
     private Integer blockIncrement = null;
@@ -85,11 +79,11 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             for (int j = 0; j < valArray.size(); j++) {
                 // first column
                 JsonNode dn = valArray.get(j);
-                this.add(checkBoxForNode(groupName, dn), constraintsForFirstColumnCheckbox());
+                this.add(toggleBoxForNode(groupName, dn), constraintsForFirstColumn());
                 // second column (optional)
                 if (++j < valArray.size()) {
                     dn = valArray.get(j);
-                    this.add(checkBoxForNode(groupName, dn), constraintsForSecondColumnCheckbox());
+                    this.add(toggleBoxForNode(groupName, dn), constraintsForSecondColumn());
                 }
             }
         }
@@ -101,10 +95,10 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
 
     public String getSelectedDependenciesString() {
         StringBuilder sb = new StringBuilder();
-        for (List<JCheckBox> chList : chkBoxesMap.values()) {
-            for (JCheckBox cb : chList) {
-                if (cb.isEnabled() && cb.isSelected()) {
-                    sb.append(cb.getName()).append(',');
+        for (List<DependencyToggleBox> chList : toggleBoxesMap.values()) {
+            for (DependencyToggleBox dtb : chList) {
+                if (dtb.isEnabled() && dtb.isSelected()) {
+                    sb.append(dtb.getName()).append(',');
                 }
             }
         }
@@ -117,19 +111,19 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
 
     void setSelectedDependenciesString(String deps) {
         HashSet<String> hs = new HashSet<>(Arrays.asList(deps.split(",")));
-        for (List<JCheckBox> chList : chkBoxesMap.values()) {
-            for (JCheckBox cb : chList) {
-                cb.setSelected(hs.contains(cb.getName()));
+        for (List<DependencyToggleBox> chList : toggleBoxesMap.values()) {
+            for (DependencyToggleBox dtb : chList) {
+                dtb.setSelected(hs.contains(dtb.getName()));
             }
         }
     }
 
     public List<String> getSelectedDependencies() {
         List<String> ret = new ArrayList<>();
-        for (List<JCheckBox> chList : chkBoxesMap.values()) {
-            for (JCheckBox cb : chList) {
-                if (cb.isEnabled() && cb.isSelected()) {
-                    ret.add(cb.getName());
+        for (List<DependencyToggleBox> chList : toggleBoxesMap.values()) {
+            for (DependencyToggleBox dtb : chList) {
+                if (dtb.isEnabled() && dtb.isSelected()) {
+                    ret.add(dtb.getName());
                 }
             }
         }
@@ -138,9 +132,9 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
 
     void setSelectedDependencies(List<String> deps) {
         HashSet<String> hs = new HashSet<>(deps);
-        for (List<JCheckBox> chList : chkBoxesMap.values()) {
-            for (JCheckBox cb : chList) {
-                cb.setSelected(hs.contains(cb.getName()));
+        for (List<DependencyToggleBox> chList : toggleBoxesMap.values()) {
+            for (DependencyToggleBox dtb : chList) {
+                dtb.setSelected(hs.contains(dtb.getName()));
             }
         }
     }
@@ -188,36 +182,32 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         return false;
     }
 
-    private JCheckBox checkBoxForNode(String group, JsonNode dn) {
-        final String name = dn.path("name").asText();
-        final String id = dn.path("id").asText();
-        final String description = dn.path("description").asText();
-        final String versRange = dn.path("versionRange").asText();
-        JCheckBox ch = new JCheckBox(name);
-        ch.setName(id);
-        ch.putClientProperty(PROP_VERSION_RANGE, versRange);
-        ch.putClientProperty(PROP_DESCRIPTION, description);
-        if (!chkBoxesMap.containsKey(group)) {
-            chkBoxesMap.put(group, new ArrayList<JCheckBox>());
+    private DependencyToggleBox toggleBoxForNode(String group, JsonNode dn) {
+        DependencyToggleBox dtb = new DependencyToggleBox();
+        dtb.initFromMetadata(dn);
+        if (!toggleBoxesMap.containsKey(group)) {
+            toggleBoxesMap.put(group, new ArrayList<DependencyToggleBox>());
         }
-        chkBoxesMap.get(group).add(ch);
-        return ch;
+        toggleBoxesMap.get(group).add(dtb);
+        return dtb;
     }
 
-    private GridBagConstraints constraintsForSecondColumnCheckbox() {
+    private GridBagConstraints constraintsForFirstColumn() {
         GridBagConstraints gbc;
         gbc = new java.awt.GridBagConstraints();
-        gbc.gridx = 1;
-        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.gridx = 0;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(INNER_GAP, INDENT, 0, 0);
         gbc.anchor = GridBagConstraints.LINE_START;
         return gbc;
     }
 
-    private GridBagConstraints constraintsForFirstColumnCheckbox() {
+    private GridBagConstraints constraintsForSecondColumn() {
         GridBagConstraints gbc;
         gbc = new java.awt.GridBagConstraints();
-        gbc.gridx = 0;
+        gbc.gridx = 1;
+        gbc.gridwidth = GridBagConstraints.REMAINDER;
+        gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(INNER_GAP, INDENT, 0, 0);
         gbc.anchor = GridBagConstraints.LINE_START;
         return gbc;
@@ -253,88 +243,11 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     // End of variables declaration//GEN-END:variables
 
     void adaptToBootVersion(String bootVersion) {
-        for (List<JCheckBox> chList : chkBoxesMap.values()) {
-            for (JCheckBox cb : chList) {
-                String verRange = (String) cb.getClientProperty(PROP_VERSION_RANGE);
-                String description = (String) cb.getClientProperty(PROP_DESCRIPTION);
-                final boolean allowable = allowable(verRange, bootVersion);
-                cb.setEnabled(allowable);
-                cb.setToolTipText(prepTooltip(description, allowable, verRange));
+        for (List<DependencyToggleBox> dtbList : toggleBoxesMap.values()) {
+            for (DependencyToggleBox dtb : dtbList) {
+                dtb.adaptToBootVersion(bootVersion);
             }
         }
-    }
-
-    private static boolean allowable(String verRange, String bootVersion) {
-        boolean ret = true;
-        if (verRange != null && !verRange.isEmpty()) {
-            if (verRange.indexOf('[') >= 0 || verRange.indexOf('(') >= 0
-                    || verRange.indexOf(']') >= 0 || verRange.indexOf(')') >= 0) {
-                // bounded range
-                String[] bounds = verRange.substring(1, verRange.length() - 1).split(",");
-                // check there are two bounds
-                if (bounds.length != 2) {
-                    return false;
-                }
-                // test various cases
-                if (bootVersion.compareTo(bounds[0]) > 0 && bootVersion.compareTo(bounds[1]) < 0) {
-                    return true;
-                } else if (bootVersion.compareTo(bounds[0]) == 0 && verRange.startsWith("[")) {
-                    return true;
-                } else if (bootVersion.compareTo(bounds[0]) == 0 && verRange.startsWith("(")) {
-                    return false;
-                } else if (bootVersion.compareTo(bounds[1]) == 0 && verRange.endsWith("]")) {
-                    return true;
-                } else if (bootVersion.compareTo(bounds[1]) == 0 && verRange.endsWith(")")) {
-                    return false;
-                } else {
-                    return false;
-                }
-            } else {
-                // unbounded range
-                return bootVersion.compareTo(verRange) >= 0;
-            }
-        }
-        return ret;
-    }
-
-    private String prepTooltip(String description, boolean allowable, String versRange) {
-        StringBuilder sb = new StringBuilder("<html>");
-        sb.append(WordUtils.wrap(description, TOOLTIP_WIDTH, "<br/>", false));
-        if (!allowable) {
-            sb.append("<br/><i>").append(decode(versRange)).append("</i>");
-        }
-        return sb.toString();
-    }
-
-    private String decode(String verRange) {
-        StringBuilder sb = new StringBuilder();
-        if (verRange != null && !verRange.isEmpty()) {
-            if (verRange.indexOf('[') >= 0 || verRange.indexOf('(') >= 0
-                    || verRange.indexOf(']') >= 0 || verRange.indexOf(')') >= 0) {
-                // bounded range
-                String[] bounds = verRange.substring(1, verRange.length() - 1).split(",");
-                // check there are two bounds
-                if (bounds.length == 2) {
-                    sb.append(bounds[0]);
-                    if (verRange.startsWith("[")) {
-                        sb.append(" &lt;= ");
-                    } else if (verRange.startsWith("(")) {
-                        sb.append(" &lt; ");
-                    }
-                    sb.append("Boot version");
-                    if (verRange.endsWith("]")) {
-                        sb.append(" &gt;= ");
-                    } else if (verRange.endsWith(")")) {
-                        sb.append(" &gt; ");
-                    }
-                    sb.append(bounds[1]);
-                }
-            } else {
-                // unbounded range
-                sb.append("Boot version &gt;= ").append(verRange);
-            }
-        }
-        return sb.toString();
     }
 
     void clearFilter() {
@@ -345,15 +258,15 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         this.removeAll();
         int cg = 1;
         for (JLabel lGroup : grpLabels) {
-            List<JCheckBox> cbList = cbFilter(lGroup.getText(), text);
-            if (!cbList.isEmpty()) {
+            List<DependencyToggleBox> dtbList = cbFilter(lGroup.getText(), text);
+            if (!dtbList.isEmpty()) {
                 this.add(lGroup, constraintsForGroupLabel(cg++ == 0));
                 int cd = 1;
-                for (JCheckBox cb : cbList) {
+                for (DependencyToggleBox dtb : dtbList) {
                     if (cd++ % 2 == 0) {
-                        this.add(cb, constraintsForSecondColumnCheckbox());
+                        this.add(dtb, constraintsForSecondColumn());
                     } else {
-                        this.add(cb, constraintsForFirstColumnCheckbox());
+                        this.add(dtb, constraintsForFirstColumn());
                     }
                 }
             }
@@ -362,20 +275,20 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         this.repaint();
     }
 
-    private List<JCheckBox> cbFilter(String group, String text) {
-        ArrayList<JCheckBox> ret = new ArrayList<>();
-        for (JCheckBox cb : chkBoxesMap.get(group)) {
-            if (text == null || cb.getText().toLowerCase().contains(text)) {
-                ret.add(cb);
+    private List<DependencyToggleBox> cbFilter(String group, String text) {
+        ArrayList<DependencyToggleBox> ret = new ArrayList<>();
+        for (DependencyToggleBox dtb : toggleBoxesMap.get(group)) {
+            if (text == null || dtb.getText().toLowerCase().contains(text)) {
+                ret.add(dtb);
             }
         }
         return ret;
     }
 
     private int computeUnitIncrement() {
-        final Iterator<List<JCheckBox>> it = chkBoxesMap.values().iterator();
+        final Iterator<List<DependencyToggleBox>> it = toggleBoxesMap.values().iterator();
         if (it.hasNext()) {
-            List<JCheckBox> list = it.next();
+            List<DependencyToggleBox> list = it.next();
             if (!list.isEmpty()) {
                 return list.get(0).getPreferredSize().height;
             }
@@ -384,9 +297,9 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     }
 
     private Integer computeBlockIncrement() {
-        final Iterator<List<JCheckBox>> it = chkBoxesMap.values().iterator();
+        final Iterator<List<DependencyToggleBox>> it = toggleBoxesMap.values().iterator();
         if (it.hasNext()) {
-            List<JCheckBox> list = it.next();
+            List<DependencyToggleBox> list = it.next();
             if (!list.isEmpty()) {
                 return list.get(0).getPreferredSize().height * 5;
             }
