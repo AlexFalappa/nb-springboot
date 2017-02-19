@@ -43,7 +43,9 @@ import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
 /**
- * Helper class managing and centralizing connection to the Spring Initializr service.
+ * Helper singleton class managing and centralizing connection to the Spring Initializr service.
+ * <p>
+ * Caches project generation and dependencies metadata.
  *
  * @author Alessandro Falappa
  */
@@ -52,40 +54,69 @@ public class InitializrService {
     private static final Logger logger = Logger.getLogger(InitializrService.class.getName());
     private final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
     private final RestTemplate rt = new RestTemplate(requestFactory);
+    private JsonNode metadata;
+    private JsonNode dependencies;
+
+    private InitializrService() {
+    }
+
+    public static InitializrService getInstance() {
+        return InitializrServiceHolder.INSTANCE;
+    }
+
+    private static class InitializrServiceHolder {
+
+        private static final InitializrService INSTANCE = new InitializrService();
+    }
+
+    public void clearCachedValues() {
+        metadata = null;
+        dependencies = null;
+    }
 
     public JsonNode getMetadata() throws Exception {
-        // set connection timeouts
-        timeoutFromPrefs();
-        // prepare request
-        final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
-        RequestEntity<Void> req = RequestEntity
-                .get(new URI(serviceUrl))
-                .accept(MediaType.valueOf("application/vnd.initializr.v2.1+json"))
-                .header("User-Agent", REST_USER_AGENT)
-                .build();
-        // connect
-        logger.log(INFO, "Getting Spring Initializr metadata from: {0}", serviceUrl);
-        logger.log(INFO, "Asking metadata as: {0}", REST_USER_AGENT);
-        long start = System.currentTimeMillis();
-        ResponseEntity<String> respEntity = rt.exchange(req, String.class);
-        // analyze response
-        final HttpStatus statusCode = respEntity.getStatusCode();
-        if (statusCode == OK) {
-            ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
-            final JsonNode json = mapper.readTree(respEntity.getBody());
-            logger.log(INFO, "Retrieved Spring Initializr service metadata. Took {0} msec", System.currentTimeMillis() - start);
-            if (logger.isLoggable(FINE)) {
-                logger.fine(mapper.writeValueAsString(json));
+        if (metadata == null) {
+            // set connection timeouts
+            timeoutFromPrefs();
+            // prepare request
+            final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
+            RequestEntity<Void> req = RequestEntity
+                    .get(new URI(serviceUrl))
+                    .accept(MediaType.valueOf("application/vnd.initializr.v2.1+json"))
+                    .header("User-Agent", REST_USER_AGENT)
+                    .build();
+            // connect
+            logger.log(INFO, "Getting Spring Initializr metadata from: {0}", serviceUrl);
+            logger.log(INFO, "Asking metadata as: {0}", REST_USER_AGENT);
+            long start = System.currentTimeMillis();
+            ResponseEntity<String> respEntity = rt.exchange(req, String.class);
+            // analyze response
+            final HttpStatus statusCode = respEntity.getStatusCode();
+            if (statusCode == OK) {
+                ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+                metadata = mapper.readTree(respEntity.getBody());
+                logger.log(INFO, "Retrieved Spring Initializr service metadata. Took {0} msec", System.currentTimeMillis() - start);
+                if (logger.isLoggable(FINE)) {
+                    logger.fine(mapper.writeValueAsString(metadata));
+                }
+                return metadata;
+            } else {
+                // log status code
+                final String errMessage = String.format("Spring initializr service connection problem. HTTP status code: %s", statusCode
+                        .toString());
+                logger.severe(errMessage);
+                // throw exception in order to set error message
+                throw new RuntimeException(errMessage);
             }
-            return json;
-        } else {
-            // log status code
-            final String errMessage = String.format("Spring initializr service connection problem. HTTP status code: %s", statusCode
-                    .toString());
-            logger.severe(errMessage);
-            // throw exception in order to set error message
-            throw new RuntimeException(errMessage);
         }
+        return metadata;
+    }
+
+    public JsonNode getDependencies() throws Exception {
+        if (dependencies == null) {
+            // TODO retrieve and cache dependencies metadata (http://start.spring.io/dependencies)
+        }
+        return dependencies;
     }
 
     public InputStream getProject(String bootVersion, String mvnGroup, String mvnArtifact, String mvnVersion, String mvnName, String mvnDesc,

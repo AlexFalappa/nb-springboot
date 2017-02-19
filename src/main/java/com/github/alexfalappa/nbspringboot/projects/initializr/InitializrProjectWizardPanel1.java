@@ -38,11 +38,6 @@ public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel, Wi
 
     WizardDescriptor wizardDescriptor;
     private InitializrProjectPanelVisual1 component;
-    private final InitializrService initializrService;
-
-    public InitializrProjectWizardPanel1(InitializrService initializrService) {
-        this.initializrService = initializrService;
-    }
 
     @Override
     public Component getComponent() {
@@ -119,7 +114,7 @@ public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel, Wi
 
     public JsonNode getInitializrMetadata() throws Exception {
         // invoke initializr service to get metadata
-        JsonNode metadata = initializrService.getMetadata();
+        JsonNode metadata = InitializrService.getInstance().getMetadata();
         // store metadata as wizard descriptor property
         this.wizardDescriptor.putProperty(WIZ_METADATA, metadata);
         return metadata;

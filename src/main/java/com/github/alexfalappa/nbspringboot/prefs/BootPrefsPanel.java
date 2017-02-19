@@ -29,6 +29,7 @@ import javax.swing.event.DocumentListener;
 import org.openide.util.NbPreferences;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService;
 
 /**
  * Plugin options panel.
@@ -193,6 +194,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         prefs.putBoolean(PrefConstants.PREF_FORCE_COLOR_OUTPUT, chColorOutput.isSelected());
         prefs.putBoolean(PrefConstants.PREF_MANUAL_RESTART, chDevtoolsTrigger.isSelected());
         prefs.putBoolean(PrefConstants.PREF_VM_OPTS_LAUNCH, chVmOptsLaunch.isSelected());
+        InitializrService.getInstance().clearCachedValues();
     }
 
     boolean valid() {

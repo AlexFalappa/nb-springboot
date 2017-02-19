@@ -92,7 +92,6 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
     private int index;
     private WizardDescriptor.Panel[] panels;
     private WizardDescriptor wiz;
-    private final InitializrService initializrService = new InitializrService();
 
     public InitializrProjectWizardIterator() {
     }
@@ -121,7 +120,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
         String deps = (String) wiz.getProperty(WIZ_DEPENDENCIES);
         try {
             // invoke initializr webservice
-            InputStream stream = initializrService
+            InputStream stream = InitializrService.getInstance()
                     .getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
             // unzip response
             unZipFile(stream, dir, (boolean) wiz.getProperty(WIZ_REMOVE_MVN_WRAPPER));
@@ -177,7 +176,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
         this.wiz.putProperty(WIZ_REMOVE_MVN_WRAPPER, true);
         // create the wizard panels
         panels = new WizardDescriptor.Panel[]{
-            new InitializrProjectWizardPanel1(initializrService),
+            new InitializrProjectWizardPanel1(),
             new InitializrProjectWizardPanel2(),
             new InitializrProjectWizardPanel3()
         };
