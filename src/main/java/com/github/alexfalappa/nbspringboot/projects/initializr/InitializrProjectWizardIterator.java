@@ -27,6 +27,7 @@ import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -56,6 +57,7 @@ import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
+import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
@@ -336,8 +338,9 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
         mainClass.append(mvnName.substring(0, 1).toUpperCase()).append(mvnName.substring(1));
         mainClass.append("Application");
         // retrieve default options from prefs
-        final boolean bForceColor = NbPreferences.forModule(InitializrProjectWizardIterator.class).getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
-        final boolean bManualRestart = NbPreferences.forModule(InitializrProjectWizardIterator.class).getBoolean(PREF_MANUAL_RESTART, false);
+        final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
+        final boolean bForceColor = prefs.getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
+        final boolean bManualRestart = prefs.getBoolean(PREF_MANUAL_RESTART, false);
         final String strVmOpts = Utils.vmOptsFromPrefs();
         // create nbactions.xml from template
         FileObject foTmpl = Templates.getTemplate(wiz);

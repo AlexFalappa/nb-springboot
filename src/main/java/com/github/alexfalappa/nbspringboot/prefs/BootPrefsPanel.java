@@ -29,7 +29,6 @@ import javax.swing.event.DocumentListener;
 import org.openide.util.NbPreferences;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
-import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService;
 
 /**
  * Plugin options panel.
@@ -168,7 +167,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
     void load() {
         // read settings and initialize GUI
-        final Preferences prefs = NbPreferences.forModule(InitializrService.class);
+        final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
         txInitializrUrl.setText(prefs.get(PrefConstants.PREF_INITIALIZR_URL, "http://start.spring.io"));
         txVmOpts.setText(prefs.get(PrefConstants.PREF_VM_OPTS, ""));
         spInitializrTimeout.setValue(prefs.getInt(PrefConstants.PREF_INITIALIZR_TIMEOUT, 30));
@@ -187,7 +186,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
 
     void store() {
         // store modified settings
-        final Preferences prefs = NbPreferences.forModule(InitializrService.class);
+        final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
         prefs.put(PrefConstants.PREF_INITIALIZR_URL, txInitializrUrl.getText());
         prefs.put(PrefConstants.PREF_VM_OPTS, txVmOpts.getText());
         prefs.putInt(PrefConstants.PREF_INITIALIZR_TIMEOUT, (int) spInitializrTimeout.getValue());

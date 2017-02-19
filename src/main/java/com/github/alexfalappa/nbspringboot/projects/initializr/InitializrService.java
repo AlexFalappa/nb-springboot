@@ -32,6 +32,7 @@ import org.springframework.web.util.UriComponentsBuilder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
+import com.github.alexfalappa.nbspringboot.PrefConstants;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_INITIALIZR_TIMEOUT;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_INITIALIZR_URL;
@@ -56,7 +57,7 @@ public class InitializrService {
         // set connection timeouts
         timeoutFromPrefs();
         // prepare request
-        final String serviceUrl = NbPreferences.forModule(InitializrService.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
+        final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
         RequestEntity<Void> req = RequestEntity
                 .get(new URI(serviceUrl))
                 .accept(MediaType.valueOf("application/vnd.initializr.v2.1+json"))
@@ -92,7 +93,7 @@ public class InitializrService {
         // set connection timeouts
         timeoutFromPrefs();
         // prepare parameterized url
-        final String serviceUrl = NbPreferences.forModule(InitializrService.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
+        final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUrl.concat("/starter.zip"))
                 .queryParam("type", "maven-project")
                 .queryParam("bootVersion", bootVersion)
@@ -136,7 +137,7 @@ public class InitializrService {
     }
 
     private void timeoutFromPrefs() {
-        final int serviceTimeoutMillis = 1000 * NbPreferences.forModule(InitializrService.class).getInt(PREF_INITIALIZR_TIMEOUT, 30);
+        final int serviceTimeoutMillis = 1000 * NbPreferences.forModule(PrefConstants.class).getInt(PREF_INITIALIZR_TIMEOUT, 30);
         requestFactory.setConnectTimeout(serviceTimeoutMillis);
         requestFactory.setReadTimeout(serviceTimeoutMillis);
     }

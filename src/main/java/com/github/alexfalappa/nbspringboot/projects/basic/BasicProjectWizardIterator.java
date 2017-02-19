@@ -26,6 +26,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.prefs.Preferences;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -45,6 +46,7 @@ import org.openide.util.NbBundle;
 import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 
+import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
@@ -215,8 +217,9 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
 
     private void createNbActions(FileObject dir) throws IOException {
         // retrieve default options from prefs
-        final boolean bForceColor = NbPreferences.forModule(BasicProjectWizardIterator.class).getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
-        final boolean bManualRestart = NbPreferences.forModule(BasicProjectWizardIterator.class).getBoolean(PREF_MANUAL_RESTART, false);
+        final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
+        final boolean bForceColor = prefs.getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
+        final boolean bManualRestart = prefs.getBoolean(PREF_MANUAL_RESTART, false);
         final String strVmOpts = Utils.vmOptsFromPrefs();
         // create nbactions.xml from template
         FileObject foTmpl = Templates.getTemplate(wiz);
