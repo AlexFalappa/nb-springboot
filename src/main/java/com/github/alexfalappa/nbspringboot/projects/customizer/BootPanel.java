@@ -508,9 +508,9 @@ public class BootPanel extends javax.swing.JPanel {
     private void updateVmOptions() {
         StringBuilder sb = new StringBuilder();
         if (chVmOptsLaunch.isSelected()) {
-            sb.append(VMOPTS_OPTIMIZE);
+            sb.append(VMOPTS_OPTIMIZE).append(' ');
         }
-        sb.append(txVmOpts.getText());
+        sb.append(txVmOpts.getText().trim());
         final String strVmOpts = sb.toString();
         if (strVmOpts == null || strVmOpts.isEmpty()) {
             runProps.remove(PROP_RUN_VMOPTIONS);
@@ -528,7 +528,7 @@ public class BootPanel extends javax.swing.JPanel {
             boolean isVmOptsLaunch = runProps.get(PROP_RUN_VMOPTIONS).startsWith(VMOPTS_OPTIMIZE);
             chVmOptsLaunch.setSelected(isVmOptsLaunch);
             if (isVmOptsLaunch) {
-                txVmOpts.setText(runProps.get(PROP_RUN_VMOPTIONS).substring(VMOPTS_OPTIMIZE.length()));
+                txVmOpts.setText(runProps.get(PROP_RUN_VMOPTIONS).substring(VMOPTS_OPTIMIZE.length()).trim());
             } else {
                 txVmOpts.setText(runProps.get(PROP_RUN_VMOPTIONS));
             }
