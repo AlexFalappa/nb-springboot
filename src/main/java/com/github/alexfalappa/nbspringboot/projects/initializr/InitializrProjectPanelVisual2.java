@@ -18,9 +18,11 @@ package com.github.alexfalappa.nbspringboot.projects.initializr;
 import java.awt.Color;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.util.List;
 
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JComboBox;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
@@ -37,13 +39,11 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 
 public class InitializrProjectPanelVisual2 extends JPanel {
 
-    private final InitializrProjectWizardPanel2 panel;
     private final DefaultComboBoxModel<NamedItem> dcbmBootVersion = new DefaultComboBoxModel<>();
     private boolean initialized = false;
 
-    public InitializrProjectPanelVisual2(InitializrProjectWizardPanel2 panel) {
+    public InitializrProjectPanelVisual2() {
         initComponents();
-        this.panel = panel;
         // setup key listener on search field linked to dependencies panel
         FilterFieldListener ffl = new FilterFieldListener(pBootDependencies);
         txFilter.addKeyListener(ffl);
@@ -52,6 +52,47 @@ public class InitializrProjectPanelVisual2 extends JPanel {
         // for some reasons setting the UIManager color directly doesn't work it must be copied in a new Color object
         final Color cr = UIManager.getColor("Panel.background");
         scroller.getViewport().setBackground(new Color(cr.getRGB()));
+    }
+
+    @Override
+    public void addNotify() {
+        super.addNotify();
+        pBootDependencies.requestFocus();
+    }
+
+    /**
+     * Trigger explicit initialization from the given JSON metadata.
+     * <p>
+     * Use the {@link #read(org.openide.WizardDescriptor)} method if inside a wizard.
+     *
+     * @param meta
+     */
+    public void init(JsonNode meta) {
+        pBootDependencies.init(meta);
+        // the following will also trigger adaptation of dependencies to default boot version
+        fillCombo(meta.path("bootVersion"), dcbmBootVersion, cbBootVersion);
+        initialized = true;
+    }
+
+    /**
+     * Fixes the boot version of the dependencies.
+     * <p>
+     * Does nothing if the panel has not been initialized.
+     *
+     * @param bootVersion
+     */
+    public void fixBootVersion(String bootVersion) {
+        if (initialized) {
+            // substitute combo with label
+            javax.swing.GroupLayout layout = (javax.swing.GroupLayout) this.getLayout();
+            layout.replace(cbBootVersion, new JLabel(bootVersion));
+            // adapt dependencies panel
+            pBootDependencies.adaptToBootVersion(bootVersion);
+        }
+    }
+
+    public List<String> getSelectedDeps() {
+        return pBootDependencies.getSelectedDependencies();
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -130,12 +171,6 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     private javax.swing.JTextField txFilter;
     // End of variables declaration//GEN-END:variables
 
-    @Override
-    public void addNotify() {
-        super.addNotify();
-        pBootDependencies.requestFocus();
-    }
-
     boolean valid(WizardDescriptor wizardDescriptor) {
         return true;
     }
@@ -148,10 +183,7 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     void read(WizardDescriptor wd) {
         if (!initialized) {
             final JsonNode meta = (JsonNode) wd.getProperty(WIZ_METADATA);
-            pBootDependencies.init(meta);
-            // the following will also trigger adaptation of dependencies to default boot version
-            fillCombo(meta.path("bootVersion"), dcbmBootVersion, cbBootVersion);
-            initialized = true;
+            init(meta);
         } else {
             pBootDependencies.setSelectedDependenciesString((String) wd.getProperty(WIZ_DEPENDENCIES));
             cbBootVersion.setSelectedItem(wd.getProperty(WIZ_BOOT_VERSION));

@@ -41,7 +41,7 @@ public class InitializrProjectWizardPanel2 implements WizardDescriptor.Panel, Wi
     @Override
     public Component getComponent() {
         if (component == null) {
-            component = new InitializrProjectPanelVisual2(this);
+            component = new InitializrProjectPanelVisual2();
             component.setName(NbBundle.getMessage(InitializrProjectWizardPanel2.class, "LBL_DependenciesStep"));
         }
         return component;
