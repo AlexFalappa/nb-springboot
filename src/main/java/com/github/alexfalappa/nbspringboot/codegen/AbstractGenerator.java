@@ -20,8 +20,11 @@ import java.util.logging.Logger;
 
 import javax.swing.text.JTextComponent;
 
+import org.netbeans.modules.maven.model.pom.Dependency;
+import org.netbeans.modules.maven.model.pom.DependencyContainer;
+import org.netbeans.modules.maven.model.pom.POMModel;
+import org.netbeans.modules.xml.xam.Component;
 import org.netbeans.modules.xml.xam.Model;
-import org.netbeans.modules.xml.xam.dom.AbstractDocumentModel;
 import org.netbeans.spi.editor.codegen.CodeGenerator;
 import org.openide.awt.StatusDisplayer;
 
@@ -33,13 +36,13 @@ import static java.util.logging.Logger.getLogger;
  *
  * @author Alessandro Falappa
  */
-public abstract class AbstractGenerator<T extends AbstractDocumentModel> implements CodeGenerator {
+public abstract class AbstractGenerator implements CodeGenerator {
 
     protected final Logger logger = getLogger(getClass().getName());
     protected final JTextComponent component;
-    protected final T model;
+    protected final POMModel model;
 
-    protected AbstractGenerator(T model, JTextComponent component) {
+    protected AbstractGenerator(POMModel model, JTextComponent component) {
         this.model = model;
         this.component = component;
     }
@@ -85,4 +88,43 @@ public abstract class AbstractGenerator<T extends AbstractDocumentModel> impleme
         int write();
     }
 
+    public static class DependencyModelWriter implements ModelWriter {
+
+        final JTextComponent component;
+        final POMModel model;
+        private final String groupId;
+        private final String artifactId;
+
+        public DependencyModelWriter(JTextComponent component, POMModel model, String groupId, String artifactId) {
+            this.component = component;
+            this.model = model;
+            this.groupId = groupId;
+            this.artifactId = artifactId;
+        }
+
+        @Override
+        public int write() {
+            int pos = component.getCaretPosition();
+            DependencyContainer container = findContainer(pos, model);
+            Dependency dep = container.findDependencyById(groupId, artifactId, null);
+            if (dep == null) {
+                dep = model.getFactory().createDependency();
+                dep.setGroupId(groupId);
+                dep.setArtifactId(artifactId);
+                container.addDependency(dep);
+            }
+            return model.getAccess().findPosition(dep.getPeer());
+        }
+
+        private DependencyContainer findContainer(int pos, POMModel model) {
+            Component dc = model.findComponent(pos);
+            while (dc != null) {
+                if (dc instanceof DependencyContainer) {
+                    return (DependencyContainer) dc;
+                }
+                dc = dc.getParent();
+            }
+            return model.getProject();
+        }
+    }
 }

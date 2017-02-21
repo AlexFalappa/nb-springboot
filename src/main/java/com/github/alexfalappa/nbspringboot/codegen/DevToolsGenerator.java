@@ -23,15 +23,12 @@ import javax.swing.text.JTextComponent;
 import org.netbeans.api.editor.mimelookup.MimeRegistration;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.modules.maven.api.Constants;
-import org.netbeans.modules.maven.model.pom.Dependency;
-import org.netbeans.modules.maven.model.pom.DependencyContainer;
 import org.netbeans.modules.maven.model.pom.POMModel;
-import org.netbeans.modules.xml.xam.Component;
 import org.netbeans.spi.editor.codegen.CodeGenerator;
 import org.openide.filesystems.FileObject;
 import org.openide.util.Lookup;
 
-public class DevToolsGenerator extends AbstractGenerator<POMModel> {
+public class DevToolsGenerator extends AbstractGenerator {
 
     private final String GROUP_ID = "org.springframework.boot";
     private final String ARTIFACT_ID = "spring-boot-devtools";
@@ -69,33 +66,7 @@ public class DevToolsGenerator extends AbstractGenerator<POMModel> {
         assert fo != null;
         org.netbeans.api.project.Project prj = FileOwnerQuery.getOwner(fo);
         assert prj != null;
-        writeModel(new ModelWriter() {
-            @Override
-            public int write() {
-                int pos = component.getCaretPosition();
-                DependencyContainer container = findContainer(pos, model);
-                Dependency dep = container.findDependencyById(GROUP_ID, ARTIFACT_ID, "jar");
-                if (dep == null) {
-                    dep = model.getFactory().createDependency();
-                    dep.setGroupId(GROUP_ID);
-                    dep.setArtifactId(ARTIFACT_ID);
-                    dep.setOptional(Boolean.TRUE);
-                    container.addDependency(dep);
-                }
-                return dep.getModel().getAccess().findPosition(dep.getPeer());
-            }
-
-            private DependencyContainer findContainer(int pos, POMModel model) {
-                Component dc = model.findComponent(pos);
-                while (dc != null) {
-                    if (dc instanceof DependencyContainer) {
-                        return (DependencyContainer) dc;
-                    }
-                    dc = dc.getParent();
-                }
-                return model.getProject();
-            }
-        });
+        writeModel(new DependencyModelWriter(component, model, GROUP_ID, ARTIFACT_ID));
     }
 
 }
