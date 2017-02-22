@@ -49,6 +49,14 @@ import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Logger.getLogger;
 
+/**
+ * Maven POM code generator to add a Spring Boot dependency.
+ * <p>
+ * Uses the metadata exposed by the Spring Initializr service.
+ *
+ * @see InitializrService
+ * @author Alessandro Falappa
+ */
 public class SpringStarterGenerator implements CodeGenerator {
 
     protected final Logger logger = getLogger(getClass().getName());
@@ -89,7 +97,7 @@ public class SpringStarterGenerator implements CodeGenerator {
 
     @Override
     public String getDisplayName() {
-        return "Spring Dependencies...";
+        return "Spring Boot Dependencies...";
     }
 
     @Override
@@ -138,6 +146,7 @@ public class SpringStarterGenerator implements CodeGenerator {
         logger.log(Level.INFO, "Adding Spring Boot dependencies: {0}", selectedDeps.toString());
         JsonNode depsMeta = InitializrService.getInstance().getDependencies(bootVersion);
         Iterator<Map.Entry<String, JsonNode>> it = depsMeta.path("dependencies").fields();
+        int newPos = component.getCaretPosition();
         try {
             if (model.startTransaction()) {
                 DependencyContainer container = model.getProject();
@@ -177,6 +186,7 @@ public class SpringStarterGenerator implements CodeGenerator {
                                 addBom(depsMeta, depInfo.get("bom").asText());
                             }
                             container.addDependency(dep);
+                            newPos = model.getAccess().findPosition(dep.getPeer());
                         }
                     }
                 }
@@ -189,6 +199,7 @@ public class SpringStarterGenerator implements CodeGenerator {
                         StatusDisplayer.IMPORTANCE_ERROR_HIGHLIGHT);
             }
         }
+        component.setCaretPosition(newPos);
     }
 
     private void addBom(JsonNode depsMeta, String bomId) {
