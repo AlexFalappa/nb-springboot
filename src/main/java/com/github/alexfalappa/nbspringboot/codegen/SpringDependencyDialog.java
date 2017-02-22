@@ -17,7 +17,8 @@ package com.github.alexfalappa.nbspringboot.codegen;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.ActionMap;
@@ -55,8 +56,12 @@ public class SpringDependencyDialog extends javax.swing.JDialog {
         });
     }
 
-    public void init(JsonNode meta, String bootVersion) {
+    public void init(JsonNode meta) {
         ippvDeps.init(meta);
+        pack();
+    }
+
+    public void fixBootVersion(String bootVersion) {
         ippvDeps.fixBootVersion(bootVersion);
     }
 
@@ -69,8 +74,8 @@ public class SpringDependencyDialog extends javax.swing.JDialog {
         return returnStatus;
     }
 
-    public List<String> getSelectedDeps() {
-        return ippvDeps.getSelectedDeps();
+    public Set<String> getSelectedDeps() {
+        return new HashSet<>(ippvDeps.getSelectedDeps());
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -115,7 +120,7 @@ public class SpringDependencyDialog extends javax.swing.JDialog {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(cancelButton)
                 .addContainerGap())
-            .addComponent(ippvDeps, javax.swing.GroupLayout.DEFAULT_SIZE, 450, Short.MAX_VALUE)
+            .addComponent(ippvDeps, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
 
         layout.linkSize(javax.swing.SwingConstants.HORIZONTAL, new java.awt.Component[] {cancelButton, okButton});
@@ -123,7 +128,7 @@ public class SpringDependencyDialog extends javax.swing.JDialog {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                .addComponent(ippvDeps, javax.swing.GroupLayout.DEFAULT_SIZE, 245, Short.MAX_VALUE)
+                .addComponent(ippvDeps, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(cancelButton)
