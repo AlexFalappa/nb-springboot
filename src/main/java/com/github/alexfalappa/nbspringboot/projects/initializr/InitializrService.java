@@ -18,8 +18,10 @@ package com.github.alexfalappa.nbspringboot.projects.initializr;
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.net.URI;
+import java.util.Map;
 import java.util.logging.Logger;
 
+import org.apache.commons.collections4.map.LRUMap;
 import org.openide.util.NbPreferences;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -28,6 +30,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
+import org.springframework.web.util.UriTemplate;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,7 +58,7 @@ public class InitializrService {
     private final SimpleClientHttpRequestFactory requestFactory = new SimpleClientHttpRequestFactory();
     private final RestTemplate rt = new RestTemplate(requestFactory);
     private JsonNode metadata;
-    private JsonNode dependencies;
+    private Map<String, JsonNode> dependencyMetaMap = new LRUMap<>(6);
 
     private InitializrService() {
     }
@@ -71,7 +74,7 @@ public class InitializrService {
 
     public void clearCachedValues() {
         metadata = null;
-        dependencies = null;
+        dependencyMetaMap = null;
     }
 
     public JsonNode getMetadata() throws Exception {
@@ -112,11 +115,44 @@ public class InitializrService {
         return metadata;
     }
 
-    public JsonNode getDependencies() throws Exception {
-        if (dependencies == null) {
-            // TODO retrieve and cache dependencies metadata (http://start.spring.io/dependencies)
+    public JsonNode getDependencies(String bootVersion) throws Exception {
+        if (!dependencyMetaMap.containsKey(bootVersion)) {
+            // set connection timeouts
+            timeoutFromPrefs();
+            // prepare request
+            final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
+            UriTemplate template = new UriTemplate(serviceUrl.concat("/dependencies?{bootVersion}"));
+            RequestEntity<Void> req = RequestEntity
+                    .get(template.expand(bootVersion))
+                    .accept(MediaType.valueOf("application/vnd.initializr.v2.1+json"))
+                    .header("User-Agent", REST_USER_AGENT)
+                    .build();
+            // connect
+            logger.log(INFO, "Getting Spring Initializr dependencies metadata from: {0}", template);
+            logger.log(INFO, "Asking metadata as: {0}", REST_USER_AGENT);
+            long start = System.currentTimeMillis();
+            ResponseEntity<String> respEntity = rt.exchange(req, String.class);
+            // analyze response
+            final HttpStatus statusCode = respEntity.getStatusCode();
+            if (statusCode == OK) {
+                ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
+                final JsonNode depMeta = mapper.readTree(respEntity.getBody());
+                logger.log(INFO, "Retrieved Spring Initializr dependencies metadata for boot version {0}. Took {1} msec",
+                        new Object[]{bootVersion, System.currentTimeMillis() - start});
+                if (logger.isLoggable(FINE)) {
+                    logger.fine(mapper.writeValueAsString(depMeta));
+                }
+                dependencyMetaMap.put(bootVersion, depMeta);
+            } else {
+                // log status code
+                final String errMessage = String.format("Spring initializr service connection problem. HTTP status code: %s", statusCode
+                        .toString());
+                logger.severe(errMessage);
+                // throw exception in order to set error message
+                throw new RuntimeException(errMessage);
+            }
         }
-        return dependencies;
+        return dependencyMetaMap.get(bootVersion);
     }
 
     public InputStream getProject(String bootVersion, String mvnGroup, String mvnArtifact, String mvnVersion, String mvnName, String mvnDesc,
