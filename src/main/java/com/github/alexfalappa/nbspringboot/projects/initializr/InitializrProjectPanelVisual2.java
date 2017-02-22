@@ -16,12 +16,13 @@
 package com.github.alexfalappa.nbspringboot.projects.initializr;
 
 import java.awt.Color;
+import java.awt.Font;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.List;
+import java.util.Objects;
 
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
@@ -70,7 +71,7 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     public void init(JsonNode meta) {
         pBootDependencies.init(meta);
         // the following will also trigger adaptation of dependencies to default boot version
-        fillCombo(meta.path("bootVersion"), dcbmBootVersion, cbBootVersion);
+        fillCombo(meta.path("bootVersion"));
         initialized = true;
     }
 
@@ -82,10 +83,13 @@ public class InitializrProjectPanelVisual2 extends JPanel {
      * @param bootVersion
      */
     public void fixBootVersion(String bootVersion) {
+        Objects.requireNonNull(bootVersion);
         if (initialized) {
             // substitute combo with label
             javax.swing.GroupLayout layout = (javax.swing.GroupLayout) this.getLayout();
-            layout.replace(cbBootVersion, new JLabel(bootVersion));
+            final JLabel label = new JLabel(bootVersion);
+            label.setFont(label.getFont().deriveFont(Font.BOLD));
+            layout.replace(cbBootVersion, label);
             // adapt dependencies panel
             pBootDependencies.adaptToBootVersion(bootVersion);
         }
@@ -113,6 +117,7 @@ public class InitializrProjectPanelVisual2 extends JPanel {
 
         org.openide.awt.Mnemonics.setLocalizedText(lBootVersion, org.openide.util.NbBundle.getMessage(InitializrProjectPanelVisual2.class, "InitializrProjectPanelVisual2.lBootVersion.text")); // NOI18N
 
+        cbBootVersion.setModel(dcbmBootVersion);
         cbBootVersion.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 cbBootVersionActionPerformed(evt);
@@ -158,12 +163,12 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     }// </editor-fold>//GEN-END:initComponents
 
     private void cbBootVersionActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_cbBootVersionActionPerformed
-        final NamedItem bootVersionItem = (NamedItem) cbBootVersion.getSelectedItem();
+        final NamedItem bootVersionItem = cbBootVersion.getItemAt(cbBootVersion.getSelectedIndex());
         pBootDependencies.adaptToBootVersion(bootVersionItem.getId());
     }//GEN-LAST:event_cbBootVersionActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JComboBox<String> cbBootVersion;
+    private javax.swing.JComboBox<NamedItem> cbBootVersion;
     private javax.swing.JLabel lBootVersion;
     private javax.swing.JLabel lFilter;
     private com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel pBootDependencies;
@@ -194,14 +199,13 @@ public class InitializrProjectPanelVisual2 extends JPanel {
         // nothing to validate
     }
 
-    private void fillCombo(JsonNode attrNode, DefaultComboBoxModel<NamedItem> comboModel, JComboBox combo) {
+    private void fillCombo(JsonNode attrNode) {
         JsonNode valArray = attrNode.path("values");
-        comboModel.removeAllElements();
+        dcbmBootVersion.removeAllElements();
         for (JsonNode val : valArray) {
-            comboModel.addElement(new NamedItem(val.get("id").asText(), val.get("name").asText()));
+            dcbmBootVersion.addElement(new NamedItem(val.get("id").asText(), val.get("name").asText()));
         }
-        combo.setModel(comboModel);
-        combo.setSelectedItem(new NamedItem(attrNode.path("default").asText(), ""));
+        cbBootVersion.setSelectedItem(new NamedItem(attrNode.path("default").asText(), ""));
     }
 
     private void clearFilter() {
