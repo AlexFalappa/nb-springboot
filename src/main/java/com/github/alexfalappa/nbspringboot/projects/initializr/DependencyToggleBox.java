@@ -136,6 +136,7 @@ public class DependencyToggleBox extends javax.swing.JPanel {
             bReference.setOpaque(false);
             bReference.setContentAreaFilled(false);
             bReference.setBorderPainted(false);
+            bReference.setFocusable(false);
             bReference.putClientProperty("Nimbus.Overrides", uiDef);
             bReference.addActionListener(refActionListener);
             this.add(bReference);
@@ -155,6 +156,7 @@ public class DependencyToggleBox extends javax.swing.JPanel {
             bGuide.setOpaque(false);
             bGuide.setContentAreaFilled(false);
             bGuide.setBorderPainted(false);
+            bGuide.setFocusable(false);
             bGuide.putClientProperty("Nimbus.Overrides", uiDef);
             bGuide.addActionListener(guideActionListener);
             this.add(bGuide);
