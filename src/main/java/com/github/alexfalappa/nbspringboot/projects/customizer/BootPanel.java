@@ -54,7 +54,9 @@ public class BootPanel extends javax.swing.JPanel {
     public static final String PROP_RUN_VMOPTIONS = "run.jvmArguments";
     public static final String PROP_DEBUG_MODE = "Env.DEBUG";
     public static final String PROP_FORCE_COLOR = "Env.SPRING_OUTPUT_ANSI_ENABLED";
+    public static final String PROP_JPDA = "jpda.listen";
     public static final String VMOPTS_OPTIMIZE = "-noverify -XX:TieredStopAtLevel=1";
+    public static final String VMOPTS_DEBUG = "-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address}";
     private static final Logger logger = Logger.getLogger(BootPanel.class.getName());
     private ModelHandle2 mh2;
     private Map<String, String> runProps;
@@ -90,17 +92,40 @@ public class BootPanel extends javax.swing.JPanel {
         // store reference to project properties model and to properties of maven actions for run/debug
         this.mh2 = mh2;
         boolean sbRun = false;
+        boolean sbDebug = false;
         ActionToGoalMapping mapps = mh2.getActionMappings();
         for (NetbeansActionMapping map : mapps.getActions()) {
             if (map.getActionName().equals(ActionProvider.COMMAND_RUN)) {
                 sbRun = map.getGoals().contains("spring-boot:run");
                 this.runProps = map.getProperties();
+                // remove 'exec.args' and 'exec.executable' properties
+                runProps.remove("exec.args");
+                runProps.remove("exec.executable");
             } else if (map.getActionName().equals(ActionProvider.COMMAND_DEBUG)) {
+                sbDebug = map.getGoals().contains("spring-boot:run");
                 this.debugProps = map.getProperties();
+                // ensure debug properties contain 'run.jvmArguments' for debug
+                final String debugVmOpts = debugProps.get(PROP_RUN_VMOPTIONS);
+                if (debugVmOpts == null) {
+                    debugProps.put(PROP_RUN_VMOPTIONS, VMOPTS_DEBUG);
+                } else if (!debugVmOpts.startsWith(VMOPTS_DEBUG)) {
+                    debugProps.put(PROP_RUN_VMOPTIONS, String.format("%s %s", VMOPTS_DEBUG, debugVmOpts));
+                }
+                // ensure debug properties contain 'jpda.listen' prop set to true
+                debugProps.put(PROP_JPDA, "true");
+                // remove 'exec.args' and 'exec.executable' properties
+                debugProps.remove("exec.args");
+                debugProps.remove("exec.executable");
             }
         }
+        if (runProps == null) {
+            logger.warning("No runProps available");
+        }
+        if (debugProps == null) {
+            logger.warning("No debugProps available");
+        }
         // if run trough the maven spring boot plugin
-        if (sbRun) {
+        if (sbRun && sbDebug) {
             // make the widgets reflect the existing cmd line args
             parseCmdLineArgs();
             parseVmOptions();
@@ -514,10 +539,10 @@ public class BootPanel extends javax.swing.JPanel {
         final String strVmOpts = sb.toString();
         if (strVmOpts == null || strVmOpts.isEmpty()) {
             runProps.remove(PROP_RUN_VMOPTIONS);
-            debugProps.remove(PROP_RUN_VMOPTIONS);
+            debugProps.put(PROP_RUN_VMOPTIONS, VMOPTS_DEBUG);
         } else {
             runProps.put(PROP_RUN_VMOPTIONS, strVmOpts);
-            debugProps.put(PROP_RUN_VMOPTIONS, strVmOpts);
+            debugProps.put(PROP_RUN_VMOPTIONS, String.format("%s %s", VMOPTS_DEBUG, strVmOpts));
         }
         mh2.markAsModified(mh2.getActionMappings());
         logger.log(FINER, "VM options: {0}", runProps.get(PROP_RUN_VMOPTIONS));
