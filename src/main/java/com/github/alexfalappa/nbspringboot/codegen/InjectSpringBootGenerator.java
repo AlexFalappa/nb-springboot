@@ -28,10 +28,15 @@ import javax.swing.text.JTextComponent;
 
 import org.netbeans.api.editor.mimelookup.MimeRegistration;
 import org.netbeans.modules.maven.api.Constants;
+import org.netbeans.modules.maven.model.pom.Build;
+import org.netbeans.modules.maven.model.pom.Configuration;
 import org.netbeans.modules.maven.model.pom.Dependency;
 import org.netbeans.modules.maven.model.pom.DependencyContainer;
 import org.netbeans.modules.maven.model.pom.DependencyManagement;
 import org.netbeans.modules.maven.model.pom.POMModel;
+import org.netbeans.modules.maven.model.pom.Parent;
+import org.netbeans.modules.maven.model.pom.Plugin;
+import org.netbeans.modules.maven.model.pom.Project;
 import org.netbeans.modules.maven.model.pom.Repository;
 import org.netbeans.modules.maven.model.pom.RepositoryPolicy;
 import org.netbeans.modules.xml.xam.Model;
@@ -107,64 +112,63 @@ public class InjectSpringBootGenerator implements CodeGenerator {
             StatusDisplayer.getDefault().setStatusText("Cannot parse document. Unable to generate content.");
             return;
         }
+        int newPos = component.getCaretPosition();
         try {
-            JsonNode meta = InitializrService.getInstance().getMetadata();
-            String bootVersion = meta.path("bootVersion").path("default").asText();
-            // TODO add parent pom declaration
-            // TODO add 'java.version' property
-            // TODO add 'spring-boot-starter' compile dependency
-            // TODO add 'spring-boot-starter-test' test dependency
-            // TODO add 'spring-boot-maven-plugin'
-/*
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
-    <groupId>com.example</groupId>
-    <artifactId>demo</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>jar</packaging>
-    <name>demo</name>
-    <description>Demo project for Spring Boot</description>
-    <parent>
-        <groupId>org.springframework.boot</groupId>
-        <artifactId>spring-boot-starter-parent</artifactId>
-        <version>1.5.1.RELEASE</version>
-        <relativePath/>
-        <!-- lookup parent from repository -->
-    </parent>
-    <properties>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <java.version>1.8</java.version>
-    </properties>
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-    </dependencies>
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <fork>true</fork>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
-</project>
-             */
+            if (model.startTransaction()) {
+                JsonNode meta = InitializrService.getInstance().getMetadata();
+                String bootVersion = meta.path("bootVersion").path("default").asText();
+                Project prj = model.getProject();
+                // add parent pom declaration
+                Parent parent = model.getFactory().createParent();
+                parent.setGroupId("org.springframework.boot");
+                parent.setArtifactId("spring-boot-starter-parent");
+                parent.setVersion(bootVersion);
+                prj.setPomParent(parent);
+                // add 'java.version' property deducing it from 'maven.compiler.source' if present
+                final Map<String, String> propertiesMap = prj.getProperties().getProperties();
+                if (propertiesMap.containsKey(PROP_COMPILER_SOURCE)) {
+                    prj.getProperties().setProperty(PROP_JAVAVERSION, propertiesMap.get(PROP_COMPILER_SOURCE));
+                } else {
+                    prj.getProperties().setProperty(PROP_JAVAVERSION, "1.7");
+                }
+                // add 'spring-boot-starter' compile dependency
+                Dependency dep = model.getFactory().createDependency();
+                dep.setGroupId("org.springframework.boot");
+                dep.setArtifactId("spring-boot-starter");
+                prj.addDependency(dep);
+                // add 'spring-boot-starter-test' test dependency
+                dep = model.getFactory().createDependency();
+                dep.setGroupId("org.springframework.boot");
+                dep.setArtifactId("spring-boot-starter-test");
+                dep.setScope("test");
+                prj.addDependency(dep);
+                // add 'spring-boot-maven-plugin'
+                Build build = model.getFactory().createBuild();
+                Plugin plugin = model.getFactory().createPlugin();
+                plugin.setGroupId("org.springframework.boot");
+                plugin.setArtifactId("spring-boot-maven-plugin");
+                Configuration config = model.getFactory().createConfiguration();
+                config.setSimpleParameter("fork", "true");
+                plugin.setConfiguration(config);
+                build.addPlugin(plugin);
+                prj.setBuild(build);
+                // position caret at newly added parent declaration
+                newPos = model.getAccess().findPosition(parent.getPeer());
+            }
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
+        } finally {
+            try {
+                model.endTransaction();
+            } catch (IllegalStateException ex) {
+                StatusDisplayer.getDefault().setStatusText("Cannot write to the model: " + ex.getMessage(),
+                        StatusDisplayer.IMPORTANCE_ERROR_HIGHLIGHT);
+            }
         }
+        component.setCaretPosition(newPos);
     }
+    private static final String PROP_JAVAVERSION = "java.version";
+    private static final String PROP_COMPILER_SOURCE = "maven.compiler.source";
 
     private void addDeps(String bootVersion, final Set<String> selectedDeps) throws Exception {
         logger.log(Level.INFO, "Adding Spring Boot dependencies: {0}", selectedDeps.toString());

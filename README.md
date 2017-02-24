@@ -32,7 +32,9 @@ Alternatively download the desired `nbm` package from https://github.com/AlexFal
     * `Controller` annotated classes (Spring MVC)
     * `RestController` annotated classes (Spring MVC)
     * interfaces extending `Repository` (Spring Data)
-* Additional code generator in `pom.xml` files to add Spring Boot dependencies (dependency metadata is taken from the _Spring Initializr_ web service)
+* Additional code generators in `pom.xml` files:
+    * Add Spring Boot dependencies (dependency metadata is taken from the _Spring Initializr_ web service)
+    * Add basic Spring Boot setup
 * Toolbar button to trigger _Spring Boot_ devtools reload
 * Specific _Spring Boot_ project properties page to:
     * Specify command line run arguments and launch VM options
@@ -66,6 +68,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 * __1.5__ (??? 2017): Work In Progress
     * The _Spring Initializr_ project wizard now supports documentation links recently added to the _Spring Initializr_ web service
     * The old code generators for Maven `pom.xml` files have been superseded by a new code generator for adding a set of Spring Boot dependencies exploiting the _Spring Initializr_ service metadata
+    * New code generator for Maven `pom.xml` to add a basic Spring Boot project setup to generic Maven projects
 
 * __1.4__ (January 2017): Better application launch
     * Improved project properties panel:
