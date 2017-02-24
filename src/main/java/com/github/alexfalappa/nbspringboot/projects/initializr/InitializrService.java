@@ -102,7 +102,6 @@ public class InitializrService {
                 if (logger.isLoggable(FINE)) {
                     logger.fine(mapper.writeValueAsString(metadata));
                 }
-                return metadata;
             } else {
                 // log status code
                 final String errMessage = String.format("Spring initializr service connection problem. HTTP status code: %s", statusCode
