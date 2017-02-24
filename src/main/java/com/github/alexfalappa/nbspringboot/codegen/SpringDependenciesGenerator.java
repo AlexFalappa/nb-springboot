@@ -57,18 +57,18 @@ import static java.util.logging.Logger.getLogger;
  * @see InitializrService
  * @author Alessandro Falappa
  */
-public class SpringStarterGenerator implements CodeGenerator {
+public class SpringDependenciesGenerator implements CodeGenerator {
 
     protected final Logger logger = getLogger(getClass().getName());
     protected final JTextComponent component;
     protected final POMModel model;
 
-    public SpringStarterGenerator(POMModel model, JTextComponent component) {
+    public SpringDependenciesGenerator(POMModel model, JTextComponent component) {
         this.model = model;
         this.component = component;
     }
 
-    @MimeRegistration(mimeType = Constants.POM_MIME_TYPE, service = CodeGenerator.Factory.class, position = 1025)
+    @MimeRegistration(mimeType = Constants.POM_MIME_TYPE, service = CodeGenerator.Factory.class, position = 1000)
     public static class Factory implements CodeGenerator.Factory {
 
         @Override
@@ -88,7 +88,7 @@ public class SpringStarterGenerator implements CodeGenerator {
                 }
                 if (found) {
                     JTextComponent component = context.lookup(JTextComponent.class);
-                    toRet.add(new SpringStarterGenerator(model, component));
+                    toRet.add(new SpringDependenciesGenerator(model, component));
                 }
             }
             return toRet;
