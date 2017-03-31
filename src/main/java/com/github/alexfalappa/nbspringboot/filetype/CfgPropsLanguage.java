@@ -17,6 +17,7 @@ package com.github.alexfalappa.nbspringboot.filetype;
 
 import org.netbeans.api.lexer.Language;
 import org.netbeans.modules.csl.spi.DefaultLanguageConfig;
+import org.netbeans.modules.csl.spi.LanguageRegistration;
 
 import com.github.alexfalappa.nbspringboot.filetype.lexer.CfgPropsTokenId;
 
@@ -24,6 +25,7 @@ import com.github.alexfalappa.nbspringboot.filetype.lexer.CfgPropsTokenId;
  *
  * @author Alessandro Falappa
  */
+@LanguageRegistration(mimeType = CfgPropsLanguage.MIME_TYPE)
 public class CfgPropsLanguage extends DefaultLanguageConfig {
 
     public static final String MIME_TYPE = "text/application+properties"; //NOI18N
@@ -35,12 +37,12 @@ public class CfgPropsLanguage extends DefaultLanguageConfig {
 
     @Override
     public String getDisplayName() {
-        return "INI"; //NOI18N
+        return "Spring Boot properties"; //NOI18N
     }
 
     @Override
     public String getLineCommentPrefix() {
-        return ";"; //NOI18N
+        return "#"; //NOI18N
     }
 
 }

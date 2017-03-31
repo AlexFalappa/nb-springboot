@@ -104,7 +104,7 @@ public class CfgPropsDataObject extends MultiDataObject {
 
     public CfgPropsDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {
         super(pf, loader);
-        registerEditor(CfgPropsLanguage.MIME_TYPE, false);
+        registerEditor(CfgPropsLanguage.MIME_TYPE, true);
     }
 
     @Override
@@ -124,7 +124,7 @@ public class CfgPropsDataObject extends MultiDataObject {
             iconBase = "com/github/alexfalappa/nbspringboot/springboot-logo.png",
             persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED,
             mimeType = CfgPropsLanguage.MIME_TYPE,
-            preferredID = "ini.source",
+            preferredID = "bootcfgprops.source",
             position = 1
     )
     public static MultiViewEditorElement createMultiViewEditorElement(Lookup context) {

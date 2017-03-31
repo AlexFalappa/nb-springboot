@@ -55,12 +55,12 @@ public class CfgPropsLexer implements Lexer<CfgPropsTokenId> {
                 state = 0;
                 return info.tokenFactory().createToken(CfgPropsTokenId.COMMENT);
             }
-            if (i == ':') {
+            if (i == '=') {
                 i = input.read();
             }
             while (i != '\n'
                     && i != '\r'
-                    && i != ':'
+                    && i != '='
                     && i != LexerInput.EOF) {
                 i = input.read();
             }
@@ -73,7 +73,7 @@ public class CfgPropsLexer implements Lexer<CfgPropsTokenId> {
             if (i != LexerInput.EOF) {
                 input.backup(1);
             }
-            state = i == ':' ? 1 : 0;
+            state = i == '=' ? 1 : 0;
             if (input.readLength() == 0) {
                 return null;
             }

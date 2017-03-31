@@ -130,6 +130,11 @@
             <version>${netbeans.api.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-editor-errorstripe</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>
+        <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-api-java-classpath</artifactId>
             <version>${netbeans.api.version}</version>
