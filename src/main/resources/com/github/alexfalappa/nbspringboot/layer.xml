@@ -14,7 +14,9 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
+
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
+
 <filesystem>
     <folder name="Templates">
         <folder name="springboot">
@@ -22,15 +24,16 @@ limitations under the License.
             <attr name="position" intvalue="805"/>
         </folder>
     </folder>
+
     <folder name="Editors">
         <folder name="text">
             <folder name="application+properties">
-                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.github.alexfalappa.nbspringboot.filetype.lexer.Bundle"/>
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.github.alexfalappa.nbspringboot.filetype.Bundle"/>
                 <folder name="FontsColors">
                     <folder name="NetBeans">
                         <folder name="Defaults">
                             <file name="FontAndColors.xml" url="filetype/FontAndColors.xml">
-                                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.github.alexfalappa.nbspringboot.filetype.lexer.Bundle"/>
+                                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.github.alexfalappa.nbspringboot.filetype.Bundle"/>
                             </file>
                         </folder>
                     </folder>
