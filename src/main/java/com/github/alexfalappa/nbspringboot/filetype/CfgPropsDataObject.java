@@ -36,16 +36,16 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
 @Messages({
-    "LBL_AppProps_LOADER=Spring Boot configuration properties"
+    "MimeTypeDisplayName=Spring Boot Configuration Properties"
 })
 @MIMEResolver.Registration(
-        displayName = "Spring Boot Configuration Properties",
+        displayName = "#MimeTypeDisplayName",
         resource = "cfgprops-resolver.xml"
 )
 @DataObject.Registration(
         mimeType = CfgPropsLanguage.MIME_TYPE,
         iconBase = "com/github/alexfalappa/nbspringboot/springboot-logo.png",
-        displayName = "#LBL_AppProps_LOADER",
+        displayName = "#MimeTypeDisplayName",
         position = 300
 )
 @ActionReferences({

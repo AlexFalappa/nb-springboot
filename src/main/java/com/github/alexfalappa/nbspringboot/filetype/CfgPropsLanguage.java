@@ -37,7 +37,7 @@ public class CfgPropsLanguage extends DefaultLanguageConfig {
 
     @Override
     public String getDisplayName() {
-        return "Spring Boot properties"; //NOI18N
+        return Bundle.MimeTypeDisplayName();
     }
 
     @Override
