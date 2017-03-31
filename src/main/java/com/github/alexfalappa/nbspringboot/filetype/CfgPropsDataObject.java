@@ -17,16 +17,23 @@ package com.github.alexfalappa.nbspringboot.filetype;
 
 import java.io.IOException;
 
+import org.netbeans.core.spi.multiview.MultiViewElement;
+import org.netbeans.core.spi.multiview.text.MultiViewEditorElement;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.MIMEResolver;
+import org.openide.loaders.DataNode;
 import org.openide.loaders.DataObject;
 import org.openide.loaders.DataObjectExistsException;
 import org.openide.loaders.MultiDataObject;
 import org.openide.loaders.MultiFileLoader;
+import org.openide.nodes.Children;
+import org.openide.nodes.Node;
+import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
+import org.openide.windows.TopComponent;
 
 @Messages({
     "LBL_AppProps_LOADER=Spring Boot configuration properties"
@@ -36,7 +43,7 @@ import org.openide.util.NbBundle.Messages;
         resource = "cfgprops-resolver.xml"
 )
 @DataObject.Registration(
-        mimeType = "text/application+properties",
+        mimeType = CfgPropsLanguage.MIME_TYPE,
         iconBase = "com/github/alexfalappa/nbspringboot/springboot-logo.png",
         displayName = "#LBL_AppProps_LOADER",
         position = 300
@@ -97,12 +104,31 @@ public class CfgPropsDataObject extends MultiDataObject {
 
     public CfgPropsDataObject(FileObject pf, MultiFileLoader loader) throws DataObjectExistsException, IOException {
         super(pf, loader);
-        registerEditor("text/application+properties", false);
+        registerEditor(CfgPropsLanguage.MIME_TYPE, false);
+    }
+
+    @Override
+    protected Node createNodeDelegate() {
+        DataNode node = new DataNode(this, Children.LEAF, getLookup());
+        return node;
     }
 
     @Override
     protected int associateLookup() {
         return 1;
+    }
+
+    @Messages("Source=&Source")
+    @MultiViewElement.Registration(
+            displayName = "#Source",
+            iconBase = "com/github/alexfalappa/nbspringboot/springboot-logo.png",
+            persistenceType = TopComponent.PERSISTENCE_ONLY_OPENED,
+            mimeType = CfgPropsLanguage.MIME_TYPE,
+            preferredID = "ini.source",
+            position = 1
+    )
+    public static MultiViewEditorElement createMultiViewEditorElement(Lookup context) {
+        return new MultiViewEditorElement(context);
     }
 
 }

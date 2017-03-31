@@ -14,9 +14,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 -->
-
 <!DOCTYPE filesystem PUBLIC "-//NetBeans//DTD Filesystem 1.2//EN" "http://www.netbeans.org/dtds/filesystem-1_2.dtd">
-
 <filesystem>
     <folder name="Templates">
         <folder name="springboot">
@@ -24,4 +22,45 @@ limitations under the License.
             <attr name="position" intvalue="805"/>
         </folder>
     </folder>
+    <folder name="Editors">
+        <folder name="text">
+            <folder name="application+properties">
+                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.github.alexfalappa.nbspringboot.filetype.lexer.Bundle"/>
+                <folder name="FontsColors">
+                    <folder name="NetBeans">
+                        <folder name="Defaults">
+                            <file name="FontAndColors.xml" url="filetype/FontAndColors.xml">
+                                <attr name="SystemFileSystem.localizingBundle" stringvalue="com.github.alexfalappa.nbspringboot.filetype.lexer.Bundle"/>
+                            </file>
+                        </folder>
+                    </folder>
+                    <!--
+                    <folder name="CityLights">
+                        <folder name="Defaults">
+                            <file name="FontAndColors-citylights.xml" url="FontAndColors-citylights.xml">
+                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.languages.ini.resources.Bundle"/>
+                            </file>
+                        </folder>
+                    </folder>
+                    <folder name="BlueTheme">
+                        <folder name="Defaults">
+                            <file name="FontAndColors-bluetheme.xml" url="FontAndColors-bluetheme.xml">
+                                <attr name="SystemFileSystem.localizingBundle" stringvalue="org.netbeans.modules.languages.ini.resources.Bundle"/>
+                            </file>
+                        </folder>
+                    </folder>
+                    -->
+                </folder>
+            </folder>
+        </folder>
+    </folder>
+
+    <folder name="OptionsDialog">
+        <folder name="PreviewExamples">
+            <folder name="text">
+                <file name="application+properties" url="filetype/cfgPropsExample.properties"/>
+            </folder>
+        </folder>
+    </folder>
+
 </filesystem>
