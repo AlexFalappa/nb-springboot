@@ -17,12 +17,13 @@ limitations under the License.
 <!DOCTYPE fontscolors PUBLIC "-//NetBeans//DTD Editor Fonts and Colors settings 1.1//EN" "http://www.netbeans.org/dtds/EditorFontsColors-1_1.dtd">
 <fontscolors>
     <fontcolor foreColor="ff969696" name="comment"/>
-    <fontcolor foreColor="ff509a05" name="section_delim">
+    <fontcolor foreColor="ff509a05" name="dot">
         <font style="bold"/>
     </fontcolor>
-    <fontcolor foreColor="ff509a05" name="section"/>
+    <fontcolor foreColor="ff509a05" name="array_idx"/>
+    <fontcolor foreColor="ff509a05" name="bracket"/>
     <fontcolor foreColor="ff09097c" name="key" />
-    <fontcolor foreColor="ff000000" name="equals"/>
+    <fontcolor foreColor="ff000000" name="separator"/>
     <fontcolor foreColor="ffd15a00" name="value" />
     <fontcolor name="whitespace" />
     <fontcolor name="error" default="error"/>

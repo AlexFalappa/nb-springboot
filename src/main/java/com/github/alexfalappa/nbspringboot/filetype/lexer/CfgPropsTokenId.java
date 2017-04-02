@@ -32,10 +32,11 @@ import com.github.alexfalappa.nbspringboot.filetype.CfgPropsLanguage;
  */
 public enum CfgPropsTokenId implements TokenId {
     COMMENT("comment"), // NOI18N
-    SECTION_DELIM("section_delim"), // NOI18N
-    SECTION("section"), // NOI18N
+    DOT("dot"), // NOI18N
+    ARRAY_IDX("array_idx"), // NOI18N
+    BRACKET("bracket"), // NOI18N
     KEY("key"), // NOI18N
-    EQUALS("equals"), // NOI18N
+    SEPARATOR("separator"), // NOI18N
     VALUE("value"), // NOI18N
     WHITESPACE("whitespace"), // NOI18N
     ERROR("error"); // NOI18N
