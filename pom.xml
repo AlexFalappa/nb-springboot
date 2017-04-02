@@ -224,6 +224,18 @@
             <artifactId>org-netbeans-core-multiview</artifactId>
             <version>${netbeans.api.version}</version>
         </dependency>
+        <!--remove the following deps-->
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-editor</artifactId>
+            <version>RELEASE81</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-editor-lib</artifactId>
+            <version>RELEASE81</version>
+        </dependency>
+        <!--remove above deps-->
         <dependency>
             <groupId>org.netbeans.contrib.yenta</groupId>
             <artifactId>api</artifactId>
