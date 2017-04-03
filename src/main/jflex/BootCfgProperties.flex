@@ -1,8 +1,25 @@
 /*
+ * Copyright 2017 Alessandro Falappa.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/*
  * Based on Java Properties lexer found on https://upsource.jetbrains.com/idea-ce/file/idea-ce-083f663c71f761cb0cb398a2d5ae4a42163507d1/plugins/properties/src/com/intellij/lang/properties/parsing/Properties.flex
  */
 package com.github.alexfalappa.nbspringboot.filetype.lexer;
 
+import org.netbeans.spi.lexer.LexerInput;
+import org.netbeans.spi.lexer.LexerRestartInfo;
 import com.github.alexfalappa.nbspringboot.filetype.lexer.CfgPropsTokenId;
 
 
@@ -12,9 +29,87 @@ import com.github.alexfalappa.nbspringboot.filetype.lexer.CfgPropsTokenId;
 %line
 %column
 %unicode
-%function nextToken
+%function nextTokenId
 %type CfgPropsTokenId
 %{
+    private StateStack stack = new StateStack();
+
+    private LexerInput input;
+
+    public BootCfgPropertiesScanner(LexerRestartInfo info) {
+        this.input = info.input();
+        if(info.state() != null) {
+            //reset state
+            setState((LexerState) info.state());
+        } else {
+            zzState = zzLexicalState = YYINITIAL;
+            stack.clear();
+        }
+
+    }
+
+    public static final class LexerState  {
+        final StateStack stack;
+        /** the current state of the DFA */
+        final int zzState;
+        /** the current lexical state */
+        final int zzLexicalState;
+
+        LexerState(StateStack stack, int zzState, int zzLexicalState) {
+            this.stack = stack;
+            this.zzState = zzState;
+            this.zzLexicalState = zzLexicalState;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            }
+            if (obj == null || obj.getClass() != this.getClass()) {
+                return false;
+            }
+            LexerState state = (LexerState) obj;
+            return (this.stack.equals(state.stack)
+                && (this.zzState == state.zzState)
+                && (this.zzLexicalState == state.zzLexicalState));
+        }
+
+        @Override
+        public int hashCode() {
+            int hash = 11;
+            hash = 31 * hash + this.zzState;
+            hash = 31 * hash + this.zzLexicalState;
+            if (stack != null) {
+                hash = 31 * hash + this.stack.hashCode();
+            }
+            return hash;
+        }
+    }
+
+    public LexerState getState() {
+        return new LexerState(stack.createClone(), zzState, zzLexicalState);
+    }
+
+    public void setState(LexerState state) {
+        this.stack.copyFrom(state.stack);
+        this.zzState = state.zzState;
+        this.zzLexicalState = state.zzLexicalState;
+    }
+
+    protected int getZZLexicalState() {
+        return zzLexicalState;
+    }
+
+    protected void popState() {
+        yybegin(stack.popStack());
+    }
+
+    protected void pushState(final int state) {
+        stack.pushStack(getZZLexicalState());
+        yybegin(state);
+    }
+
     private void dump(){
         System.out.format("[%2d;%2d] '%s'  ",yyline,yycolumn,yytext());
     }

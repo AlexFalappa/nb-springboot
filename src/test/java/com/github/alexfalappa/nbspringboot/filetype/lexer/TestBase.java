@@ -23,7 +23,11 @@ public class TestBase {
         try {
             try (StringReader sr = new StringReader(input)) {
                 BootCfgPropertiesScanner bcps = new BootCfgPropertiesScanner(sr);
-                bcps.nextToken();
+                CfgPropsTokenId tok = bcps.nextTokenId();
+                while (tok != null) {
+                    System.out.println(tok);
+                    tok = bcps.nextTokenId();
+                }
                 fail("Parsed while it should not");
             }
         } catch (IOException ex) {
@@ -38,10 +42,10 @@ public class TestBase {
         try {
             try (StringReader sr = new StringReader(input)) {
                 BootCfgPropertiesScanner bcps = new BootCfgPropertiesScanner(sr);
-                CfgPropsTokenId tok = bcps.nextToken();
+                CfgPropsTokenId tok = bcps.nextTokenId();
                 while (tok != null) {
                     System.out.println(tok);
-                    tok = bcps.nextToken();
+                    tok = bcps.nextTokenId();
                 }
             }
         } catch (IOException ex) {
