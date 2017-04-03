@@ -287,6 +287,23 @@
                 </executions>
             </plugin>
             <plugin>
+                <groupId>de.jflex</groupId>
+                <artifactId>jflex-maven-plugin</artifactId>
+                <version>1.6.1</version>
+                <configuration>
+                    <lexDefinitions>
+                        <lexDefinition>src/main/jflex/BootCfgProperties.flex</lexDefinition>
+                    </lexDefinitions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
                 <version>4.1</version>
