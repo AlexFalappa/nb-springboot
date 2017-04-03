@@ -70,7 +70,7 @@ public class BasicTest extends TestBase {
     @Test
     public void testSingleDottedColon() throws URISyntaxException, IOException {
         System.out.println("\n-- single dotted colon");
-        parseMatch("prefix.key:val");
+        parseMatch("prefix.middle.key:val");
     }
 
     @Test
