@@ -27,7 +27,10 @@ END_OF_LINE_COMMENT=("#"|"!")[^\r\n]*
 KEY_SEPARATOR=[:=]
 KEY_SEPARATOR_SPACE=\ \t
 KEY_DOT="."
-KEY_CHARACTER=[^:=\ \n\r\t\f\\.] | "\\"{CRLF} | "\\".
+KEY_OBRACKET="["
+KEY_CBRACKET="]"
+KEY_ARR_IDX=0|[1-9][0-9]*
+KEY_CHARACTER=[^:\[\]=\ \n\r\t\f\\.] | "\\"{CRLF} | "\\".
 FIRST_VALUE_CHARACTER_BEFORE_SEP={VALUE_CHARACTER}
 VALUE_CHARACTERS_BEFORE_SEP=([^:=\ \t\n\r\f\\] | "\\"{CRLF} | "\\".)({VALUE_CHARACTER}*)
 VALUE_CHARACTERS_AFTER_SEP=([^\ \t\n\r\f\\] | "\\"{CRLF} | "\\".)({VALUE_CHARACTER}*)
@@ -45,6 +48,9 @@ VALUE_CHARACTERS_AFTER_SEP=([^\ \t\n\r\f\\] | "\\"{CRLF} | "\\".)({VALUE_CHARACT
 
 <IN_KEY> {
     {KEY_DOT}                            { yybegin(IN_KEY); dump(); return CfgPropsTokenId.DOT; }
+    {KEY_OBRACKET}                       { yybegin(IN_KEY); dump(); return CfgPropsTokenId.BRACKET; }
+    {KEY_ARR_IDX}                        { yybegin(IN_KEY); dump(); return CfgPropsTokenId.ARRAY_IDX; }
+    {KEY_CBRACKET}                       { yybegin(IN_KEY); dump(); return CfgPropsTokenId.BRACKET; }
     {KEY_CHARACTER}+                     { yybegin(IN_KEY); dump(); return CfgPropsTokenId.KEY; }
     {KEY_SEPARATOR_SPACE}+               { yybegin(IN_KEY_VALUE_SEPARATOR_HEAD); dump(); return CfgPropsTokenId.WHITESPACE; }
     {KEY_SEPARATOR}                      { yybegin(IN_KEY_VALUE_SEPARATOR_TAIL); dump(); return CfgPropsTokenId.SEPARATOR; }
