@@ -22,15 +22,25 @@ import org.netbeans.spi.lexer.LexerInput;
 import org.netbeans.spi.lexer.LexerRestartInfo;
 import com.github.alexfalappa.nbspringboot.filetype.lexer.CfgPropsTokenId;
 
-
 %%
 
 %class BootCfgPropertiesScanner
-%line
-%column
-%unicode
-%function nextTokenId
 %type CfgPropsTokenId
+%function nextTokenId
+%unicode
+%char
+
+%eofval{
+        if(input.readLength() > 0) {
+            // backup eof
+            input.backup(1);
+            //and return the text as error token
+            return CfgPropsTokenId.ERROR;
+        } else {
+            return null;
+        }
+%eofval}
+
 %{
     private StateStack stack = new StateStack();
 
@@ -110,9 +120,7 @@ import com.github.alexfalappa.nbspringboot.filetype.lexer.CfgPropsTokenId;
         yybegin(state);
     }
 
-    private void dump(){
-        System.out.format("[%2d;%2d] '%s'  ",yyline,yycolumn,yytext());
-    }
+   /* end user code */
 %}
 
 CRLF=\R
@@ -137,37 +145,37 @@ VALUE_CHARACTERS_AFTER_SEP=([^\ \t\n\r\f\\] | "\\"{CRLF} | "\\".)({VALUE_CHARACT
 
 %%
 
-<YYINITIAL> {END_OF_LINE_COMMENT}        { yybegin(YYINITIAL); dump(); return CfgPropsTokenId.COMMENT; }
+<YYINITIAL> {END_OF_LINE_COMMENT}        { yybegin(YYINITIAL); return CfgPropsTokenId.COMMENT; }
 
-<YYINITIAL> {KEY_CHARACTER}+             { yybegin(IN_KEY); dump(); return CfgPropsTokenId.KEY; }
+<YYINITIAL> {KEY_CHARACTER}+             { yybegin(IN_KEY); return CfgPropsTokenId.KEY; }
 
 <IN_KEY> {
-    {KEY_DOT}                            { yybegin(IN_KEY); dump(); return CfgPropsTokenId.DOT; }
-    {KEY_OBRACKET}                       { yybegin(IN_KEY); dump(); return CfgPropsTokenId.BRACKET; }
-    {KEY_ARR_IDX}                        { yybegin(IN_KEY); dump(); return CfgPropsTokenId.ARRAY_IDX; }
-    {KEY_CBRACKET}                       { yybegin(IN_KEY); dump(); return CfgPropsTokenId.BRACKET; }
-    {KEY_CHARACTER}+                     { yybegin(IN_KEY); dump(); return CfgPropsTokenId.KEY; }
-    {KEY_SEPARATOR_SPACE}+               { yybegin(IN_KEY_VALUE_SEPARATOR_HEAD); dump(); return CfgPropsTokenId.WHITESPACE; }
-    {KEY_SEPARATOR}                      { yybegin(IN_KEY_VALUE_SEPARATOR_TAIL); dump(); return CfgPropsTokenId.SEPARATOR; }
+    {KEY_DOT}                            { yybegin(IN_KEY); return CfgPropsTokenId.DOT; }
+    {KEY_OBRACKET}                       { yybegin(IN_KEY); return CfgPropsTokenId.BRACKET; }
+    {KEY_ARR_IDX}                        { yybegin(IN_KEY); return CfgPropsTokenId.ARRAY_IDX; }
+    {KEY_CBRACKET}                       { yybegin(IN_KEY); return CfgPropsTokenId.BRACKET; }
+    {KEY_CHARACTER}+                     { yybegin(IN_KEY); return CfgPropsTokenId.KEY; }
+    {KEY_SEPARATOR_SPACE}+               { yybegin(IN_KEY_VALUE_SEPARATOR_HEAD); return CfgPropsTokenId.WHITESPACE; }
+    {KEY_SEPARATOR}                      { yybegin(IN_KEY_VALUE_SEPARATOR_TAIL); return CfgPropsTokenId.SEPARATOR; }
 }
 
 <IN_KEY_VALUE_SEPARATOR_HEAD> {
-    {KEY_SEPARATOR_SPACE}+               { yybegin(IN_KEY_VALUE_SEPARATOR_HEAD); dump(); return CfgPropsTokenId.WHITESPACE; }
-    {KEY_SEPARATOR}                      { yybegin(IN_KEY_VALUE_SEPARATOR_TAIL); dump(); return CfgPropsTokenId.SEPARATOR; }
-    {VALUE_CHARACTERS_BEFORE_SEP}        { yybegin(YYINITIAL); dump(); return CfgPropsTokenId.VALUE; }
-    {CRLF}{WHITE_SPACE_CHAR}*            { yybegin(YYINITIAL); dump(); return CfgPropsTokenId.WHITESPACE; }
+    {KEY_SEPARATOR_SPACE}+               { yybegin(IN_KEY_VALUE_SEPARATOR_HEAD); return CfgPropsTokenId.WHITESPACE; }
+    {KEY_SEPARATOR}                      { yybegin(IN_KEY_VALUE_SEPARATOR_TAIL); return CfgPropsTokenId.SEPARATOR; }
+    {VALUE_CHARACTERS_BEFORE_SEP}        { yybegin(YYINITIAL); return CfgPropsTokenId.VALUE; }
+    {CRLF}{WHITE_SPACE_CHAR}*            { yybegin(YYINITIAL); return CfgPropsTokenId.WHITESPACE; }
 }
 
 <IN_KEY_VALUE_SEPARATOR_TAIL> {
-    {KEY_SEPARATOR_SPACE}+               { yybegin(IN_KEY_VALUE_SEPARATOR_TAIL); dump(); return CfgPropsTokenId.WHITESPACE; }
-    {VALUE_CHARACTERS_AFTER_SEP}         { yybegin(YYINITIAL); dump(); return CfgPropsTokenId.VALUE; }
-    {CRLF}{WHITE_SPACE_CHAR}*            { yybegin(YYINITIAL); dump(); return CfgPropsTokenId.WHITESPACE; }
+    {KEY_SEPARATOR_SPACE}+               { yybegin(IN_KEY_VALUE_SEPARATOR_TAIL); return CfgPropsTokenId.WHITESPACE; }
+    {VALUE_CHARACTERS_AFTER_SEP}         { yybegin(YYINITIAL); return CfgPropsTokenId.VALUE; }
+    {CRLF}{WHITE_SPACE_CHAR}*            { yybegin(YYINITIAL); return CfgPropsTokenId.WHITESPACE; }
 }
 
-<IN_VALUE> {VALUE_CHARACTER}+            { yybegin(YYINITIAL); dump(); return CfgPropsTokenId.VALUE; }
+<IN_VALUE> {VALUE_CHARACTER}+            { yybegin(YYINITIAL); return CfgPropsTokenId.VALUE; }
 
-<IN_VALUE> {CRLF}{WHITE_SPACE_CHAR}*     { yybegin(YYINITIAL); dump(); return CfgPropsTokenId.WHITESPACE; }
+<IN_VALUE> {CRLF}{WHITE_SPACE_CHAR}*     { yybegin(YYINITIAL); return CfgPropsTokenId.WHITESPACE; }
 
-{WHITE_SPACE_CHAR}+                      { dump(); return CfgPropsTokenId.WHITESPACE; }
+{WHITE_SPACE_CHAR}+                      { return CfgPropsTokenId.WHITESPACE; }
 
-[^]                                      { dump(); return CfgPropsTokenId.ERROR; }
+[^]                                      { return CfgPropsTokenId.ERROR; }

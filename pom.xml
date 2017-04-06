@@ -13,6 +13,7 @@
     <properties>
         <netbeans.api.version>RELEASE81</netbeans.api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <skipTests>true</skipTests>
         <spring.version>4.3.7.RELEASE</spring.version>
         <springboot.version>1.5.2.RELEASE</springboot.version>
     </properties>
@@ -299,11 +300,13 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--use only when generating scanner class
             <plugin>
                 <groupId>de.jflex</groupId>
-                <artifactId>jflex-maven-plugin</artifactId>
-                <version>1.6.1</version>
+                <artifactId>maven-jflex-plugin</artifactId>
+                <version>1.4.3</version>
                 <configuration>
+                    <skeleton>src/main/jflex/skeleton.netbeans</skeleton>
                     <lexDefinitions>
                         <lexDefinition>src/main/jflex/BootCfgProperties.flex</lexDefinition>
                     </lexDefinitions>
@@ -316,6 +319,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
