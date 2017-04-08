@@ -20,6 +20,7 @@ limitations under the License.
 <MIME-resolver>
     <file>
         <name name="application" substring="true"/>
+        <name name="bootstrap" substring="true"/>
         <ext name="properties"/>
         <resolver mime="text/application+properties"/>
     </file>
