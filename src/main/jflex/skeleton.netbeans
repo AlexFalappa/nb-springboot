@@ -1,3 +1,4 @@
+
   /** This character denotes the end of file */
   public static final int YYEOF = LexerInput.EOF;
 
@@ -14,7 +15,7 @@
 
   /* error messages for the codes above */
   private static final String ZZ_ERROR_MSG[] = {
-    "Unkown internal scanner error",
+    "Unknown internal scanner error",
     "Error: could not match input",
     "Error: pushback value was too large"
   };
@@ -68,15 +69,17 @@
 
   /** zzAtEOF == true <=> the scanner is at the EOF */
   private boolean zzAtEOF = false;
+ 
+ /** 
+   * The number of occupied positions in zzBuffer beyond zzEndRead.
+   * When a lead/high surrogate has been read from the input stream
+   * into the final zzBuffer position, this will have a value of 1;
+   * otherwise, it will have a value of 0.
+   */
+  private int zzFinalHighSurrogate = 0;
 
 --- user class code
 
-  /**
-   * Creates a new scanner
-   * There is also a java.io.InputStream version of this constructor.
-   *
-   * @param   in  the java.io.Reader to read input from.
-   */
 --- constructor declaration
 
 
@@ -101,6 +104,8 @@
    * <b>cannot</b> be reused (internal buffer is discarded and lost).
    * Lexical state is set to <tt>ZZ_INITIAL</tt>.
    *
+   * Internal scan buffer is resized down to its initial length, if it has grown.
+   *
    * @param reader   the new input stream 
    */
   public final void yyreset(java.io.Reader reader) {
@@ -109,8 +114,11 @@
     zzAtEOF  = false;
     zzEndRead = zzStartRead = 0;
     zzCurrentPos = zzMarkedPos = zzPushbackPos = 0;
+    zzFinalHighSurrogate = 0;
     yyline = yychar = yycolumn = 0;
     zzLexicalState = YYINITIAL;
+    if (zzBuffer.length > ZZ_BUFFERSIZE)
+      zzBuffer = new char[ZZ_BUFFERSIZE];
   }
 
 
@@ -266,15 +274,15 @@
       }
 --- char count update
 
---- actions
-        default: 
-          if (zzInput == YYEOF) 
-            //zzAtEOF = true;
+      if (zzInput == YYEOF) {
+        //zzAtEOF = true;
 --- eofvalue
-          
-          else {
+      }
+      else {
+--- actions
+          default:
 --- no match
-          }
+        }
       }
     }
   }

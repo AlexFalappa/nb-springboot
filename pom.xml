@@ -303,8 +303,8 @@
             <!--use only when generating scanner class
             <plugin>
                 <groupId>de.jflex</groupId>
-                <artifactId>maven-jflex-plugin</artifactId>
-                <version>1.4.3</version>
+                <artifactId>jflex-maven-plugin</artifactId>
+                <version>1.6.1</version>
                 <configuration>
                     <skeleton>src/main/jflex/skeleton.netbeans</skeleton>
                     <lexDefinitions>
