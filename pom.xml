@@ -13,6 +13,7 @@
     <properties>
         <netbeans.api.version>RELEASE81</netbeans.api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <skipTests>true</skipTests>
         <spring.version>4.3.7.RELEASE</spring.version>
         <springboot.version>1.5.2.RELEASE</springboot.version>
     </properties>
@@ -121,6 +122,21 @@
         </dependency>
         <dependency>
             <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-csl-api</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-lexer</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.modules</groupId>
+            <artifactId>org-netbeans-modules-editor-errorstripe</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-api-java-classpath</artifactId>
             <version>${netbeans.api.version}</version>
         </dependency>
@@ -205,10 +221,40 @@
             <version>${netbeans.api.version}</version>
         </dependency>
         <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-core-multiview</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>
+        <!--remove the following deps-->
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-editor</artifactId>
+            <version>RELEASE81</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-editor-lib</artifactId>
+            <version>RELEASE81</version>
+        </dependency>
+        <!--remove above deps-->
+        <dependency>
             <groupId>org.netbeans.contrib.yenta</groupId>
             <artifactId>api</artifactId>
             <version>1.1</version>
             <scope>provided</scope>
+        </dependency>
+        <!--test dependencies-->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.12</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest-core</artifactId>
+            <version>1.3</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -254,6 +300,26 @@
                     </execution>
                 </executions>
             </plugin>
+            <!--use only when generating scanner class
+            <plugin>
+                <groupId>de.jflex</groupId>
+                <artifactId>jflex-maven-plugin</artifactId>
+                <version>1.6.1</version>
+                <configuration>
+                    <skeleton>src/main/jflex/skeleton.netbeans</skeleton>
+                    <lexDefinitions>
+                        <lexDefinition>src/main/jflex/BootCfgProperties.flex</lexDefinition>
+                    </lexDefinitions>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
