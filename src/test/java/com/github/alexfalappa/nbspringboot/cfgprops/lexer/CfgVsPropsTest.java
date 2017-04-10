@@ -1,4 +1,4 @@
-package com.github.alexfalappa.nbspringboot.filetype.lexer;
+package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
 
 import java.io.IOException;
 import java.io.InputStream;

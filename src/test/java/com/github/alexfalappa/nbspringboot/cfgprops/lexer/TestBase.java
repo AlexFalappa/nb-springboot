@@ -1,4 +1,7 @@
-package com.github.alexfalappa.nbspringboot.filetype.lexer;
+package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
+
+import com.github.alexfalappa.nbspringboot.cfgprops.lexer.BootCfgPropertiesScanner;
+import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsTokenId;
 
 import java.io.IOException;
 import java.io.StringReader;

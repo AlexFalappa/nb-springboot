@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.cfgeditor;
+package com.github.alexfalappa.nbspringboot.cfgprops.completion;
 
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -39,6 +39,7 @@ import org.springframework.boot.configurationprocessor.metadata.ConfigurationMet
 import org.springframework.boot.configurationprocessor.metadata.ItemHint;
 import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 
+import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static java.util.logging.Level.FINER;
@@ -58,7 +59,7 @@ import static java.util.logging.Level.FINER;
  * @author Aggelos Karalias
  * @author Alessandro Falappa
  */
-@MimeRegistration(mimeType = "text/x-properties", service = CompletionProvider.class)
+@MimeRegistration(mimeType = CfgPropsLanguage.MIME_TYPE, service = CompletionProvider.class)
 public class BootConfigurationCompletionProvider implements CompletionProvider {
 
     private static final Logger logger = Logger.getLogger(BootConfigurationCompletionProvider.class.getName());

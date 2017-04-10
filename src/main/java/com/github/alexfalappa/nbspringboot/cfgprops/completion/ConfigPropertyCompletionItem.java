@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.cfgeditor;
+package com.github.alexfalappa.nbspringboot.cfgprops.completion;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -57,7 +57,7 @@ import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 public class ConfigPropertyCompletionItem implements CompletionItem {
 
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
-            "com/github/alexfalappa/nbspringboot/cfgeditor/springboot-property.png"));
+            "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-property.png"));
     private final ItemMetadata configurationItem;
     private final SpringBootService bootService;
     private final int caretOffset;

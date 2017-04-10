@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.filetype;
+package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
 
 import org.netbeans.api.lexer.Language;
 import org.netbeans.modules.csl.spi.DefaultLanguageConfig;
 import org.netbeans.modules.csl.spi.LanguageRegistration;
-
-import com.github.alexfalappa.nbspringboot.filetype.lexer.CfgPropsTokenId;
+import org.openide.util.NbBundle;
 
 /**
  *
@@ -37,7 +36,7 @@ public class CfgPropsLanguage extends DefaultLanguageConfig {
 
     @Override
     public String getDisplayName() {
-        return Bundle.MimeTypeDisplayName();
+        return NbBundle.getMessage(getClass(), MIME_TYPE);
     }
 
     @Override

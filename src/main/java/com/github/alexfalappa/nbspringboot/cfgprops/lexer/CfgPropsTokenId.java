@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.filetype.lexer;
+package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
 
 import java.util.Collection;
 import java.util.EnumSet;
@@ -24,7 +24,7 @@ import org.netbeans.spi.lexer.LanguageHierarchy;
 import org.netbeans.spi.lexer.Lexer;
 import org.netbeans.spi.lexer.LexerRestartInfo;
 
-import com.github.alexfalappa.nbspringboot.filetype.CfgPropsLanguage;
+import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
 
 /**
  *

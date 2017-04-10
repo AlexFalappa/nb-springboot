@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.filetype;
+package com.github.alexfalappa.nbspringboot.cfgprops.filetype;
+
+
+import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
 
 import java.io.IOException;
 

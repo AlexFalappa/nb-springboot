@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.cfgeditor;
+package com.github.alexfalappa.nbspringboot.cfgprops.completion;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -50,7 +50,7 @@ public class ConfigValueCompletionItem implements CompletionItem {
 
     private final ItemHint.ValueHint hint;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
-            "com/github/alexfalappa/nbspringboot/cfgeditor/springboot-value.png"));
+            "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-value.png"));
     private final int caretOffset;
     private final int dotOffset;
 
