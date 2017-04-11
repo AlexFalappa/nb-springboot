@@ -157,6 +157,16 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
             ProjectManager.getDefault().clearNonProjectCache();
             // Always open top dir as a project:
             resultSet.add(dir);
+            // open main class file
+            String mainClass = String.format("src/main/java/%s/%c%sApplication.java",
+                    pkg.replace('.', '/'),
+                    Character.toUpperCase(mvnName.charAt(0)),
+                    mvnName.substring(1)
+            );
+            FileObject foMain = dir.getFileObject(mainClass);
+            if (foMain != null) {
+                resultSet.add(foMain);
+            }
             // trigger download of dependencies
             Project prj = ProjectManager.getDefault().findProject(dir);
             if (prj != null) {
@@ -344,9 +354,11 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
 
     private void createNbActions(String pkg, String mvnName, FileObject dir) throws IOException {
         // build main class string
-        StringBuilder mainClass = new StringBuilder(pkg).append('.');
-        mainClass.append(mvnName.substring(0, 1).toUpperCase()).append(mvnName.substring(1));
-        mainClass.append("Application");
+        StringBuilder mainClass = new StringBuilder(pkg);
+        mainClass.append('.')
+                .append(Character.toUpperCase(mvnName.charAt(0)))
+                .append(mvnName.substring(1))
+                .append("Application");
         // retrieve default options from prefs
         final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
         final boolean bForceColor = prefs.getBoolean(PREF_FORCE_COLOR_OUTPUT, true);

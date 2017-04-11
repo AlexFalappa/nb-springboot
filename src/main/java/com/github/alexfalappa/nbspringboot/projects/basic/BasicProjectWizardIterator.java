@@ -105,6 +105,11 @@ public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInst
         ProjectManager.getDefault().clearNonProjectCache();
         // Always open top dir as a project:
         resultSet.add(dir);
+        // open main class
+        FileObject foMain = dir.getFileObject("src/main/java/com/example/BasicApplication.java");
+        if (foMain != null) {
+            resultSet.add(foMain);
+        }
         handle.progress(3);
         // trigger download of dependencies
         Project prj = ProjectManager.getDefault().findProject(dir);
