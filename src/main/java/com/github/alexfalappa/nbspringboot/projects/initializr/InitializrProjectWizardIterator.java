@@ -147,6 +147,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
                     XMLUtil.write(pomDoc, out, "UTF-8");
                 }
             }
+            ProjectManager.getDefault().clearNonProjectCache();
             // Always open top dir as a project:
             resultSet.add(dir);
             // Look for nested projects to open as well:
@@ -170,6 +171,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
     @Override
     public void initialize(WizardDescriptor wiz) {
         this.wiz = wiz;
+        wiz.putProperty("NewProjectWizard_Title", NbBundle.getMessage(InitializrProjectWizardIterator.class, "LBL_WizardTitle")); //NOI18N
         index = 0;
         // set other defaults
         this.wiz.putProperty(WIZ_USE_SB_MVN_PLUGIN, true);

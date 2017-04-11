@@ -23,7 +23,6 @@ import java.io.OutputStream;
 import java.text.MessageFormat;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.prefs.Preferences;
@@ -117,6 +116,7 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
     @Override
     public void initialize(WizardDescriptor wiz) {
         this.wiz = wiz;
+        wiz.putProperty("NewProjectWizard_Title", NbBundle.getMessage(BasicProjectWizardIterator.class, "LBL_WizardTitle")); //NOI18N
         index = 0;
         panels = createPanels();
         // Make sure list of steps is accurate.
@@ -223,15 +223,12 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
         final String strVmOpts = Utils.vmOptsFromPrefs();
         // create nbactions.xml from template
         FileObject foTmpl = Templates.getTemplate(wiz);
-        List<FileObject> list = new FileBuilder(foTmpl, dir)
+        new FileBuilder(foTmpl, dir)
                 .name("nbactions")
                 .param("forceColor", bForceColor)
                 .param("manualRestart", bManualRestart)
                 .param("vmOpts", strVmOpts)
                 .build();
-        if (!list.isEmpty()) {
-            System.out.println(FileUtil.getFileDisplayName(list.get(0)));
-        }
     }
 
 }
