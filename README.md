@@ -73,6 +73,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
     * The _Spring Initializr_ project wizard now supports documentation links recently added to the _Spring Initializr_ web service
     * The old code generators for Maven `pom.xml` files have been superseded by a new code generator for adding a set of Spring Boot dependencies exploiting the _Spring Initializr_ service metadata
     * New code generator for Maven `pom.xml` to add a basic Spring Boot project setup to generic Maven projects
+    * Project wizards open the main class and trigger async download of dependencies after creation
     * Metadata downloaded from the *Spring Initializr* web service are now cached
     * Upgrade to Spring Boot 1.5.2
 
