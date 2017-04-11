@@ -76,6 +76,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
     * Project wizards open the main class and trigger async download of dependencies after creation
     * Metadata downloaded from the *Spring Initializr* web service are now cached
     * Upgrade to Spring Boot 1.5.2
+    * [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/8?closed=1)
 
 * __1.4__ (January 2017): Better application launch
     * Improved project properties panel:
