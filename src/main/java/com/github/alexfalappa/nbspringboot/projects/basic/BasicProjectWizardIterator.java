@@ -31,6 +31,7 @@ import java.util.zip.ZipInputStream;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 
+import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.templates.FileBuilder;
@@ -62,7 +63,7 @@ import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_REST
         position = 255
 )
 @Messages("BasicSpringbootProject_displayName=Spring Boot basic project")
-public class BasicProjectWizardIterator implements WizardDescriptor.InstantiatingIterator {
+public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInstantiatingIterator {
 
     private int index;
     private WizardDescriptor.Panel[] panels;
@@ -88,19 +89,23 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
     }
 
     @Override
-    public Set<FileObject> instantiate() throws IOException {
+    public Set<FileObject> instantiate(ProgressHandle handle) throws IOException {
+        handle.start(5);
         Set<FileObject> resultSet = new LinkedHashSet<>();
         File dirF = FileUtil.normalizeFile((File) wiz.getProperty("projdir"));
         dirF.mkdirs();
+        handle.progress(1);
         FileObject dir = FileUtil.toFileObject(dirF);
         FileObject template = URLMapper.findFileObject(getClass().getResource("BasicSpringbootProject.zip"));
         unZipFile(template.getInputStream(), dir);
+        handle.progress(2);
         // create nbactions.xml file
         createNbActions(dir);
         // clear non project cache
         ProjectManager.getDefault().clearNonProjectCache();
         // Always open top dir as a project:
         resultSet.add(dir);
+        handle.progress(3);
         // trigger download of dependencies
         Project prj = ProjectManager.getDefault().findProject(dir);
         if (prj != null) {
@@ -109,6 +114,7 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
                 mvn.downloadDependencyAndJavadocSource(false);
             }
         }
+        handle.progress(4);
         // remember folder for creation of new projects
         File parent = dirF.getParentFile();
         if (parent != null && parent.exists()) {
@@ -233,6 +239,11 @@ public class BasicProjectWizardIterator implements WizardDescriptor.Instantiatin
                 .param("manualRestart", bManualRestart)
                 .param("vmOpts", strVmOpts)
                 .build();
+    }
+
+    @Override
+    public Set instantiate() throws IOException {
+        throw new UnsupportedOperationException("Not supported.");
     }
 
 }

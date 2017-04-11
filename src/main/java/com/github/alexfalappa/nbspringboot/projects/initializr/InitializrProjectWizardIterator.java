@@ -33,6 +33,7 @@ import java.util.zip.ZipInputStream;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 
+import org.netbeans.api.progress.ProgressHandle;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.templates.FileBuilder;
@@ -88,7 +89,7 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
         position = 256
 )
 @Messages("InitializrSpringbootProject_displayName=Spring Boot Initializr project")
-public class InitializrProjectWizardIterator implements WizardDescriptor.InstantiatingIterator {
+public class InitializrProjectWizardIterator implements WizardDescriptor.ProgressInstantiatingIterator {
 
     private int index;
     private WizardDescriptor.Panel[] panels;
@@ -102,7 +103,8 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
     }
 
     @Override
-    public Set<FileObject> instantiate(/*ProgressHandle handle*/) throws IOException {
+    public Set<FileObject> instantiate(ProgressHandle handle) throws IOException {
+        handle.start(5);
         Set<FileObject> resultSet = new LinkedHashSet<>();
         File dirF = FileUtil.normalizeFile((File) wiz.getProperty(WIZ_PROJ_LOCATION));
         dirF.mkdirs();
@@ -119,12 +121,15 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
         String lang = ((NamedItem) wiz.getProperty(WIZ_LANGUAGE)).getId();
         String javaVersion = ((NamedItem) wiz.getProperty(WIZ_JAVA_VERSION)).getId();
         String deps = (String) wiz.getProperty(WIZ_DEPENDENCIES);
+        handle.progress(1);
         try {
             // invoke initializr webservice
             InputStream stream = InitializrService.getInstance()
                     .getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
+            handle.progress(2);
             // unzip response
             unZipFile(stream, dir, (boolean) wiz.getProperty(WIZ_REMOVE_MVN_WRAPPER));
+            handle.progress(3);
             // parse pom.xml
             final FileObject foPom = dir.getFileObject("pom.xml");
             Document pomDoc = XMLUtil.parse(new InputSource(foPom.getInputStream()), false, false, null, null);
@@ -160,6 +165,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
                     mvn.downloadDependencyAndJavadocSource(false);
                 }
             }
+            handle.progress(4);
             // remember folder for creation of new projects
             File parent = dirF.getParentFile();
             if (parent != null && parent.exists()) {
@@ -395,5 +401,10 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
                 }
             }
         }
+    }
+
+    @Override
+    public Set instantiate() throws IOException {
+        throw new UnsupportedOperationException("Not supported.");
     }
 }
