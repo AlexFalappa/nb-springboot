@@ -98,7 +98,7 @@ public class InjectSpringBootGenerator implements CodeGenerator {
 
     @Override
     public String getDisplayName() {
-        return "Add Spring Boot basic setup";
+        return "Inject Spring Boot Setup";
     }
 
     @Override
