@@ -23,7 +23,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.MessageFormat;
-import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
 import java.util.Set;
@@ -34,9 +33,11 @@ import java.util.zip.ZipInputStream;
 import javax.swing.JComponent;
 import javax.swing.event.ChangeListener;
 
+import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectManager;
 import org.netbeans.api.templates.FileBuilder;
 import org.netbeans.api.templates.TemplateRegistration;
+import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.spi.project.ui.support.ProjectChooser;
 import org.netbeans.spi.project.ui.templates.support.Templates;
 import org.openide.WizardDescriptor;
@@ -147,17 +148,19 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Instant
                     XMLUtil.write(pomDoc, out, "UTF-8");
                 }
             }
+            // clear non project cache
             ProjectManager.getDefault().clearNonProjectCache();
             // Always open top dir as a project:
             resultSet.add(dir);
-            // Look for nested projects to open as well:
-            Enumeration<? extends FileObject> e = dir.getFolders(true);
-            while (e.hasMoreElements()) {
-                FileObject subfolder = e.nextElement();
-                if (ProjectManager.getDefault().isProject(subfolder)) {
-                    resultSet.add(subfolder);
+            // trigger download of dependencies
+            Project prj = ProjectManager.getDefault().findProject(dir);
+            if (prj != null) {
+                final NbMavenProject mvn = prj.getLookup().lookup(NbMavenProject.class);
+                if (mvn != null) {
+                    mvn.downloadDependencyAndJavadocSource(false);
                 }
             }
+            // remember folder for creation of new projects
             File parent = dirF.getParentFile();
             if (parent != null && parent.exists()) {
                 ProjectChooser.setProjectsFolder(parent);
