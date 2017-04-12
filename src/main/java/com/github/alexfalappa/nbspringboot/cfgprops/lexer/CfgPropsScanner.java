@@ -28,7 +28,7 @@ import org.netbeans.spi.lexer.LexerRestartInfo;
  * <a href="http://www.jflex.de/">JFlex</a> 1.6.1 from the specification file
  * <tt>/home/sasha/Sviluppo/gitrepos/nb-springboot/src/main/jflex/BootCfgProperties.flex</tt>
  */
-class BootCfgPropertiesScanner {
+class CfgPropsScanner {
 
     /** This character denotes the end of file */
     public static final int YYEOF = LexerInput.EOF;
@@ -279,7 +279,7 @@ class BootCfgPropertiesScanner {
 
     private LexerInput input;
 
-    public BootCfgPropertiesScanner(LexerRestartInfo info) {
+    public CfgPropsScanner(LexerRestartInfo info) {
         this.input = info.input();
         if (info.state() != null) {
             //reset state
@@ -360,7 +360,7 @@ class BootCfgPropertiesScanner {
      *
      * @param in the java.io.Reader to read input from.
      */
-    BootCfgPropertiesScanner(java.io.Reader in) {
+    CfgPropsScanner(java.io.Reader in) {
         this.zzReader = in;
     }
 

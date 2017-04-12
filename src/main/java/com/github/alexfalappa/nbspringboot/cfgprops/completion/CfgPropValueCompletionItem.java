@@ -46,7 +46,7 @@ import org.springframework.boot.configurationprocessor.metadata.ItemHint;
  *
  * @author Alessandro Falappa
  */
-public class ConfigValueCompletionItem implements CompletionItem {
+public class CfgPropValueCompletionItem implements CompletionItem {
 
     private final ItemHint.ValueHint hint;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
@@ -54,7 +54,7 @@ public class ConfigValueCompletionItem implements CompletionItem {
     private final int caretOffset;
     private final int dotOffset;
 
-    public ConfigValueCompletionItem(ItemHint.ValueHint hint, int dotOffset, int caretOffset) {
+    public CfgPropValueCompletionItem(ItemHint.ValueHint hint, int dotOffset, int caretOffset) {
         this.hint = hint;
         this.dotOffset = dotOffset;
         this.caretOffset = caretOffset;
@@ -107,7 +107,7 @@ public class ConfigValueCompletionItem implements CompletionItem {
         return new AsyncCompletionTask(new AsyncCompletionQuery() {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                completionResultSet.setDocumentation(new ConfigValueCompletionDocumentation(ConfigValueCompletionItem.this));
+                completionResultSet.setDocumentation(new CfgPropValueCompletionDocumentation(CfgPropValueCompletionItem.this));
                 completionResultSet.finish();
             }
         });

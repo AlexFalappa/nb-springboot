@@ -16,7 +16,7 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
 
 /**
- * Helper class to persiste a JFlex scanner state.
+ * Helper class used to save a JFlex scanner state.
  * <p>
  * Taken from NB languages.ini module.
  *

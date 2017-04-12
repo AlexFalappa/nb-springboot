@@ -27,11 +27,11 @@ import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 /**
  * @author Alessandro Falappa
  */
-public class ConfigValueCompletionDocumentation implements CompletionDocumentation {
+public class CfgPropValueCompletionDocumentation implements CompletionDocumentation {
 
-    private final ConfigValueCompletionItem item;
+    private final CfgPropValueCompletionItem item;
 
-    public ConfigValueCompletionDocumentation(ConfigValueCompletionItem item) {
+    public CfgPropValueCompletionDocumentation(CfgPropValueCompletionItem item) {
         this.item = item;
     }
 

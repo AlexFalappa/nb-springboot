@@ -24,7 +24,7 @@ import com.github.alexfalappa.nbspringboot.filetype.lexer.CfgPropsTokenId;
 
 %%
 
-%class BootCfgPropertiesScanner
+%class CfgPropsScanner
 %type CfgPropsTokenId
 %function nextTokenId
 %unicode
@@ -46,7 +46,7 @@ import com.github.alexfalappa.nbspringboot.filetype.lexer.CfgPropsTokenId;
 
     private LexerInput input;
 
-    public BootCfgPropertiesScanner(LexerRestartInfo info) {
+    public CfgPropsScanner(LexerRestartInfo info) {
         this.input = info.input();
         if(info.state() != null) {
             //reset state

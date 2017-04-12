@@ -1,6 +1,6 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
 
-import com.github.alexfalappa.nbspringboot.cfgprops.lexer.BootCfgPropertiesScanner;
+import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsScanner;
 import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsTokenId;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class TestBase {
         System.out.println(input);
         try {
             try (StringReader sr = new StringReader(input)) {
-                BootCfgPropertiesScanner bcps = new BootCfgPropertiesScanner(sr);
+                CfgPropsScanner bcps = new CfgPropsScanner(sr);
                 CfgPropsTokenId tok = bcps.nextTokenId();
                 while (tok != null) {
                     System.out.println(tok);
@@ -44,7 +44,7 @@ public class TestBase {
         System.out.println(input);
         try {
             try (StringReader sr = new StringReader(input)) {
-                BootCfgPropertiesScanner bcps = new BootCfgPropertiesScanner(sr);
+                CfgPropsScanner bcps = new CfgPropsScanner(sr);
                 CfgPropsTokenId tok = bcps.nextTokenId();
                 while (tok != null) {
                     System.out.println(tok);

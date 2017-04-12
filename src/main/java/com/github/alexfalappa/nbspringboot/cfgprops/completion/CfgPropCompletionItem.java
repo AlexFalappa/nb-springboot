@@ -54,7 +54,7 @@ import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
  * @author Aggelos Karalias
  * @author Alessandro Falappa
  */
-public class ConfigPropertyCompletionItem implements CompletionItem {
+public class CfgPropCompletionItem implements CompletionItem {
 
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-property.png"));
@@ -65,7 +65,7 @@ public class ConfigPropertyCompletionItem implements CompletionItem {
     private boolean overwrite;
     private final String type;
 
-    public ConfigPropertyCompletionItem(ItemMetadata configurationItem, SpringBootService bootService, int propStartOffset, int caretOffset) {
+    public CfgPropCompletionItem(ItemMetadata configurationItem, SpringBootService bootService, int propStartOffset, int caretOffset) {
         this.overwrite = false;
         this.configurationItem = configurationItem;
         if (configurationItem.getType() != null) {
@@ -148,7 +148,7 @@ public class ConfigPropertyCompletionItem implements CompletionItem {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int i) {
                 completionResultSet
-                        .setDocumentation(new ConfigPropertyCompletionDocumentation(ConfigPropertyCompletionItem.this, bootService));
+                        .setDocumentation(new CfgPropCompletionDocumentation(CfgPropCompletionItem.this, bootService));
                 completionResultSet.finish();
             }
         });

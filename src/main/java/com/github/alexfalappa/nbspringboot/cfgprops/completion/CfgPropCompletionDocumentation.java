@@ -41,18 +41,18 @@ import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 /**
  * The Spring Boot Configuration implementation of CompletionDocumentation.
  *
- * It utilizes a {@link ConfigPropertyCompletionItem} to display the documentation for that item and actions like opening the source type of
+ * It utilizes a {@link CfgPropCompletionItem} to display the documentation for that item and actions like opening the source type of
  * a property in editor and navigate to a general spring boot configuration documentation page.
  *
  * @author Aggelos Karalias
  * @author Alessandro Falappa
  */
-public class ConfigPropertyCompletionDocumentation implements CompletionDocumentation {
+public class CfgPropCompletionDocumentation implements CompletionDocumentation {
 
-    private final ConfigPropertyCompletionItem item;
+    private final CfgPropCompletionItem item;
     private final SpringBootService bootService;
 
-    public ConfigPropertyCompletionDocumentation(ConfigPropertyCompletionItem item, SpringBootService sbs) {
+    public CfgPropCompletionDocumentation(CfgPropCompletionItem item, SpringBootService sbs) {
         this.item = item;
         this.bootService = sbs;
     }

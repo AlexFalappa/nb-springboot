@@ -33,11 +33,11 @@ import org.netbeans.spi.lexer.TokenFactory;
  */
 public class CfgPropsLexer implements Lexer<CfgPropsTokenId> {
 
-    private final BootCfgPropertiesScanner scanner;
+    private final CfgPropsScanner scanner;
     private final TokenFactory<CfgPropsTokenId> tokenFactory;
 
     CfgPropsLexer(LexerRestartInfo<CfgPropsTokenId> info) {
-        scanner = new BootCfgPropertiesScanner(info);
+        scanner = new CfgPropsScanner(info);
         tokenFactory = info.tokenFactory();
     }
 

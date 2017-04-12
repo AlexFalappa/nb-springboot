@@ -60,9 +60,9 @@ import static java.util.logging.Level.FINER;
  * @author Alessandro Falappa
  */
 @MimeRegistration(mimeType = CfgPropsLanguage.MIME_TYPE, service = CompletionProvider.class)
-public class BootConfigurationCompletionProvider implements CompletionProvider {
+public class CfgPropsCompletionProvider implements CompletionProvider {
 
-    private static final Logger logger = Logger.getLogger(BootConfigurationCompletionProvider.class.getName());
+    private static final Logger logger = Logger.getLogger(CfgPropsCompletionProvider.class.getName());
     private static final Pattern PATTERN_PROP_NAME = Pattern.compile("[^=\\s]+");
 
     @Override
@@ -135,7 +135,7 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
         long mark = System.currentTimeMillis();
         logger.log(FINER, "Completing property name: {0}", filter);
         for (ItemMetadata item : sbs.queryPropertyMetadata(filter)) {
-            completionResultSet.addItem(new ConfigPropertyCompletionItem(item, sbs, startOffset, caretOffset));
+            completionResultSet.addItem(new CfgPropCompletionItem(item, sbs, startOffset, caretOffset));
         }
         final long elapsed = System.currentTimeMillis() - mark;
         logger.log(FINER, "Property completion of ''{0}'' took: {1} msecs", new Object[]{filter, elapsed});
@@ -146,7 +146,7 @@ public class BootConfigurationCompletionProvider implements CompletionProvider {
         long mark = System.currentTimeMillis();
         logger.log(FINER, "Completing property value: {0}", filter);
         for (ItemHint.ValueHint hint : sbs.queryHintMetadata(propName, filter)) {
-            completionResultSet.addItem(new ConfigValueCompletionItem(hint, startOffset, caretOffset));
+            completionResultSet.addItem(new CfgPropValueCompletionItem(hint, startOffset, caretOffset));
         }
         final long elapsed = System.currentTimeMillis() - mark;
         logger.log(FINER, "Value completion of ''{0}'' on ''{1}'' took: {2} msecs", new Object[]{filter, propName, elapsed});
