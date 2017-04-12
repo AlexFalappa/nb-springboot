@@ -21,6 +21,7 @@ import org.netbeans.modules.csl.spi.LanguageRegistration;
 import org.openide.util.NbBundle;
 
 /**
+ * NetBeans language definition for Spring Boot configuration properties.
  *
  * @author Alessandro Falappa
  */

@@ -24,9 +24,10 @@ import org.netbeans.spi.lexer.LanguageHierarchy;
 import org.netbeans.spi.lexer.Lexer;
 import org.netbeans.spi.lexer.LexerRestartInfo;
 
-import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
-
 /**
+ * Configuration properties token definitions.
+ * <p>
+ * Also defines NB Lexer API LanguageHierarchy.
  *
  * @author Alessandro Falappa
  */

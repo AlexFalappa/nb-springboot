@@ -25,6 +25,9 @@ import org.netbeans.spi.lexer.LexerRestartInfo;
 import org.netbeans.spi.lexer.TokenFactory;
 
 /**
+ * NB Lexer for Spring Boot configuration properties.
+ * <p>
+ * Bridges the JFlex generated scanner with NB lexing API.
  *
  * @author Alessandro Falappa
  */
