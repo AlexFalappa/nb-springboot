@@ -67,7 +67,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 ## Changelog
 
 * __1.5.1__ (??? 2017): Work In Progress
-    * ...
+    * Upgrade to Spring Boot 1.5.3
 
 * __1.5__ (Apr 2017): Dependencies management and configuration properties editor
     * Configuration properties files:
