@@ -66,7 +66,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 ## Changelog
 
-* __1.6__ (??? 2017): Work In Progress
+* __1.5.1__ (??? 2017): Work In Progress
     * ...
 
 * __1.5__ (Apr 2017): Dependencies management and configuration properties editor
