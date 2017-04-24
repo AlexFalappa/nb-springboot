@@ -104,11 +104,11 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
 
     @Override
     public Set<FileObject> instantiate(ProgressHandle handle) throws IOException {
-        handle.start(5);
+        handle.start(4);
         Set<FileObject> resultSet = new LinkedHashSet<>();
         File dirF = FileUtil.normalizeFile((File) wiz.getProperty(WIZ_PROJ_LOCATION));
         dirF.mkdirs();
-        FileObject dir = FileUtil.toFileObject(dirF);
+        FileObject foDir = FileUtil.toFileObject(dirF);
         // prepare service invocation params
         String bootVersion = ((NamedItem) wiz.getProperty(WIZ_BOOT_VERSION)).getId();
         String mvnGroup = (String) wiz.getProperty(WIZ_GROUP);
@@ -128,16 +128,16 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
                     .getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
             handle.progress(2);
             // unzip response
-            unZipFile(stream, dir, (boolean) wiz.getProperty(WIZ_REMOVE_MVN_WRAPPER));
+            unZipFile(stream, foDir, (boolean) wiz.getProperty(WIZ_REMOVE_MVN_WRAPPER));
             handle.progress(3);
             // parse pom.xml
-            final FileObject foPom = dir.getFileObject("pom.xml");
+            final FileObject foPom = foDir.getFileObject("pom.xml");
             Document pomDoc = XMLUtil.parse(new InputSource(foPom.getInputStream()), false, false, null, null);
             boolean pomModified = false;
             // manage run/debug trough maven plugin
             if ((boolean) wiz.getProperty(WIZ_USE_SB_MVN_PLUGIN)) {
                 // create nbactions.xml file with custom maven actions configuration
-                createNbActions(pkg, mvnName, dir);
+                createNbActions(pkg, mvnName, foDir);
                 // modify pom.xml content and add forking flag to plugin configuration
                 pomConfigMvnPlugin(pomDoc);
                 pomModified = true;
@@ -156,26 +156,17 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
             // clear non project cache
             ProjectManager.getDefault().clearNonProjectCache();
             // Always open top dir as a project:
-            resultSet.add(dir);
-            // open main class file
-            String mainClass = String.format("src/main/java/%s/%c%sApplication.java",
-                    pkg.replace('.', '/'),
-                    Character.toUpperCase(mvnName.charAt(0)),
-                    mvnName.substring(1)
-            );
-            FileObject foMain = dir.getFileObject(mainClass);
-            if (foMain != null) {
-                resultSet.add(foMain);
-            }
+            resultSet.add(foDir);
+            // open pom.xml file
+            resultSet.add(foPom);
             // trigger download of dependencies
-            Project prj = ProjectManager.getDefault().findProject(dir);
+            Project prj = ProjectManager.getDefault().findProject(foDir);
             if (prj != null) {
                 final NbMavenProject mvn = prj.getLookup().lookup(NbMavenProject.class);
                 if (mvn != null) {
                     mvn.downloadDependencyAndJavadocSource(false);
                 }
             }
-            handle.progress(4);
             // remember folder for creation of new projects
             File parent = dirF.getParentFile();
             if (parent != null && parent.exists()) {
@@ -184,6 +175,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }
+        handle.finish();
         return resultSet;
     }
 
