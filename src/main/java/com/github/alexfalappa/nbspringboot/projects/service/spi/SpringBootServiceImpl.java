@@ -89,12 +89,11 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
     }
 
-    @Override
-    public void init() {
-        logger.info("Initializing SpringBoot service");
+    private void init() {
         if (mvnPrj == null) {
             return;
         }
+        logger.info("Initializing SpringBoot service");
         // check maven project has a dependency starting with 'spring-boot'
         logger.fine("Checking maven project has a spring boot dependency");
         springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
@@ -192,8 +191,12 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public List<ItemMetadata> queryPropertyMetadata(String filter) {
+        if (cpExec != null) {
+            updateCacheMaps();
+        } else {
+            init();
+        }
         List<ItemMetadata> ret = new LinkedList<>();
-        updateCacheMaps();
         for (String propName : properties.keySet()) {
             if (filter == null || propName.contains(filter)) {
                 ret.addAll(properties.get(propName));
@@ -209,8 +212,12 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public List<ItemHint.ValueHint> queryHintMetadata(String propertyName, String filter) {
+        if (cpExec != null) {
+            updateCacheMaps();
+        } else {
+            init();
+        }
         List<ItemHint.ValueHint> ret = new LinkedList<>();
-        updateCacheMaps();
         if (hints.containsKey(propertyName)) {
             ItemHint hint = hints.get(propertyName);
             final List<ItemHint.ValueHint> values = hint.getValues();

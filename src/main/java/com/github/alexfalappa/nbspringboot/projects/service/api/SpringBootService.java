@@ -31,8 +31,6 @@ import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
  */
 public interface SpringBootService {
 
-    void init();
-
     void refresh();
 
     ClassPath getManagedClassPath();
