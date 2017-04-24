@@ -16,10 +16,13 @@
 package com.github.alexfalappa.nbspringboot.projects.basic;
 
 import java.awt.Component;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
+import java.io.PrintWriter;
 import java.text.MessageFormat;
 import java.util.LinkedHashSet;
 import java.util.NoSuchElementException;
@@ -65,6 +68,8 @@ import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_REST
 @Messages("BasicSpringbootProject_displayName=Spring Boot basic project")
 public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInstantiatingIterator {
 
+    private static final String BOOTVERSION = "1.5.3.RELEASE";
+
     private int index;
     private WizardDescriptor.Panel[] panels;
     private WizardDescriptor wiz;
@@ -90,41 +95,41 @@ public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInst
 
     @Override
     public Set<FileObject> instantiate(ProgressHandle handle) throws IOException {
-        handle.start(5);
+        handle.start(4);
         Set<FileObject> resultSet = new LinkedHashSet<>();
-        File dirF = FileUtil.normalizeFile((File) wiz.getProperty("projdir"));
-        dirF.mkdirs();
+        File fDir = FileUtil.normalizeFile((File) wiz.getProperty("projdir"));
+        fDir.mkdirs();
         handle.progress(1);
-        FileObject dir = FileUtil.toFileObject(dirF);
+        FileObject foDir = FileUtil.toFileObject(fDir);
         FileObject template = URLMapper.findFileObject(getClass().getResource("BasicSpringbootProject.zip"));
-        unZipFile(template.getInputStream(), dir);
+        unZipFile(template.getInputStream(), foDir);
         handle.progress(2);
         // create nbactions.xml file
-        createNbActions(dir);
+        createNbActions(foDir);
         // clear non project cache
         ProjectManager.getDefault().clearNonProjectCache();
         // Always open top dir as a project:
-        resultSet.add(dir);
-        // open main class
-        FileObject foMain = dir.getFileObject("src/main/java/com/example/BasicApplication.java");
-        if (foMain != null) {
-            resultSet.add(foMain);
+        resultSet.add(foDir);
+        // open pom.xml file
+        final FileObject foPom = foDir.getFileObject("pom.xml");
+        if (foPom != null) {
+            resultSet.add(foPom);
         }
         handle.progress(3);
         // trigger download of dependencies
-        Project prj = ProjectManager.getDefault().findProject(dir);
+        Project prj = ProjectManager.getDefault().findProject(foDir);
         if (prj != null) {
             final NbMavenProject mvn = prj.getLookup().lookup(NbMavenProject.class);
             if (mvn != null) {
                 mvn.downloadDependencyAndJavadocSource(false);
             }
         }
-        handle.progress(4);
         // remember folder for creation of new projects
-        File parent = dirF.getParentFile();
+        File parent = fDir.getParentFile();
         if (parent != null && parent.exists()) {
             ProjectChooser.setProjectsFolder(parent);
         }
+        handle.finish();
         return resultSet;
     }
 
@@ -208,15 +213,19 @@ public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInst
     }
 
     private static void unZipFile(InputStream source, FileObject projectRoot) throws IOException {
-        try {
-            ZipInputStream str = new ZipInputStream(source);
+        try (ZipInputStream str = new ZipInputStream(source)) {
             ZipEntry entry;
             while ((entry = str.getNextEntry()) != null) {
+                final String filename = entry.getName();
                 if (entry.isDirectory()) {
-                    FileUtil.createFolder(projectRoot, entry.getName());
+                    FileUtil.createFolder(projectRoot, filename);
                 } else {
-                    FileObject fo = FileUtil.createData(projectRoot, entry.getName());
-                    writeFile(str, fo);
+                    FileObject fo = FileUtil.createData(projectRoot, filename);
+                    if (filename.equals("pom.xml")) {
+                        filterFile(str, fo);
+                    } else {
+                        writeFile(str, fo);
+                    }
                 }
             }
         } finally {
@@ -224,9 +233,19 @@ public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInst
         }
     }
 
-    private static void writeFile(ZipInputStream str, FileObject fo) throws IOException {
+    private static void writeFile(ZipInputStream zis, FileObject fo) throws IOException {
         try (OutputStream out = fo.getOutputStream()) {
-            FileUtil.copy(str, out);
+            FileUtil.copy(zis, out);
+        }
+    }
+
+    private static void filterFile(ZipInputStream zis, FileObject fo) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(zis));
+        try (PrintWriter pw = new PrintWriter(fo.getOutputStream())) {
+            String line;
+            while ((line = br.readLine()) != null) {
+                pw.println(line.replace("#BOOTVERSION#", BOOTVERSION));
+            }
         }
     }
 
