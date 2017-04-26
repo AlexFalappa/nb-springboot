@@ -105,8 +105,10 @@ public class SpringBootServiceImpl implements SpringBootService {
         // set up a reference to the execute classpath object
         Sources srcs = ProjectUtils.getSources(mvnPrj);
         SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
+        boolean srcGroupFound = false;
         for (SourceGroup group : srcGroups) {
             if (group.getName().toLowerCase().contains("source")) {
+                srcGroupFound = true;
                 cpExec = ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
                 logger.info("Adding classpath listener...");
                 cpExec.addPropertyChangeListener(new PropertyChangeListener() {
@@ -130,16 +132,21 @@ public class SpringBootServiceImpl implements SpringBootService {
                 break;
             }
         }
-        // check if completion of configuration properties is possible
-        try {
-            logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
-            cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
-            cfgPropsCompletionAvailable = true;
-        } catch (ClassNotFoundException ex) {
-            cfgPropsCompletionAvailable = false;
+        if (!srcGroupFound) {
+          logger.log(WARNING, "No sources found for project: {0}", new Object[]{mvnPrj.toString()});
         }
-        // build configuration properties maps
-        updateCacheMaps();
+        if (cpExec!=null) {
+          // check if completion of configuration properties is possible
+          try {
+              logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
+              cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
+              cfgPropsCompletionAvailable = true;
+          } catch (ClassNotFoundException ex) {
+              cfgPropsCompletionAvailable = false;
+          }
+          // build configuration properties maps
+          updateCacheMaps();
+        }
     }
 
     @Override
@@ -157,16 +164,20 @@ public class SpringBootServiceImpl implements SpringBootService {
             groups.clear();
             return;
         }
-        // check if completion of configuration properties is possible
-        try {
-            logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
-            cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
-            cfgPropsCompletionAvailable = true;
-        } catch (ClassNotFoundException ex) {
-            cfgPropsCompletionAvailable = false;
+        if (cpExec == null) {
+          init();
+        } else {
+          // check if completion of configuration properties is possible
+          try {
+              logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
+              cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
+              cfgPropsCompletionAvailable = true;
+          } catch (ClassNotFoundException ex) {
+              cfgPropsCompletionAvailable = false;
+          }
+          // build configuration properties maps
+          updateCacheMaps();
         }
-        // build configuration properties maps
-        updateCacheMaps();
     }
 
     @Override
