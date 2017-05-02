@@ -107,7 +107,7 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
                             //value completion
                             String valPrefix = parts[1].trim();
                             completePropValue(sbs, completionResultSet, propPrefix, valPrefix, lineStartOffset + lineToCaret.indexOf(
-                                    valPrefix), caretOffset);
+                                    valPrefix, equalSignOffset), caretOffset);
                         } else if (equalSignOffset >= 0) {
                             //value completion with empty filter
                             completePropValue(sbs, completionResultSet, propPrefix, null, lineStartOffset + equalSignOffset + 1,
