@@ -66,7 +66,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 ## Changelog
 
-* __1.5.1__ (??? 2017): Another round of fixes
+* __1.5.1__ (May 2017): Another round of fixes
     * Upgrade to Spring Boot 1.5.3
     * Projects wizard now open `pom.xml` instead of main class after generation
     * Internal reworkings to improve plugin initialization and reaction to project build and configuration properties changes
