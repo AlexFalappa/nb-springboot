@@ -22,6 +22,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import org.apache.maven.model.Dependency;
@@ -47,7 +48,7 @@ import org.springframework.util.MultiValueMap;
 
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
-import static java.util.logging.Level.FINER;
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
 import static org.springframework.boot.configurationprocessor.metadata.ItemMetadata.ItemType.GROUP;
@@ -79,7 +80,6 @@ public class SpringBootServiceImpl implements SpringBootService {
     private final MultiValueMap<String, ItemMetadata> groups = new LinkedMultiValueMap<>();
     private final Map<String, ItemHint> hints = new HashMap<>();
     private boolean springBootAvailable = false;
-    private boolean cfgPropsCompletionAvailable = false;
     private NbMavenProjectImpl mvnPrj;
     private ClassPath cpExec;
 
@@ -87,6 +87,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         if (p instanceof NbMavenProjectImpl) {
             this.mvnPrj = (NbMavenProjectImpl) p;
         }
+        logger.log(Level.INFO, "Creating Spring Boot service for project {0}", FileUtil.getFileDisplayName(p.getProjectDirectory()));
     }
 
     private void init() {
@@ -110,42 +111,34 @@ public class SpringBootServiceImpl implements SpringBootService {
             if (group.getName().toLowerCase().contains("source")) {
                 srcGroupFound = true;
                 cpExec = ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
-                logger.info("Adding classpath listener...");
-                cpExec.addPropertyChangeListener(new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        logger.fine("Execution classpath change");
-                        logger.finer(evt.toString());
-                        if (evt.getPropertyName().equalsIgnoreCase("entries")) {
-                            refresh();
-                        }
-                    }
-                });
                 // listen for pom changes
+                logger.info("Adding maven pom listener...");
                 mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
                     @Override
                     public void propertyChange(PropertyChangeEvent evt) {
-                        logger.fine("Maven pom change");
-                        logger.finer(evt.toString());
+                        final String propertyName = String.valueOf(evt.getPropertyName());
+                        logger.log(FINE, "Maven pom change ({0})", propertyName);
+                        if (propertyName.equals("MavenProject")) {
+                            refresh();
+                        }
                     }
                 });
                 break;
             }
         }
         if (!srcGroupFound) {
-          logger.log(WARNING, "No sources found for project: {0}", new Object[]{mvnPrj.toString()});
+            logger.log(WARNING, "No sources found for project: {0}", new Object[]{mvnPrj.toString()});
         }
-        if (cpExec!=null) {
-          // check if completion of configuration properties is possible
-          try {
-              logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
-              cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
-              cfgPropsCompletionAvailable = true;
-          } catch (ClassNotFoundException ex) {
-              cfgPropsCompletionAvailable = false;
-          }
-          // build configuration properties maps
-          updateCacheMaps();
+        if (cpExec != null) {
+            // check if completion of configuration properties is possible
+            try {
+                logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
+                cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
+            } catch (ClassNotFoundException ex) {
+                // no completion
+            }
+            // build configuration properties maps
+            updateCacheMaps();
         }
     }
 
@@ -157,7 +150,6 @@ public class SpringBootServiceImpl implements SpringBootService {
         springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
         // clear and exit if no spring boot dependency detected
         if (!springBootAvailable) {
-            cfgPropsCompletionAvailable = false;
             cfgMetasInJars.clear();
             properties.clear();
             hints.clear();
@@ -165,29 +157,23 @@ public class SpringBootServiceImpl implements SpringBootService {
             return;
         }
         if (cpExec == null) {
-          init();
+            init();
         } else {
-          // check if completion of configuration properties is possible
-          try {
-              logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
-              cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
-              cfgPropsCompletionAvailable = true;
-          } catch (ClassNotFoundException ex) {
-              cfgPropsCompletionAvailable = false;
-          }
-          // build configuration properties maps
-          updateCacheMaps();
+            // check if completion of configuration properties is possible
+            try {
+                logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
+                cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
+            } catch (ClassNotFoundException ex) {
+                // no completion
+            }
+            // build configuration properties maps
+            updateCacheMaps();
         }
     }
 
     @Override
     public ClassPath getManagedClassPath() {
         return cpExec;
-    }
-
-    @Override
-    public boolean cfgPropsCompletionEnabled() {
-        return cfgPropsCompletionAvailable;
     }
 
     @Override
@@ -202,9 +188,7 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public List<ItemMetadata> queryPropertyMetadata(String filter) {
-        if (cpExec != null) {
-            updateCacheMaps();
-        } else {
+        if (cpExec == null) {
             init();
         }
         List<ItemMetadata> ret = new LinkedList<>();
@@ -223,9 +207,7 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public List<ItemHint.ValueHint> queryHintMetadata(String propertyName, String filter) {
-        if (cpExec != null) {
-            updateCacheMaps();
-        } else {
+        if (cpExec == null) {
             init();
         }
         List<ItemHint.ValueHint> ret = new LinkedList<>();
@@ -255,7 +237,6 @@ public class SpringBootServiceImpl implements SpringBootService {
                 ConfigurationMetadata meta;
                 FileObject archiveFo = FileUtil.getArchiveFile(fo);
                 if (archiveFo != null) {
-                    logger.log(FINER, "Considering metadata file in archive: {0}", FileUtil.getFileDisplayName(archiveFo));
                     // parse and cache configuration metadata from JSON file in jar
                     String archivePath = archiveFo.getPath();
                     if (!cfgMetasInJars.containsKey(archivePath)) {
@@ -264,7 +245,6 @@ public class SpringBootServiceImpl implements SpringBootService {
                     }
                     meta = cfgMetasInJars.get(archivePath);
                 } else {
-                    logger.log(FINER, "Considering metadata file: {0}", FileUtil.getFileDisplayName(fo));
                     // parse configuration metadata from JSON file (usually produced by spring configuration processor)
                     logger.log(INFO, "Unmarshalling configuration metadata from {0}", FileUtil.getFileDisplayName(fo));
                     meta = jsonMarshaller.read(fo.getInputStream());

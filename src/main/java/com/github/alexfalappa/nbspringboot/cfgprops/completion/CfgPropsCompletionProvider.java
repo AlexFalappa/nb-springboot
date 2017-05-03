@@ -33,6 +33,7 @@ import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.editor.completion.CompletionTask;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationprocessor.metadata.ConfigurationMetadata;
@@ -42,6 +43,7 @@ import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
 import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
 /**
@@ -74,11 +76,9 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
         if (prj == null) {
             return null;
         }
+        logger.log(FINE, "Completing within context of prj {0}", FileUtil.getFileDisplayName(prj.getProjectDirectory()));
         final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
         if (sbs == null) {
-            return null;
-        }
-        if (!sbs.cfgPropsCompletionEnabled()) {
             return null;
         }
         logger.fine("Creating completion task");

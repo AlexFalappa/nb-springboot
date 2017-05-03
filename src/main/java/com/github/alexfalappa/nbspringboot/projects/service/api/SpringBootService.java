@@ -35,8 +35,6 @@ public interface SpringBootService {
 
     ClassPath getManagedClassPath();
 
-    boolean cfgPropsCompletionEnabled();
-
     Set<String> getPropertyNames();
 
     List<ItemMetadata> getPropertyMetadata(String propertyName);
