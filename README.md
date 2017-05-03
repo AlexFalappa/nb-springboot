@@ -70,6 +70,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
     * Upgrade to Spring Boot 1.5.3
     * Projects wizard now open `pom.xml` instead of main class after generation
     * Internal reworkings to improve plugin initialization and reaction to project build and configuration properties changes
+    * Focus filter textfield in _Add Spring Boot Dependencies_ dialog
     * [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/10?closed=1)
 
 * __1.5__ (Apr 2017): Dependencies management and configuration properties editor
