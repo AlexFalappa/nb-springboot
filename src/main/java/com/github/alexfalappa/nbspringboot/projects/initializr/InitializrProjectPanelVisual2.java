@@ -72,6 +72,7 @@ public class InitializrProjectPanelVisual2 extends JPanel {
         pBootDependencies.init(meta);
         // the following will also trigger adaptation of dependencies to default boot version
         fillCombo(meta.path("bootVersion"));
+        txFilter.requestFocusInWindow();
         initialized = true;
     }
 
