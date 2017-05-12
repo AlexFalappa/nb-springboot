@@ -22,6 +22,7 @@
                   <Component id="lBaseName" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="lProfile" alignment="0" min="-2" max="-2" attributes="0"/>
                   <Component id="lCreated" alignment="0" min="-2" max="-2" attributes="0"/>
+                  <Component id="lLocation" alignment="0" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
               <Group type="103" groupAlignment="0" attributes="0">
@@ -29,6 +30,7 @@
                   <Component id="txProfile" max="32767" attributes="0"/>
                   <Component id="txCreated" alignment="0" max="32767" attributes="0"/>
                   <Component id="chConfigSubd" alignment="0" max="32767" attributes="0"/>
+                  <Component id="cbLocation" alignment="0" max="32767" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -48,13 +50,18 @@
                   <Component id="txProfile" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lLocation" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cbLocation" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
               <Component id="chConfigSubd" min="-2" max="-2" attributes="0"/>
               <EmptySpace type="unrelated" max="-2" attributes="0"/>
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lCreated" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="txCreated" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
-              <EmptySpace max="32767" attributes="0"/>
+              <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
     </DimensionLayout>
@@ -106,6 +113,29 @@
         <Property name="editable" type="boolean" value="false"/>
         <Property name="columns" type="int" value="15"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lLocation">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="com/github/alexfalappa/nbspringboot/templates/applproperties/Bundle.properties" key="ApplVisualPanel1.lLocation.text" replaceFormat="org.openide.util.NbBundle.getBundle({sourceFileName}.class).getString(&quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="cbLocation">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="2">
+            <StringItem index="0" value="Source Resources"/>
+            <StringItem index="1" value="Test Resources"/>
+          </StringArray>
+        </Property>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cbLocationActionPerformed"/>
+      </Events>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+      </AuxValues>
     </Component>
   </SubComponents>
 </Form>

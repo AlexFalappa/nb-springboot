@@ -50,6 +50,7 @@ public final class ApplWizardIterator implements WizardDescriptor.InstantiatingI
 
     public static final String WIZ_BASE_NAME = "base.name";
     public static final String WIZ_PROFILE = "profile";
+    public static final String WIZ_LOCATION = "location";
 
     private WizardDescriptor wizard;
     private ApplWizardPanel1 panel;
@@ -85,6 +86,7 @@ public final class ApplWizardIterator implements WizardDescriptor.InstantiatingI
     public void uninitialize(WizardDescriptor wizard) {
         wizard.putProperty(WIZ_BASE_NAME, null);
         wizard.putProperty(WIZ_PROFILE, null);
+        wizard.putProperty(WIZ_LOCATION, null);
         panel = null;
     }
 

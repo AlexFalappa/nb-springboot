@@ -68,6 +68,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 * __1.5.2__ (??? 2017): Work In Progress
     * Deprecated configuration properties are now show at the bottom of completion list
+    * The `application.properties` file wizard allows to choose between _main_ and _test_ resource folders
 
 * __1.5.1__ (May 2017): Another round of fixes
     * Upgrade to Spring Boot 1.5.3
