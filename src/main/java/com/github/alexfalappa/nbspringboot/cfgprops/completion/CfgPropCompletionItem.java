@@ -174,7 +174,7 @@ public class CfgPropCompletionItem implements CompletionItem {
 
     @Override
     public int getSortPriority() {
-        return 0;
+        return (configurationItem.getDeprecation() != null) ? 1 : 0;
     }
 
     @Override
