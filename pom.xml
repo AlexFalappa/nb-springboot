@@ -42,6 +42,11 @@
             <artifactId>spring-boot-configuration-metadata</artifactId>
             <version>1.5.4.RELEASE</version>
         </dependency>
+        <dependency>
+            <groupId>org.parboiled</groupId>
+            <artifactId>parboiled-java</artifactId>
+            <version>1.1.8</version>
+        </dependency>
         <!--NetBeans Platform dependencies-->
         <dependency>
             <groupId>org.netbeans.api</groupId>
