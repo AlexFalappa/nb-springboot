@@ -7,9 +7,9 @@ NetBeans IDE plugin supporting programming with [Spring Boot](http://projects.sp
 
 This plugin requires **NetBeans 8.1** or above running on **JDK 7** or above.
 
-The plugin is available in the *Plugin Portal Update Center* thus it can be downloaded and installed trough *Tools > Plugins > Available Plugins*.
+The plugin is available in the *Plugin Portal Update Center* thus it can be downloaded and installed trough *Tools > Plugins > Available Plugins*. Please note that new releases become available on the _Update Center_ after they are verified by the folks at the _NetBeans Plugin Portal_. You can check the verification status looking at the [plugin page](http://plugins.netbeans.org/plugin/67888/nb-springboot) on the portal.
 
-Alternatively download the desired `nbm` package from https://github.com/AlexFalappa/nb-springboot/releases , go to *Tools > Plugins > Downloaded* and click on *Add Plugins...* button. Choose the downloaded `nbm` package file then click *Install*.
+To perform a manual install download the desired `nbm` package from the [releases page](https://github.com/AlexFalappa/nb-springboot/releases) , go to *Tools > Plugins > Downloaded* and click the *Add Plugins...* button. Choose the downloaded `nbm` package file then click *Install*.
 
 ## Features
 
