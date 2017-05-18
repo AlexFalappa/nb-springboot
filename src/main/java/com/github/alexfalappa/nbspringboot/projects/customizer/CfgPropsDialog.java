@@ -297,9 +297,38 @@ public class CfgPropsDialog extends javax.swing.JDialog {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                txtField.setText(null);
-                e.consume();
+            switch (e.getKeyCode()) {
+                case KeyEvent.VK_ESCAPE:
+                    final String filter = txtField.getText();
+                    if (filter == null || filter.isEmpty()) {
+                        // close dialog if filter textfield is empty
+                        setVisible(false);
+                    } else {
+                        // clear textfield
+                        txtField.setText(null);
+                        e.consume();
+                    }
+                    break;
+                case KeyEvent.VK_UP:
+                    // calculate previous selected index wrapping if needed
+                    int selIdx = lCfgProps.getSelectedIndex() - 1;
+                    if (selIdx < 0) {
+                        selIdx = lCfgProps.getModel().getSize() - 1;
+                    }
+                    // move properties list selection and scroll to it
+                    lCfgProps.setSelectedIndex(selIdx);
+                    lCfgProps.scrollRectToVisible(lCfgProps.getCellBounds(selIdx, selIdx));
+                    break;
+                case KeyEvent.VK_DOWN:
+                    // calculate next selected index wrapping if needed
+                    selIdx = lCfgProps.getSelectedIndex() + 1;
+                    if (selIdx >= lCfgProps.getModel().getSize()) {
+                        selIdx = 0;
+                    }
+                    // move properties list selection and scroll to it
+                    lCfgProps.setSelectedIndex(selIdx);
+                    lCfgProps.scrollRectToVisible(lCfgProps.getCellBounds(selIdx, selIdx));
+                    break;
             }
         }
 
