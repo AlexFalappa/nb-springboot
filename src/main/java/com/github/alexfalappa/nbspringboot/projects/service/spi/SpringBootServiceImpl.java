@@ -39,20 +39,18 @@ import org.netbeans.spi.project.ProjectServiceProvider;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
-import org.springframework.boot.configurationprocessor.metadata.ConfigurationMetadata;
-import org.springframework.boot.configurationprocessor.metadata.ItemHint;
-import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
-import org.springframework.boot.configurationprocessor.metadata.JsonMarshaller;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
+import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepository;
+import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepositoryJsonBuilder;
+import org.springframework.boot.configurationmetadata.Hints;
+import org.springframework.boot.configurationmetadata.SimpleConfigurationMetadataRepository;
+import org.springframework.boot.configurationmetadata.ValueHint;
 
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
-import static org.springframework.boot.configurationprocessor.metadata.ItemMetadata.ItemType.GROUP;
-import static org.springframework.boot.configurationprocessor.metadata.ItemMetadata.ItemType.PROPERTY;
 
 /**
  * Project wide {@link SpringBootService} implementation.
@@ -74,14 +72,12 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     private static final Logger logger = Logger.getLogger(SpringBootServiceImpl.class.getName());
     private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
-    private final JsonMarshaller jsonMarshaller = new JsonMarshaller();
-    private final Map<String, ConfigurationMetadata> cfgMetasInJars = new HashMap<>();
-    private final MultiValueMap<String, ItemMetadata> properties = new LinkedMultiValueMap<>();
-    private final MultiValueMap<String, ItemMetadata> groups = new LinkedMultiValueMap<>();
-    private final Map<String, ItemHint> hints = new HashMap<>();
+    private SimpleConfigurationMetadataRepository repo = new SimpleConfigurationMetadataRepository();
+    private final Map<String, ConfigurationMetadataRepository> reposInJars = new HashMap<>();
     private boolean springBootAvailable = false;
     private NbMavenProjectImpl mvnPrj;
     private ClassPath cpExec;
+    private Map<String, ConfigurationMetadataProperty> cachedProperties;
 
     public SpringBootServiceImpl(Project p) {
         if (p instanceof NbMavenProjectImpl) {
@@ -138,7 +134,7 @@ public class SpringBootServiceImpl implements SpringBootService {
                 // no completion
             }
             // build configuration properties maps
-            updateCacheMaps();
+            updateConfigRepo();
         }
     }
 
@@ -150,10 +146,8 @@ public class SpringBootServiceImpl implements SpringBootService {
         springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
         // clear and exit if no spring boot dependency detected
         if (!springBootAvailable) {
-            cfgMetasInJars.clear();
-            properties.clear();
-            hints.clear();
-            groups.clear();
+            reposInJars.clear();
+            cachedProperties = null;
             return;
         }
         if (cpExec == null) {
@@ -166,8 +160,8 @@ public class SpringBootServiceImpl implements SpringBootService {
             } catch (ClassNotFoundException ex) {
                 // no completion
             }
-            // build configuration properties maps
-            updateCacheMaps();
+            // build configuration metadata repository
+            updateConfigRepo();
         }
     }
 
@@ -178,98 +172,82 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public Set<String> getPropertyNames() {
-        return properties.keySet();
+        if (cachedProperties == null) {
+            cachedProperties = repo.getAllProperties();
+        }
+        return cachedProperties.keySet();
     }
 
     @Override
-    public List<ItemMetadata> getPropertyMetadata(String propertyName) {
-        return properties.get(propertyName);
+    public ConfigurationMetadataProperty getPropertyMetadata(String propertyName) {
+        if (cachedProperties == null) {
+            cachedProperties = repo.getAllProperties();
+        }
+        return cachedProperties.get(propertyName);
     }
 
     @Override
-    public List<ItemMetadata> queryPropertyMetadata(String filter) {
+    public List<ConfigurationMetadataProperty> queryPropertyMetadata(String filter) {
         if (cpExec == null) {
             init();
         }
-        List<ItemMetadata> ret = new LinkedList<>();
-        for (String propName : properties.keySet()) {
+        List<ConfigurationMetadataProperty> ret = new LinkedList<>();
+        for (String propName : getPropertyNames()) {
             if (filter == null || propName.contains(filter)) {
-                ret.addAll(properties.get(propName));
+                ret.add(cachedProperties.get(propName));
             }
         }
         return ret;
     }
 
     @Override
-    public ItemHint getHintMetadata(String propertyName) {
-        return hints.get(propertyName);
-    }
-
-    @Override
-    public List<ItemHint.ValueHint> queryHintMetadata(String propertyName, String filter) {
+    public List<ValueHint> queryHintMetadata(String propertyName, String filter) {
         if (cpExec == null) {
             init();
         }
-        List<ItemHint.ValueHint> ret = new LinkedList<>();
-        if (hints.containsKey(propertyName)) {
-            ItemHint hint = hints.get(propertyName);
-            final List<ItemHint.ValueHint> values = hint.getValues();
-            if (values != null) {
-                for (ItemHint.ValueHint valHint : values) {
-                    if (filter == null || valHint.getValue().toString().contains(filter)) {
-                        ret.add(valHint);
-                    }
+        List<ValueHint> ret = new LinkedList<>();
+        if (getPropertyNames().contains(propertyName)) {
+            Hints hints = cachedProperties.get(propertyName).getHints();
+            for (ValueHint valueHint : hints.getValueHints()) {
+                if (filter == null || valueHint.getValue().toString().contains(filter)) {
+                    ret.add(valueHint);
                 }
             }
         }
         return ret;
     }
 
-    // Update internal caches and maps from the given classpath.
-    private void updateCacheMaps() {
-        logger.fine("Updating cache maps");
-        properties.clear();
-        hints.clear();
-        groups.clear();
+    // Update internal configuration metadata repository
+    private void updateConfigRepo() {
+        logger.fine("Updating config metadata repo");
+        repo = new SimpleConfigurationMetadataRepository();
         final List<FileObject> cfgMetaFiles = cpExec.findAllResources(METADATA_JSON);
         for (FileObject fo : cfgMetaFiles) {
             try {
-                ConfigurationMetadata meta;
+                ConfigurationMetadataRepositoryJsonBuilder builder = ConfigurationMetadataRepositoryJsonBuilder.create();
+                ConfigurationMetadataRepository currRepo;
                 FileObject archiveFo = FileUtil.getArchiveFile(fo);
                 if (archiveFo != null) {
                     // parse and cache configuration metadata from JSON file in jar
                     String archivePath = archiveFo.getPath();
-                    if (!cfgMetasInJars.containsKey(archivePath)) {
+                    if (!reposInJars.containsKey(archivePath)) {
                         logger.log(INFO, "Unmarshalling configuration metadata from {0}", FileUtil.getFileDisplayName(fo));
-                        cfgMetasInJars.put(archivePath, jsonMarshaller.read(fo.getInputStream()));
+                        ConfigurationMetadataRepository jarRepo = builder.withJsonResource(fo.getInputStream()).build();
+                        reposInJars.put(archivePath, jarRepo);
                     }
-                    meta = cfgMetasInJars.get(archivePath);
+                    currRepo = reposInJars.get(archivePath);
                 } else {
-                    // parse configuration metadata from JSON file (usually produced by spring configuration processor)
+                    // parse configuration metadata from standalone JSON file (usually produced by spring configuration processor)
                     logger.log(INFO, "Unmarshalling configuration metadata from {0}", FileUtil.getFileDisplayName(fo));
-                    meta = jsonMarshaller.read(fo.getInputStream());
+                    currRepo = builder.withJsonResource(fo.getInputStream()).build();
                 }
-                // update property and groups maps
-                for (ItemMetadata item : meta.getItems()) {
-                    final String itemName = item.getName();
-                    if (item.isOfItemType(PROPERTY)) {
-                        properties.add(itemName, item);
-                    }
-                    if (item.isOfItemType(GROUP)) {
-                        groups.add(itemName, item);
-                    }
-                }
-                // update hints maps
-                for (ItemHint hint : meta.getHints()) {
-                    ItemHint old = hints.put(hint.getName(), hint);
-                    if (old != null) {
-                        logger.log(WARNING, "Overwritten hint for property ''{0}''", old.toString());
-                    }
-                }
+                repo.include(currRepo);
             } catch (Exception ex) {
                 Exceptions.printStackTrace(ex);
             }
         }
+        // clear cached values
+        cachedProperties = null;
     }
 
     private boolean dependencyArtifactIdContains(NbMavenProject nbMvn, String artifactId) {

@@ -20,7 +20,7 @@ import java.net.URL;
 import javax.swing.Action;
 
 import org.netbeans.spi.editor.completion.CompletionDocumentation;
-import org.springframework.boot.configurationprocessor.metadata.ItemHint;
+import org.springframework.boot.configurationmetadata.ValueHint;
 
 import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 
@@ -37,7 +37,7 @@ public class CfgPropValueCompletionDocumentation implements CompletionDocumentat
 
     @Override
     public String getText() {
-        ItemHint.ValueHint valueHint = item.getHint();
+        ValueHint valueHint = item.getHint();
         StringBuilder sb = new StringBuilder();
         // name and type
         sb.append("<b>").append(valueHint.getValue()).append("</b>");

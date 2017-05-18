@@ -36,9 +36,8 @@ import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
-import org.springframework.boot.configurationprocessor.metadata.ConfigurationMetadata;
-import org.springframework.boot.configurationprocessor.metadata.ItemHint;
-import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
+import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+import org.springframework.boot.configurationmetadata.ValueHint;
 
 import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
@@ -134,8 +133,8 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
     private void completePropName(SpringBootService sbs, CompletionResultSet completionResultSet, String filter, int startOffset, int caretOffset) {
         long mark = System.currentTimeMillis();
         logger.log(FINER, "Completing property name: {0}", filter);
-        for (ItemMetadata item : sbs.queryPropertyMetadata(filter)) {
-            completionResultSet.addItem(new CfgPropCompletionItem(item, sbs, startOffset, caretOffset));
+        for (ConfigurationMetadataProperty propMeta : sbs.queryPropertyMetadata(filter)) {
+            completionResultSet.addItem(new CfgPropCompletionItem(propMeta, sbs, startOffset, caretOffset));
         }
         final long elapsed = System.currentTimeMillis() - mark;
         logger.log(FINER, "Property completion of ''{0}'' took: {1} msecs", new Object[]{filter, elapsed});
@@ -145,8 +144,8 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
     public void completePropValue(SpringBootService sbs, CompletionResultSet completionResultSet, String propName, String filter, int startOffset, int caretOffset) {
         long mark = System.currentTimeMillis();
         logger.log(FINER, "Completing property value: {0}", filter);
-        for (ItemHint.ValueHint hint : sbs.queryHintMetadata(propName, filter)) {
-            completionResultSet.addItem(new CfgPropValueCompletionItem(hint, startOffset, caretOffset));
+        for (ValueHint valueHint : sbs.queryHintMetadata(propName, filter)) {
+            completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
         }
         final long elapsed = System.currentTimeMillis() - mark;
         logger.log(FINER, "Value completion of ''{0}'' on ''{1}'' took: {2} msecs", new Object[]{filter, propName, elapsed});

@@ -37,7 +37,7 @@ import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
-import org.springframework.boot.configurationprocessor.metadata.ItemHint;
+import org.springframework.boot.configurationmetadata.ValueHint;
 
 /**
  * The Spring Boot configuration property values implementation of {@code CompletionItem}.
@@ -48,19 +48,19 @@ import org.springframework.boot.configurationprocessor.metadata.ItemHint;
  */
 public class CfgPropValueCompletionItem implements CompletionItem {
 
-    private final ItemHint.ValueHint hint;
+    private final ValueHint hint;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-value.png"));
     private final int caretOffset;
     private final int dotOffset;
 
-    public CfgPropValueCompletionItem(ItemHint.ValueHint hint, int dotOffset, int caretOffset) {
+    public CfgPropValueCompletionItem(ValueHint hint, int dotOffset, int caretOffset) {
         this.hint = hint;
         this.dotOffset = dotOffset;
         this.caretOffset = caretOffset;
     }
 
-    public ItemHint.ValueHint getHint() {
+    public ValueHint getHint() {
         return hint;
     }
 

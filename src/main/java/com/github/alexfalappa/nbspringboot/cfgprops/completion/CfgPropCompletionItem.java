@@ -39,7 +39,7 @@ import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
-import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
+import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
@@ -49,7 +49,8 @@ import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 /**
  * The Spring Boot configuration property names implementation of {@code CompletionItem}.
  * <p>
- * It utilizes an {@code ItemMetadata} and the project classpath to render the completion item and spawn the documentation display.
+ * It utilizes an {@code ConfigurationMetadataProperty} and the project classpath to render the completion item and spawn the documentation
+ * display.
  *
  * @author Aggelos Karalias
  * @author Alessandro Falappa
@@ -58,18 +59,18 @@ public class CfgPropCompletionItem implements CompletionItem {
 
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-property.png"));
-    private final ItemMetadata configurationItem;
+    private final ConfigurationMetadataProperty configurationMeta;
     private final SpringBootService bootService;
     private final int caretOffset;
     private final int propStartOffset;
     private boolean overwrite;
     private final String type;
 
-    public CfgPropCompletionItem(ItemMetadata configurationItem, SpringBootService bootService, int propStartOffset, int caretOffset) {
+    public CfgPropCompletionItem(ConfigurationMetadataProperty configurationMeta, SpringBootService bootService, int propStartOffset, int caretOffset) {
         this.overwrite = false;
-        this.configurationItem = configurationItem;
-        if (configurationItem.getType() != null) {
-            type = simpleHtmlEscape(shortenJavaType(configurationItem.getType()));
+        this.configurationMeta = configurationMeta;
+        if (configurationMeta.getType() != null) {
+            type = simpleHtmlEscape(shortenJavaType(configurationMeta.getType()));
         } else {
             type = null;
         }
@@ -78,12 +79,12 @@ public class CfgPropCompletionItem implements CompletionItem {
         this.caretOffset = caretOffset;
     }
 
-    public ItemMetadata getConfigurationItem() {
-        return configurationItem;
+    public ConfigurationMetadataProperty getConfigurationMetadata() {
+        return configurationMeta;
     }
 
     public String getText() {
-        return configurationItem.getName();
+        return configurationMeta.getId();
     }
 
     public String getTextRight() {
@@ -135,7 +136,7 @@ public class CfgPropCompletionItem implements CompletionItem {
     @Override
     public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height, boolean selected) {
         String leftHtmlText = getText();
-        if (configurationItem.getDeprecation() != null) {
+        if (configurationMeta.isDeprecated()) {
             leftHtmlText = "<s>" + leftHtmlText + "</s>";
         }
         CompletionUtilities.renderHtml(fieldIcon, leftHtmlText, getTextRight(), g, defaultFont, (selected ? UIManager.getColor(
@@ -174,7 +175,7 @@ public class CfgPropCompletionItem implements CompletionItem {
 
     @Override
     public int getSortPriority() {
-        return (configurationItem.getDeprecation() != null) ? 1 : 0;
+        return (configurationMeta.isDeprecated()) ? 1 : 0;
     }
 
     @Override

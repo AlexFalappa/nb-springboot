@@ -35,7 +35,7 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.html.HTMLEditorKit;
 
-import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
+import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
@@ -52,19 +52,19 @@ import static java.awt.event.MouseEvent.BUTTON1;
 public class CfgPropsDialog extends javax.swing.JDialog {
 
     private boolean okPressed = false;
-    private TreeSet<ItemMetadata> sortedProps = new TreeSet<>(new ItemMetadataNameComparator());
+    private TreeSet<ConfigurationMetadataProperty> sortedProps = new TreeSet<>(new ConfigurationMetadataIdComparator());
 
     /** Creates new form CfgPropsDialog */
     public CfgPropsDialog(java.awt.Dialog parent) {
         super(parent, true);
         initComponents();
         // setup property list
-        lCfgProps.setCellRenderer(new ItemMetadataCellRenderer());
+        lCfgProps.setCellRenderer(new ConfigurationMetadataCellRenderer());
         lCfgProps.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
                 if (!e.getValueIsAdjusting()) {
-                    final ItemMetadata selectedValue = lCfgProps.getSelectedValue();
+                    final ConfigurationMetadataProperty selectedValue = lCfgProps.getSelectedValue();
                     if (selectedValue != null) {
                         tpDetails.setText(Utils.cfgPropDetailsHtml(selectedValue));
                         tpDetails.setCaretPosition(0);
@@ -100,7 +100,7 @@ public class CfgPropsDialog extends javax.swing.JDialog {
     }
 
     public String getSelectedPropName() {
-        return lCfgProps.getSelectedValue().getName();
+        return lCfgProps.getSelectedValue().getId();
     }
 
     /** This method is called from within the constructor to initialize the form. WARNING: Do NOT modify this code. The content of this
@@ -225,7 +225,7 @@ public class CfgPropsDialog extends javax.swing.JDialog {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton bCancel;
     private javax.swing.JButton bOk;
-    private javax.swing.JList<ItemMetadata> lCfgProps;
+    private javax.swing.JList<ConfigurationMetadataProperty> lCfgProps;
     private javax.swing.JLabel lFilter;
     private javax.swing.JScrollPane scroller1;
     private javax.swing.JScrollPane scroller2;
@@ -235,9 +235,9 @@ public class CfgPropsDialog extends javax.swing.JDialog {
     // End of variables declaration//GEN-END:variables
 
     private void filterProps(String filter) {
-        DefaultListModel<ItemMetadata> dlmCfgProps = new DefaultListModel<>();
-        for (ItemMetadata item : sortedProps) {
-            if (filter == null || item.getName().contains(filter)) {
+        DefaultListModel<ConfigurationMetadataProperty> dlmCfgProps = new DefaultListModel<>();
+        for (ConfigurationMetadataProperty item : sortedProps) {
+            if (filter == null || item.getId().contains(filter)) {
                 dlmCfgProps.addElement(item);
             }
         }
@@ -247,25 +247,25 @@ public class CfgPropsDialog extends javax.swing.JDialog {
         }
     }
 
-    private static class ItemMetadataCellRenderer extends DefaultListCellRenderer {
+    private static class ConfigurationMetadataCellRenderer extends DefaultListCellRenderer {
 
         @Override
         public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-            if (value instanceof ItemMetadata) {
-                ItemMetadata item = (ItemMetadata) value;
-                setText(item.getName());
+            if (value instanceof ConfigurationMetadataProperty) {
+                ConfigurationMetadataProperty prop = (ConfigurationMetadataProperty) value;
+                setText(prop.getId());
             }
             return this;
         }
 
     }
 
-    private static class ItemMetadataNameComparator implements Comparator<ItemMetadata> {
+    private static class ConfigurationMetadataIdComparator implements Comparator<ConfigurationMetadataProperty> {
 
         @Override
-        public int compare(ItemMetadata o1, ItemMetadata o2) {
-            return o1.getName().compareTo(o2.getName());
+        public int compare(ConfigurationMetadataProperty p1, ConfigurationMetadataProperty p2) {
+            return p1.getId().compareTo(p2.getId());
         }
 
     }

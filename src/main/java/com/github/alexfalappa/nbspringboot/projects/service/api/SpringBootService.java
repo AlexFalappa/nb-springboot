@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.Set;
 
 import org.netbeans.api.java.classpath.ClassPath;
-import org.springframework.boot.configurationprocessor.metadata.ItemHint;
-import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
+import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+import org.springframework.boot.configurationmetadata.ValueHint;
 
 /**
  * Service API for implementing support of Spring Boot related functionalities.
@@ -37,11 +37,9 @@ public interface SpringBootService {
 
     Set<String> getPropertyNames();
 
-    List<ItemMetadata> getPropertyMetadata(String propertyName);
+    ConfigurationMetadataProperty getPropertyMetadata(String propertyName);
 
-    List<ItemMetadata> queryPropertyMetadata(String filter);
+    List<ConfigurationMetadataProperty> queryPropertyMetadata(String filter);
 
-    ItemHint getHintMetadata(String propertyName);
-
-    List<ItemHint.ValueHint> queryHintMetadata(String propertyName, String filter);
+    List<ValueHint> queryHintMetadata(String propertyName, String filter);
 }

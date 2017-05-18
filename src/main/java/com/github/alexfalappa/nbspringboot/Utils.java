@@ -18,8 +18,8 @@ package com.github.alexfalappa.nbspringboot;
 import java.util.regex.Pattern;
 
 import org.openide.util.NbPreferences;
-import org.springframework.boot.configurationprocessor.metadata.ItemDeprecation;
-import org.springframework.boot.configurationprocessor.metadata.ItemMetadata;
+import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+import org.springframework.boot.configurationmetadata.Deprecation;
 
 import com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel;
 
@@ -70,10 +70,10 @@ public final class Utils {
      * @param cfgMeta the configuration property metadata object
      * @return the HTML formatted configuration property details
      */
-    public static String cfgPropDetailsHtml(ItemMetadata cfgMeta) {
+    public static String cfgPropDetailsHtml(ConfigurationMetadataProperty cfgMeta) {
         StringBuilder sb = new StringBuilder();
         // deprecation (optional)
-        ItemDeprecation deprecation = cfgMeta.getDeprecation();
+        Deprecation deprecation = cfgMeta.getDeprecation();
         if (deprecation != null) {
             sb.append("<b>Deprecated</b>");
             // deprecation reason if present
