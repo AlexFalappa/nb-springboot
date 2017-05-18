@@ -29,6 +29,7 @@ import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JTextField;
 import javax.swing.KeyStroke;
+import javax.swing.UIManager;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.event.ListSelectionEvent;
@@ -52,7 +53,7 @@ import static java.awt.event.MouseEvent.BUTTON1;
 public class CfgPropsDialog extends javax.swing.JDialog {
 
     private boolean okPressed = false;
-    private TreeSet<ConfigurationMetadataProperty> sortedProps = new TreeSet<>(new ConfigurationMetadataIdComparator());
+    private TreeSet<ConfigurationMetadataProperty> sortedProps = new TreeSet<>(new ConfigurationMetadataComparator());
 
     /** Creates new form CfgPropsDialog */
     public CfgPropsDialog(java.awt.Dialog parent) {
@@ -254,18 +255,31 @@ public class CfgPropsDialog extends javax.swing.JDialog {
             super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
             if (value instanceof ConfigurationMetadataProperty) {
                 ConfigurationMetadataProperty prop = (ConfigurationMetadataProperty) value;
-                setText(prop.getId());
+                if (prop.isDeprecated()) {
+                    setText(String.format("<html><s>%s", prop.getId()));
+                    setForeground(UIManager.getColor("textInactiveText"));
+                } else {
+                    setText(prop.getId());
+                }
             }
             return this;
         }
 
     }
 
-    private static class ConfigurationMetadataIdComparator implements Comparator<ConfigurationMetadataProperty> {
+    private static class ConfigurationMetadataComparator implements Comparator<ConfigurationMetadataProperty> {
 
         @Override
         public int compare(ConfigurationMetadataProperty p1, ConfigurationMetadataProperty p2) {
-            return p1.getId().compareTo(p2.getId());
+            boolean d1 = p1.isDeprecated();
+            boolean d2 = p2.isDeprecated();
+            if (d1 && !d2) {
+                return 1;
+            } else if (d2 && !d1) {
+                return -1;
+            } else {
+                return p1.getId().compareTo(p2.getId());
+            }
         }
 
     }
