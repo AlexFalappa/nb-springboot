@@ -311,38 +311,50 @@ public class CfgPropsDialog extends javax.swing.JDialog {
 
         @Override
         public void keyPressed(KeyEvent e) {
-            switch (e.getKeyCode()) {
-                case KeyEvent.VK_ESCAPE:
-                    final String filter = txtField.getText();
-                    if (filter == null || filter.isEmpty()) {
-                        // close dialog if filter textfield is empty
-                        setVisible(false);
-                    } else {
-                        // clear textfield
-                        txtField.setText(null);
-                        e.consume();
-                    }
-                    break;
-                case KeyEvent.VK_UP:
-                    // calculate previous selected index wrapping if needed
-                    int selIdx = lCfgProps.getSelectedIndex() - 1;
-                    if (selIdx < 0) {
-                        selIdx = lCfgProps.getModel().getSize() - 1;
-                    }
-                    // move properties list selection and scroll to it
-                    lCfgProps.setSelectedIndex(selIdx);
-                    lCfgProps.scrollRectToVisible(lCfgProps.getCellBounds(selIdx, selIdx));
-                    break;
-                case KeyEvent.VK_DOWN:
-                    // calculate next selected index wrapping if needed
-                    selIdx = lCfgProps.getSelectedIndex() + 1;
-                    if (selIdx >= lCfgProps.getModel().getSize()) {
+            final int keyCode = e.getKeyCode();
+            if (keyCode == KeyEvent.VK_ESCAPE) {
+                final String filter = txtField.getText();
+                if (filter == null || filter.isEmpty()) {
+                    // close dialog if filter textfield is empty
+                    setVisible(false);
+                } else {
+                    // clear textfield
+                    txtField.setText(null);
+                    e.consume();
+                }
+            } else {
+                final int size = lCfgProps.getModel().getSize();
+                int selIdx = lCfgProps.getSelectedIndex();
+                // calculate index
+                switch (keyCode) {
+                    case KeyEvent.VK_HOME:
                         selIdx = 0;
-                    }
-                    // move properties list selection and scroll to it
-                    lCfgProps.setSelectedIndex(selIdx);
-                    lCfgProps.scrollRectToVisible(lCfgProps.getCellBounds(selIdx, selIdx));
-                    break;
+                        break;
+                    case KeyEvent.VK_PAGE_UP:
+                        selIdx -= lCfgProps.getVisibleRowCount();
+                        break;
+                    case KeyEvent.VK_UP:
+                        selIdx -= 1;
+                        break;
+                    case KeyEvent.VK_DOWN:
+                        selIdx += 1;
+                        break;
+                    case KeyEvent.VK_PAGE_DOWN:
+                        selIdx += lCfgProps.getVisibleRowCount();
+                        break;
+                    case KeyEvent.VK_END:
+                        selIdx = size - 1;
+                        break;
+                }
+                // wrap if needed
+                if (selIdx < 0) {
+                    selIdx += size;
+                } else if (selIdx >= size) {
+                    selIdx -= size;
+                }
+                // move properties list selection and scroll to it
+                lCfgProps.setSelectedIndex(selIdx);
+                lCfgProps.scrollRectToVisible(lCfgProps.getCellBounds(selIdx, selIdx));
             }
         }
 
