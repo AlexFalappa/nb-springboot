@@ -32,6 +32,7 @@ import com.github.alexfalappa.nbspringboot.projects.BootRecommendedTemplates;
  */
 public class FileTemplates {
 
+    public static final String CATEGORY_SPRING_FRAMEWORK = "spring-framework-types";
     public static final String CATEGORY_SPRING_BOOT = "spring-boot-types";
     public static final String CATEGORY_SPRING_MVC = "spring-mvc-types";
     public static final String CATEGORY_SPRING_DATA = "spring-data-types";
@@ -89,7 +90,7 @@ public class FileTemplates {
             content = "Configuration.java.template",
             description = "Configuration.html",
             scriptEngine = "freemarker",
-            category = {CATEGORY_SPRING_BOOT},
+            category = {CATEGORY_SPRING_FRAMEWORK},
             position = 400)
     @NbBundle.Messages(value = "config_displayName=Configuration Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> configuration() {
@@ -103,7 +104,7 @@ public class FileTemplates {
             content = "Component.java.template",
             description = "Component.html",
             scriptEngine = "freemarker",
-            category = {CATEGORY_SPRING_BOOT},
+            category = {CATEGORY_SPRING_FRAMEWORK},
             position = 500)
     @NbBundle.Messages(value = "component_displayName=Component Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> component() {
@@ -117,7 +118,7 @@ public class FileTemplates {
             content = "Service.java.template",
             description = "Service.html",
             scriptEngine = "freemarker",
-            category = {CATEGORY_SPRING_BOOT},
+            category = {CATEGORY_SPRING_FRAMEWORK},
             position = 600)
     @NbBundle.Messages(value = "service_displayName=Service Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> service() {
