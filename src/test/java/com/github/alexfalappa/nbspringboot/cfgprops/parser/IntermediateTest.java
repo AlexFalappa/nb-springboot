@@ -156,8 +156,14 @@ public class IntermediateTest extends TestBase {
     }
 
     @Test
-    public void testMultipleArrayNotation() throws URISyntaxException, IOException {
+    public void testArrayNotation() throws URISyntaxException, IOException {
         System.out.println("\n-- array notation");
+        parseMatch(" \t array[12] =\tval1");
+    }
+
+    @Test
+    public void testMultipleArrayNotation() throws URISyntaxException, IOException {
+        System.out.println("\n-- multiple array notation");
         parseMatch(" \t array[0] =\tval1\n"
                 + " prefix.array[1]=val2");
     }

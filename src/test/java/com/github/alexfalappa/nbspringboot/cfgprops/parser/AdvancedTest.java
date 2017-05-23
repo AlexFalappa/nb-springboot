@@ -30,7 +30,7 @@ public class AdvancedTest extends TestBase {
     public void testSingleEqualContinuationSpace() throws URISyntaxException, IOException {
         System.out.println("\n-- single equal continuation space");
         parseMatch("key2=value\\\n"
-                + "  with space at start of continuation");
+                + "    with space at start of continuation");
     }
 
     @Test

@@ -139,13 +139,13 @@ public class IntermediateTest extends TestBase {
     @Test
     public void testUnicodeKey() throws URISyntaxException, IOException {
         System.out.println("\n-- unicode in key");
-        parseMatch("\\u00a9=value");
+        parseMatch("key\\u00a9=value");
     }
 
     @Test
     public void testUnicodeValue() throws URISyntaxException, IOException {
         System.out.println("\n-- unicode in value");
-        parseMatch("key=\\u00A9");
+        parseMatch("key=value\\u00A9");
     }
 
     @Test

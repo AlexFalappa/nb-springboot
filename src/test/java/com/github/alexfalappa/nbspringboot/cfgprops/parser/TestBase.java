@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.TreeSet;
 
+import org.junit.experimental.categories.Category;
 import org.parboiled.Parboiled;
 import org.parboiled.errors.ErrorUtils;
 import org.parboiled.errors.ParseError;
@@ -15,6 +16,8 @@ import org.parboiled.parserunners.ReportingParseRunner;
 import org.parboiled.parserunners.TracingParseRunner;
 import org.parboiled.support.ParseTreeUtils;
 import org.parboiled.support.ParsingResult;
+
+import com.github.alexfalappa.nbspringboot.cfgprops.ParserTests;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
@@ -24,6 +27,7 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Alessandro Falappa
  */
+@Category(ParserTests.class)
 public class TestBase {
 
     final protected BootCfgParser parser;

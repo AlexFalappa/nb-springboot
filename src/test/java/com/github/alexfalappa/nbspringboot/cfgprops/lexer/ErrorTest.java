@@ -3,7 +3,6 @@ package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -11,7 +10,7 @@ import org.junit.Test;
  *
  * @author Alessandro Falappa
  */
-@Ignore
+//@Ignore
 public class ErrorTest extends TestBase {
 
     @Test

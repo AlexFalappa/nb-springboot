@@ -86,7 +86,11 @@ public class BootCfgParser extends BaseParser<String> {
                                 Optional(whitespace()),
                                 Sequence(value(sbvValue), push(sbvValue.getString()))
                         ),
-                        key()
+                        Sequence(
+                                key(),
+                                Optional(whitespace()),
+                                FirstOf(eolChar(), EOI)
+                        )
                 ),
                 actionStoreProp
         );
