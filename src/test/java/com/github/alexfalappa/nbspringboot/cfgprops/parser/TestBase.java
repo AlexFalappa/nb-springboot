@@ -30,12 +30,12 @@ import static org.junit.Assert.assertTrue;
 @Category(ParserTests.class)
 public class TestBase {
 
-    final protected BootCfgParser parser;
+    final protected CfgPropsParboiled parser;
     final protected ReportingParseRunner reportingRunner;
     final protected TracingParseRunner tracingRunner;
 
     TestBase() {
-        parser = Parboiled.createParser(BootCfgParser.class);
+        parser = Parboiled.createParser(CfgPropsParboiled.class);
         tracingRunner = new TracingParseRunner(parser.cfgProps());
         reportingRunner = new ReportingParseRunner(parser.cfgProps());
     }

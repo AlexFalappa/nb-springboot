@@ -25,7 +25,7 @@ import org.parboiled.support.Var;
  * @author Alessandro Falappa
  */
 //@BuildParseTree
-public class BootCfgParser extends BaseParser<String> {
+public class CfgPropsParboiled extends BaseParser<String> {
 
     private Properties parsedProps = new Properties();
 
@@ -125,7 +125,6 @@ public class BootCfgParser extends BaseParser<String> {
                         ),
                         encodedUnicode(sbv),
                         literalOrSpace(sbv)
-                //                        Sequence(notEolChar(), sbv.append(matchedChar()))
                 )
         );
     }
@@ -134,6 +133,7 @@ public class BootCfgParser extends BaseParser<String> {
         return OneOrMore(
                 FirstOf(
                         new JavaIdPartMatcher(sbv),
+                        Ch('-'),
                         encodedSpecialChar(sbv),
                         encodedTab(sbv),
                         encodedLinefeed(sbv),
@@ -151,7 +151,8 @@ public class BootCfgParser extends BaseParser<String> {
                         encodedTab(sbv),
                         encodedLinefeed(sbv),
                         encodedUnicode(sbv),
-                        malformedEscape(sbv)
+                        malformedEscape(sbv),
+                        AnyOf("[](){}\"'%&@+-*/")
                 )
         );
     }

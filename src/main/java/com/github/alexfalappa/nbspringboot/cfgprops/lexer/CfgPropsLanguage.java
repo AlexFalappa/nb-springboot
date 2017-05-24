@@ -18,7 +18,10 @@ package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
 import org.netbeans.api.lexer.Language;
 import org.netbeans.modules.csl.spi.DefaultLanguageConfig;
 import org.netbeans.modules.csl.spi.LanguageRegistration;
+import org.netbeans.modules.parsing.spi.Parser;
 import org.openide.util.NbBundle;
+
+import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 
 /**
  * NetBeans language definition for Spring Boot configuration properties.
@@ -43,6 +46,11 @@ public class CfgPropsLanguage extends DefaultLanguageConfig {
     @Override
     public String getLineCommentPrefix() {
         return "#"; //NOI18N
+    }
+
+    @Override
+    public Parser getParser() {
+        return new CfgPropsParser();
     }
 
 }
