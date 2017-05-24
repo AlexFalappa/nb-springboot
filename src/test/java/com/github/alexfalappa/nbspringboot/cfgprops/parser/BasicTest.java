@@ -56,6 +56,18 @@ public class BasicTest extends TestBase {
     }
 
     @Test
+    public void testSingleEqualHyphen() throws URISyntaxException, IOException {
+        System.out.println("\n-- single equal hyphen");
+        parseMatch("my-key=val");
+    }
+
+    @Test
+    public void testSingleEqualUnderscore() throws URISyntaxException, IOException {
+        System.out.println("\n-- single equal underscore");
+        parseMatch("my_key=val");
+    }
+
+    @Test
     public void testSingleColonEmpty() throws URISyntaxException, IOException {
         System.out.println("\n-- single empty colon");
         parseMatch("key:");
@@ -71,6 +83,18 @@ public class BasicTest extends TestBase {
     public void testSingleDottedColon() throws URISyntaxException, IOException {
         System.out.println("\n-- single dotted colon");
         parseMatch("prefix.middle.key:val");
+    }
+
+    @Test
+    public void testSingleColonHyphen() throws URISyntaxException, IOException {
+        System.out.println("\n-- single colon hyphen");
+        parseMatch("my-key:val");
+    }
+
+    @Test
+    public void testSingleColonUnderscore() throws URISyntaxException, IOException {
+        System.out.println("\n-- single colon underscore");
+        parseMatch("my_key:val");
     }
 
     @Test

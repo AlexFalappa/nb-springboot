@@ -149,6 +149,12 @@ public class IntermediateTest extends TestBase {
     }
 
     @Test
+    public void testUnusualValue() throws URISyntaxException, IOException {
+        System.out.println("\n-- unusual chars in value");
+        parseMatch("key=[({+})]£$%&@#-_^\"*/'`|/;ç°§*<>");
+    }
+
+    @Test
     public void testMultipleMixedSep() throws URISyntaxException, IOException {
         System.out.println("\n-- multiple mixed separators");
         parseMatch("key1:val1\n"
