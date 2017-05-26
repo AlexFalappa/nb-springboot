@@ -28,7 +28,7 @@ import org.netbeans.modules.parsing.spi.ParseException;
 import org.netbeans.modules.parsing.spi.Parser;
 import org.netbeans.modules.parsing.spi.SourceModificationEvent;
 import org.parboiled.Parboiled;
-import org.parboiled.parserunners.ReportingParseRunner;
+import org.parboiled.parserunners.RecoveringParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**
@@ -38,7 +38,7 @@ import org.parboiled.support.ParsingResult;
 public class CfgPropsParser extends Parser {
 
     private final CfgPropsParboiled parboiled;
-    private ReportingParseRunner runner;
+    private RecoveringParseRunner runner;
     private Snapshot snapshot;
     private ParsingResult result;
 
@@ -50,7 +50,8 @@ public class CfgPropsParser extends Parser {
     public void parse(Snapshot snapshot, Task task, SourceModificationEvent sme) throws ParseException {
         this.snapshot = snapshot;
         System.out.println("Parsing...");
-        runner = new ReportingParseRunner(parboiled.cfgProps());
+        runner = new RecoveringParseRunner(parboiled.cfgProps());
+        parboiled.reset();
         result = runner.run(snapshot.getText().toString());
 //        if (!result.matched) {
 //            throw new ParseException("errore di parsing");
@@ -59,7 +60,7 @@ public class CfgPropsParser extends Parser {
 
     @Override
     public Result getResult(Task task) throws ParseException {
-        return new CfgPropsParserResult(snapshot, result);
+        return new CfgPropsParserResult(snapshot, result, parboiled);
     }
 
     @Override
@@ -74,10 +75,12 @@ public class CfgPropsParser extends Parser {
 
         private final ParsingResult result;
         private boolean valid = true;
+        private final CfgPropsParboiled parser;
 
-        CfgPropsParserResult(Snapshot snapshot, ParsingResult result) {
+        CfgPropsParserResult(Snapshot snapshot, ParsingResult result, CfgPropsParboiled parser) {
             super(snapshot);
             this.result = result;
+            this.parser = parser;
         }
 
         public ParsingResult getResult() throws org.netbeans.modules.parsing.spi.ParseException {
@@ -85,6 +88,10 @@ public class CfgPropsParser extends Parser {
                 throw new org.netbeans.modules.parsing.spi.ParseException();
             }
             return result;
+        }
+
+        public CfgPropsParboiled getParser() {
+            return parser;
         }
 
         @Override

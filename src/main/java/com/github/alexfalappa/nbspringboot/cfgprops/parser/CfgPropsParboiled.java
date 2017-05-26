@@ -1,5 +1,7 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Properties;
 
 import org.parboiled.Action;
@@ -28,11 +30,19 @@ import org.parboiled.support.Var;
 public class CfgPropsParboiled extends BaseParser<String> {
 
     private Properties parsedProps = new Properties();
+    private List<CfgPropLine> propList = new LinkedList<>();
 
     public Properties getParsedProps() {
         return parsedProps;
     }
 
+    public List<CfgPropLine> getPropsList() {
+        return propList;
+    }
+
+    public void reset() {
+        propList.clear();
+    }
     Action<String> actionStoreProp = new Action<String>() {
         @Override
         public boolean run(Context<java.lang.String> context) {
@@ -43,13 +53,18 @@ public class CfgPropsParboiled extends BaseParser<String> {
                     System.out.println("Empty stack");
                     break;
                 case 1:
-                    parsedProps.setProperty(stack.pop(), "");
+                    String propName = stack.pop();
+                    parsedProps.setProperty(propName, "");
+                    propList.add(CfgPropLine.of(context.getPosition().line, propName, ""));
                     break;
                 case 2:
-                    parsedProps.setProperty(stack.pop(1), stack.pop());
+                    propName = stack.pop();
+                    final String propValue = stack.pop();
+                    parsedProps.setProperty(propValue, propName);
+                    propList.add(CfgPropLine.of(context.getPosition().line, propValue, propName));
                     break;
                 default:
-                    System.out.println("More than 2 values on the stack");
+                    throw new IllegalStateException("More than 2 values on the stack");
             }
             return true;
         }

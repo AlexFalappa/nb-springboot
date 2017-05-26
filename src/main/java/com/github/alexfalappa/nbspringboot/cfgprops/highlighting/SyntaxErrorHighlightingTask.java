@@ -16,7 +16,9 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -36,6 +38,7 @@ import org.parboiled.errors.ErrorUtils;
 import org.parboiled.errors.InvalidInputError;
 import org.parboiled.errors.ParseError;
 
+import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropLine;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 
 /**
@@ -47,12 +50,13 @@ public class SyntaxErrorHighlightingTask extends ParserResultTask<CfgPropsParser
     private Formatter<InvalidInputError> formatter = new DefaultInvalidInputErrorFormatter();
 
     @Override
-    public void run(CfgPropsParser.CfgPropsParserResult sjResult, SchedulerEvent se) {
+    public void run(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se) {
         try {
             System.out.println("Running SyntaxErrorHighlightingTask");
-            List<ParseError> parseErrors = sjResult.getResult().parseErrors;
-            Document document = sjResult.getSnapshot().getSource().getDocument(false);
+            List<ParseError> parseErrors = cfgResult.getResult().parseErrors;
+            Document document = cfgResult.getSnapshot().getSource().getDocument(false);
             List<ErrorDescription> errors = new ArrayList<>();
+            // syntax errors
             for (ParseError error : parseErrors) {
                 System.out.println(ErrorUtils.printParseError(error));
                 String message = error.getErrorMessage() != null
@@ -62,14 +66,32 @@ public class SyntaxErrorHighlightingTask extends ParserResultTask<CfgPropsParser
                                 : error.getClass().getSimpleName();
 //                int start = NbDocument.findLineOffset((StyledDocument) document, token.beginLine - 1) + token.beginColumn - 1;
 //                int end = NbDocument.findLineOffset((StyledDocument) document, token.endLine - 1) + token.endColumn;
-                ErrorDescription errorDescription = ErrorDescriptionFactory.createErrorDescription(
+                ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
                         Severity.ERROR,
                         message,
                         document,
                         document.createPosition(error.getStartIndex()),
                         document.createPosition(error.getEndIndex())
                 );
-                errors.add(errorDescription);
+                errors.add(errDesc);
+            }
+            // duplicate props
+            List<CfgPropLine> propsList = cfgResult.getParser().getPropsList();
+            System.out.printf("PropList size %d%n", propsList.size());
+            Set<String> keys = new HashSet<>();
+            for (CfgPropLine propLine : propsList) {
+                final String key = propLine.getKey();
+                if (keys.contains(key)) {
+                    ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
+                            Severity.WARNING,
+                            "Duplicate property",
+                            document,
+                            propLine.getLine()
+                    );
+                    errors.add(errDesc);
+                } else {
+                    keys.add(key);
+                }
             }
             HintsController.setErrors(document, "simple-java", errors);
         } catch (BadLocationException | ParseException ex1) {
