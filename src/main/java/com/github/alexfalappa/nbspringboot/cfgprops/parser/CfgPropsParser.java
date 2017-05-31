@@ -17,6 +17,9 @@ package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.SortedSet;
 
 import javax.swing.event.ChangeListener;
 
@@ -39,9 +42,8 @@ import org.parboiled.support.ParsingResult;
 public class CfgPropsParser extends Parser {
 
     private final CfgPropsParboiled parboiled;
-    private RecoveringParseRunner runner;
     private Snapshot snapshot;
-    private ParsingResult result;
+    private ParsingResult parbResult;
 
     public CfgPropsParser() {
         parboiled = Parboiled.createParser(CfgPropsParboiled.class);
@@ -50,18 +52,16 @@ public class CfgPropsParser extends Parser {
     @Override
     public void parse(Snapshot snapshot, Task task, SourceModificationEvent sme) throws ParseException {
         this.snapshot = snapshot;
-        System.out.println("Parsing...");
-        runner = new RecoveringParseRunner(parboiled.cfgProps());
+        System.out.println("\n\nParsing...");
+        RecoveringParseRunner runner = new RecoveringParseRunner(parboiled.cfgProps());
         parboiled.reset();
-        result = runner.run(snapshot.getText().toString());
-//        if (!result.matched) {
-//            throw new ParseException("errore di parsing");
-//        }
+        parbResult = runner.run(snapshot.getText().toString());
+        parboiled.getParsedProps().list(System.out);
     }
 
     @Override
     public Result getResult(Task task) throws ParseException {
-        return new CfgPropsParserResult(snapshot, result, parboiled);
+        return new CfgPropsParserResult(snapshot, parbResult, parboiled.getParsedProps(), parboiled.getPropLines());
     }
 
     @Override
@@ -74,30 +74,36 @@ public class CfgPropsParser extends Parser {
 
     public static class CfgPropsParserResult extends ParserResult {
 
-        private final ParsingResult result;
+        private final ParsingResult parbResult;
+        private final Properties parsedProps;
         private boolean valid = true;
-        private final CfgPropsParboiled parser;
+        private final Map<String, SortedSet<Integer>> propLines;
 
-        CfgPropsParserResult(Snapshot snapshot, ParsingResult result, CfgPropsParboiled parser) {
+        CfgPropsParserResult(Snapshot snapshot, ParsingResult parbResult, Properties parsedProps, Map<String, SortedSet<Integer>> propLines) {
             super(snapshot);
-            this.result = result;
-            this.parser = parser;
-        }
-
-        public ParsingResult getResult() throws org.netbeans.modules.parsing.spi.ParseException {
-            if (!valid) {
-                throw new org.netbeans.modules.parsing.spi.ParseException();
-            }
-            return result;
-        }
-
-        public CfgPropsParboiled getParser() {
-            return parser;
+            this.parbResult = parbResult;
+            this.parsedProps = parsedProps;
+            this.propLines = propLines;
         }
 
         @Override
         protected void invalidate() {
             valid = false;
+        }
+
+        public ParsingResult getParbResult() throws org.netbeans.modules.parsing.spi.ParseException {
+            if (!valid) {
+                throw new org.netbeans.modules.parsing.spi.ParseException();
+            }
+            return parbResult;
+        }
+
+        public Properties getParsedProps() {
+            return parsedProps;
+        }
+
+        public Map<String, SortedSet<Integer>> getPropLines() {
+            return propLines;
         }
 
         @Override

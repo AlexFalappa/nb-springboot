@@ -1,8 +1,10 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Properties;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 import org.parboiled.Action;
 import org.parboiled.BaseParser;
@@ -26,47 +28,53 @@ import org.parboiled.support.Var;
  *
  * @author Alessandro Falappa
  */
-//@BuildParseTree
 public class CfgPropsParboiled extends BaseParser<String> {
 
     private Properties parsedProps = new Properties();
-    private List<CfgPropLine> propList = new LinkedList<>();
+    private Map<String, SortedSet<Integer>> propLines = new HashMap<>();
 
     public Properties getParsedProps() {
         return parsedProps;
     }
 
-    public List<CfgPropLine> getPropsList() {
-        return propList;
+    public Map<String, SortedSet<Integer>> getPropLines() {
+        return propLines;
     }
 
     public void reset() {
-        propList.clear();
+        parsedProps.clear();
+        propLines.clear();
     }
+
     Action<String> actionStoreProp = new Action<String>() {
         @Override
         public boolean run(Context<java.lang.String> context) {
-            final ValueStack<java.lang.String> stack = context.getValueStack();
+            final ValueStack<String> stack = context.getValueStack();
             int size = stack.size();
             switch (size) {
-                case 0:
-                    System.out.println("Empty stack");
-                    break;
                 case 1:
                     String propName = stack.pop();
                     parsedProps.setProperty(propName, "");
-                    propList.add(CfgPropLine.of(context.getPosition().line, propName, ""));
+                    addLine(propName, context.getPosition().line);
                     break;
                 case 2:
-                    propName = stack.pop();
+                    // NOTE: stack popping order below is important!
                     final String propValue = stack.pop();
-                    parsedProps.setProperty(propValue, propName);
-                    propList.add(CfgPropLine.of(context.getPosition().line, propValue, propName));
+                    propName = stack.pop();
+                    parsedProps.setProperty(propName, propValue);
+                    addLine(propName, context.getPosition().line);
                     break;
                 default:
-                    throw new IllegalStateException("More than 2 values on the stack");
+                    throw new IllegalStateException("Zero or more than 2 values on the parsing stack");
             }
             return true;
+        }
+
+        private void addLine(java.lang.String propName, int line) {
+            if (!propLines.containsKey(propName)) {
+                propLines.put(propName, new TreeSet<Integer>());
+            }
+            propLines.get(propName).add(line);
         }
 
         @Override

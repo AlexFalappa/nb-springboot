@@ -22,9 +22,9 @@ package com.github.alexfalappa.nbspringboot.cfgprops.parser;
  */
 public class CfgPropLine {
 
-    final int line;
-    final String key;
-    final String value;
+    private final int line;
+    private final String key;
+    private final String value;
 
     public CfgPropLine(int line, String key, String value) {
         this.line = line;
@@ -42,6 +42,11 @@ public class CfgPropLine {
 
     public String getValue() {
         return value;
+    }
+
+    @Override
+    public String toString() {
+        return "[" + line + "] " + key + " -> " + value;
     }
 
     public static CfgPropLine of(int line, String key, String value) {

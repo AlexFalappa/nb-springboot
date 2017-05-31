@@ -80,7 +80,7 @@ public class TestBase {
         } else {
             TreeSet<Object> sortedKeys = new TreeSet<>(p.keySet());
             for (Object k : sortedKeys) {
-                System.out.printf("[%s] -> [%s]%n", k.toString(), p.get(k).toString());
+                System.out.printf("[%s] -> [%s]%n", k.toString(), p.getProperty(k.toString()));
             }
         }
     }

@@ -16,9 +16,10 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
 import java.util.ArrayList;
-import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
+import java.util.SortedSet;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -34,11 +35,9 @@ import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Exceptions;
 import org.parboiled.common.Formatter;
 import org.parboiled.errors.DefaultInvalidInputErrorFormatter;
-import org.parboiled.errors.ErrorUtils;
 import org.parboiled.errors.InvalidInputError;
 import org.parboiled.errors.ParseError;
 
-import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropLine;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 
 /**
@@ -48,51 +47,49 @@ import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
  */
 public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.CfgPropsParserResult> {
 
-    private Formatter<InvalidInputError> formatter = new DefaultInvalidInputErrorFormatter();
+    private final Formatter<InvalidInputError> formatter = new DefaultInvalidInputErrorFormatter();
 
     @Override
     public void run(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se) {
         try {
-            System.out.println("Running SyntaxErrorHighlightingTask");
-            List<ParseError> parseErrors = cfgResult.getResult().parseErrors;
+            System.out.println("--- Highlighting errors/warnings...");
+            List<ParseError> parseErrors = cfgResult.getParbResult().parseErrors;
             Document document = cfgResult.getSnapshot().getSource().getDocument(false);
             List<ErrorDescription> errors = new ArrayList<>();
             // syntax errors
-            System.out.println("... syntax errors");
             for (ParseError error : parseErrors) {
-                System.out.println(ErrorUtils.printParseError(error));
+//                System.out.println(ErrorUtils.printParseError(error));
+//                System.out.printf("start %d stop %d%n", error.getStartIndex(), error.getEndIndex());
                 String message = error.getErrorMessage() != null
                         ? error.getErrorMessage()
                         : error instanceof InvalidInputError
                                 ? formatter.format((InvalidInputError) error)
                                 : error.getClass().getSimpleName();
-//                int start = NbDocument.findLineOffset((StyledDocument) document, token.beginLine - 1) + token.beginColumn - 1;
-//                int end = NbDocument.findLineOffset((StyledDocument) document, token.endLine - 1) + token.endColumn;
                 ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
                         Severity.ERROR,
                         message,
                         document,
-                        document.createPosition(error.getStartIndex()),
-                        document.createPosition(error.getEndIndex())
+                        document.createPosition(Math.min(error.getStartIndex(), document.getLength() + 1)),
+                        document.createPosition(Math.min(error.getEndIndex(), document.getLength() + 1))
                 );
                 errors.add(errDesc);
             }
             // duplicate props
-            System.out.println("... duplicate props");
-            List<CfgPropLine> propsList = cfgResult.getParser().getPropsList();
-            Set<String> keys = new HashSet<>();
-            for (CfgPropLine propLine : propsList) {
-                final String key = propLine.getKey();
-                if (keys.contains(key)) {
-                    ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
-                            Severity.WARNING,
-                            "Duplicate property",
-                            document,
-                            propLine.getLine()
-                    );
-                    errors.add(errDesc);
-                } else {
-                    keys.add(key);
+            Map<String, SortedSet<Integer>> propsLines = cfgResult.getPropLines();
+            for (Map.Entry<String, SortedSet<Integer>> entry : propsLines.entrySet()) {
+                final SortedSet<Integer> lines = entry.getValue();
+                if (lines.size() > 1) {
+                    Iterator<Integer> it = lines.iterator();
+                    Integer firstLine = it.next();
+                    while (it.hasNext()) {
+                        ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
+                                Severity.WARNING,
+                                String.format("Duplicate of property at line %d", firstLine),
+                                document,
+                                it.next()
+                        );
+                        errors.add(errDesc);
+                    }
                 }
             }
             HintsController.setErrors(document, "simple-java", errors);
