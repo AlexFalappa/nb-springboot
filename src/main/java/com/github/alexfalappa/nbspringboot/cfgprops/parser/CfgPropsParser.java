@@ -32,6 +32,7 @@ import org.parboiled.parserunners.RecoveringParseRunner;
 import org.parboiled.support.ParsingResult;
 
 /**
+ * NetBeans Parsing & Lexing API parser for integrating the Parboiled parser.
  *
  * @author Alessandro Falappa
  */

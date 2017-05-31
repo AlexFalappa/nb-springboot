@@ -26,6 +26,7 @@ import org.netbeans.modules.parsing.spi.TaskFactory;
 import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
 
 /**
+ * Factory for NetBeans API highlighting tasks.
  *
  * @author Alessandro Falappa
  */

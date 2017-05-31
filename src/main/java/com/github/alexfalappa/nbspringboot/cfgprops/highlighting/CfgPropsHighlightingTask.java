@@ -42,6 +42,7 @@ import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropLine;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 
 /**
+ * Highlighting task for syntax errors, duplicate properties and ... in configuration properties editor.
  *
  * @author Alessandro Falappa
  */

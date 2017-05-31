@@ -16,6 +16,7 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 
 /**
+ * Parsing element representing a key value pari of a configuration property on a line.
  *
  * @author Alessandro Falappa
  */
