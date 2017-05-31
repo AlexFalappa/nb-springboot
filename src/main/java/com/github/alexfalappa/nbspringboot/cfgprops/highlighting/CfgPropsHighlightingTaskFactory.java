@@ -29,12 +29,12 @@ import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
  *
  * @author Alessandro Falappa
  */
-@MimeRegistration(mimeType = CfgPropsLanguage.MIME_TYPE, service = SyntaxErrorHighlightingTaskFactory.class)
-public class SyntaxErrorHighlightingTaskFactory extends TaskFactory {
+@MimeRegistration(mimeType = CfgPropsLanguage.MIME_TYPE, service = CfgPropsHighlightingTaskFactory.class)
+public class CfgPropsHighlightingTaskFactory extends TaskFactory {
 
     @Override
     public Collection<? extends SchedulerTask> create(Snapshot snpsht) {
-        return Collections.singleton(new SyntaxErrorHighlightingTask());
+        return Collections.singleton(new CfgPropsHighlightingTask());
     }
 
 }

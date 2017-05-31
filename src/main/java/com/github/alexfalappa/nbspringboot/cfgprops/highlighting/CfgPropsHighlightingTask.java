@@ -45,7 +45,7 @@ import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
  *
  * @author Alessandro Falappa
  */
-public class SyntaxErrorHighlightingTask extends ParserResultTask<CfgPropsParser.CfgPropsParserResult> {
+public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.CfgPropsParserResult> {
 
     private Formatter<InvalidInputError> formatter = new DefaultInvalidInputErrorFormatter();
 
@@ -57,6 +57,7 @@ public class SyntaxErrorHighlightingTask extends ParserResultTask<CfgPropsParser
             Document document = cfgResult.getSnapshot().getSource().getDocument(false);
             List<ErrorDescription> errors = new ArrayList<>();
             // syntax errors
+            System.out.println("... syntax errors");
             for (ParseError error : parseErrors) {
                 System.out.println(ErrorUtils.printParseError(error));
                 String message = error.getErrorMessage() != null
@@ -76,8 +77,8 @@ public class SyntaxErrorHighlightingTask extends ParserResultTask<CfgPropsParser
                 errors.add(errDesc);
             }
             // duplicate props
+            System.out.println("... duplicate props");
             List<CfgPropLine> propsList = cfgResult.getParser().getPropsList();
-            System.out.printf("PropList size %d%n", propsList.size());
             Set<String> keys = new HashSet<>();
             for (CfgPropLine propLine : propsList) {
                 final String key = propLine.getKey();
