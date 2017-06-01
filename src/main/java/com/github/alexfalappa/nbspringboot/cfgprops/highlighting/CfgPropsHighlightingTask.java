@@ -20,10 +20,12 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedSet;
+import java.util.logging.Logger;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import org.netbeans.api.project.Project;
 import org.netbeans.modules.parsing.spi.ParseException;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 import org.netbeans.modules.parsing.spi.Scheduler;
@@ -32,13 +34,19 @@ import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
+import org.openide.util.Utilities;
 import org.parboiled.common.Formatter;
 import org.parboiled.errors.DefaultInvalidInputErrorFormatter;
 import org.parboiled.errors.InvalidInputError;
 import org.parboiled.errors.ParseError;
+import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
+
+import static java.util.logging.Level.FINE;
 
 /**
  * Highlighting task for syntax errors, duplicate properties and ... in configuration properties editor.
@@ -47,6 +55,7 @@ import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
  */
 public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.CfgPropsParserResult> {
 
+    private static final Logger logger = Logger.getLogger(CfgPropsHighlightingTask.class.getName());
     private final Formatter<InvalidInputError> formatter = new DefaultInvalidInputErrorFormatter();
 
     @Override
@@ -89,6 +98,24 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
                                 it.next()
                         );
                         errors.add(errDesc);
+                    }
+                }
+            }
+            // data type check
+            Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
+            if (prj != null) {
+                logger.log(FINE, "Highlighting within context of prj {0}", FileUtil.getFileDisplayName(prj.getProjectDirectory()));
+                final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
+                if (sbs != null) {
+                    for (Object obj : cfgResult.getParsedProps().keySet()) {
+                        String pName = (String) obj;
+                        ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
+                        if (cfgMeta != null) {
+                            String type = cfgMeta.getType();
+                            logger.log(FINE, "Property {0} should be of type {1}", new Object[]{pName, type});
+                        } else {
+                            logger.log(FINE, "No metadata for {0}", pName);
+                        }
                     }
                 }
             }
