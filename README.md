@@ -66,7 +66,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 ## Changelog
 
-* __1.5.2__ (??? 2017): Work In Progress
+* __1.6__ (??? 2017): Work In Progress
     * Deprecated configuration properties are now show at the bottom of completion list
     * The `application.properties` file wizard allows to choose between _main_ and _test_ resource folders
 
