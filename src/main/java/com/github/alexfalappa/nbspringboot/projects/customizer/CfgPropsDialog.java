@@ -354,27 +354,50 @@ public class CfgPropsDialog extends javax.swing.JDialog {
                 }
             } else {
                 final int size = lCfgProps.getModel().getSize();
+                // short circuit if empty size
+                if (size == 0) {
+                    return;
+                }
                 int selIdx = lCfgProps.getSelectedIndex();
-                // calculate index
+                final int pageStep = lCfgProps.getVisibleRowCount();
+                // calculate new index
                 switch (keyCode) {
                     case KeyEvent.VK_PAGE_UP:
-                        selIdx -= lCfgProps.getVisibleRowCount();
+                        selIdx -= pageStep;
+                        // clamp to [0 : size-1] range
+                        if (selIdx < 0) {
+                            selIdx = 0;
+                        } else if (selIdx >= size) {
+                            selIdx = size - 1;
+                        }
                         break;
                     case KeyEvent.VK_UP:
                         selIdx -= 1;
+                        // wrap if needed
+                        if (selIdx < 0) {
+                            selIdx += size;
+                        } else if (selIdx >= size) {
+                            selIdx -= size;
+                        }
                         break;
                     case KeyEvent.VK_DOWN:
                         selIdx += 1;
+                        // wrap if needed
+                        if (selIdx < 0) {
+                            selIdx += size;
+                        } else if (selIdx >= size) {
+                            selIdx -= size;
+                        }
                         break;
                     case KeyEvent.VK_PAGE_DOWN:
-                        selIdx += lCfgProps.getVisibleRowCount();
+                        selIdx += pageStep;
+                        // clamp to [0 : size-1] range
+                        if (selIdx < 0) {
+                            selIdx = 0;
+                        } else if (selIdx >= size) {
+                            selIdx = size - 1;
+                        }
                         break;
-                }
-                // wrap if needed
-                if (selIdx < 0) {
-                    selIdx += size;
-                } else if (selIdx >= size) {
-                    selIdx -= size;
                 }
                 // move properties list selection and scroll to it
                 lCfgProps.setSelectedIndex(selIdx);
