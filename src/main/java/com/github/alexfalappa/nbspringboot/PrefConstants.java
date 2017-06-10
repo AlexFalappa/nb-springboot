@@ -28,6 +28,8 @@ public final class PrefConstants {
     public static final String PREF_MANUAL_RESTART = "nbspringboot.defaultopts.manual-restart";
     public static final String PREF_VM_OPTS = "nbspringboot.defaultopts.vm-options";
     public static final String PREF_VM_OPTS_LAUNCH = "nbspringboot.defaultopts.launch-vm-options";
+    public static final String PREF_DEPR_SORT_LAST = "nbspringboot.defaultopts.sort-deprecated-last";
+    public static final String PREF_DEPR_ERROR_SHOW = "nbspringboot.defaultopts.show-error-deprecated";
 
     // prevent instantiation
     private PrefConstants() {
