@@ -75,7 +75,13 @@ public final class Utils {
         // deprecation (optional)
         Deprecation deprecation = cfgMeta.getDeprecation();
         if (deprecation != null) {
-            sb.append("<b>Deprecated</b>");
+            sb.append("<b>");
+            if (isErrorDeprecated(cfgMeta)) {
+                sb.append("REMOVED");
+            } else {
+                sb.append("Deprecated");
+            }
+            sb.append("</b>");
             // deprecation reason if present
             String reason = deprecation.getReason();
             if (reason != null) {
@@ -107,5 +113,10 @@ public final class Utils {
         }
         sb.append(NbPreferences.forModule(Utils.class).get(PREF_VM_OPTS, ""));
         return sb.toString();
+    }
+
+    public static boolean isErrorDeprecated(ConfigurationMetadataProperty meta) {
+        Deprecation depr = meta.getDeprecation();
+        return depr != null && depr.getLevel() != null && depr.getLevel().equals(Deprecation.Level.ERROR);
     }
 }

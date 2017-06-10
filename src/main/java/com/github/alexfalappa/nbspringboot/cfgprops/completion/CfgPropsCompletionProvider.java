@@ -17,6 +17,7 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.completion;
 
 import java.util.logging.Logger;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -35,13 +36,18 @@ import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
+import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
+import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_ERROR_SHOW;
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_SORT_LAST;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
@@ -131,10 +137,20 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
 
     // Create a completion result list of config properties based on a filter string, classpath and document offsets.
     private void completePropName(SpringBootService sbs, CompletionResultSet completionResultSet, String filter, int startOffset, int caretOffset) {
+        final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
+        final boolean bDeprLast = prefs.getBoolean(PREF_DEPR_SORT_LAST, true);
+        final boolean bErrorShow = prefs.getBoolean(PREF_DEPR_ERROR_SHOW, false);
         long mark = System.currentTimeMillis();
         logger.log(FINER, "Completing property name: {0}", filter);
         for (ConfigurationMetadataProperty propMeta : sbs.queryPropertyMetadata(filter)) {
-            completionResultSet.addItem(new CfgPropCompletionItem(propMeta, sbs, startOffset, caretOffset));
+            if (Utils.isErrorDeprecated(propMeta)) {
+                // show error level deprecated props based on pref
+                if (bErrorShow) {
+                    completionResultSet.addItem(new CfgPropCompletionItem(propMeta, sbs, startOffset, caretOffset, bDeprLast));
+                }
+            } else {
+                completionResultSet.addItem(new CfgPropCompletionItem(propMeta, sbs, startOffset, caretOffset, bDeprLast));
+            }
         }
         final long elapsed = System.currentTimeMillis() - mark;
         logger.log(FINER, "Property completion of ''{0}'' took: {1} msecs", new Object[]{filter, elapsed});

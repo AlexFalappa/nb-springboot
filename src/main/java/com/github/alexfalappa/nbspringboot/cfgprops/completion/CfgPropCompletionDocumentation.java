@@ -30,6 +30,7 @@ import org.springframework.boot.configurationmetadata.Deprecation;
 import org.springframework.boot.configurationmetadata.Hints;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
@@ -63,7 +64,12 @@ public class CfgPropCompletionDocumentation implements CompletionDocumentation {
         // deprecation (optional)
         Deprecation deprecation = configurationMeta.getDeprecation();
         if (deprecation != null) {
-            sb.append("<br/><br/><b><i>Deprecated");
+            sb.append("<br/><br/><b><i>");
+            if (Utils.isErrorDeprecated(configurationMeta)) {
+                sb.append("REMOVED");
+            } else {
+                sb.append("Deprecated");
+            }
             // deprecation reason if present
             String reason = deprecation.getReason();
             if (reason != null) {

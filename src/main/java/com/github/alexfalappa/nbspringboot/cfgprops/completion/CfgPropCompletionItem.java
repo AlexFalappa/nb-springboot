@@ -41,6 +41,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.Utils.shortenJavaType;
@@ -65,8 +66,9 @@ public class CfgPropCompletionItem implements CompletionItem {
     private final int propStartOffset;
     private boolean overwrite;
     private final String type;
+    private final boolean sortDeprLast;
 
-    public CfgPropCompletionItem(ConfigurationMetadataProperty configurationMeta, SpringBootService bootService, int propStartOffset, int caretOffset) {
+    public CfgPropCompletionItem(ConfigurationMetadataProperty configurationMeta, SpringBootService bootService, int propStartOffset, int caretOffset, boolean sortDeprLast) {
         this.overwrite = false;
         this.configurationMeta = configurationMeta;
         if (configurationMeta.getType() != null) {
@@ -77,6 +79,7 @@ public class CfgPropCompletionItem implements CompletionItem {
         this.bootService = bootService;
         this.propStartOffset = propStartOffset;
         this.caretOffset = caretOffset;
+        this.sortDeprLast = sortDeprLast;
     }
 
     public ConfigurationMetadataProperty getConfigurationMetadata() {
@@ -139,8 +142,11 @@ public class CfgPropCompletionItem implements CompletionItem {
         if (configurationMeta.isDeprecated()) {
             leftHtmlText = "<s>" + leftHtmlText + "</s>";
         }
+        final Color color = Utils.isErrorDeprecated(configurationMeta)
+                ? UIManager.getColor("textInactiveText")
+                : UIManager.getColor("List.foreground");
         CompletionUtilities.renderHtml(fieldIcon, leftHtmlText, getTextRight(), g, defaultFont, (selected ? UIManager.getColor(
-                "List.selectionForeground") : UIManager.getColor("List.foreground")), width, height, selected);
+                "List.selectionForeground") : color), width, height, selected);
     }
 
     @Override
@@ -175,7 +181,7 @@ public class CfgPropCompletionItem implements CompletionItem {
 
     @Override
     public int getSortPriority() {
-        return (configurationMeta.isDeprecated()) ? 1 : 0;
+        return (configurationMeta.isDeprecated() && sortDeprLast) ? 1 : 0;
     }
 
     @Override
