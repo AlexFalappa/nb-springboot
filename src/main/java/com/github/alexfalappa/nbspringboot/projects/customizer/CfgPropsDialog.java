@@ -357,9 +357,6 @@ public class CfgPropsDialog extends javax.swing.JDialog {
                 int selIdx = lCfgProps.getSelectedIndex();
                 // calculate index
                 switch (keyCode) {
-                    case KeyEvent.VK_HOME:
-                        selIdx = 0;
-                        break;
                     case KeyEvent.VK_PAGE_UP:
                         selIdx -= lCfgProps.getVisibleRowCount();
                         break;
@@ -371,9 +368,6 @@ public class CfgPropsDialog extends javax.swing.JDialog {
                         break;
                     case KeyEvent.VK_PAGE_DOWN:
                         selIdx += lCfgProps.getVisibleRowCount();
-                        break;
-                    case KeyEvent.VK_END:
-                        selIdx = size - 1;
                         break;
                 }
                 // wrap if needed
