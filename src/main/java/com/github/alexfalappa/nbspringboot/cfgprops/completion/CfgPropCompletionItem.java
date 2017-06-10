@@ -143,7 +143,7 @@ public class CfgPropCompletionItem implements CompletionItem {
             leftHtmlText = "<s>" + leftHtmlText + "</s>";
         }
         final Color color = Utils.isErrorDeprecated(configurationMeta)
-                ? UIManager.getColor("textInactiveText")
+                ? UIManager.getColor("nb.errorForeground")
                 : UIManager.getColor("List.foreground");
         CompletionUtilities.renderHtml(fieldIcon, leftHtmlText, getTextRight(), g, defaultFont, (selected ? UIManager.getColor(
                 "List.selectionForeground") : color), width, height, selected);

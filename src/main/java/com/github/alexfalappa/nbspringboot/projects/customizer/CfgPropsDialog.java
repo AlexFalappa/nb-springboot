@@ -58,7 +58,7 @@ import static java.awt.event.MouseEvent.BUTTON1;
 public class CfgPropsDialog extends javax.swing.JDialog {
 
     private boolean okPressed = false;
-    private TreeSet<ConfigurationMetadataProperty> sortedProps;
+    private final TreeSet<ConfigurationMetadataProperty> sortedProps;
     private final boolean bDeprErrorShow;
 
     /** Creates new form CfgPropsDialog */
@@ -72,7 +72,6 @@ public class CfgPropsDialog extends javax.swing.JDialog {
         // setup props sorting
         this.sortedProps = new TreeSet<>(new ConfigurationMetadataComparator(bDeprLast));
         // setup property list
-        lCfgProps.setCellRenderer(new ConfigurationMetadataCellRenderer());
         lCfgProps.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
             @Override
             public void valueChanged(ListSelectionEvent e) {
@@ -155,6 +154,7 @@ public class CfgPropsDialog extends javax.swing.JDialog {
         splitter.setContinuousLayout(true);
 
         lCfgProps.setSelectionMode(javax.swing.ListSelectionModel.SINGLE_SELECTION);
+        lCfgProps.setCellRenderer(new ConfigurationMetadataCellRenderer());
         lCfgProps.setVisibleRowCount(16);
         lCfgProps.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -276,7 +276,7 @@ public class CfgPropsDialog extends javax.swing.JDialog {
                 if (prop.isDeprecated()) {
                     setText(String.format("<html><s>%s", prop.getId()));
                     if (Utils.isErrorDeprecated(prop)) {
-                        setForeground(UIManager.getColor("textInactiveText"));
+                        setForeground(UIManager.getColor("nb.errorForeground"));
                     }
                 } else {
                     setText(prop.getId());
