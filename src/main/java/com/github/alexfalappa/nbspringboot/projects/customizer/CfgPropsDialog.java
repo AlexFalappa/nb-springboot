@@ -22,6 +22,7 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.Comparator;
 import java.util.TreeSet;
+import java.util.prefs.Preferences;
 
 import javax.swing.DefaultListCellRenderer;
 import javax.swing.DefaultListModel;
@@ -36,11 +37,15 @@ import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.text.html.HTMLEditorKit;
 
+import org.openide.util.NbPreferences;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
+import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_ERROR_SHOW;
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_SORT_LAST;
 import static java.awt.event.MouseEvent.BUTTON1;
 
 /**
@@ -53,12 +58,19 @@ import static java.awt.event.MouseEvent.BUTTON1;
 public class CfgPropsDialog extends javax.swing.JDialog {
 
     private boolean okPressed = false;
-    private TreeSet<ConfigurationMetadataProperty> sortedProps = new TreeSet<>(new ConfigurationMetadataComparator());
+    private TreeSet<ConfigurationMetadataProperty> sortedProps;
+    private final boolean bDeprErrorShow;
 
     /** Creates new form CfgPropsDialog */
     public CfgPropsDialog(java.awt.Dialog parent) {
         super(parent, true);
         initComponents();
+        // retrieve some flads from prefs
+        final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
+        final boolean bDeprLast = prefs.getBoolean(PREF_DEPR_SORT_LAST, true);
+        bDeprErrorShow = prefs.getBoolean(PREF_DEPR_ERROR_SHOW, false);
+        // setup props sorting
+        this.sortedProps = new TreeSet<>(new ConfigurationMetadataComparator(bDeprLast));
         // setup property list
         lCfgProps.setCellRenderer(new ConfigurationMetadataCellRenderer());
         lCfgProps.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -239,7 +251,13 @@ public class CfgPropsDialog extends javax.swing.JDialog {
         DefaultListModel<ConfigurationMetadataProperty> dlmCfgProps = new DefaultListModel<>();
         for (ConfigurationMetadataProperty item : sortedProps) {
             if (filter == null || item.getId().contains(filter)) {
-                dlmCfgProps.addElement(item);
+                if (Utils.isErrorDeprecated(item)) {
+                    if (bDeprErrorShow) {
+                        dlmCfgProps.addElement(item);
+                    }
+                } else {
+                    dlmCfgProps.addElement(item);
+                }
             }
         }
         lCfgProps.setModel(dlmCfgProps);
@@ -257,7 +275,9 @@ public class CfgPropsDialog extends javax.swing.JDialog {
                 ConfigurationMetadataProperty prop = (ConfigurationMetadataProperty) value;
                 if (prop.isDeprecated()) {
                     setText(String.format("<html><s>%s", prop.getId()));
-                    setForeground(UIManager.getColor("textInactiveText"));
+                    if (Utils.isErrorDeprecated(prop)) {
+                        setForeground(UIManager.getColor("textInactiveText"));
+                    }
                 } else {
                     setText(prop.getId());
                 }
@@ -269,16 +289,26 @@ public class CfgPropsDialog extends javax.swing.JDialog {
 
     private static class ConfigurationMetadataComparator implements Comparator<ConfigurationMetadataProperty> {
 
+        private final boolean sortDeprLast;
+
+        public ConfigurationMetadataComparator(boolean sortDeprLast) {
+            this.sortDeprLast = sortDeprLast;
+        }
+
         @Override
         public int compare(ConfigurationMetadataProperty p1, ConfigurationMetadataProperty p2) {
-            boolean d1 = p1.isDeprecated();
-            boolean d2 = p2.isDeprecated();
-            if (d1 && !d2) {
-                return 1;
-            } else if (d2 && !d1) {
-                return -1;
-            } else {
+            if (!sortDeprLast) {
                 return p1.getId().compareTo(p2.getId());
+            } else {
+                boolean d1 = p1.isDeprecated();
+                boolean d2 = p2.isDeprecated();
+                if (d1 && !d2) {
+                    return 1;
+                } else if (d2 && !d1) {
+                    return -1;
+                } else {
+                    return p1.getId().compareTo(p2.getId());
+                }
             }
         }
 
