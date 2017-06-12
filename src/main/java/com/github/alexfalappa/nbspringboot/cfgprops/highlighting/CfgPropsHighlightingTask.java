@@ -15,13 +15,13 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
-import java.beans.PropertyEditor;
-import java.beans.PropertyEditorManager;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
 import java.util.logging.Logger;
 
 import javax.swing.text.BadLocationException;
@@ -48,9 +48,9 @@ import org.springframework.util.ClassUtils;
 
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
+import com.github.drapostolos.typeparser.TypeParser;
 
 import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.WARNING;
 
 /**
  * Highlighting task for syntax errors, duplicate properties and ... in configuration properties editor.
@@ -62,6 +62,7 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
     private static final Logger logger = Logger.getLogger(CfgPropsHighlightingTask.class.getName());
     private static final String ERROR_LAYER_NAME = "boot-cfg-props";
     private final Formatter<InvalidInputError> formatter = new DefaultInvalidInputErrorFormatter();
+    private TypeParser parser = TypeParser.newBuilder().build();
 
     @Override
     public void run(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se) {
@@ -112,37 +113,46 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
                 logger.log(FINE, "Highlighting within context of prj {0}", FileUtil.getFileDisplayName(prj.getProjectDirectory()));
                 final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
                 if (sbs != null) {
-                    for (Object obj : cfgResult.getParsedProps().keySet()) {
-                        String pName = (String) obj;
+                    final Set<String> pNames = new TreeSet<>(cfgResult.getParsedProps().stringPropertyNames());
+                    for (String pName : pNames) {
+                        StringBuilder sb = new StringBuilder(pName);
                         ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
                         if (cfgMeta != null) {
                             String type = cfgMeta.getType();
-                            logger.log(FINE, "Property {0} should be of type {1}", new Object[]{pName, type});
+                            sb.append(" (").append(type).append(')');
                             try {
                                 Class<?> clazz = ClassUtils.forName(type, getClass().getClassLoader());
                                 if (clazz == null) {
-                                    logger.log(WARNING, "Could not instantiate class");
+                                    sb.append(" (class not instantiable)");
                                 }
-                                PropertyEditor pEd = PropertyEditorManager.findEditor(clazz);
-                                if (pEd != null) {
-                                    try {
-                                        pEd.setAsText(cfgResult.getParsedProps().getProperty(pName));
-                                        Object value = pEd.getValue();
-                                        logger.log(FINE, "Converted object class {0}", value.getClass().getName());
-                                    } catch (Exception e) {
-                                        logger.log(WARNING, "Prop editor conversion problem: {0}", e.toString());
-                                    }
-                                } else {
-                                    logger.log(FINE, "No property editor found");
+                                sb.append(": ");
+                                try {
+                                    Object parsed = parser.parseType(cfgResult.getParsedProps().getProperty(pName), clazz);
+                                    sb.append("OK");
+                                } catch (Exception e) {
+                                    sb.append(" Failed conversion - ").append(e.toString());
                                 }
+//                                PropertyEditor pEd = PropertyEditorManager.findEditor(clazz);
+//                                if (pEd != null) {
+//                                    try {
+//                                        pEd.setAsText(cfgResult.getParsedProps().getProperty(pName));
+//                                        Object value = pEd.getValue();
+//                                        logger.log(FINE, "Converted object class {0}", value.getClass().getName());
+//                                    } catch (Exception e) {
+//                                        logger.log(FINE, "Prop editor conversion problem: {0}", e.toString());
+//                                    }
+//                                } else {
+//                                    logger.log(FINE, "No property editor found");
+//                                }
                             } catch (ClassNotFoundException ex) {
-                                logger.log(WARNING, ex.toString());
+                                sb.append(" Class not found - ").append(ex.toString());
                             } catch (LinkageError ex) {
-                                logger.log(WARNING, ex.toString());
+                                sb.append(" Linkage error - ").append(ex.toString());
                             }
                         } else {
-                            logger.log(FINE, "No metadata for {0}", pName);
+                            sb.append(": no metadata");
                         }
+                        logger.log(FINE, sb.toString());
                     }
                 }
             }
