@@ -151,7 +151,13 @@ public class IntermediateTest extends TestBase {
     @Test
     public void testUnusualValue() throws URISyntaxException, IOException {
         System.out.println("\n-- unusual chars in value");
-        parseMatch("key=[({+})]£$%&@#-_^\"*/'`|/;ç°§*<>");
+        parseMatch("key=[({+})]£$%&@-_^\"*/'`|;,.`ç°§*<>");
+    }
+
+    @Test
+    public void testUnusualKey() throws URISyntaxException, IOException {
+        System.out.println("\n-- unusual chars in key");
+        parseMatch("({+})£$%&@-_^\"*/'`|;,`ç°§*<>=value");
     }
 
     @Test
