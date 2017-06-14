@@ -53,6 +53,7 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 import com.github.drapostolos.typeparser.TypeParser;
 
 import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.FINER;
 import static java.util.regex.Pattern.compile;
 
 /**
@@ -66,13 +67,14 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
     private static final String ERROR_LAYER_NAME = "boot-cfg-props";
     private final Pattern pOneGenTypeArg = compile("([^<>]+)<(.+)>");
     private final Pattern pTwoGenTypeArgs = compile("([^<>]+)<(.+),(.+)>");
+    private final Pattern pArrayNotation = compile("(.+)\\[\\d+\\]");
     private final Formatter<InvalidInputError> formatter = new DefaultInvalidInputErrorFormatter();
     private final TypeParser parser = TypeParser.newBuilder().build();
 
     @Override
     public void run(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se) {
         try {
-            System.out.println("--- Highlighting errors/warnings...");
+            logger.fine("Highlighting errors/warnings...");
             List<ParseError> parseErrors = cfgResult.getParbResult().parseErrors;
             Document document = cfgResult.getSnapshot().getSource().getDocument(false);
             List<ErrorDescription> errors = new ArrayList<>();
@@ -120,45 +122,62 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
                 if (sbs != null) {
                     final Set<String> pNames = new TreeSet<>(cfgResult.getParsedProps().stringPropertyNames());
                     for (String pName : pNames) {
-                        // TODO manage array notation in prop name (strip '[index]' from pName)
-                        // TODO manage map notation in prop name (see if pName starts with a set of known map props)
                         ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
+                        if (cfgMeta == null) {
+                            // try to interpret array notation (strip '[index]' from pName)
+                            Matcher mArrNot = pArrayNotation.matcher(pName);
+                            if (mArrNot.matches()) {
+                                cfgMeta = sbs.getPropertyMetadata(mArrNot.group(1));
+                                logger.log(FINER, "Checking {0} as collection  property", pName);
+                            } else {
+                                // try to interpret map notation (see if pName starts with a set of known map props)
+                                for (String mapPropertyName : sbs.getMapPropertyNames()) {
+                                    if (pName.startsWith(mapPropertyName)) {
+                                        cfgMeta = sbs.getPropertyMetadata(mapPropertyName);
+                                        logger.log(FINER, "Checking {0} as map property", pName);
+                                        break;
+                                    }
+                                }
+                            }
+                        } else {
+                            logger.log(FINER, "Checking {0} as simple property", pName);
+                        }
                         if (cfgMeta != null) {
-                            String type = cfgMeta.getType();
+                            final String type = cfgMeta.getType();
+                            final String pValue = cfgResult.getParsedProps().getProperty(pName);
+                            final Integer line = propsLines.get(pName).first();
                             if (type.contains("<")) {
                                 // maps
                                 Matcher mMap = pTwoGenTypeArgs.matcher(type);
                                 if (mMap.matches() && mMap.groupCount() == 3) {
-                                    String baseType = mMap.group(1);
                                     String keyType = mMap.group(2);
+                                    check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, line, errors);
                                     String valueType = mMap.group(3);
+                                    check(valueType, pValue, document, line, errors);
                                 }
                                 // collections
                                 Matcher mColl = pOneGenTypeArg.matcher(type);
                                 if (mColl.matches() && mColl.groupCount() == 2) {
-                                    String baseType = mColl.group(1);
                                     String genericType = mColl.group(2);
-                                    if (baseType.contains("List")) {
-                                    } else if (baseType.contains("Set")) {
-                                    } else if (baseType.contains("Collection")) {
+                                    if (pValue.contains(",")) {
+                                        for (String val : pValue.split("\\s*,\\s*")) {
+                                            check(genericType, val, document, line, errors);
+                                        }
                                     } else {
-                                        // other
+                                        check(genericType, pValue, document, line, errors);
                                     }
                                 }
                             } else {
-                                // non generic types
-                                try {
-                                    if (!checkType(type, cfgResult.getParsedProps().getProperty(pName))) {
-                                        ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
-                                                Severity.ERROR,
-                                                String.format("Cannot parse value as '%s'", type),
-                                                document,
-                                                propsLines.get(pName).first()
-                                        );
-                                        errors.add(errDesc);
+                                if (pValue.contains(",") && type.endsWith("[]")) {
+                                    for (String val : pValue.split("\\s*,\\s*")) {
+                                        check(type.substring(0, type.length() - 2), val, document, line, errors);
                                     }
-                                } catch (IllegalArgumentException ex) {
-                                    // problems instantiating type class, cannot decide, ignore
+                                } else {
+                                    if (type.endsWith("[]")) {
+                                        check(type.substring(0, type.length() - 2), pValue, document, line, errors);
+                                    } else {
+                                        check(type, pValue, document, line, errors);
+                                    }
                                 }
                             }
                         } else {
@@ -170,6 +189,23 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
             HintsController.setErrors(document, ERROR_LAYER_NAME, errors);
         } catch (BadLocationException | ParseException ex1) {
             Exceptions.printStackTrace(ex1);
+        }
+    }
+
+    private void check(String type, String text, Document document, int line, List<ErrorDescription> errors) {
+        // non generic types
+        try {
+            if (!checkType(type, text)) {
+                ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
+                        Severity.ERROR,
+                        String.format("Cannot parse %s as '%s'", text, type),
+                        document,
+                        line
+                );
+                errors.add(errDesc);
+            }
+        } catch (IllegalArgumentException ex) {
+            // problems instantiating type class, cannot decide, ignore
         }
     }
 
@@ -192,8 +228,16 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
         if (clazz != null) {
             try {
                 Object parsed = parser.parseType(text, clazz);
-            } catch (Exception e) {
-                return false;
+            } catch (Exception e1) {
+                if (clazz.isEnum()) {
+                    try {
+                        Object parsed = parser.parseType(text.toUpperCase(), clazz);
+                    } catch (Exception e2) {
+                        return false;
+                    }
+                } else {
+                    return false;
+                }
             }
         }
         return true;

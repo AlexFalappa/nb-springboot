@@ -252,21 +252,21 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
         // update cached values
         cachedProperties = repo.getAllProperties();
-        // extract collection / map properties names
+        // extract collection/map properties names based on heuristics
         for (Map.Entry<String, ConfigurationMetadataProperty> entry : cachedProperties.entrySet()) {
-            final List<ValueHint> keyHints = entry.getValue().getHints().getKeyHints();
-            if (!keyHints.isEmpty()) {
-                mapProperties.add(entry.getKey());
-            }
             final String type = entry.getValue().getType();
             if (type != null) {
-                if (type.contains("List") || type.contains("Set") || type.contains("Collection")) {
-                    collectionProperties.add(entry.getKey());
+                final String key = entry.getKey();
+                if (type.contains("Map<")) {
+                    mapProperties.add(key);
+                }
+                if (type.contains("List<") || type.contains("Set<") || type.contains("Collection<")) {
+                    collectionProperties.add(key);
                 }
             }
         }
         System.out.printf("Collections: %s%n", collectionProperties);
-        System.out.printf("Maps: %s%n", mapProperties);
+        System.out.printf("       Maps: %s%n", mapProperties);
     }
 
     private boolean dependencyArtifactIdContains(NbMavenProject nbMvn, String artifactId) {
@@ -281,12 +281,12 @@ public class SpringBootServiceImpl implements SpringBootService {
     }
 
     @Override
-    public boolean isCollection(String propertyName) {
-        return collectionProperties.contains(propertyName);
+    public Set<String> getCollectionPropertyNames() {
+        return collectionProperties;
     }
 
     @Override
-    public boolean isMap(String propertyName) {
-        return mapProperties.contains(propertyName);
+    public Set<String> getMapPropertyNames() {
+        return mapProperties;
     }
 }

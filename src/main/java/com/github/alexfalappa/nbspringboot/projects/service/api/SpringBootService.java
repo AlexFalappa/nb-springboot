@@ -37,9 +37,9 @@ public interface SpringBootService {
 
     Set<String> getPropertyNames();
 
-    boolean isCollection(String propertyName);
+    Set<String> getCollectionPropertyNames();
 
-    boolean isMap(String propertyName);
+    Set<String> getMapPropertyNames();
 
     ConfigurationMetadataProperty getPropertyMetadata(String propertyName);
 
