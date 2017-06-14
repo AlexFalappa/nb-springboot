@@ -13,7 +13,7 @@
     <properties>
         <netbeans.api.version>RELEASE81</netbeans.api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <!--<skipTests>true</skipTests>-->
+        <skipTests>true</skipTests>
     </properties>
 
     <dependencies>
@@ -221,6 +221,11 @@
         <dependency>
             <groupId>org.netbeans.api</groupId>
             <artifactId>org-netbeans-modules-java-sourceui</artifactId>
+            <version>${netbeans.api.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.netbeans.api</groupId>
+            <artifactId>org-netbeans-modules-java-project</artifactId>
             <version>${netbeans.api.version}</version>
         </dependency>
         <dependency>
