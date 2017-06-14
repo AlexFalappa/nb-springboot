@@ -175,7 +175,7 @@ public class CfgPropsParboiled extends BaseParser<String> {
                         encodedLinefeed(sbv),
                         encodedUnicode(sbv),
                         malformedEscape(sbv),
-                        Sequence(AnyOf("[].(){}-+*/^|;,`°§<>\"'%&@"), sbv.append(matchedChar()))
+                        Sequence(AnyOf("=:[].(){}-+*/^|;,`°§<>\"'%&@"), sbv.append(matchedChar()))
                 )
         );
     }

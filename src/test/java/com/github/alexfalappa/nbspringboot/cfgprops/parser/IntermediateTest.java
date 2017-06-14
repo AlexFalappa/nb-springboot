@@ -125,6 +125,12 @@ public class IntermediateTest extends TestBase {
     }
 
     @Test
+    public void testEqualValue() throws URISyntaxException, IOException {
+        System.out.println("\n-- non escaped equal in value");
+        parseMatch("key=a=val");
+    }
+
+    @Test
     public void testEscapedColonKey() throws URISyntaxException, IOException {
         System.out.println("\n-- escaped colon in key");
         parseMatch("a\\:key:val");
@@ -134,6 +140,12 @@ public class IntermediateTest extends TestBase {
     public void testEscapedColonValue() throws URISyntaxException, IOException {
         System.out.println("\n-- escaped colon in value");
         parseMatch("key:a\\:val");
+    }
+
+    @Test
+    public void testColonValue() throws URISyntaxException, IOException {
+        System.out.println("\n-- non escaped colon in value");
+        parseMatch("key:a:val");
     }
 
     @Test
