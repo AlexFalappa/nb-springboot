@@ -41,7 +41,10 @@ public class CfgPropValueCompletionDocumentation implements CompletionDocumentat
         StringBuilder sb = new StringBuilder();
         // name and type
         sb.append("<b>").append(valueHint.getValue()).append("</b>");
-        sb.append("<br/>").append(simpleHtmlEscape(valueHint.getDescription()));
+        final String description = valueHint.getDescription();
+        if (description != null) {
+            sb.append("<br/>").append(simpleHtmlEscape(description));
+        }
         return sb.toString();
     }
 
