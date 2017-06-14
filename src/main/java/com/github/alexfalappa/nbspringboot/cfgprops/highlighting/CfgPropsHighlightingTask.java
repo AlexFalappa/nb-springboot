@@ -23,6 +23,8 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -51,6 +53,7 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 import com.github.drapostolos.typeparser.TypeParser;
 
 import static java.util.logging.Level.FINE;
+import static java.util.regex.Pattern.compile;
 
 /**
  * Highlighting task for syntax errors, duplicate properties and ... in configuration properties editor.
@@ -61,8 +64,10 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
 
     private static final Logger logger = Logger.getLogger(CfgPropsHighlightingTask.class.getName());
     private static final String ERROR_LAYER_NAME = "boot-cfg-props";
+    private final Pattern pOneGenTypeArg = compile("([^<>]+)<(.+)>");
+    private final Pattern pTwoGenTypeArgs = compile("([^<>]+)<(.+),(.+)>");
     private final Formatter<InvalidInputError> formatter = new DefaultInvalidInputErrorFormatter();
-    private TypeParser parser = TypeParser.newBuilder().build();
+    private final TypeParser parser = TypeParser.newBuilder().build();
 
     @Override
     public void run(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se) {
@@ -115,44 +120,50 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
                 if (sbs != null) {
                     final Set<String> pNames = new TreeSet<>(cfgResult.getParsedProps().stringPropertyNames());
                     for (String pName : pNames) {
-                        StringBuilder sb = new StringBuilder(pName);
+                        // TODO manage array notation in prop name (strip '[index]' from pName)
+                        // TODO manage map notation in prop name (see if pName starts with a set of known map props)
                         ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
                         if (cfgMeta != null) {
                             String type = cfgMeta.getType();
-                            sb.append(" (").append(type).append(')');
-                            try {
-                                Class<?> clazz = ClassUtils.forName(type, getClass().getClassLoader());
-                                if (clazz == null) {
-                                    sb.append(" (class not instantiable)");
+                            if (type.contains("<")) {
+                                // maps
+                                Matcher mMap = pTwoGenTypeArgs.matcher(type);
+                                if (mMap.matches() && mMap.groupCount() == 3) {
+                                    String baseType = mMap.group(1);
+                                    String keyType = mMap.group(2);
+                                    String valueType = mMap.group(3);
                                 }
-                                sb.append(": ");
+                                // collections
+                                Matcher mColl = pOneGenTypeArg.matcher(type);
+                                if (mColl.matches() && mColl.groupCount() == 2) {
+                                    String baseType = mColl.group(1);
+                                    String genericType = mColl.group(2);
+                                    if (baseType.contains("List")) {
+                                    } else if (baseType.contains("Set")) {
+                                    } else if (baseType.contains("Collection")) {
+                                    } else {
+                                        // other
+                                    }
+                                }
+                            } else {
+                                // non generic types
                                 try {
-                                    Object parsed = parser.parseType(cfgResult.getParsedProps().getProperty(pName), clazz);
-                                    sb.append("OK");
-                                } catch (Exception e) {
-                                    sb.append(" Failed conversion - ").append(e.toString());
+                                    if (!checkType(type, cfgResult.getParsedProps().getProperty(pName))) {
+                                        ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
+                                                Severity.ERROR,
+                                                String.format("Cannot parse value as '%s'", type),
+                                                document,
+                                                propsLines.get(pName).first()
+                                        );
+                                        errors.add(errDesc);
+                                    }
+                                } catch (IllegalArgumentException ex) {
+                                    // problems instantiating type class, cannot decide, ignore
                                 }
-//                                PropertyEditor pEd = PropertyEditorManager.findEditor(clazz);
-//                                if (pEd != null) {
-//                                    try {
-//                                        pEd.setAsText(cfgResult.getParsedProps().getProperty(pName));
-//                                        Object value = pEd.getValue();
-//                                        logger.log(FINE, "Converted object class {0}", value.getClass().getName());
-//                                    } catch (Exception e) {
-//                                        logger.log(FINE, "Prop editor conversion problem: {0}", e.toString());
-//                                    }
-//                                } else {
-//                                    logger.log(FINE, "No property editor found");
-//                                }
-                            } catch (ClassNotFoundException ex) {
-                                sb.append(" Class not found - ").append(ex.toString());
-                            } catch (LinkageError ex) {
-                                sb.append(" Linkage error - ").append(ex.toString());
                             }
                         } else {
-                            sb.append(": no metadata");
+                            logger.log(FINE, "No metadata for {0}   ", pName);
                         }
-                        logger.log(FINE, sb.toString());
                     }
                 }
             }
@@ -176,4 +187,15 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
     public void cancel() {
     }
 
+    private boolean checkType(String type, String text) throws IllegalArgumentException {
+        Class<?> clazz = ClassUtils.resolveClassName(type, getClass().getClassLoader());
+        if (clazz != null) {
+            try {
+                Object parsed = parser.parseType(text, clazz);
+            } catch (Exception e) {
+                return false;
+            }
+        }
+        return true;
+    }
 }

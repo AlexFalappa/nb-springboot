@@ -18,6 +18,7 @@ package com.github.alexfalappa.nbspringboot.projects.service.spi;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -78,6 +79,8 @@ public class SpringBootServiceImpl implements SpringBootService {
     private NbMavenProjectImpl mvnPrj;
     private ClassPath cpExec;
     private Map<String, ConfigurationMetadataProperty> cachedProperties;
+    private final Set<String> collectionProperties = new HashSet<>();
+    private final Set<String> mapProperties = new HashSet<>();
 
     public SpringBootServiceImpl(Project p) {
         if (p instanceof NbMavenProjectImpl) {
@@ -147,7 +150,8 @@ public class SpringBootServiceImpl implements SpringBootService {
         // clear and exit if no spring boot dependency detected
         if (!springBootAvailable) {
             reposInJars.clear();
-            cachedProperties = null;
+            collectionProperties.clear();
+            mapProperties.clear();
             return;
         }
         if (cpExec == null) {
@@ -172,16 +176,16 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public Set<String> getPropertyNames() {
-        if (cachedProperties == null) {
-            cachedProperties = repo.getAllProperties();
+        if (cpExec == null) {
+            init();
         }
         return cachedProperties.keySet();
     }
 
     @Override
     public ConfigurationMetadataProperty getPropertyMetadata(String propertyName) {
-        if (cachedProperties == null) {
-            cachedProperties = repo.getAllProperties();
+        if (cpExec == null) {
+            init();
         }
         return cachedProperties.get(propertyName);
     }
@@ -246,8 +250,23 @@ public class SpringBootServiceImpl implements SpringBootService {
                 Exceptions.printStackTrace(ex);
             }
         }
-        // clear cached values
-        cachedProperties = null;
+        // update cached values
+        cachedProperties = repo.getAllProperties();
+        // extract collection / map properties names
+        for (Map.Entry<String, ConfigurationMetadataProperty> entry : cachedProperties.entrySet()) {
+            final List<ValueHint> keyHints = entry.getValue().getHints().getKeyHints();
+            if (!keyHints.isEmpty()) {
+                mapProperties.add(entry.getKey());
+            }
+            final String type = entry.getValue().getType();
+            if (type != null) {
+                if (type.contains("List") || type.contains("Set") || type.contains("Collection")) {
+                    collectionProperties.add(entry.getKey());
+                }
+            }
+        }
+        System.out.printf("Collections: %s%n", collectionProperties);
+        System.out.printf("Maps: %s%n", mapProperties);
     }
 
     private boolean dependencyArtifactIdContains(NbMavenProject nbMvn, String artifactId) {
@@ -259,5 +278,15 @@ public class SpringBootServiceImpl implements SpringBootService {
             }
         }
         return false;
+    }
+
+    @Override
+    public boolean isCollection(String propertyName) {
+        return collectionProperties.contains(propertyName);
+    }
+
+    @Override
+    public boolean isMap(String propertyName) {
+        return mapProperties.contains(propertyName);
     }
 }
