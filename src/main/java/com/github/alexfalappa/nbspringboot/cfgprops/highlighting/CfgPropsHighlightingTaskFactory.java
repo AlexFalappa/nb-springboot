@@ -15,8 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 
 import org.netbeans.api.editor.mimelookup.MimeRegistration;
 import org.netbeans.modules.parsing.api.Snapshot;
@@ -35,7 +35,11 @@ public class CfgPropsHighlightingTaskFactory extends TaskFactory {
 
     @Override
     public Collection<? extends SchedulerTask> create(Snapshot snpsht) {
-        return Collections.singleton(new CfgPropsHighlightingTask());
+        return Arrays.asList(
+                new SyntaxErrorHighlightingTask(),
+                new DuplicatesHighlightingTask(),
+                new DataTypeMismatchHighlightingTask()
+        );
     }
 
 }
