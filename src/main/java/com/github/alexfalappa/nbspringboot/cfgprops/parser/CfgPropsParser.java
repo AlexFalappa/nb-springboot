@@ -52,11 +52,9 @@ public class CfgPropsParser extends Parser {
     @Override
     public void parse(Snapshot snapshot, Task task, SourceModificationEvent sme) throws ParseException {
         this.snapshot = snapshot;
-        System.out.println("\n\nParsing...");
         RecoveringParseRunner runner = new RecoveringParseRunner(parboiled.cfgProps());
         parboiled.reset();
         parbResult = runner.run(snapshot.getText().toString());
-        parboiled.getParsedProps().list(System.out);
     }
 
     @Override

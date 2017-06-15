@@ -110,18 +110,6 @@ public class SpringBootServiceImpl implements SpringBootService {
             if (group.getName().toLowerCase().contains("source")) {
                 srcGroupFound = true;
                 cpExec = ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
-                // listen for pom changes
-                logger.info("Adding maven pom listener...");
-                mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
-                    @Override
-                    public void propertyChange(PropertyChangeEvent evt) {
-                        final String propertyName = String.valueOf(evt.getPropertyName());
-                        logger.log(FINE, "Maven pom change ({0})", propertyName);
-                        if (propertyName.equals("MavenProject")) {
-                            refresh();
-                        }
-                    }
-                });
                 break;
             }
         }
@@ -136,6 +124,18 @@ public class SpringBootServiceImpl implements SpringBootService {
             } catch (ClassNotFoundException ex) {
                 // no completion
             }
+            // listen for pom changes
+            logger.info("Adding maven pom listener...");
+            mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    final String propertyName = String.valueOf(evt.getPropertyName());
+                    logger.log(FINE, "Maven pom change ({0})", propertyName);
+                    if (propertyName.equals("MavenProject")) {
+                        refresh();
+                    }
+                }
+            });
             // build configuration properties maps
             updateConfigRepo();
         }

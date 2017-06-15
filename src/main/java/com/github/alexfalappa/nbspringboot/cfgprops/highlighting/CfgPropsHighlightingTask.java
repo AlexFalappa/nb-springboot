@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -29,7 +30,12 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.api.project.SourceGroup;
+import org.netbeans.api.project.Sources;
 import org.netbeans.modules.parsing.spi.ParseException;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 import org.netbeans.modules.parsing.spi.Scheduler;
@@ -79,9 +85,8 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
             Document document = cfgResult.getSnapshot().getSource().getDocument(false);
             List<ErrorDescription> errors = new ArrayList<>();
             // syntax errors
+            logger.fine("Syntax errors");
             for (ParseError error : parseErrors) {
-//                System.out.println(ErrorUtils.printParseError(error));
-//                System.out.printf("start %d stop %d%n", error.getStartIndex(), error.getEndIndex());
                 String message = error.getErrorMessage() != null
                         ? error.getErrorMessage()
                         : error instanceof InvalidInputError
@@ -97,6 +102,7 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
                 errors.add(errDesc);
             }
             // duplicate props
+            logger.fine("Duplicate props");
             Map<String, SortedSet<Integer>> propsLines = cfgResult.getPropLines();
             for (Map.Entry<String, SortedSet<Integer>> entry : propsLines.entrySet()) {
                 final SortedSet<Integer> lines = entry.getValue();
@@ -115,45 +121,52 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
                 }
             }
             // data type check
+            logger.fine("Data type check");
             Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
             if (prj != null) {
-                logger.log(FINE, "Highlighting within context of prj {0}", FileUtil.getFileDisplayName(prj.getProjectDirectory()));
+                logger.log(FINER, "Context project: {0}", FileUtil.getFileDisplayName(prj.getProjectDirectory()));
                 final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
-                if (sbs != null) {
-                    final Set<String> pNames = new TreeSet<>(cfgResult.getParsedProps().stringPropertyNames());
+                final ClassPath cp = getProjectClasspath(prj);
+                if (sbs != null && cp != null) {
+                    final Properties parsedProps = cfgResult.getParsedProps();
+                    final Set<String> pNames = new TreeSet<>(parsedProps.stringPropertyNames());
                     for (String pName : pNames) {
+                        StringBuilder sb = new StringBuilder("Property ").append(pName).append(" -> ")
+                                .append(parsedProps.getProperty(pName));
                         ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
                         if (cfgMeta == null) {
                             // try to interpret array notation (strip '[index]' from pName)
                             Matcher mArrNot = pArrayNotation.matcher(pName);
                             if (mArrNot.matches()) {
                                 cfgMeta = sbs.getPropertyMetadata(mArrNot.group(1));
-                                logger.log(FINER, "Checking {0} as collection  property", pName);
+                                sb.append("    - property with array notation");
                             } else {
                                 // try to interpret map notation (see if pName starts with a set of known map props)
                                 for (String mapPropertyName : sbs.getMapPropertyNames()) {
                                     if (pName.startsWith(mapPropertyName)) {
                                         cfgMeta = sbs.getPropertyMetadata(mapPropertyName);
-                                        logger.log(FINER, "Checking {0} as map property", pName);
+                                        sb.append("    - property with map notation");
                                         break;
                                     }
                                 }
                             }
                         } else {
-                            logger.log(FINER, "Checking {0} as simple property", pName);
+                            sb.append("    - direct property");
                         }
+                        logger.log(FINER, sb.toString());
                         if (cfgMeta != null) {
                             final String type = cfgMeta.getType();
-                            final String pValue = cfgResult.getParsedProps().getProperty(pName);
+                            final String pValue = parsedProps.getProperty(pName);
                             final Integer line = propsLines.get(pName).first();
+                            final ClassLoader cl = cp.getClassLoader(true);
                             if (type.contains("<")) {
                                 // maps
                                 Matcher mMap = pTwoGenTypeArgs.matcher(type);
                                 if (mMap.matches() && mMap.groupCount() == 3) {
                                     String keyType = mMap.group(2);
-                                    check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, line, errors);
+                                    check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, line, errors, cl);
                                     String valueType = mMap.group(3);
-                                    check(valueType, pValue, document, line, errors);
+                                    check(valueType, pValue, document, line, errors, cl);
                                 }
                                 // collections
                                 Matcher mColl = pOneGenTypeArg.matcher(type);
@@ -161,22 +174,22 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
                                     String genericType = mColl.group(2);
                                     if (pValue.contains(",")) {
                                         for (String val : pValue.split("\\s*,\\s*")) {
-                                            check(genericType, val, document, line, errors);
+                                            check(genericType, val, document, line, errors, cl);
                                         }
                                     } else {
-                                        check(genericType, pValue, document, line, errors);
+                                        check(genericType, pValue, document, line, errors, cl);
                                     }
                                 }
                             } else {
                                 if (pValue.contains(",") && type.endsWith("[]")) {
                                     for (String val : pValue.split("\\s*,\\s*")) {
-                                        check(type.substring(0, type.length() - 2), val, document, line, errors);
+                                        check(type.substring(0, type.length() - 2), val, document, line, errors, cl);
                                     }
                                 } else {
                                     if (type.endsWith("[]")) {
-                                        check(type.substring(0, type.length() - 2), pValue, document, line, errors);
+                                        check(type.substring(0, type.length() - 2), pValue, document, line, errors, cl);
                                     } else {
-                                        check(type, pValue, document, line, errors);
+                                        check(type, pValue, document, line, errors, cl);
                                     }
                                 }
                             }
@@ -192,13 +205,24 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
         }
     }
 
-    private void check(String type, String text, Document document, int line, List<ErrorDescription> errors) {
+    private ClassPath getProjectClasspath(Project prj) {
+        Sources srcs = ProjectUtils.getSources(prj);
+        SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
+        for (SourceGroup group : srcGroups) {
+            if (group.getName().toLowerCase().contains("source")) {
+                return ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
+            }
+        }
+        return null;
+    }
+
+    private void check(String type, String text, Document document, int line, List<ErrorDescription> errors, ClassLoader cl) {
         // non generic types
         try {
-            if (!checkType(type, text)) {
+            if (!checkType(type, text, cl)) {
                 ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
                         Severity.ERROR,
-                        String.format("Cannot parse %s as '%s'", text, type),
+                        String.format("Cannot parse '%s' as %s", text, type),
                         document,
                         line
                 );
@@ -223,8 +247,8 @@ public class CfgPropsHighlightingTask extends ParserResultTask<CfgPropsParser.Cf
     public void cancel() {
     }
 
-    private boolean checkType(String type, String text) throws IllegalArgumentException {
-        Class<?> clazz = ClassUtils.resolveClassName(type, getClass().getClassLoader());
+    private boolean checkType(String type, String text, ClassLoader cl) throws IllegalArgumentException {
+        Class<?> clazz = ClassUtils.resolveClassName(type, cl);
         if (clazz != null) {
             try {
                 Object parsed = parser.parseType(text, clazz);
