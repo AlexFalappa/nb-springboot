@@ -18,10 +18,6 @@ package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -42,6 +38,7 @@ import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileUtil;
+import org.openide.util.Pair;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.util.ClassUtils;
@@ -72,7 +69,7 @@ public class DataTypeMismatchHighlightingTask extends ParserResultTask<CfgPropsP
     public void run(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se) {
         logger.fine("Highlighting data type mismatches");
         List<ErrorDescription> errors = new ArrayList<>();
-        final Map<String, SortedSet<Integer>> propsLines = cfgResult.getPropLines();
+        final Map<Integer, Pair<String, String>> propsLines = cfgResult.getPropLines();
         final Document document = cfgResult.getSnapshot().getSource().getDocument(false);
         final Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
         if (prj != null) {
@@ -80,36 +77,34 @@ public class DataTypeMismatchHighlightingTask extends ParserResultTask<CfgPropsP
             final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
             final ClassPath cp = getProjectClasspath(prj);
             if (sbs != null && cp != null) {
-                final Properties parsedProps = cfgResult.getParsedProps();
-                final Set<String> pNames = new TreeSet<>(parsedProps.stringPropertyNames());
-                for (String pName : pNames) {
-                    StringBuilder sb = new StringBuilder("Property ").append(pName).append(" -> ")
-                            .append(parsedProps.getProperty(pName));
+                final Map<Integer, Pair<String, String>> propLines = cfgResult.getPropLines();
+                for (Map.Entry<Integer, Pair<String, String>> entry : propLines.entrySet()) {
+                    int line = entry.getKey();
+                    String pName = entry.getValue().first();
+                    String pValue = entry.getValue().second();
+                    StringBuilder sb = new StringBuilder(String.format("%2d) ", line));
+                    sb.append(pName).append(" -> ").append(pValue);
                     ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
                     if (cfgMeta == null) {
                         // try to interpret array notation (strip '[index]' from pName)
                         Matcher mArrNot = pArrayNotation.matcher(pName);
                         if (mArrNot.matches()) {
                             cfgMeta = sbs.getPropertyMetadata(mArrNot.group(1));
-                            sb.append("    - property with array notation");
+                            sb.append("    - array notation");
                         } else {
                             // try to interpret map notation (see if pName starts with a set of known map props)
                             for (String mapPropertyName : sbs.getMapPropertyNames()) {
                                 if (pName.startsWith(mapPropertyName)) {
                                     cfgMeta = sbs.getPropertyMetadata(mapPropertyName);
-                                    sb.append("    - property with map notation");
+                                    sb.append("    - map notation");
                                     break;
                                 }
                             }
                         }
-                    } else {
-                        sb.append("    - direct property");
                     }
                     logger.log(FINER, sb.toString());
                     if (cfgMeta != null) {
                         final String type = cfgMeta.getType();
-                        final String pValue = parsedProps.getProperty(pName);
-                        final Integer line = propsLines.get(pName).first();
                         final ClassLoader cl = cp.getClassLoader(true);
                         if (type.contains("<")) {
                             // maps
@@ -180,6 +175,9 @@ public class DataTypeMismatchHighlightingTask extends ParserResultTask<CfgPropsP
     }
 
     private void check(String type, String text, Document document, int line, List<ErrorDescription> errors, ClassLoader cl) {
+        if (text == null || text.isEmpty()) {
+            return;
+        }
         // non generic types
         try {
             if (!checkType(type, text, cl)) {

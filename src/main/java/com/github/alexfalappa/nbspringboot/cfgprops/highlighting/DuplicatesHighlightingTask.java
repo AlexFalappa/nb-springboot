@@ -16,10 +16,9 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.SortedSet;
 import java.util.logging.Logger;
 
 import javax.swing.text.Document;
@@ -31,6 +30,7 @@ import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
+import org.openide.util.Pair;
 
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 
@@ -49,21 +49,18 @@ public class DuplicatesHighlightingTask extends ParserResultTask<CfgPropsParser.
         logger.fine("Highlighting duplicate props");
         List<ErrorDescription> errors = new ArrayList<>();
         final Document document = cfgResult.getSnapshot().getSource().getDocument(false);
-        final Map<String, SortedSet<Integer>> propsLines = cfgResult.getPropLines();
-        for (Map.Entry<String, SortedSet<Integer>> entry : propsLines.entrySet()) {
-            final SortedSet<Integer> lines = entry.getValue();
-            if (lines.size() > 1) {
-                Iterator<Integer> it = lines.iterator();
-                Integer firstLine = it.next();
-                while (it.hasNext()) {
-                    ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
-                            Severity.WARNING,
-                            String.format("Duplicate of property at line %d", firstLine),
-                            document,
-                            it.next()
-                    );
-                    errors.add(errDesc);
-                }
+        Map<String, Integer> firstOccur = new HashMap<>();
+        final Map<Integer, Pair<String, String>> propLines = cfgResult.getPropLines();
+        for (Map.Entry<Integer, Pair<String, String>> entry : propLines.entrySet()) {
+            final String propName = entry.getValue().first();
+            final Integer line = entry.getKey();
+            if (firstOccur.containsKey(propName)) {
+                ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(Severity.WARNING,
+                        String.format("Duplicate of property at line %d", firstOccur.get(propName)),
+                        document, line);
+                errors.add(errDesc);
+            } else {
+                firstOccur.put(propName, line);
             }
         }
         HintsController.setErrors(document, ERROR_LAYER_NAME, errors);

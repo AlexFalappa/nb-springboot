@@ -3,9 +3,8 @@ package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
+import org.openide.util.Pair;
 import org.parboiled.Action;
 import org.parboiled.BaseParser;
 import org.parboiled.Context;
@@ -31,13 +30,13 @@ import org.parboiled.support.Var;
 public class CfgPropsParboiled extends BaseParser<String> {
 
     private Properties parsedProps = new Properties();
-    private Map<String, SortedSet<Integer>> propLines = new HashMap<>();
+    private Map<Integer, Pair<String, String>> propLines = new HashMap<>();
 
     public Properties getParsedProps() {
         return parsedProps;
     }
 
-    public Map<String, SortedSet<Integer>> getPropLines() {
+    public Map<Integer, Pair<String, String>> getPropLines() {
         return propLines;
     }
 
@@ -50,31 +49,25 @@ public class CfgPropsParboiled extends BaseParser<String> {
         @Override
         public boolean run(Context<java.lang.String> context) {
             final ValueStack<String> stack = context.getValueStack();
+            int line = context.getPosition().line;
             int size = stack.size();
             switch (size) {
                 case 1:
                     String propName = stack.pop();
                     parsedProps.setProperty(propName, "");
-                    addLine(propName, context.getPosition().line);
+                    propLines.put(line, Pair.of(propName, ""));
                     break;
                 case 2:
                     // NOTE: stack popping order below is important!
                     final String propValue = stack.pop();
                     propName = stack.pop();
                     parsedProps.setProperty(propName, propValue);
-                    addLine(propName, context.getPosition().line);
+                    propLines.put(line, Pair.of(propName, propValue));
                     break;
                 default:
                     throw new IllegalStateException("Zero or more than 2 values on the parsing stack");
             }
             return true;
-        }
-
-        private void addLine(java.lang.String propName, int line) {
-            if (!propLines.containsKey(propName)) {
-                propLines.put(propName, new TreeSet<Integer>());
-            }
-            propLines.get(propName).add(line);
         }
 
         @Override

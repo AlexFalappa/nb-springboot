@@ -19,7 +19,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.SortedSet;
 
 import javax.swing.event.ChangeListener;
 
@@ -30,6 +29,7 @@ import org.netbeans.modules.parsing.api.Task;
 import org.netbeans.modules.parsing.spi.ParseException;
 import org.netbeans.modules.parsing.spi.Parser;
 import org.netbeans.modules.parsing.spi.SourceModificationEvent;
+import org.openide.util.Pair;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.RecoveringParseRunner;
 import org.parboiled.support.ParsingResult;
@@ -75,9 +75,9 @@ public class CfgPropsParser extends Parser {
         private final ParsingResult parbResult;
         private final Properties parsedProps;
         private boolean valid = true;
-        private final Map<String, SortedSet<Integer>> propLines;
+        private final Map<Integer, Pair<String, String>> propLines;
 
-        CfgPropsParserResult(Snapshot snapshot, ParsingResult parbResult, Properties parsedProps, Map<String, SortedSet<Integer>> propLines) {
+        CfgPropsParserResult(Snapshot snapshot, ParsingResult parbResult, Properties parsedProps, Map<Integer, Pair<String, String>> propLines) {
             super(snapshot);
             this.parbResult = parbResult;
             this.parsedProps = parsedProps;
@@ -100,7 +100,7 @@ public class CfgPropsParser extends Parser {
             return parsedProps;
         }
 
-        public Map<String, SortedSet<Integer>> getPropLines() {
+        public Map<Integer, Pair<String, String>> getPropLines() {
             return propLines;
         }
 
