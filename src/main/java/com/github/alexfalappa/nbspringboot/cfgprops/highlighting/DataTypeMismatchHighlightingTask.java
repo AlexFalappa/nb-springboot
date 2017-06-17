@@ -63,7 +63,7 @@ public class DataTypeMismatchHighlightingTask extends ParserResultTask<CfgPropsP
     private final Pattern pOneGenTypeArg = compile("([^<>]+)<(.+)>");
     private final Pattern pTwoGenTypeArgs = compile("([^<>]+)<(.+),(.+)>");
     private final Pattern pArrayNotation = compile("(.+)\\[\\d+\\]");
-    private final TypeParser parser = TypeParser.newBuilder().build();
+    private final TypeParser parser = TypeParser.newBuilder().enablePropertyEditor().build();
 
     @Override
     public void run(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se) {
