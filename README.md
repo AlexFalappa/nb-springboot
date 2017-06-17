@@ -67,7 +67,16 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 ## Changelog
 
 * __1.6__ (??? 2017): Work In Progress
-    * Deprecated configuration properties are now show at the bottom of completion list
+    * Error highlighting in configuration properties editor for:
+        * Syntax errors
+        * Duplicate properties
+        * Data type mismatches (__NOTE__: see documentation for limitations)
+    * Upgrade to Spring Boot 1.5.4
+    * Style of configuration properties items in lists is more uniform
+    * Manage deprecation error level in configuration properties metadata
+    * New plugin options for configuration properties lists used in completion and override on launch:
+        * Include deprecated properties with level error
+        * Show all deprecated properties last
     * The `application.properties` file wizard allows to choose between _main_ and _test_ resource folders
 
 * __1.5.1__ (May 2017): Another round of fixes
