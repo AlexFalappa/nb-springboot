@@ -1,4 +1,4 @@
-package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
+package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -9,8 +9,10 @@ import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Properties;
 
-import org.junit.Ignore;
 import org.junit.Test;
+import org.parboiled.errors.ErrorUtils;
+import org.parboiled.errors.ParseError;
+import org.parboiled.support.ParsingResult;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -20,36 +22,37 @@ import static org.junit.Assert.assertTrue;
  *
  * @author Alessandro Falappa
  */
-@Ignore
+//@Ignore
 public class CfgVsPropsTest extends TestBase {
 
     @Test
     public void testCompareProps() throws IOException, URISyntaxException {
         System.out.println("\n--- compare props");
-        Properties loaded = new Properties();
         try (InputStream is = getClass().getResourceAsStream("/load.properties")) {
             System.out.println("\nLOADED");
+            Properties loaded = new Properties();
             loaded.load(is);
             listPropsOrdered(loaded);
+            System.out.println("\nPARSED");
+            final String strFile = readResource("/load.properties");
+            ParsingResult pr = reportingRunner.run(strFile);
+            final Properties parsed = parser.getParsedProps();
+            listPropsOrdered(parsed);
+            if (!pr.matched) {
+//                pr = tracingRunner.run(strFile);
+                System.out.println("\n\nParser did not match input:");
+                for (Object err : reportingRunner.getParseErrors()) {
+                    ParseError pe = (ParseError) err;
+                    System.out.format("\t%s%n", ErrorUtils.printParseError(pe));
+                }
+            }
+            assertTrue("Failed parsing", pr.matched);
+            assertEquals("Different loaded/parsed sizes", loaded.size(), parsed.size());
+            for (Map.Entry<Object, Object> entry : loaded.entrySet()) {
+                assertTrue("Missing key in parsed", parsed.containsKey(entry.getKey()));
+                assertEquals("Different loaded-parsed value", entry.getValue(), parsed.get(entry.getKey().toString()));
+            }
         }
-        InputStream is = getClass().getResourceAsStream("/load.properties");
-//        try (InputStream is = getClass().getResourceAsStream("/load.properties")) {
-        System.out.println("\nPARSED");
-//            BootCfgParser cp = new BootCfgParser(is);
-//            cp.disable_tracing();
-//            cp.parse();
-        final Properties parsed = new Properties();//cp.getParsedProps();
-        listPropsOrdered(parsed);
-        for (Map.Entry<Object, Object> entry : loaded.entrySet()) {
-            final Object loadedKey = entry.getKey();
-            assertTrue(String.format("Missing key '%s' in parsed", loadedKey.toString()), parsed.containsKey(loadedKey));
-            final Object loadedVal = entry.getValue();
-            final String parsedVal = parsed.getProperty(loadedKey.toString());
-            assertEquals(String.format("Loaded value '%s' differs from parsed one '%s'", loadedVal, parsedVal), loadedVal, parsedVal);
-        }
-//        } catch (ParseException ex) {
-//            fail(ex.getMessage());
-//        }
     }
 
     public void testWriteProps() throws IOException {

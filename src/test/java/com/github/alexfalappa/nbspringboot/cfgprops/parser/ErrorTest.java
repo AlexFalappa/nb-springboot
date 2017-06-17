@@ -1,4 +1,4 @@
-package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
+package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -6,7 +6,7 @@ import java.net.URISyntaxException;
 import org.junit.Test;
 
 /**
- * Syntax test suite for BootCfgParser.
+ * Syntax test suite for BootCfgParser: error scenario.
  *
  * @author Alessandro Falappa
  */

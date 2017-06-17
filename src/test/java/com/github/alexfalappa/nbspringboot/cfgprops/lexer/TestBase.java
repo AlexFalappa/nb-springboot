@@ -1,8 +1,5 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
 
-import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsScanner;
-import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsTokenId;
-
 import java.io.IOException;
 import java.io.StringReader;
 import java.net.URISyntaxException;
@@ -12,6 +9,10 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.TreeSet;
 
+import org.junit.experimental.categories.Category;
+
+import com.github.alexfalappa.nbspringboot.cfgprops.LexerTests;
+
 import static org.junit.Assert.fail;
 
 /**
@@ -19,6 +20,7 @@ import static org.junit.Assert.fail;
  *
  * @author Alessandro Falappa
  */
+@Category(LexerTests.class)
 public class TestBase {
 
     protected void parseNoMatch(String input) {

@@ -1,4 +1,4 @@
-package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
+package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
@@ -6,7 +6,7 @@ import java.net.URISyntaxException;
 import org.junit.Test;
 
 /**
- * Syntax test suite for BootCfgParser.
+ * Syntax test suite for BootCfgParser: intermediate scenario.
  *
  * @author Alessandro Falappa
  */
@@ -125,6 +125,12 @@ public class IntermediateTest extends TestBase {
     }
 
     @Test
+    public void testEqualValue() throws URISyntaxException, IOException {
+        System.out.println("\n-- non escaped equal in value");
+        parseMatch("key=a=val");
+    }
+
+    @Test
     public void testEscapedColonKey() throws URISyntaxException, IOException {
         System.out.println("\n-- escaped colon in key");
         parseMatch("a\\:key:val");
@@ -137,6 +143,12 @@ public class IntermediateTest extends TestBase {
     }
 
     @Test
+    public void testColonValue() throws URISyntaxException, IOException {
+        System.out.println("\n-- non escaped colon in value");
+        parseMatch("key:a:val");
+    }
+
+    @Test
     public void testUnicodeKey() throws URISyntaxException, IOException {
         System.out.println("\n-- unicode in key");
         parseMatch("key\\u00a9=value");
@@ -146,6 +158,18 @@ public class IntermediateTest extends TestBase {
     public void testUnicodeValue() throws URISyntaxException, IOException {
         System.out.println("\n-- unicode in value");
         parseMatch("key=value\\u00A9");
+    }
+
+    @Test
+    public void testUnusualValue() throws URISyntaxException, IOException {
+        System.out.println("\n-- unusual chars in value");
+        parseMatch("key=[({+})]£$%&@-_^\"*/'`|;,.`ç°§*<>");
+    }
+
+    @Test
+    public void testUnusualKey() throws URISyntaxException, IOException {
+        System.out.println("\n-- unusual chars in key");
+        parseMatch("({+})£$%&@-_^\"*/'`|;,`ç°§*<>=value");
     }
 
     @Test

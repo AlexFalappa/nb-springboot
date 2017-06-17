@@ -37,6 +37,10 @@ public interface SpringBootService {
 
     Set<String> getPropertyNames();
 
+    Set<String> getCollectionPropertyNames();
+
+    Set<String> getMapPropertyNames();
+
     ConfigurationMetadataProperty getPropertyMetadata(String propertyName);
 
     List<ConfigurationMetadataProperty> queryPropertyMetadata(String filter);
