@@ -15,10 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,12 +28,9 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
-import org.netbeans.modules.parsing.spi.ParserResultTask;
-import org.netbeans.modules.parsing.spi.Scheduler;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
-import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Pair;
@@ -43,6 +38,7 @@ import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.util.ClassUtils;
 
+import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 import com.github.drapostolos.typeparser.TypeParser;
@@ -56,21 +52,36 @@ import static java.util.regex.Pattern.compile;
  *
  * @author Alessandro Falappa
  */
-public class DataTypeMismatchHighlightingTask extends ParserResultTask<CfgPropsParser.CfgPropsParserResult> {
+public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
 
-    private static final Logger logger = Logger.getLogger(DataTypeMismatchHighlightingTask.class.getName());
-    private static final String ERROR_LAYER_NAME = "boot-cfgprops-typemismatches";
     private final Pattern pOneGenTypeArg = compile("([^<>]+)<(.+)>");
     private final Pattern pTwoGenTypeArgs = compile("([^<>]+)<(.+),(.+)>");
     private final Pattern pArrayNotation = compile("(.+)\\[\\d+\\]");
     private final TypeParser parser = TypeParser.newBuilder().enablePropertyEditor().build();
 
     @Override
-    public void run(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se) {
+    protected String getHighlightPrefName() {
+        return PrefConstants.PREF_HLIGHT_LEV_DTMISMATCH;
+    }
+
+    @Override
+    protected int getHighlightDefaultValue() {
+        return 2;
+    }
+
+    @Override
+    protected String getErrorLayerName() {
+        return "boot-cfgprops-typemismatches";
+    }
+
+    @Override
+    public int getPriority() {
+        return 200;
+    }
+
+    @Override
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity) {
         logger.fine("Highlighting data type mismatches");
-        List<ErrorDescription> errors = new ArrayList<>();
-        final Map<Integer, Pair<String, String>> propsLines = cfgResult.getPropLines();
-        final Document document = cfgResult.getSnapshot().getSource().getDocument(false);
         final Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
         if (prj != null) {
             logger.log(FINER, "Context project: {0}", FileUtil.getFileDisplayName(prj.getProjectDirectory()));
@@ -111,9 +122,9 @@ public class DataTypeMismatchHighlightingTask extends ParserResultTask<CfgPropsP
                             Matcher mMap = pTwoGenTypeArgs.matcher(type);
                             if (mMap.matches() && mMap.groupCount() == 3) {
                                 String keyType = mMap.group(2);
-                                check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, line, errors, cl);
+                                check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, line, errors, cl, severity);
                                 String valueType = mMap.group(3);
-                                check(valueType, pValue, document, line, errors, cl);
+                                check(valueType, pValue, document, line, errors, cl, severity);
                             }
                             // collections
                             Matcher mColl = pOneGenTypeArg.matcher(type);
@@ -121,22 +132,22 @@ public class DataTypeMismatchHighlightingTask extends ParserResultTask<CfgPropsP
                                 String genericType = mColl.group(2);
                                 if (pValue.contains(",")) {
                                     for (String val : pValue.split("\\s*,\\s*")) {
-                                        check(genericType, val, document, line, errors, cl);
+                                        check(genericType, val, document, line, errors, cl, severity);
                                     }
                                 } else {
-                                    check(genericType, pValue, document, line, errors, cl);
+                                    check(genericType, pValue, document, line, errors, cl, severity);
                                 }
                             }
                         } else {
                             if (pValue.contains(",") && type.endsWith("[]")) {
                                 for (String val : pValue.split("\\s*,\\s*")) {
-                                    check(type.substring(0, type.length() - 2), val, document, line, errors, cl);
+                                    check(type.substring(0, type.length() - 2), val, document, line, errors, cl, severity);
                                 }
                             } else {
                                 if (type.endsWith("[]")) {
-                                    check(type.substring(0, type.length() - 2), pValue, document, line, errors, cl);
+                                    check(type.substring(0, type.length() - 2), pValue, document, line, errors, cl, severity);
                                 } else {
-                                    check(type, pValue, document, line, errors, cl);
+                                    check(type, pValue, document, line, errors, cl, severity);
                                 }
                             }
                         }
@@ -146,7 +157,6 @@ public class DataTypeMismatchHighlightingTask extends ParserResultTask<CfgPropsP
                 }
             }
         }
-        HintsController.setErrors(document, ERROR_LAYER_NAME, errors);
     }
 
     private ClassPath getProjectClasspath(Project prj) {
@@ -160,21 +170,7 @@ public class DataTypeMismatchHighlightingTask extends ParserResultTask<CfgPropsP
         return null;
     }
 
-    @Override
-    public int getPriority() {
-        return 200;
-    }
-
-    @Override
-    public Class<? extends Scheduler> getSchedulerClass() {
-        return Scheduler.EDITOR_SENSITIVE_TASK_SCHEDULER;
-    }
-
-    @Override
-    public void cancel() {
-    }
-
-    private void check(String type, String text, Document document, int line, List<ErrorDescription> errors, ClassLoader cl) {
+    private void check(String type, String text, Document document, int line, List<ErrorDescription> errors, ClassLoader cl, Severity severity) {
         if (text == null || text.isEmpty()) {
             return;
         }
@@ -182,7 +178,7 @@ public class DataTypeMismatchHighlightingTask extends ParserResultTask<CfgPropsP
         try {
             if (!checkType(type, text, cl)) {
                 ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
-                        Severity.ERROR,
+                        severity,
                         String.format("Cannot parse '%s' as %s", text, type),
                         document,
                         line

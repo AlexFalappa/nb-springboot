@@ -15,23 +15,19 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Logger;
 
 import javax.swing.text.Document;
 
-import org.netbeans.modules.parsing.spi.ParserResultTask;
-import org.netbeans.modules.parsing.spi.Scheduler;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
-import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Pair;
 
+import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 
 /**
@@ -39,31 +35,21 @@ import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
  *
  * @author Alessandro Falappa
  */
-public class DuplicatesHighlightingTask extends ParserResultTask<CfgPropsParser.CfgPropsParserResult> {
-
-    private static final Logger logger = Logger.getLogger(DuplicatesHighlightingTask.class.getName());
-    private static final String ERROR_LAYER_NAME = "boot-cfgprops-duplicates";
+public class DuplicatesHighlightingTask extends BaseHighlightingTask {
 
     @Override
-    public void run(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se) {
-        logger.fine("Highlighting duplicate props");
-        List<ErrorDescription> errors = new ArrayList<>();
-        final Document document = cfgResult.getSnapshot().getSource().getDocument(false);
-        Map<String, Integer> firstOccur = new HashMap<>();
-        final Map<Integer, Pair<String, String>> propLines = cfgResult.getPropLines();
-        for (Map.Entry<Integer, Pair<String, String>> entry : propLines.entrySet()) {
-            final String propName = entry.getValue().first();
-            final Integer line = entry.getKey();
-            if (firstOccur.containsKey(propName)) {
-                ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(Severity.WARNING,
-                        String.format("Duplicate of property at line %d", firstOccur.get(propName)),
-                        document, line);
-                errors.add(errDesc);
-            } else {
-                firstOccur.put(propName, line);
-            }
-        }
-        HintsController.setErrors(document, ERROR_LAYER_NAME, errors);
+    protected String getHighlightPrefName() {
+        return PrefConstants.PREF_HLIGHT_LEV_DUPLICATES;
+    }
+
+    @Override
+    protected int getHighlightDefaultValue() {
+        return 1;
+    }
+
+    @Override
+    protected String getErrorLayerName() {
+        return "boot-cfgprops-duplicates";
     }
 
     @Override
@@ -72,11 +58,26 @@ public class DuplicatesHighlightingTask extends ParserResultTask<CfgPropsParser.
     }
 
     @Override
-    public Class<? extends Scheduler> getSchedulerClass() {
-        return Scheduler.EDITOR_SENSITIVE_TASK_SCHEDULER;
-    }
-
-    @Override
-    public void cancel() {
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity) {
+        logger.fine("Highlighting duplicate props");
+        Map<String, Integer> firstOccur = new HashMap<>();
+        final Map<Integer, Pair<String, String>> propLines = cfgResult.getPropLines();
+        for (Map.Entry<Integer, Pair<String, String>> entry : propLines.entrySet()) {
+            final String propName = entry.getValue().first();
+            final Integer line = entry.getKey();
+            if (firstOccur.containsKey(propName)) {
+                ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
+                        severity,
+                        String.format("Duplicate of property at line %d", firstOccur.get(propName)),
+                        document,
+                        line);
+                errors.add(errDesc);
+            } else {
+                firstOccur.put(propName, line);
+            }
+            if (canceled) {
+                break;
+            }
+        }
     }
 }

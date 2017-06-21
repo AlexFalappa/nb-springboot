@@ -15,20 +15,15 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import org.netbeans.modules.parsing.spi.ParseException;
-import org.netbeans.modules.parsing.spi.ParserResultTask;
-import org.netbeans.modules.parsing.spi.Scheduler;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
-import org.netbeans.spi.editor.hints.HintsController;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Exceptions;
 import org.parboiled.common.Formatter;
@@ -36,6 +31,7 @@ import org.parboiled.errors.DefaultInvalidInputErrorFormatter;
 import org.parboiled.errors.InvalidInputError;
 import org.parboiled.errors.ParseError;
 
+import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 
 /**
@@ -43,38 +39,23 @@ import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
  *
  * @author Alessandro Falappa
  */
-public class SyntaxErrorHighlightingTask extends ParserResultTask<CfgPropsParser.CfgPropsParserResult> {
+public class SyntaxErrorHighlightingTask extends BaseHighlightingTask {
 
-    private static final Logger logger = Logger.getLogger(SyntaxErrorHighlightingTask.class.getName());
-    private static final String ERROR_LAYER_NAME = "boot-props-syntax-errors";
     private final Formatter<InvalidInputError> formatter = new DefaultInvalidInputErrorFormatter();
 
     @Override
-    public void run(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se) {
-        logger.fine("Highlighting syntax errors");
-        try {
-            List<ErrorDescription> errors = new ArrayList<>();
-            final List<ParseError> parseErrors = cfgResult.getParbResult().parseErrors;
-            final Document document = cfgResult.getSnapshot().getSource().getDocument(false);
-            for (ParseError error : parseErrors) {
-                String message = error.getErrorMessage() != null
-                        ? error.getErrorMessage()
-                        : error instanceof InvalidInputError
-                                ? formatter.format((InvalidInputError) error)
-                                : error.getClass().getSimpleName();
-                ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
-                        Severity.ERROR,
-                        message,
-                        document,
-                        document.createPosition(Math.min(error.getStartIndex(), document.getLength() + 1)),
-                        document.createPosition(Math.min(error.getEndIndex(), document.getLength() + 1))
-                );
-                errors.add(errDesc);
-            }
-            HintsController.setErrors(document, ERROR_LAYER_NAME, errors);
-        } catch (BadLocationException | ParseException ex1) {
-            Exceptions.printStackTrace(ex1);
-        }
+    protected String getHighlightPrefName() {
+        return PrefConstants.PREF_HLIGHT_LEV_SYNERR;
+    }
+
+    @Override
+    protected int getHighlightDefaultValue() {
+        return 2;
+    }
+
+    @Override
+    protected String getErrorLayerName() {
+        return "boot-props-syntax-errors";
     }
 
     @Override
@@ -83,11 +64,27 @@ public class SyntaxErrorHighlightingTask extends ParserResultTask<CfgPropsParser
     }
 
     @Override
-    public Class<? extends Scheduler> getSchedulerClass() {
-        return Scheduler.EDITOR_SENSITIVE_TASK_SCHEDULER;
-    }
-
-    @Override
-    public void cancel() {
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity) {
+        logger.fine("Highlighting syntax errors");
+        try {
+            final List<ParseError> parseErrors = cfgResult.getParbResult().parseErrors;
+            for (ParseError error : parseErrors) {
+                String message = error.getErrorMessage() != null
+                        ? error.getErrorMessage()
+                        : error instanceof InvalidInputError
+                                ? formatter.format((InvalidInputError) error)
+                                : error.getClass().getSimpleName();
+                ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
+                        severity,
+                        message,
+                        document,
+                        document.createPosition(Math.min(error.getStartIndex(), document.getLength() + 1)),
+                        document.createPosition(Math.min(error.getEndIndex(), document.getLength() + 1))
+                );
+                errors.add(errDesc);
+            }
+        } catch (BadLocationException | ParseException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }
 }
