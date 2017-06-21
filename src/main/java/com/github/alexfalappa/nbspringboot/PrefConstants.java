@@ -30,6 +30,9 @@ public final class PrefConstants {
     public static final String PREF_VM_OPTS_LAUNCH = "nbspringboot.defaultopts.launch-vm-options";
     public static final String PREF_DEPR_SORT_LAST = "nbspringboot.defaultopts.sort-deprecated-last";
     public static final String PREF_DEPR_ERROR_SHOW = "nbspringboot.defaultopts.show-error-deprecated";
+    public static final String PREF_HLIGHT_LEV_SYNERR = "nbspringboot.highlight-level.syntax-errors";
+    public static final String PREF_HLIGHT_LEV_DUPLICATES = "nbspringboot.highlight-level.duplicates";
+    public static final String PREF_HLIGHT_LEV_DTMISMATCH = "nbspringboot.highlight-level.data-type-mismatches";
 
     // prevent instantiation
     private PrefConstants() {
