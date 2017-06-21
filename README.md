@@ -73,11 +73,12 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
         -  Duplicate properties
         -  Data type mismatches *(see documentation for limitations)*
     -  Upgrade to Spring Boot 1.5.4
-    -  Style of configuration properties items in lists is more uniform
     -  Manage deprecation error level in configuration properties metadata
+    -  New plugin options for customizing error higlighting severity
     -  New plugin options for configuration properties lists used in completion and override on launch:
         -  Include deprecated properties with level error
         -  Show all deprecated properties last
+    -  Style of configuration properties items in lists is more uniform
     -  The `application.properties` file wizard allows to choose between *main* and *test* resource folders
 
 -  **1.5.1** (May 2017): Another round of fixes
