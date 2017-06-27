@@ -20,7 +20,8 @@ package com.github.alexfalappa.nbspringboot.filetype.lexer;
 
 import org.netbeans.spi.lexer.LexerInput;
 import org.netbeans.spi.lexer.LexerRestartInfo;
-import com.github.alexfalappa.nbspringboot.filetype.lexer.CfgPropsTokenId;
+import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsTokenId;
+import com.github.alexfalappa.nbspringboot.cfgprops.lexer.StateStack;
 
 %%
 
@@ -126,14 +127,15 @@ import com.github.alexfalappa.nbspringboot.filetype.lexer.CfgPropsTokenId;
 CRLF=\R
 WHITE_SPACE_CHAR=[\ \n\r\t\f]
 VALUE_CHARACTER=[^\n\r\f\\] | "\\"{CRLF} | "\\".
-END_OF_LINE_COMMENT=("#"|"!")[^\r\n]*
+COMMENT_START=[#!]
+END_OF_LINE_COMMENT={COMMENT_START}[^\r\n]*
 KEY_SEPARATOR=[:=]
 KEY_SEPARATOR_SPACE=\ \t
 KEY_DOT="."
 KEY_OBRACKET="["
 KEY_CBRACKET="]"
 KEY_ARR_IDX=0|[1-9][0-9]*
-KEY_CHARACTER=[^:\[\]=\ \n\r\t\f\\.] | "\\"{CRLF} | "\\".
+KEY_CHARACTER=[^#!:\[\]=\ \n\r\t\f\\.] | "\\"{CRLF} | "\\".
 FIRST_VALUE_CHARACTER_BEFORE_SEP={VALUE_CHARACTER}
 VALUE_CHARACTERS_BEFORE_SEP=([^:=\ \t\n\r\f\\] | "\\"{CRLF} | "\\".)({VALUE_CHARACTER}*)
 VALUE_CHARACTERS_AFTER_SEP=([^\ \t\n\r\f\\] | "\\"{CRLF} | "\\".)({VALUE_CHARACTER}*)
@@ -157,6 +159,7 @@ VALUE_CHARACTERS_AFTER_SEP=([^\ \t\n\r\f\\] | "\\"{CRLF} | "\\".)({VALUE_CHARACT
     {KEY_CHARACTER}+                     { yybegin(IN_KEY); return CfgPropsTokenId.KEY; }
     {KEY_SEPARATOR_SPACE}+               { yybegin(IN_KEY_VALUE_SEPARATOR_HEAD); return CfgPropsTokenId.WHITESPACE; }
     {KEY_SEPARATOR}                      { yybegin(IN_KEY_VALUE_SEPARATOR_TAIL); return CfgPropsTokenId.SEPARATOR; }
+    {END_OF_LINE_COMMENT}                { yybegin(YYINITIAL); return CfgPropsTokenId.COMMENT; }
 }
 
 <IN_KEY_VALUE_SEPARATOR_HEAD> {
