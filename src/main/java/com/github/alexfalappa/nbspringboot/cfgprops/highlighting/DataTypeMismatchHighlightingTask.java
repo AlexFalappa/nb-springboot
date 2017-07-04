@@ -17,6 +17,7 @@ package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -32,7 +33,6 @@ import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Severity;
-import org.openide.filesystems.FileUtil;
 import org.openide.util.Pair;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
@@ -43,8 +43,6 @@ import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 import com.github.drapostolos.typeparser.TypeParser;
 
-import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.FINER;
 import static java.util.regex.Pattern.compile;
 
 /**
@@ -84,7 +82,6 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
         logger.fine("Highlighting data type mismatches");
         final Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
         if (prj != null) {
-            logger.log(FINER, "Context project: {0}", FileUtil.getFileDisplayName(prj.getProjectDirectory()));
             final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
             final ClassPath cp = getProjectClasspath(prj);
             if (sbs != null && cp != null) {
@@ -93,27 +90,22 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                     int line = entry.getKey();
                     String pName = entry.getValue().first();
                     String pValue = entry.getValue().second();
-                    StringBuilder sb = new StringBuilder(String.format("%2d) ", line));
-                    sb.append(pName).append(" -> ").append(pValue);
                     ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
                     if (cfgMeta == null) {
                         // try to interpret array notation (strip '[index]' from pName)
                         Matcher mArrNot = pArrayNotation.matcher(pName);
                         if (mArrNot.matches()) {
                             cfgMeta = sbs.getPropertyMetadata(mArrNot.group(1));
-                            sb.append("    - array notation");
                         } else {
                             // try to interpret map notation (see if pName starts with a set of known map props)
                             for (String mapPropertyName : sbs.getMapPropertyNames()) {
                                 if (pName.startsWith(mapPropertyName)) {
                                     cfgMeta = sbs.getPropertyMetadata(mapPropertyName);
-                                    sb.append("    - map notation");
                                     break;
                                 }
                             }
                         }
                     }
-                    logger.log(FINER, sb.toString());
                     if (cfgMeta != null) {
                         final String type = cfgMeta.getType();
                         final ClassLoader cl = cp.getClassLoader(true);
@@ -151,11 +143,12 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                                 }
                             }
                         }
-                    } else {
-                        logger.log(FINE, "No metadata for {0}   ", pName);
                     }
                 }
             }
+        }
+        if (!errors.isEmpty()) {
+            logger.log(Level.FINE, "Found {0} data type mismatches", errors.size());
         }
     }
 

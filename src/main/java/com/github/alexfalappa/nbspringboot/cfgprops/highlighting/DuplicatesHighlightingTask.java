@@ -18,6 +18,7 @@ package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 
 import javax.swing.text.Document;
 
@@ -78,6 +79,9 @@ public class DuplicatesHighlightingTask extends BaseHighlightingTask {
             if (canceled) {
                 break;
             }
+        }
+        if (!errors.isEmpty()) {
+            logger.log(Level.FINE, "Found {0} duplicates", errors.size());
         }
     }
 }

@@ -16,6 +16,7 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
 import java.util.List;
+import java.util.logging.Level;
 
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -87,6 +88,9 @@ public class SyntaxErrorHighlightingTask extends BaseHighlightingTask {
             }
         } catch (BadLocationException | ParseException ex) {
             Exceptions.printStackTrace(ex);
+        }
+        if (!errors.isEmpty()) {
+            logger.log(Level.FINE, "Found {0} syntax errors", errors.size());
         }
     }
 }
