@@ -26,6 +26,7 @@ import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Exceptions;
+import org.parboiled.buffers.InputBuffer;
 import org.parboiled.common.Formatter;
 import org.parboiled.errors.DefaultInvalidInputErrorFormatter;
 import org.parboiled.errors.InvalidInputError;
@@ -67,6 +68,7 @@ public class SyntaxErrorHighlightingTask extends BaseHighlightingTask {
     protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity) {
         logger.fine("Highlighting syntax errors");
         try {
+            final InputBuffer ibuf = cfgResult.getParbResult().inputBuffer;
             final List<ParseError> parseErrors = cfgResult.getParbResult().parseErrors;
             for (ParseError error : parseErrors) {
                 String message = error.getErrorMessage() != null
@@ -78,8 +80,8 @@ public class SyntaxErrorHighlightingTask extends BaseHighlightingTask {
                         severity,
                         message,
                         document,
-                        document.createPosition(Math.min(error.getStartIndex(), document.getLength() + 1)),
-                        document.createPosition(Math.min(error.getEndIndex(), document.getLength() + 1))
+                        document.createPosition(ibuf.getOriginalIndex(error.getStartIndex())),
+                        document.createPosition(ibuf.getOriginalIndex(error.getEndIndex()))
                 );
                 errors.add(errDesc);
             }
