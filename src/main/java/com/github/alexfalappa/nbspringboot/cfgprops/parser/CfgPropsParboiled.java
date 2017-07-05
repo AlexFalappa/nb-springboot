@@ -51,21 +51,25 @@ public class CfgPropsParboiled extends BaseParser<String> {
             final ValueStack<String> stack = context.getValueStack();
             int line = context.getPosition().line;
             int size = stack.size();
-            switch (size) {
-                case 1:
-                    String propName = stack.pop();
-                    parsedProps.setProperty(propName, "");
-                    propLines.put(line, Pair.of(propName, ""));
-                    break;
-                case 2:
-                    // NOTE: stack popping order below is important!
-                    final String propValue = stack.pop();
-                    propName = stack.pop();
-                    parsedProps.setProperty(propName, propValue);
-                    propLines.put(line, Pair.of(propName, propValue));
-                    break;
-                default:
-                    throw new IllegalStateException("Zero or more than 2 values on the parsing stack");
+            if (!context.hasError()) {
+                switch (size) {
+                    case 1:
+                        String propName = stack.pop();
+                        parsedProps.setProperty(propName, "");
+                        propLines.put(line, Pair.of(propName, ""));
+                        break;
+                    case 2:
+                        // NOTE: stack popping order below is important!
+                        final String propValue = stack.pop();
+                        propName = stack.pop();
+                        parsedProps.setProperty(propName, propValue);
+                        propLines.put(line, Pair.of(propName, propValue));
+                        break;
+                    default:
+                        throw new IllegalStateException(String.format("Cannot manage %d values on the parsing stack", size));
+                }
+            } else {
+                stack.clear();
             }
             return true;
         }
