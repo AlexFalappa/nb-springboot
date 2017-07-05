@@ -38,7 +38,8 @@ public class CfgPropsHighlightingTaskFactory extends TaskFactory {
         return Arrays.asList(
                 new SyntaxErrorHighlightingTask(),
                 new DuplicatesHighlightingTask(),
-                new DataTypeMismatchHighlightingTask()
+                new DataTypeMismatchHighlightingTask(),
+                new UnknownPropsHighlightingTask()
         );
     }
 
