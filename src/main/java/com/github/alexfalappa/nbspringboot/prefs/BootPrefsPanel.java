@@ -81,6 +81,8 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         cbDupl = new javax.swing.JComboBox<>();
         lDtMismatch = new javax.swing.JLabel();
         cbDtMismatch = new javax.swing.JComboBox<>();
+        lUnknown = new javax.swing.JLabel();
+        cbUnknown = new javax.swing.JComboBox<>();
 
         org.openide.awt.Mnemonics.setLocalizedText(lInitializr, org.openide.util.NbBundle.getMessage(BootPrefsPanel.class, "BootPrefsPanel.lInitializr.text")); // NOI18N
 
@@ -125,6 +127,10 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         org.openide.awt.Mnemonics.setLocalizedText(lDtMismatch, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.lDtMismatch.text")); // NOI18N
 
         cbDtMismatch.setModel(new DefaultComboBoxModel<>(SEVERITY_LEVELS));
+
+        org.openide.awt.Mnemonics.setLocalizedText(lUnknown, org.openide.util.NbBundle.getBundle(BootPrefsPanel.class).getString("BootPrefsPanel.lUnknown.text")); // NOI18N
+
+        cbUnknown.setModel(new DefaultComboBoxModel<>(SEVERITY_LEVELS));
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
@@ -185,12 +191,14 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(lSynErr)
                                             .addComponent(lDupl)
-                                            .addComponent(lDtMismatch))
+                                            .addComponent(lDtMismatch)
+                                            .addComponent(lUnknown))
                                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                                             .addComponent(cbSynErr, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                             .addComponent(cbDupl, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                            .addComponent(cbDtMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                                            .addComponent(cbDtMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                            .addComponent(cbUnknown, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                                 .addGap(0, 0, Short.MAX_VALUE)))))
                 .addContainerGap())
         );
@@ -250,6 +258,10 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(lDtMismatch)
                     .addComponent(cbDtMismatch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(lUnknown)
+                    .addComponent(cbUnknown, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
     }// </editor-fold>//GEN-END:initComponents
@@ -268,6 +280,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         cbDtMismatch.setSelectedIndex(prefs.getInt(PrefConstants.PREF_HLIGHT_LEV_DTMISMATCH, 2));
         cbDupl.setSelectedIndex(prefs.getInt(PrefConstants.PREF_HLIGHT_LEV_DUPLICATES, 1));
         cbSynErr.setSelectedIndex(prefs.getInt(PrefConstants.PREF_HLIGHT_LEV_SYNERR, 2));
+        cbUnknown.setSelectedIndex(prefs.getInt(PrefConstants.PREF_HLIGHT_LEV_UNKNOWN, 1));
         // listen to changes in form fields and call controller.changed()
         // Register listener on the textFields to detect changes
         txInitializrUrl.getDocument().addDocumentListener(this);
@@ -281,6 +294,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         cbDtMismatch.addActionListener(this);
         cbDupl.addActionListener(this);
         cbSynErr.addActionListener(this);
+        cbUnknown.addActionListener(this);
     }
 
     void store() {
@@ -297,6 +311,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         prefs.putInt(PrefConstants.PREF_HLIGHT_LEV_DTMISMATCH, cbDtMismatch.getSelectedIndex());
         prefs.putInt(PrefConstants.PREF_HLIGHT_LEV_DUPLICATES, cbDupl.getSelectedIndex());
         prefs.putInt(PrefConstants.PREF_HLIGHT_LEV_SYNERR, cbSynErr.getSelectedIndex());
+        prefs.putInt(PrefConstants.PREF_HLIGHT_LEV_UNKNOWN, cbUnknown.getSelectedIndex());
         InitializrService.getInstance().clearCachedValues();
     }
 
@@ -315,6 +330,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
     private javax.swing.JComboBox<String> cbDtMismatch;
     private javax.swing.JComboBox<String> cbDupl;
     private javax.swing.JComboBox<String> cbSynErr;
+    private javax.swing.JComboBox<String> cbUnknown;
     private javax.swing.JCheckBox chColorOutput;
     private javax.swing.JCheckBox chDeprErrorShow;
     private javax.swing.JCheckBox chDeprSortLast;
@@ -331,6 +347,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
     private javax.swing.JLabel lLists;
     private javax.swing.JLabel lSeconds;
     private javax.swing.JLabel lSynErr;
+    private javax.swing.JLabel lUnknown;
     private javax.swing.JLabel lVmOpts;
     private javax.swing.JSeparator sep1;
     private javax.swing.JSeparator sep2;

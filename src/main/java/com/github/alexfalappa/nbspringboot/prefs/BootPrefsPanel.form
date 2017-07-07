@@ -85,12 +85,14 @@
                                           <Component id="lSynErr" min="-2" max="-2" attributes="0"/>
                                           <Component id="lDupl" min="-2" max="-2" attributes="0"/>
                                           <Component id="lDtMismatch" min="-2" max="-2" attributes="0"/>
+                                          <Component id="lUnknown" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                       <EmptySpace max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
                                           <Component id="cbSynErr" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="cbDupl" alignment="0" min="-2" max="-2" attributes="0"/>
                                           <Component id="cbDtMismatch" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="cbUnknown" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
                                   </Group>
                               </Group>
@@ -171,6 +173,11 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lDtMismatch" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="cbDtMismatch" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lUnknown" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cbUnknown" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -338,6 +345,23 @@
       </Properties>
     </Component>
     <Component class="javax.swing.JComboBox" name="cbDtMismatch">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
+          <Connection code="new DefaultComboBoxModel&lt;&gt;(SEVERITY_LEVELS)" type="code"/>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lUnknown">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="com/github/alexfalappa/nbspringboot/prefs/Bundle.properties" key="BootPrefsPanel.lUnknown.text" replaceFormat="org.openide.util.NbBundle.getBundle({sourceFileName}.class).getString(&quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="cbUnknown">
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="new DefaultComboBoxModel&lt;&gt;(SEVERITY_LEVELS)" type="code"/>

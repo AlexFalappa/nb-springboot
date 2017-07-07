@@ -33,6 +33,7 @@ public final class PrefConstants {
     public static final String PREF_HLIGHT_LEV_SYNERR = "nbspringboot.highlight-level.syntax-errors";
     public static final String PREF_HLIGHT_LEV_DUPLICATES = "nbspringboot.highlight-level.duplicates";
     public static final String PREF_HLIGHT_LEV_DTMISMATCH = "nbspringboot.highlight-level.data-type-mismatches";
+    public static final String PREF_HLIGHT_LEV_UNKNOWN = "nbspringboot.highlight-level.unknown-props";
 
     // prevent instantiation
     private PrefConstants() {

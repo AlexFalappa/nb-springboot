@@ -49,12 +49,12 @@ public class UnknownPropsHighlightingTask extends BaseHighlightingTask {
 
     @Override
     protected String getHighlightPrefName() {
-        return PrefConstants.PREF_HLIGHT_LEV_DTMISMATCH;
+        return PrefConstants.PREF_HLIGHT_LEV_UNKNOWN;
     }
 
     @Override
     protected int getHighlightDefaultValue() {
-        return 2;
+        return 1;
     }
 
     @Override
