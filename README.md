@@ -67,7 +67,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 ## Changelog
 
--  **1.6** (??? 2017): Work In Progress
+-  **1.6** (Jul 2017): Configuration properties highlighting
     -  Error highlighting in configuration properties editor for:
         -  Syntax errors
         -  Duplicate properties
