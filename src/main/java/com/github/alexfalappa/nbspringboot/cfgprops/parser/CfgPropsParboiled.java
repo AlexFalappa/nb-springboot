@@ -153,7 +153,7 @@ public class CfgPropsParboiled extends BaseParser<String> {
         return OneOrMore(
                 FirstOf(
                         new JavaIdPartMatcher(sbv),
-                        Sequence(AnyOf("(){}-+*/^|;,`°§<>\"'%&@"), sbv.append(matchedChar())),
+                        Sequence(AnyOf("(){}-+*/^|;,`°§<>\"'%&@?"), sbv.append(matchedChar())),
                         encodedSpecialChar(sbv),
                         encodedTab(sbv),
                         encodedLinefeed(sbv),
@@ -172,7 +172,7 @@ public class CfgPropsParboiled extends BaseParser<String> {
                         encodedLinefeed(sbv),
                         encodedUnicode(sbv),
                         malformedEscape(sbv),
-                        Sequence(AnyOf("=:[].(){}-+*/^|;,`°§<>\"'%&@"), sbv.append(matchedChar()))
+                        Sequence(AnyOf("=:[].(){}-+*/^|;,`°§<>\"'%&@?"), sbv.append(matchedChar()))
                 )
         );
     }
