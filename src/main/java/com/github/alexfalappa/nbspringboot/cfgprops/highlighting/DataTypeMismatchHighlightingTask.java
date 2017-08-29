@@ -54,7 +54,6 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
 
     private final Pattern pOneGenTypeArg = compile("([^<>]+)<(.+)>");
     private final Pattern pTwoGenTypeArgs = compile("([^<>]+)<(.+),(.+)>");
-    private final Pattern pArrayNotation = compile("(.+)\\[\\d+\\]");
     private final TypeParser parser = TypeParser.newBuilder().enablePropertyEditor().build();
 
     @Override
@@ -91,21 +90,6 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                     String pName = entry.getValue().first();
                     String pValue = entry.getValue().second();
                     ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
-                    if (cfgMeta == null) {
-                        // try to interpret array notation (strip '[index]' from pName)
-                        Matcher mArrNot = pArrayNotation.matcher(pName);
-                        if (mArrNot.matches()) {
-                            cfgMeta = sbs.getPropertyMetadata(mArrNot.group(1));
-                        } else {
-                            // try to interpret map notation (see if pName starts with a set of known map props)
-                            for (String mapPropertyName : sbs.getMapPropertyNames()) {
-                                if (pName.startsWith(mapPropertyName)) {
-                                    cfgMeta = sbs.getPropertyMetadata(mapPropertyName);
-                                    break;
-                                }
-                            }
-                        }
-                    }
                     if (cfgMeta != null) {
                         final String type = cfgMeta.getType();
                         final ClassLoader cl = cp.getClassLoader(true);

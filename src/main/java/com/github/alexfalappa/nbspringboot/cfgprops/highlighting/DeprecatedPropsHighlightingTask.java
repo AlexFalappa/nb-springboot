@@ -18,8 +18,6 @@ package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import javax.swing.text.Document;
 
@@ -37,7 +35,6 @@ import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
-import static java.util.regex.Pattern.compile;
 import static org.springframework.boot.configurationmetadata.Deprecation.Level.ERROR;
 
 /**
@@ -46,8 +43,6 @@ import static org.springframework.boot.configurationmetadata.Deprecation.Level.E
  * @author Alessandro Falappa
  */
 public class DeprecatedPropsHighlightingTask extends BaseHighlightingTask {
-
-    private final Pattern pArrayNotation = compile("(.+)\\[\\d+\\]");
 
     @Override
     protected String getHighlightPrefName() {
@@ -81,21 +76,6 @@ public class DeprecatedPropsHighlightingTask extends BaseHighlightingTask {
                     int line = entry.getKey();
                     String pName = entry.getValue().first();
                     ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
-                    if (cfgMeta == null) {
-                        // try to interpret array notation (strip '[index]' from pName)
-                        Matcher mArrNot = pArrayNotation.matcher(pName);
-                        if (mArrNot.matches()) {
-                            cfgMeta = sbs.getPropertyMetadata(mArrNot.group(1));
-                        } else {
-                            // try to interpret map notation (see if pName starts with a set of known map props)
-                            for (String mapPropertyName : sbs.getMapPropertyNames()) {
-                                if (pName.startsWith(mapPropertyName)) {
-                                    cfgMeta = sbs.getPropertyMetadata(mapPropertyName);
-                                    break;
-                                }
-                            }
-                        }
-                    }
                     if (cfgMeta != null && cfgMeta.getDeprecation() != null) {
                         Deprecation.Level deprLevel = cfgMeta.getDeprecation().getLevel();
                         ErrorDescription errDesc;

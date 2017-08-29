@@ -25,6 +25,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
@@ -40,10 +42,10 @@ import org.netbeans.spi.project.ProjectServiceProvider;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
+import org.springframework.boot.bind.RelaxedNames;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepository;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepositoryJsonBuilder;
-import org.springframework.boot.configurationmetadata.Hints;
 import org.springframework.boot.configurationmetadata.SimpleConfigurationMetadataRepository;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
@@ -52,6 +54,7 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
+import static java.util.regex.Pattern.compile;
 
 /**
  * Project wide {@link SpringBootService} implementation.
@@ -73,6 +76,7 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     private static final Logger logger = Logger.getLogger(SpringBootServiceImpl.class.getName());
     private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
+    private final Pattern pArrayNotation = compile("(.+)\\[\\d+\\]");
     private SimpleConfigurationMetadataRepository repo = new SimpleConfigurationMetadataRepository();
     private final Map<String, ConfigurationMetadataRepository> reposInJars = new HashMap<>();
     private boolean springBootAvailable = false;
@@ -187,7 +191,26 @@ public class SpringBootServiceImpl implements SpringBootService {
         if (cpExec == null) {
             init();
         }
-        return cachedProperties.get(propertyName);
+        // generate and try relaxed variants
+        for (String relaxedName : new RelaxedNames(propertyName)) {
+            if (cachedProperties.containsKey(relaxedName)) {
+                return cachedProperties.get(relaxedName);
+            } else {
+                // try to interpret array notation (strip '[index]' from pName)
+                Matcher mArrNot = pArrayNotation.matcher(relaxedName);
+                if (mArrNot.matches()) {
+                    return cachedProperties.get(mArrNot.group(1));
+                } else {
+                    // try to interpret map notation (see if pName starts with a set of known map props)
+                    for (String mapPropertyName : getMapPropertyNames()) {
+                        if (relaxedName.startsWith(mapPropertyName)) {
+                            return cachedProperties.get(mapPropertyName);
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     @Override
@@ -210,9 +233,9 @@ public class SpringBootServiceImpl implements SpringBootService {
             init();
         }
         List<ValueHint> ret = new LinkedList<>();
-        if (getPropertyNames().contains(propertyName)) {
-            Hints hints = cachedProperties.get(propertyName).getHints();
-            for (ValueHint valueHint : hints.getValueHints()) {
+        ConfigurationMetadataProperty cfgMeta = getPropertyMetadata(propertyName);
+        if (cfgMeta != null) {
+            for (ValueHint valueHint : cfgMeta.getHints().getValueHints()) {
                 if (filter == null || valueHint.getValue().toString().contains(filter)) {
                     ret.add(valueHint);
                 }
