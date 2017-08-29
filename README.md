@@ -68,7 +68,9 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 ## Changelog
 
 -  **1.6.1** (??? 2017): Work In Progress
-    -  Added error highlighting in configuration properties editor for deprecated properties according to their level in metadata
+    -  Error highlighting in configuration properties editor:
+        -  Added highlighting for deprecated properties according to their level in metadata
+        -  Relaxed configuration properties name variants are recognized
     -  Upgrade to Spring Boot 1.5.6
     -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/12?closed=1)
 
