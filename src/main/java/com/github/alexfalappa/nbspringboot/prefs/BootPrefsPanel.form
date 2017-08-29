@@ -68,31 +68,32 @@
                               <Group type="103" groupAlignment="0" attributes="0">
                                   <Component id="chColorOutput" min="-2" max="-2" attributes="0"/>
                                   <Component id="chDevtoolsTrigger" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace min="0" pref="0" max="32767" attributes="0"/>
-                          </Group>
-                          <Group type="102" alignment="0" attributes="0">
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="lLists" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chDeprSortLast" alignment="0" min="-2" max="-2" attributes="0"/>
-                                  <Component id="chDeprErrorShow" alignment="0" min="-2" max="-2" attributes="0"/>
-                              </Group>
-                              <EmptySpace type="separate" max="32767" attributes="0"/>
-                              <Group type="103" groupAlignment="0" attributes="0">
-                                  <Component id="lErrHighl" min="-2" max="-2" attributes="0"/>
                                   <Group type="102" alignment="0" attributes="0">
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="lSynErr" min="-2" max="-2" attributes="0"/>
-                                          <Component id="lDupl" min="-2" max="-2" attributes="0"/>
-                                          <Component id="lDtMismatch" min="-2" max="-2" attributes="0"/>
-                                          <Component id="lUnknown" min="-2" max="-2" attributes="0"/>
+                                          <Component id="lLists" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chDeprSortLast" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="chDeprErrorShow" alignment="0" min="-2" max="-2" attributes="0"/>
                                       </Group>
-                                      <EmptySpace max="-2" attributes="0"/>
+                                      <EmptySpace type="separate" max="-2" attributes="0"/>
                                       <Group type="103" groupAlignment="0" attributes="0">
-                                          <Component id="cbSynErr" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="cbDupl" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="cbDtMismatch" alignment="0" min="-2" max="-2" attributes="0"/>
-                                          <Component id="cbUnknown" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Component id="lErrHighl" alignment="0" min="-2" max="-2" attributes="0"/>
+                                          <Group type="102" alignment="0" attributes="0">
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Component id="lSynErr" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="lDupl" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="lDtMismatch" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="lUnknown" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="lDeprecated" alignment="0" min="-2" max="-2" attributes="0"/>
+                                              </Group>
+                                              <EmptySpace max="-2" attributes="0"/>
+                                              <Group type="103" groupAlignment="0" attributes="0">
+                                                  <Component id="cbSynErr" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="cbDupl" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="cbDtMismatch" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="cbUnknown" alignment="0" min="-2" max="-2" attributes="0"/>
+                                                  <Component id="cbDeprecated" min="-2" max="-2" attributes="0"/>
+                                              </Group>
+                                          </Group>
                                       </Group>
                                   </Group>
                               </Group>
@@ -178,6 +179,11 @@
               <Group type="103" groupAlignment="3" attributes="0">
                   <Component id="lUnknown" alignment="3" min="-2" max="-2" attributes="0"/>
                   <Component id="cbUnknown" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
+              <EmptySpace max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="lDeprecated" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cbDeprecated" alignment="3" min="-2" max="-2" attributes="0"/>
               </Group>
               <EmptySpace max="32767" attributes="0"/>
           </Group>
@@ -365,6 +371,26 @@
       <Properties>
         <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.RADConnectionPropertyEditor">
           <Connection code="new DefaultComboBoxModel&lt;&gt;(SEVERITY_LEVELS)" type="code"/>
+        </Property>
+      </Properties>
+      <AuxValues>
+        <AuxValue name="JavaCodeGenerator_TypeParameters" type="java.lang.String" value="&lt;String&gt;"/>
+      </AuxValues>
+    </Component>
+    <Component class="javax.swing.JLabel" name="lDeprecated">
+      <Properties>
+        <Property name="text" type="java.lang.String" editor="org.netbeans.modules.i18n.form.FormI18nStringEditor">
+          <ResourceString bundle="com/github/alexfalappa/nbspringboot/prefs/Bundle.properties" key="BootPrefsPanel.lDeprecated.text" replaceFormat="org.openide.util.NbBundle.getBundle({sourceFileName}.class).getString(&quot;{key}&quot;)"/>
+        </Property>
+      </Properties>
+    </Component>
+    <Component class="javax.swing.JComboBox" name="cbDeprecated">
+      <Properties>
+        <Property name="model" type="javax.swing.ComboBoxModel" editor="org.netbeans.modules.form.editors2.ComboBoxModelEditor">
+          <StringArray count="2">
+            <StringItem index="0" value="None"/>
+            <StringItem index="1" value="Highlight"/>
+          </StringArray>
         </Property>
       </Properties>
       <AuxValues>

@@ -31,25 +31,27 @@ import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Pair;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+import org.springframework.boot.configurationmetadata.Deprecation;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static java.util.regex.Pattern.compile;
+import static org.springframework.boot.configurationmetadata.Deprecation.Level.ERROR;
 
 /**
- * Highlighting task for unknown configuration properties names.
+ * Highlighting task for deprecated configuration properties names.
  *
  * @author Alessandro Falappa
  */
-public class UnknownPropsHighlightingTask extends BaseHighlightingTask {
+public class DeprecatedPropsHighlightingTask extends BaseHighlightingTask {
 
     private final Pattern pArrayNotation = compile("(.+)\\[\\d+\\]");
 
     @Override
     protected String getHighlightPrefName() {
-        return PrefConstants.PREF_HLIGHT_LEV_UNKNOWN;
+        return PrefConstants.PREF_HLIGHT_LEV_DEPRECATED;
     }
 
     @Override
@@ -59,17 +61,17 @@ public class UnknownPropsHighlightingTask extends BaseHighlightingTask {
 
     @Override
     protected String getErrorLayerName() {
-        return "boot-cfgprops-unknownprops";
+        return "boot-cfgprops-deprecatedprops";
     }
 
     @Override
     public int getPriority() {
-        return 500;
+        return 400;
     }
 
     @Override
-    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity) {
-        logger.fine("Highlighting unknown properties");
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity unused) {
+        logger.fine("Highlighting deprecated properties");
         final Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
         if (prj != null) {
             final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
@@ -94,20 +96,31 @@ public class UnknownPropsHighlightingTask extends BaseHighlightingTask {
                             }
                         }
                     }
-                    if (cfgMeta == null) {
-                        ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
-                                severity,
-                                String.format("Unknown Spring Boot property '%s'", pName),
-                                document,
-                                line
-                        );
+                    if (cfgMeta != null && cfgMeta.getDeprecation() != null) {
+                        Deprecation.Level deprLevel = cfgMeta.getDeprecation().getLevel();
+                        ErrorDescription errDesc;
+                        if (deprLevel == ERROR) {
+                            errDesc = ErrorDescriptionFactory.createErrorDescription(
+                                    Severity.ERROR,
+                                    String.format("No more supported Spring Boot property '%s'", pName),
+                                    document,
+                                    line
+                            );
+                        } else {
+                            errDesc = ErrorDescriptionFactory.createErrorDescription(
+                                    Severity.WARNING,
+                                    String.format("Deprecated Spring Boot property '%s'", pName),
+                                    document,
+                                    line
+                            );
+                        }
                         errors.add(errDesc);
                     }
                 }
             }
         }
         if (!errors.isEmpty()) {
-            logger.log(Level.FINE, "Found {0} unknown properties", errors.size());
+            logger.log(Level.FINE, "Found {0} deprecated properties", errors.size());
         }
     }
 

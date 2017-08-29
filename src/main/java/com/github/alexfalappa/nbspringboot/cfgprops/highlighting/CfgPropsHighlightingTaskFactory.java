@@ -39,6 +39,7 @@ public class CfgPropsHighlightingTaskFactory extends TaskFactory {
                 new SyntaxErrorHighlightingTask(),
                 new DuplicatesHighlightingTask(),
                 new DataTypeMismatchHighlightingTask(),
+                new DeprecatedPropsHighlightingTask(),
                 new UnknownPropsHighlightingTask()
         );
     }
