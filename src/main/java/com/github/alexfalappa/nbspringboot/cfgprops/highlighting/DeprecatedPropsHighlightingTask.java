@@ -116,6 +116,9 @@ public class DeprecatedPropsHighlightingTask extends BaseHighlightingTask {
                         }
                         errors.add(errDesc);
                     }
+                    if (canceled) {
+                        break;
+                    }
                 }
             }
         }

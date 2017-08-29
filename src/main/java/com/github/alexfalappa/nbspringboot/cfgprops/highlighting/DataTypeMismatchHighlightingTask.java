@@ -144,6 +144,9 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                             }
                         }
                     }
+                    if (canceled) {
+                        break;
+                    }
                 }
             }
         }

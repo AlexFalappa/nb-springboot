@@ -85,6 +85,9 @@ public class SyntaxErrorHighlightingTask extends BaseHighlightingTask {
                         document.createPosition(ibuf.getOriginalIndex(error.getEndIndex()))
                 );
                 errors.add(errDesc);
+                if (canceled) {
+                    break;
+                }
             }
         } catch (BadLocationException | ParseException ex) {
             Exceptions.printStackTrace(ex);
