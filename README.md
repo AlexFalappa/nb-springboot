@@ -67,6 +67,11 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 ## Changelog
 
+-  **1.6.1** (??? 2017): Work In Progress
+    -  Added error highlighting in configuration properties editor for deprecated properties according to their level in metadata
+    -  Upgrade to Spring Boot 1.5.6
+    -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/12?closed=1)
+
 -  **1.6** (Jul 2017): Configuration properties highlighting
     -  Error highlighting in configuration properties editor for:
         -  Syntax errors
@@ -81,6 +86,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
         -  Show all deprecated properties last
     -  Style of configuration properties items in lists is more uniform
     -  The `application.properties` file wizard allows to choose between *main* and *test* resource folders
+    -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/11?closed=1)
 
 -  **1.5.1** (May 2017): Another round of fixes
     -  Upgrade to Spring Boot 1.5.3
