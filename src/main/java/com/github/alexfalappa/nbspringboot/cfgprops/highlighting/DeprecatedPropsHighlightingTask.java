@@ -15,17 +15,24 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 import javax.swing.text.Document;
+import javax.swing.text.StyledDocument;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
+import org.netbeans.spi.editor.hints.ChangeInfo;
+import org.netbeans.spi.editor.hints.EnhancedFix;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
+import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.Severity;
+import org.openide.awt.StatusDisplayer;
+import org.openide.text.NbDocument;
 import org.openide.util.Pair;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
@@ -77,12 +84,19 @@ public class DeprecatedPropsHighlightingTask extends BaseHighlightingTask {
                     String pName = entry.getValue().first();
                     ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
                     if (cfgMeta != null && cfgMeta.getDeprecation() != null) {
-                        Deprecation.Level deprLevel = cfgMeta.getDeprecation().getLevel();
+                        final Deprecation deprecation = cfgMeta.getDeprecation();
+                        List<Fix> fixes = new ArrayList<>();
+                        fixes.add(new DeletePropFix((StyledDocument) document, line, pName));
+                        if (deprecation.getReplacement() != null) {
+                            fixes.add(new ReplacePropFix((StyledDocument) document, line, pName, deprecation.getReplacement()));
+                        }
+                        Deprecation.Level deprLevel = deprecation.getLevel();
                         ErrorDescription errDesc;
                         if (deprLevel == ERROR) {
                             errDesc = ErrorDescriptionFactory.createErrorDescription(
                                     Severity.ERROR,
                                     String.format("No more supported Spring Boot property '%s'", pName),
+                                    fixes,
                                     document,
                                     line
                             );
@@ -90,6 +104,7 @@ public class DeprecatedPropsHighlightingTask extends BaseHighlightingTask {
                             errDesc = ErrorDescriptionFactory.createErrorDescription(
                                     Severity.WARNING,
                                     String.format("Deprecated Spring Boot property '%s'", pName),
+                                    fixes,
                                     document,
                                     line
                             );
@@ -107,4 +122,69 @@ public class DeprecatedPropsHighlightingTask extends BaseHighlightingTask {
         }
     }
 
+    private static class DeletePropFix implements EnhancedFix {
+
+        private final StyledDocument document;
+        private final int line;
+        private final String bodyText;
+
+        public DeletePropFix(StyledDocument document, int line, String bodyText) {
+            this.document = document;
+            this.line = line;
+            this.bodyText = bodyText;
+        }
+
+        @Override
+        public String getText() {
+            return "Remove property";
+        }
+
+        @Override
+        public CharSequence getSortText() {
+            return "delete";
+        }
+
+        @Override
+        public ChangeInfo implement() throws Exception {
+            int start = NbDocument.findLineOffset(document, line - 1);
+            document.remove(start, bodyText.length());
+            StatusDisplayer.getDefault().setStatusText("Removed property: " + bodyText);
+            return null;
+        }
+    }
+
+    private static class ReplacePropFix implements EnhancedFix {
+
+        private final StyledDocument document;
+        private final int line;
+        private final String bodyText;
+        private final String replacement;
+
+        public ReplacePropFix(StyledDocument document, int line, String bodyText, String replacement) {
+            this.document = document;
+            this.line = line;
+            this.bodyText = bodyText;
+            this.replacement = replacement;
+        }
+
+        @Override
+        public String getText() {
+            return String.format("Use replacement '%s'", replacement);
+        }
+
+        @Override
+        public CharSequence getSortText() {
+            return "replace";
+        }
+
+        @Override
+        public ChangeInfo implement() throws Exception {
+            int start = NbDocument.findLineOffset(document, line - 1);
+            document.remove(start, bodyText.length());
+            document.insertString(start, replacement, null);
+            StatusDisplayer.getDefault().setStatusText("Replaced property: " + bodyText);
+            return null;
+        }
+
+    }
 }
