@@ -17,9 +17,9 @@ package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 
@@ -29,12 +29,14 @@ import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.Severity;
-import org.openide.util.Pair;
+import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.Deprecation;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgElement;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.fixes.DeletePropFix;
 import com.github.alexfalappa.nbspringboot.cfgprops.fixes.ReplacePropFix;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
@@ -76,38 +78,47 @@ public class DeprecatedPropsHighlightingTask extends BaseHighlightingTask {
         if (prj != null) {
             final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
             if (sbs != null) {
-                final Map<Integer, Pair<String, String>> propLines = cfgResult.getPropLines();
-                for (Map.Entry<Integer, Pair<String, String>> entry : propLines.entrySet()) {
-                    int line = entry.getKey();
-                    String pName = entry.getValue().first();
+                for (PairElement pair : cfgResult.getCfgFile().getElements()) {
+                    final CfgElement key = pair.getKey();
+                    final CfgElement value = pair.getValue();
+                    final String pName = key.getText();
                     ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
                     if (cfgMeta != null && cfgMeta.getDeprecation() != null) {
-                        final Deprecation deprecation = cfgMeta.getDeprecation();
-                        List<Fix> fixes = new ArrayList<>();
-                        fixes.add(new DeletePropFix((StyledDocument) document, line, pName));
-                        if (deprecation.getReplacement() != null) {
-                            fixes.add(new ReplacePropFix((StyledDocument) document, line, pName, deprecation.getReplacement()));
+                        try {
+                            final Deprecation deprecation = cfgMeta.getDeprecation();
+                            List<Fix> fixes = new ArrayList<>();
+                            final int start = key.getIdxStart();
+                            int end = value != null ? value.getIdxEnd() : key.getIdxEnd();
+                            fixes.add(new DeletePropFix((StyledDocument) document, key.getText(), key.getIdxStart(), end));
+                            if (deprecation.getReplacement() != null) {
+                                end = key.getIdxEnd();
+                                fixes.add(new ReplacePropFix((StyledDocument) document, start, end, deprecation.getReplacement()));
+                            }
+                            Deprecation.Level deprLevel = deprecation.getLevel();
+                            ErrorDescription errDesc;
+                            if (deprLevel == ERROR) {
+                                errDesc = ErrorDescriptionFactory.createErrorDescription(
+                                        Severity.ERROR,
+                                        String.format("No more supported Spring Boot property '%s'", pName),
+                                        fixes,
+                                        document,
+                                        document.createPosition(start),
+                                        document.createPosition(end)
+                                );
+                            } else {
+                                errDesc = ErrorDescriptionFactory.createErrorDescription(
+                                        Severity.WARNING,
+                                        String.format("Deprecated Spring Boot property '%s'", pName),
+                                        fixes,
+                                        document,
+                                        document.createPosition(start),
+                                        document.createPosition(end)
+                                );
+                            }
+                            errors.add(errDesc);
+                        } catch (BadLocationException ex) {
+                            Exceptions.printStackTrace(ex);
                         }
-                        Deprecation.Level deprLevel = deprecation.getLevel();
-                        ErrorDescription errDesc;
-                        if (deprLevel == ERROR) {
-                            errDesc = ErrorDescriptionFactory.createErrorDescription(
-                                    Severity.ERROR,
-                                    String.format("No more supported Spring Boot property '%s'", pName),
-                                    fixes,
-                                    document,
-                                    line
-                            );
-                        } else {
-                            errDesc = ErrorDescriptionFactory.createErrorDescription(
-                                    Severity.WARNING,
-                                    String.format("Deprecated Spring Boot property '%s'", pName),
-                                    fixes,
-                                    document,
-                                    line
-                            );
-                        }
-                        errors.add(errDesc);
                     }
                     if (canceled) {
                         break;

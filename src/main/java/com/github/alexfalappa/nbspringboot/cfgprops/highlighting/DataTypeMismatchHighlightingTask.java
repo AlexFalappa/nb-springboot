@@ -16,11 +16,11 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import org.netbeans.api.java.classpath.ClassPath;
@@ -33,12 +33,14 @@ import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Severity;
-import org.openide.util.Pair;
+import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.util.ClassUtils;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgElement;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 import com.github.drapostolos.typeparser.TypeParser;
@@ -84,48 +86,52 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
             final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
             final ClassPath cp = getProjectClasspath(prj);
             if (sbs != null && cp != null) {
-                final Map<Integer, Pair<String, String>> propLines = cfgResult.getPropLines();
-                for (Map.Entry<Integer, Pair<String, String>> entry : propLines.entrySet()) {
-                    int line = entry.getKey();
-                    String pName = entry.getValue().first();
-                    String pValue = entry.getValue().second();
+                final ClassLoader cl = cp.getClassLoader(true);
+                for (PairElement pair : cfgResult.getCfgFile().getElements()) {
+                    final CfgElement key = pair.getKey();
+                    final CfgElement value = pair.getValue();
+                    final String pName = key.getText();
+                    final String pValue = value != null ? value.getText() : "";
                     ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
                     if (cfgMeta != null) {
-                        final String type = cfgMeta.getType();
-                        final ClassLoader cl = cp.getClassLoader(true);
-                        if (type.contains("<")) {
-                            // maps
-                            Matcher mMap = pTwoGenTypeArgs.matcher(type);
-                            if (mMap.matches() && mMap.groupCount() == 3) {
-                                String keyType = mMap.group(2);
-                                check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, line, errors, cl, severity);
-                                String valueType = mMap.group(3);
-                                check(valueType, pValue, document, line, errors, cl, severity);
-                            }
-                            // collections
-                            Matcher mColl = pOneGenTypeArg.matcher(type);
-                            if (mColl.matches() && mColl.groupCount() == 2) {
-                                String genericType = mColl.group(2);
-                                if (pValue.contains(",")) {
-                                    for (String val : pValue.split("\\s*,\\s*")) {
-                                        check(genericType, val, document, line, errors, cl, severity);
-                                    }
-                                } else {
-                                    check(genericType, pValue, document, line, errors, cl, severity);
+                        try {
+                            final String type = cfgMeta.getType();
+                            if (type.contains("<")) {
+                                // maps
+                                Matcher mMap = pTwoGenTypeArgs.matcher(type);
+                                if (mMap.matches() && mMap.groupCount() == 3) {
+                                    String keyType = mMap.group(2);
+                                    check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, key, errors, cl, severity);
+                                    String valueType = mMap.group(3);
+                                    check(valueType, pValue, document, value, errors, cl, severity);
                                 }
-                            }
-                        } else {
-                            if (pValue.contains(",") && type.endsWith("[]")) {
-                                for (String val : pValue.split("\\s*,\\s*")) {
-                                    check(type.substring(0, type.length() - 2), val, document, line, errors, cl, severity);
+                                // collections
+                                Matcher mColl = pOneGenTypeArg.matcher(type);
+                                if (mColl.matches() && mColl.groupCount() == 2) {
+                                    String genericType = mColl.group(2);
+                                    if (pValue.contains(",")) {
+                                        for (String val : pValue.split("\\s*,\\s*")) {
+                                            check(genericType, val, document, value, errors, cl, severity);
+                                        }
+                                    } else {
+                                        check(genericType, pValue, document, value, errors, cl, severity);
+                                    }
                                 }
                             } else {
-                                if (type.endsWith("[]")) {
-                                    check(type.substring(0, type.length() - 2), pValue, document, line, errors, cl, severity);
+                                if (pValue.contains(",") && type.endsWith("[]")) {
+                                    for (String val : pValue.split("\\s*,\\s*")) {
+                                        check(type.substring(0, type.length() - 2), val, document, value, errors, cl, severity);
+                                    }
                                 } else {
-                                    check(type, pValue, document, line, errors, cl, severity);
+                                    if (type.endsWith("[]")) {
+                                        check(type.substring(0, type.length() - 2), pValue, document, value, errors, cl, severity);
+                                    } else {
+                                        check(type, pValue, document, value, errors, cl, severity);
+                                    }
                                 }
                             }
+                        } catch (BadLocationException ex) {
+                            Exceptions.printStackTrace(ex);
                         }
                     }
                     if (canceled) {
@@ -150,7 +156,7 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
         return null;
     }
 
-    private void check(String type, String text, Document document, int line, List<ErrorDescription> errors, ClassLoader cl, Severity severity) {
+    private void check(String type, String text, Document document, CfgElement elem, List<ErrorDescription> errors, ClassLoader cl, Severity severity) throws BadLocationException {
         if (text == null || text.isEmpty()) {
             return;
         }
@@ -161,7 +167,8 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                         severity,
                         String.format("Cannot parse '%s' as %s", text, type),
                         document,
-                        line
+                        document.createPosition(elem.getIdxStart()),
+                        document.createPosition(elem.getIdxEnd())
                 );
                 errors.add(errDesc);
             }

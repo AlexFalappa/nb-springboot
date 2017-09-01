@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 
@@ -29,9 +30,12 @@ import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.Severity;
-import org.openide.util.Pair;
+import org.openide.text.NbDocument;
+import org.openide.util.Exceptions;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgElement;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.fixes.DeletePropFix;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 
@@ -66,20 +70,29 @@ public class DuplicatesHighlightingTask extends BaseHighlightingTask {
     protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity) {
         logger.fine("Highlighting duplicate props");
         Map<String, Integer> firstOccur = new HashMap<>();
-        final Map<Integer, Pair<String, String>> propLines = cfgResult.getPropLines();
-        for (Map.Entry<Integer, Pair<String, String>> entry : propLines.entrySet()) {
-            final String pName = entry.getValue().first();
-            final Integer line = entry.getKey();
+        System.out.println(cfgResult.getCfgFile());
+        for (PairElement pair : cfgResult.getCfgFile().getElements()) {
+            final CfgElement key = pair.getKey();
+            final CfgElement value = pair.getValue();
+            final String pName = key.getText();
+            final Integer line = NbDocument.findLineNumber((StyledDocument) document, key.getIdxStart()) + 1;
             if (firstOccur.containsKey(pName)) {
-                List<Fix> fixes = new ArrayList<>();
-                fixes.add(new DeletePropFix((StyledDocument) document, line, pName));
-                ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
-                        severity,
-                        String.format("Duplicate of property at line %d", firstOccur.get(pName)),
-                        fixes,
-                        document,
-                        line);
-                errors.add(errDesc);
+                try {
+                    List<Fix> fixes = new ArrayList<>();
+                    int end = value != null ? value.getIdxEnd() : key.getIdxEnd();
+                    fixes.add(new DeletePropFix((StyledDocument) document, key.getText(), key.getIdxStart(), end));
+                    ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
+                            severity,
+                            String.format("Duplicate of property at line %d", firstOccur.get(pName)),
+                            fixes,
+                            document,
+                            document.createPosition(key.getIdxStart()),
+                            document.createPosition(key.getIdxEnd())
+                    );
+                    errors.add(errDesc);
+                } catch (BadLocationException ex) {
+                    Exceptions.printStackTrace(ex);
+                }
             } else {
                 firstOccur.put(pName, line);
             }

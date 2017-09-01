@@ -17,9 +17,9 @@ package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 
+import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 
@@ -29,11 +29,13 @@ import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.Severity;
-import org.openide.util.Pair;
+import org.openide.util.Exceptions;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgElement;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.fixes.DeletePropFix;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
@@ -72,22 +74,28 @@ public class UnknownPropsHighlightingTask extends BaseHighlightingTask {
         if (prj != null) {
             final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
             if (sbs != null) {
-                final Map<Integer, Pair<String, String>> propLines = cfgResult.getPropLines();
-                for (Map.Entry<Integer, Pair<String, String>> entry : propLines.entrySet()) {
-                    int line = entry.getKey();
-                    String pName = entry.getValue().first();
+                for (PairElement pair : cfgResult.getCfgFile().getElements()) {
+                    final CfgElement key = pair.getKey();
+                    final CfgElement value = pair.getValue();
+                    final String pName = key.getText();
                     ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
                     if (cfgMeta == null) {
-                        List<Fix> fixes = new ArrayList<>();
-                        fixes.add(new DeletePropFix((StyledDocument) document, line, pName));
-                        ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
-                                severity,
-                                String.format("Unknown Spring Boot property '%s'", pName),
-                                fixes,
-                                document,
-                                line
-                        );
-                        errors.add(errDesc);
+                        try {
+                            List<Fix> fixes = new ArrayList<>();
+                            int end = value != null ? value.getIdxEnd() : key.getIdxEnd();
+                            fixes.add(new DeletePropFix((StyledDocument) document, key.getText(), key.getIdxStart(), end));
+                            ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
+                                    severity,
+                                    String.format("Unknown Spring Boot property '%s'", pName),
+                                    fixes,
+                                    document,
+                                    document.createPosition(key.getIdxStart()),
+                                    document.createPosition(key.getIdxEnd())
+                            );
+                            errors.add(errDesc);
+                        } catch (BadLocationException ex) {
+                            Exceptions.printStackTrace(ex);
+                        }
                     }
                     if (canceled) {
                         break;

@@ -15,12 +15,12 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.fixes;
 
-import javax.swing.text.StyledDocument;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.EnhancedFix;
 import org.openide.awt.StatusDisplayer;
-import org.openide.text.NbDocument;
 
 /**
  * {@link EnhancedFix} implementation to remove a deprecated config property.
@@ -29,14 +29,16 @@ import org.openide.text.NbDocument;
  */
 public class DeletePropFix implements BaseFix {
 
-    private final StyledDocument document;
-    private final int line;
-    private final String bodyText;
+    private final Document document;
+    private final int start;
+    private final int end;
+    private final String propName;
 
-    public DeletePropFix(StyledDocument document, int line, String bodyText) {
+    public DeletePropFix(Document document, String propName, int start, int end) throws BadLocationException {
         this.document = document;
-        this.line = line;
-        this.bodyText = bodyText;
+        this.start = start;
+        this.end = end;
+        this.propName = propName;
     }
 
     @Override
@@ -51,9 +53,8 @@ public class DeletePropFix implements BaseFix {
 
     @Override
     public ChangeInfo implement() throws Exception {
-        int start = NbDocument.findLineOffset(document, line - 1);
-        document.remove(start, bodyText.length());
-        StatusDisplayer.getDefault().setStatusText("Removed property: " + bodyText);
+        document.remove(start, end - start);
+        StatusDisplayer.getDefault().setStatusText("Removed property: " + propName);
         return null;
     }
 

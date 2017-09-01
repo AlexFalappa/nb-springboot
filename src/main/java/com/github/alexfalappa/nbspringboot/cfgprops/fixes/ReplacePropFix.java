@@ -15,12 +15,12 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.fixes;
 
-import javax.swing.text.StyledDocument;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 import org.netbeans.spi.editor.hints.ChangeInfo;
 import org.netbeans.spi.editor.hints.EnhancedFix;
 import org.openide.awt.StatusDisplayer;
-import org.openide.text.NbDocument;
 
 /**
  * {@link EnhancedFix} implementation to replace a deprecated config property with its replacement.
@@ -29,15 +29,17 @@ import org.openide.text.NbDocument;
  */
 public class ReplacePropFix implements BaseFix {
 
-    private final StyledDocument document;
-    private final int line;
+    private final Document document;
+    private final int start;
+    private final int end;
     private final String bodyText;
     private final String replacement;
 
-    public ReplacePropFix(StyledDocument document, int line, String bodyText, String replacement) {
+    public ReplacePropFix(Document document, int start, int end, String replacement) throws BadLocationException {
         this.document = document;
-        this.line = line;
-        this.bodyText = bodyText;
+        this.start = start;
+        this.end = end;
+        this.bodyText = document.getText(start, end - start);
         this.replacement = replacement;
     }
 
@@ -53,8 +55,7 @@ public class ReplacePropFix implements BaseFix {
 
     @Override
     public ChangeInfo implement() throws Exception {
-        int start = NbDocument.findLineOffset(document, line - 1);
-        document.remove(start, bodyText.length());
+        document.remove(start, end - start);
         document.insertString(start, replacement, null);
         StatusDisplayer.getDefault().setStatusText("Replaced property: " + bodyText);
         return null;
