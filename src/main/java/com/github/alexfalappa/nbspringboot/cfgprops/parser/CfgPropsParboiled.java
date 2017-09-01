@@ -1,10 +1,7 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
-import org.openide.util.Pair;
 import org.parboiled.Action;
 import org.parboiled.BaseParser;
 import org.parboiled.Context;
@@ -12,6 +9,12 @@ import org.parboiled.Rule;
 import org.parboiled.support.StringBuilderVar;
 import org.parboiled.support.ValueStack;
 import org.parboiled.support.Var;
+
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgElement;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgFile;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.KeyElement;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.ValueElement;
 
 /**
  * Spring Boot configuration properties parser based on Parboiled library.
@@ -27,47 +30,86 @@ import org.parboiled.support.Var;
  *
  * @author Alessandro Falappa
  */
-public class CfgPropsParboiled extends BaseParser<String> {
+public class CfgPropsParboiled extends BaseParser<CfgElement> {
 
     private Properties parsedProps = new Properties();
-    private Map<Integer, Pair<String, String>> propLines = new HashMap<>();
+//    private Map<Integer, Pair<String, String>> propLines = new HashMap<>();
+    private CfgFile cfgFile = new CfgFile();
 
     public Properties getParsedProps() {
         return parsedProps;
     }
 
-    public Map<Integer, Pair<String, String>> getPropLines() {
-        return propLines;
+//    public Map<Integer, Pair<String, String>> getPropLines() {
+//        return propLines;
+//    }
+    public CfgFile getCfgFile() {
+        return cfgFile;
     }
 
     public void reset() {
         parsedProps.clear();
-        propLines.clear();
+//        propLines.clear();
+        cfgFile = new CfgFile();
     }
 
-    Action<String> actionStoreProp = new Action<String>() {
+    Action<CfgElement> keyStoreProp = new Action<CfgElement>() {
         @Override
-        public boolean run(Context<java.lang.String> context) {
-            final ValueStack<String> stack = context.getValueStack();
-            int line = context.getPosition().line;
-            int size = stack.size();
+        public boolean run(Context<CfgElement> context) {
+            if (!context.inErrorRecovery()) {
+                final int start = context.getMatchStartIndex();
+                final int end = context.getMatchEndIndex();
+                final String key = context.getInputBuffer().extract(start, end);
+                System.out.printf("[%3d;%3d] key: '%s'%n", start, end, key);
+                KeyElement elemKey = new KeyElement(start, end, key);
+                context.getValueStack().push(elemKey);
+            }
+            return true;
+        }
+    };
+
+    Action<CfgElement> valueStoreProp = new Action<CfgElement>() {
+        @Override
+        public boolean run(Context<CfgElement> context) {
+            if (!context.inErrorRecovery()) {
+                final int start = context.getMatchStartIndex();
+                final int end = context.getMatchEndIndex();
+                final String value = context.getInputBuffer().extract(start, end);
+                System.out.printf("[%3d;%3d] value: '%s'%n", start, end, value);
+                ValueElement elemVal = new ValueElement(start, end, value);
+                context.getValueStack().push(elemVal);
+            }
+            return true;
+        }
+    };
+
+    Action<CfgElement> actionStoreProp = new Action<CfgElement>() {
+        @Override
+        public boolean run(Context<CfgElement> context) {
+            final ValueStack<CfgElement> stack = context.getValueStack();
             if (!context.hasError()) {
+                PairElement pair = new PairElement();
+                int size = stack.size();
                 switch (size) {
                     case 1:
-                        String propName = stack.pop();
-                        parsedProps.setProperty(propName, "");
-                        propLines.put(line, Pair.of(propName, ""));
+                        CfgElement elemKey = stack.pop();
+                        parsedProps.setProperty(elemKey.getText(), "");
+                        pair.setKey(elemKey);
+//                        propLines.put(line, Pair.of(elem, ""));
                         break;
                     case 2:
                         // NOTE: stack popping order below is important!
-                        final String propValue = stack.pop();
-                        propName = stack.pop();
-                        parsedProps.setProperty(propName, propValue);
-                        propLines.put(line, Pair.of(propName, propValue));
+                        final CfgElement elemValue = stack.pop();
+                        elemKey = stack.pop();
+                        parsedProps.setProperty(elemKey.getText(), elemValue.getText());
+                        pair.setKey(elemKey);
+                        pair.setValue(elemValue);
+//                        propLines.put(line, Pair.of(elemKey, elemValue));
                         break;
                     default:
                         throw new IllegalStateException(String.format("Cannot manage %d values on the parsing stack", size));
                 }
+                cfgFile.getElements().add(pair);
             } else {
                 stack.clear();
             }
@@ -75,7 +117,7 @@ public class CfgPropsParboiled extends BaseParser<String> {
         }
 
         @Override
-        public java.lang.String toString() {
+        public String toString() {
             return "StorePropsAction";
         }
 
@@ -101,13 +143,15 @@ public class CfgPropsParboiled extends BaseParser<String> {
                 FirstOf(
                         Sequence(
                                 key(),
+                                keyStoreProp,
                                 Optional(whitespace()),
                                 separator(),
                                 Optional(whitespace()),
-                                Sequence(value(sbvValue), push(sbvValue.getString()))
+                                Sequence(value(sbvValue), valueStoreProp)
                         ),
                         Sequence(
                                 key(),
+                                keyStoreProp,
                                 Optional(whitespace()),
                                 FirstOf(eolChar(), EOI)
                         )
@@ -130,8 +174,7 @@ public class CfgPropsParboiled extends BaseParser<String> {
                                 literal(sbvKey)
                         )
                 ),
-                Optional(arrayIndex(sbvKey)),
-                push(sbvKey.getString())
+                Optional(arrayIndex(sbvKey))
         );
     }
 

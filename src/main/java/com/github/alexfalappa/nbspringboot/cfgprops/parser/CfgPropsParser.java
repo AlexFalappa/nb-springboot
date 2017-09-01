@@ -17,7 +17,6 @@ package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 
 import javax.swing.event.ChangeListener;
@@ -29,10 +28,11 @@ import org.netbeans.modules.parsing.api.Task;
 import org.netbeans.modules.parsing.spi.ParseException;
 import org.netbeans.modules.parsing.spi.Parser;
 import org.netbeans.modules.parsing.spi.SourceModificationEvent;
-import org.openide.util.Pair;
 import org.parboiled.Parboiled;
 import org.parboiled.parserunners.RecoveringParseRunner;
 import org.parboiled.support.ParsingResult;
+
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgFile;
 
 /**
  * NetBeans Parsing & Lexing API parser for integrating the Parboiled parser.
@@ -59,7 +59,7 @@ public class CfgPropsParser extends Parser {
 
     @Override
     public Result getResult(Task task) throws ParseException {
-        return new CfgPropsParserResult(snapshot, parbResult, parboiled.getParsedProps(), parboiled.getPropLines());
+        return new CfgPropsParserResult(snapshot, parbResult, parboiled.getParsedProps(), parboiled.getCfgFile());
     }
 
     @Override
@@ -75,13 +75,13 @@ public class CfgPropsParser extends Parser {
         private final ParsingResult parbResult;
         private final Properties parsedProps;
         private boolean valid = true;
-        private final Map<Integer, Pair<String, String>> propLines;
+        private final CfgFile cfgFile;
 
-        CfgPropsParserResult(Snapshot snapshot, ParsingResult parbResult, Properties parsedProps, Map<Integer, Pair<String, String>> propLines) {
+        CfgPropsParserResult(Snapshot snapshot, ParsingResult parbResult, Properties parsedProps, CfgFile cfgFile) {
             super(snapshot);
             this.parbResult = parbResult;
             this.parsedProps = parsedProps;
-            this.propLines = propLines;
+            this.cfgFile = cfgFile;
         }
 
         @Override
@@ -100,8 +100,8 @@ public class CfgPropsParser extends Parser {
             return parsedProps;
         }
 
-        public Map<Integer, Pair<String, String>> getPropLines() {
-            return propLines;
+        public CfgFile getCfgFile() {
+            return cfgFile;
         }
 
         @Override
