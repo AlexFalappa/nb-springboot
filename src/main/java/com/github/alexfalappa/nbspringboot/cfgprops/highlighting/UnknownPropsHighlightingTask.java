@@ -15,22 +15,26 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 import javax.swing.text.Document;
+import javax.swing.text.StyledDocument;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
+import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Pair;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.cfgprops.fixes.DeletePropFix;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
@@ -74,9 +78,12 @@ public class UnknownPropsHighlightingTask extends BaseHighlightingTask {
                     String pName = entry.getValue().first();
                     ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
                     if (cfgMeta == null) {
+                        List<Fix> fixes = new ArrayList<>();
+                        fixes.add(new DeletePropFix((StyledDocument) document, line, pName));
                         ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
                                 severity,
                                 String.format("Unknown Spring Boot property '%s'", pName),
+                                fixes,
                                 document,
                                 line
                         );

@@ -15,20 +15,24 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 
 import javax.swing.text.Document;
+import javax.swing.text.StyledDocument;
 
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
+import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Pair;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.cfgprops.fixes.DeletePropFix;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 
 /**
@@ -64,17 +68,20 @@ public class DuplicatesHighlightingTask extends BaseHighlightingTask {
         Map<String, Integer> firstOccur = new HashMap<>();
         final Map<Integer, Pair<String, String>> propLines = cfgResult.getPropLines();
         for (Map.Entry<Integer, Pair<String, String>> entry : propLines.entrySet()) {
-            final String propName = entry.getValue().first();
+            final String pName = entry.getValue().first();
             final Integer line = entry.getKey();
-            if (firstOccur.containsKey(propName)) {
+            if (firstOccur.containsKey(pName)) {
+                List<Fix> fixes = new ArrayList<>();
+                fixes.add(new DeletePropFix((StyledDocument) document, line, pName));
                 ErrorDescription errDesc = ErrorDescriptionFactory.createErrorDescription(
                         severity,
-                        String.format("Duplicate of property at line %d", firstOccur.get(propName)),
+                        String.format("Duplicate of property at line %d", firstOccur.get(pName)),
+                        fixes,
                         document,
                         line);
                 errors.add(errDesc);
             } else {
-                firstOccur.put(propName, line);
+                firstOccur.put(pName, line);
             }
             if (canceled) {
                 break;

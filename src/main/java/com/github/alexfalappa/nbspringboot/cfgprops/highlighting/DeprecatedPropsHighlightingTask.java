@@ -25,20 +25,18 @@ import javax.swing.text.StyledDocument;
 
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
-import org.netbeans.spi.editor.hints.ChangeInfo;
-import org.netbeans.spi.editor.hints.EnhancedFix;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.Severity;
-import org.openide.awt.StatusDisplayer;
-import org.openide.text.NbDocument;
 import org.openide.util.Pair;
 import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.Deprecation;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.cfgprops.fixes.DeletePropFix;
+import com.github.alexfalappa.nbspringboot.cfgprops.fixes.ReplacePropFix;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
@@ -122,69 +120,4 @@ public class DeprecatedPropsHighlightingTask extends BaseHighlightingTask {
         }
     }
 
-    private static class DeletePropFix implements EnhancedFix {
-
-        private final StyledDocument document;
-        private final int line;
-        private final String bodyText;
-
-        public DeletePropFix(StyledDocument document, int line, String bodyText) {
-            this.document = document;
-            this.line = line;
-            this.bodyText = bodyText;
-        }
-
-        @Override
-        public String getText() {
-            return "Remove property";
-        }
-
-        @Override
-        public CharSequence getSortText() {
-            return "delete";
-        }
-
-        @Override
-        public ChangeInfo implement() throws Exception {
-            int start = NbDocument.findLineOffset(document, line - 1);
-            document.remove(start, bodyText.length());
-            StatusDisplayer.getDefault().setStatusText("Removed property: " + bodyText);
-            return null;
-        }
-    }
-
-    private static class ReplacePropFix implements EnhancedFix {
-
-        private final StyledDocument document;
-        private final int line;
-        private final String bodyText;
-        private final String replacement;
-
-        public ReplacePropFix(StyledDocument document, int line, String bodyText, String replacement) {
-            this.document = document;
-            this.line = line;
-            this.bodyText = bodyText;
-            this.replacement = replacement;
-        }
-
-        @Override
-        public String getText() {
-            return String.format("Use replacement '%s'", replacement);
-        }
-
-        @Override
-        public CharSequence getSortText() {
-            return "replace";
-        }
-
-        @Override
-        public ChangeInfo implement() throws Exception {
-            int start = NbDocument.findLineOffset(document, line - 1);
-            document.remove(start, bodyText.length());
-            document.insertString(start, replacement, null);
-            StatusDisplayer.getDefault().setStatusText("Replaced property: " + bodyText);
-            return null;
-        }
-
-    }
 }
