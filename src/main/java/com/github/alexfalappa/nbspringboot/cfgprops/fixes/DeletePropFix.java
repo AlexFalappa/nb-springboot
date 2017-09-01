@@ -27,7 +27,7 @@ import org.openide.text.NbDocument;
  *
  * @author Alessandro Falappa
  */
-public class DeletePropFix implements EnhancedFix {
+public class DeletePropFix implements BaseFix {
 
     private final StyledDocument document;
     private final int line;
@@ -46,7 +46,7 @@ public class DeletePropFix implements EnhancedFix {
 
     @Override
     public CharSequence getSortText() {
-        return "delete";
+        return SORT_DELETION;
     }
 
     @Override

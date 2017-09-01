@@ -27,7 +27,7 @@ import org.openide.text.NbDocument;
  *
  * @author Alessandro Falappa
  */
-public class ReplacePropFix implements EnhancedFix {
+public class ReplacePropFix implements BaseFix {
 
     private final StyledDocument document;
     private final int line;
@@ -48,7 +48,7 @@ public class ReplacePropFix implements EnhancedFix {
 
     @Override
     public CharSequence getSortText() {
-        return "replace";
+        return SORT_REPLACEMENT;
     }
 
     @Override
