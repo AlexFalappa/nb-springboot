@@ -288,8 +288,6 @@ public class SpringBootServiceImpl implements SpringBootService {
                 }
             }
         }
-        System.out.printf("Collections: %s%n", collectionProperties);
-        System.out.printf("       Maps: %s%n", mapProperties);
     }
 
     private boolean dependencyArtifactIdContains(NbMavenProject nbMvn, String artifactId) {
