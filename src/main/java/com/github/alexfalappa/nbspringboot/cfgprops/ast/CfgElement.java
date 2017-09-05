@@ -18,17 +18,17 @@ package com.github.alexfalappa.nbspringboot.cfgprops.ast;
 import static java.lang.Integer.compare;
 
 /**
+ * The basic configuration element.
+ * <p>
+ * It is an immutable object and groups a text and the char index range of its position in the document.
  *
  * @author Alessandro Falappa
  */
 public class CfgElement implements Comparable<CfgElement> {
 
-    private int idxStart;
-    private int idxEnd;
-    private String text;
-
-    public CfgElement() {
-    }
+    private final int idxStart;
+    private final int idxEnd;
+    private final String text;
 
     public CfgElement(int idxStart, int idxEnd, String text) {
         this.idxStart = idxStart;
@@ -40,24 +40,12 @@ public class CfgElement implements Comparable<CfgElement> {
         return idxStart;
     }
 
-    public void setIdxStart(int idxStart) {
-        this.idxStart = idxStart;
-    }
-
     public int getIdxEnd() {
         return idxEnd;
     }
 
-    public void setIdxEnd(int idxEnd) {
-        this.idxEnd = idxEnd;
-    }
-
     public String getText() {
         return text;
-    }
-
-    public void setText(String text) {
-        this.text = text;
     }
 
     @Override

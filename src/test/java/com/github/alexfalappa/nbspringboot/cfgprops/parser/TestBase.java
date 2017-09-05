@@ -8,6 +8,7 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.TreeSet;
 
+import org.junit.Before;
 import org.junit.experimental.categories.Category;
 import org.parboiled.Parboiled;
 import org.parboiled.errors.ErrorUtils;
@@ -38,6 +39,11 @@ public class TestBase {
         parser = Parboiled.createParser(CfgPropsParboiled.class);
         tracingRunner = new TracingParseRunner(parser.cfgProps());
         reportingRunner = new ReportingParseRunner(parser.cfgProps());
+    }
+
+    @Before
+    public void clearParser() {
+        parser.reset();
     }
 
     protected void parseNoMatch(String input) {

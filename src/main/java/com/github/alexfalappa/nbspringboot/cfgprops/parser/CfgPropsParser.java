@@ -18,6 +18,8 @@ package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 import java.util.Collections;
 import java.util.List;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.event.ChangeListener;
 
@@ -32,7 +34,9 @@ import org.parboiled.Parboiled;
 import org.parboiled.parserunners.RecoveringParseRunner;
 import org.parboiled.support.ParsingResult;
 
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgFile;
+import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 
 /**
  * NetBeans Parsing & Lexing API parser for integrating the Parboiled parser.
@@ -41,6 +45,7 @@ import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgFile;
  */
 public class CfgPropsParser extends Parser {
 
+    private static final Logger logger = Logger.getLogger(CfgPropsParser.class.getName());
     private final CfgPropsParboiled parboiled;
     private Snapshot snapshot;
     private ParsingResult parbResult;
@@ -51,10 +56,12 @@ public class CfgPropsParser extends Parser {
 
     @Override
     public void parse(Snapshot snapshot, Task task, SourceModificationEvent sme) throws ParseException {
+        logger.fine("Parsing...");
         this.snapshot = snapshot;
         RecoveringParseRunner runner = new RecoveringParseRunner(parboiled.cfgProps());
         parboiled.reset();
         parbResult = runner.run(snapshot.getText().toString());
+        logParsingResult();
     }
 
     @Override
@@ -68,6 +75,26 @@ public class CfgPropsParser extends Parser {
 
     @Override
     public void removeChangeListener(ChangeListener cl) {
+    }
+
+    private void logParsingResult() {
+        if (logger.isLoggable(Level.FINER)) {
+            logger.finer("Parsed properties:");
+            final Properties parsedProps = parboiled.getParsedProps();
+            for (String pname : parsedProps.stringPropertyNames()) {
+                logger.log(Level.FINER, "\t{0} -> {1}", new Object[]{pname, parsedProps.getProperty(pname)});
+            }
+            logger.finer("Parsed AST:");
+            final CfgFile cfgFile = parboiled.getCfgFile();
+            for (PairElement p : cfgFile.getElements()) {
+                CfgElement e = p.getKey();
+                logger.finer(String.format("\t(%3d;%3d) key: %s", e.getIdxStart(), e.getIdxEnd(), e.getText()));
+                e = p.getValue();
+                if (e != null) {
+                    logger.finer(String.format("\t(%3d;%3d) val: %s", e.getIdxStart(), e.getIdxEnd(), e.getText()));
+                }
+            }
+        }
     }
 
     public static class CfgPropsParserResult extends ParserResult {

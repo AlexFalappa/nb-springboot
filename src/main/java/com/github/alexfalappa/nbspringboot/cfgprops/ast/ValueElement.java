@@ -16,6 +16,7 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.ast;
 
 /**
+ * A {@link CfgElement} for a configuration property value.
  *
  * @author Alessandro Falappa
  */

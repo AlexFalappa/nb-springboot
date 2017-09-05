@@ -16,15 +16,15 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.ast;
 
 /**
+ * A {@link CfgElement} for a configuration property key.
+ * <p>
+ * Has also a {@code prefix} property (currently unused).
  *
  * @author Alessandro Falappa
  */
 public class KeyElement extends CfgElement {
 
     String prefix;
-
-    public KeyElement() {
-    }
 
     public KeyElement(int idxStart, int idxEnd, String text) {
         super(idxStart, idxEnd, text);

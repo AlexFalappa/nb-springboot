@@ -9,7 +9,6 @@ import org.parboiled.BaseParser;
 import org.parboiled.Context;
 import org.parboiled.Rule;
 import org.parboiled.buffers.InputBuffer;
-import org.parboiled.support.StringBuilderVar;
 import org.parboiled.support.ValueStack;
 import org.parboiled.support.Var;
 
@@ -41,23 +40,18 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
     private static final Pattern PAT_ESCAPES = compile("\\\\.");
     private static final Pattern PAT_ESCAPED_NEWLINE = compile("\\\\\\n\\s*");
     private Properties parsedProps = new Properties();
-//    private Map<Integer, Pair<String, String>> propLines = new HashMap<>();
     private CfgFile cfgFile = new CfgFile();
 
     public Properties getParsedProps() {
         return parsedProps;
     }
 
-//    public Map<Integer, Pair<String, String>> getPropLines() {
-//        return propLines;
-//    }
     public CfgFile getCfgFile() {
         return cfgFile;
     }
 
     public void reset() {
         parsedProps.clear();
-//        propLines.clear();
         cfgFile = new CfgFile();
     }
 
@@ -74,6 +68,12 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
             }
             return true;
         }
+
+        @Override
+        public java.lang.String toString() {
+            return "KeyStoreAction";
+        }
+
     };
 
     Action<CfgElement> valueStoreProp = new Action<CfgElement>() {
@@ -89,6 +89,12 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
             }
             return true;
         }
+
+        @Override
+        public java.lang.String toString() {
+            return "ValueStoreAction";
+        }
+
     };
 
     Action<CfgElement> actionStoreProp = new Action<CfgElement>() {
@@ -96,28 +102,23 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
         public boolean run(Context<CfgElement> context) {
             final ValueStack<CfgElement> stack = context.getValueStack();
             if (!context.hasError()) {
-                PairElement pair = new PairElement();
                 int size = stack.size();
                 switch (size) {
                     case 1:
                         CfgElement elemKey = stack.pop();
                         parsedProps.setProperty(unescape(elemKey.getText()), "");
-                        pair.setKey(elemKey);
-//                        propLines.put(line, Pair.of(elem, ""));
+                        cfgFile.getElements().add(new PairElement(elemKey));
                         break;
                     case 2:
                         // NOTE: stack popping order below is important!
                         final CfgElement elemValue = stack.pop();
                         elemKey = stack.pop();
                         parsedProps.setProperty(unescape(elemKey.getText()), unescape(elemValue.getText()));
-                        pair.setKey(elemKey);
-                        pair.setValue(elemValue);
-//                        propLines.put(line, Pair.of(elemKey, elemValue));
+                        cfgFile.getElements().add(new PairElement(elemKey, elemValue));
                         break;
                     default:
                         throw new IllegalStateException(String.format("Cannot manage %d values on the parsing stack", size));
                 }
-                cfgFile.getElements().add(pair);
             } else {
                 stack.clear();
             }
@@ -146,7 +147,6 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
     }
 
     Rule kvPair() {
-        StringBuilderVar sbvValue = new StringBuilderVar();
         return Sequence(
                 FirstOf(
                         Sequence(
@@ -155,7 +155,7 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
                                 Optional(whitespace()),
                                 separator(),
                                 Optional(whitespace()),
-                                Sequence(value(sbvValue), valueStoreProp)
+                                Sequence(value(), valueStoreProp)
                         ),
                         Sequence(
                                 key(),
@@ -173,66 +173,65 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
     }
 
     Rule key() {
-        StringBuilderVar sbvKey = new StringBuilderVar();
         return Sequence(
-                literal(sbvKey),
+                literal(),
                 ZeroOrMore(
                         Sequence(
-                                Ch('.'), sbvKey.append('.'),
-                                literal(sbvKey)
+                                Ch('.'),
+                                literal()
                         )
                 ),
-                Optional(arrayIndex(sbvKey))
+                Optional(arrayIndex())
         );
     }
 
-    Rule value(StringBuilderVar sbv) {
+    Rule value() {
         return ZeroOrMore(
                 FirstOf(
                         Sequence(
                                 escapedEolChar(),
                                 Optional(whitespace()),
-                                Sequence(notEolWhitespace(), sbv.append(matchedChar()))
+                                notEolWhitespace()
                         ),
-                        encodedUnicode(sbv),
-                        literalOrSpace(sbv)
+                        encodedUnicode(),
+                        literalOrSpace()
                 )
         );
     }
 
-    Rule literal(StringBuilderVar sbv) {
+    Rule literal() {
         return OneOrMore(
                 FirstOf(
-                        new JavaIdPartMatcher(sbv),
-                        Sequence(AnyOf("(){}-+*/^|;,`°§<>\"'%&@?"), sbv.append(matchedChar())),
-                        encodedSpecialChar(sbv),
-                        encodedTab(sbv),
-                        encodedLinefeed(sbv),
-                        encodedUnicode(sbv)
+                        new JavaIdPartMatcher(),
+                        AnyOf("(){}-+*/^|;,`°§<>\"'%&@?"),
+                        encodedSpecialChar(),
+                        encodedTab(),
+                        encodedLinefeed(),
+                        encodedUnicode()
                 )
         );
     }
 
-    Rule literalOrSpace(StringBuilderVar sbv) {
+    Rule literalOrSpace() {
         return OneOrMore(
                 FirstOf(
-                        new JavaIdPartMatcher(sbv),
-                        Sequence(AnyOf(" \t\f"), sbv.append(matchedChar())),
-                        encodedSpecialChar(sbv),
-                        encodedTab(sbv),
-                        encodedLinefeed(sbv),
-                        encodedUnicode(sbv),
-                        malformedEscape(sbv),
-                        Sequence(AnyOf("=:[].(){}-+*/^|;,`°§<>\"'%&@?"), sbv.append(matchedChar()))
+                        new JavaIdPartMatcher(),
+                        AnyOf(" \t\f"),
+                        encodedSpecialChar(),
+                        encodedTab(),
+                        encodedLinefeed(),
+                        encodedUnicode(),
+                        malformedEscape(),
+                        AnyOf("=:[].(){}-+*/^|;,`°§<>\"'%&@?")
                 )
         );
     }
 
-    Rule arrayIndex(StringBuilderVar sbv) {
+    Rule arrayIndex() {
         return Sequence(
-                Sequence(Ch('['), sbv.append('[')),
-                Sequence(integer(), sbv.append(match())),
-                Sequence(Ch(']'), sbv.append(']'))
+                Ch('['),
+                integer(),
+                Ch(']')
         );
     }
 
@@ -260,23 +259,23 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
         return AnyOf("#!");
     }
 
-    Rule encodedSpecialChar(StringBuilderVar sbv) {
-        return Sequence(Ch('\\'), AnyOf(" \\=:#!"), sbv.append(matchedChar()));
+    Rule encodedSpecialChar() {
+        return Sequence(Ch('\\'), AnyOf(" \\=:#!"));
     }
 
-    Rule encodedLinefeed(StringBuilderVar sbv) {
-        return Sequence(Ch('\\'), Ch('n'), sbv.append('\n'));
+    Rule encodedLinefeed() {
+        return Sequence(Ch('\\'), Ch('n'));
     }
 
-    Rule encodedTab(StringBuilderVar sbv) {
-        return Sequence(Ch('\\'), Ch('t'), sbv.append('\t'));
+    Rule encodedTab() {
+        return Sequence(Ch('\\'), Ch('t'));
     }
 
-    Rule encodedUnicode(StringBuilderVar sbv) {
+    Rule encodedUnicode() {
         return Sequence(
                 Ch('\\'),
                 Ch('u'),
-                Sequence(hexDigit(), hexDigit(), hexDigit(), hexDigit()), sbv.append(uniToStr(match()))
+                Sequence(hexDigit(), hexDigit(), hexDigit(), hexDigit())
         );
     }
 
@@ -284,8 +283,8 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
         return Sequence(Ch('\\'), eolChar());
     }
 
-    Rule malformedEscape(StringBuilderVar sbv) {
-        return Sequence(Ch('\\'), NoneOf("ntu \t\f\r\n=:#!\\"), sbv.append(matchedChar()));
+    Rule malformedEscape() {
+        return Sequence(Ch('\\'), NoneOf("ntu \t\f\r\n=:#!\\"));
     }
 
     Rule integer() {
@@ -311,7 +310,7 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
         try {
             codePoint = Integer.parseInt(str, 16);
             ret = new String(Character.toChars(codePoint));
-        } catch (NumberFormatException numberFormatException) {
+        } catch (NumberFormatException ex) {
             // may happen while typing a partial edit. Ignore.
         }
         return ret;

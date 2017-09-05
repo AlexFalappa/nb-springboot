@@ -19,6 +19,9 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /**
+ * Content of a configuration properties file.
+ * <p>
+ * Basically a set of {@link PairElement} sorted by position in text document.
  *
  * @author Alessandro Falappa
  */

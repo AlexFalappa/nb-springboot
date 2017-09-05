@@ -2,7 +2,6 @@ package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 
 import org.parboiled.MatcherContext;
 import org.parboiled.matchers.CustomMatcher;
-import org.parboiled.support.StringBuilderVar;
 
 /**
  * A custom matcher delegating to {@code Character.isJavaIdentifierPart()}.
@@ -11,11 +10,8 @@ import org.parboiled.support.StringBuilderVar;
  */
 public class JavaIdPartMatcher extends CustomMatcher {
 
-    private final StringBuilderVar sbv;
-
-    public JavaIdPartMatcher(StringBuilderVar sbv) {
+    public JavaIdPartMatcher() {
         super("JavaIdPart");
-        this.sbv = sbv;
     }
 
     @Override
@@ -43,7 +39,6 @@ public class JavaIdPartMatcher extends CustomMatcher {
         if (!acceptChar(context.getCurrentChar())) {
             return false;
         }
-        sbv.append(context.getCurrentChar());
         context.advanceIndex(1);
         context.createNode();
         return true;

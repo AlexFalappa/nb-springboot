@@ -16,15 +16,19 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.ast;
 
 /**
+ * A key-value pair.
+ * <p>
+ * Groups two {@link CfgElement}s, one for the key and another optional one for the value.
  *
  * @author Alessandro Falappa
  */
 public class PairElement implements Comparable<PairElement> {
 
-    private CfgElement key;
+    private final CfgElement key;
     private CfgElement value;
 
-    public PairElement() {
+    public PairElement(CfgElement key) {
+        this.key = key;
     }
 
     public PairElement(CfgElement key, CfgElement value) {
@@ -34,10 +38,6 @@ public class PairElement implements Comparable<PairElement> {
 
     public CfgElement getKey() {
         return key;
-    }
-
-    public void setKey(CfgElement key) {
-        this.key = key;
     }
 
     public CfgElement getValue() {
