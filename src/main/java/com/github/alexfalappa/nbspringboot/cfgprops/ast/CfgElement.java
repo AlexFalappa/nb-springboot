@@ -15,11 +15,13 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.ast;
 
+import static java.lang.Integer.compare;
+
 /**
  *
  * @author Alessandro Falappa
  */
-public class CfgElement {
+public class CfgElement implements Comparable<CfgElement> {
 
     private int idxStart;
     private int idxEnd;
@@ -56,5 +58,11 @@ public class CfgElement {
 
     public void setText(String text) {
         this.text = text;
+    }
+
+    @Override
+    public int compareTo(CfgElement o) {
+        int compareStarts = compare(idxStart, o.idxStart);
+        return compareStarts == 0 ? compare(idxEnd, o.idxEnd) : compareStarts;
     }
 }

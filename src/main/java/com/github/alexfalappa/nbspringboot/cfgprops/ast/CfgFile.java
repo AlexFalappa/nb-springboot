@@ -15,8 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.ast;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
@@ -24,25 +24,10 @@ import java.util.List;
  */
 public class CfgFile {
 
-    private List<PairElement> elements = new LinkedList<>();
+    private Set<PairElement> elements = new TreeSet<>();
 
-    public List<PairElement> getElements() {
+    public Set<PairElement> getElements() {
         return elements;
-    }
-
-    @Override
-    public String toString() {
-        StringBuilder sb = new StringBuilder();
-        for (PairElement p : elements) {
-            CfgElement e = p.getKey();
-            sb.append(String.format("[%3d;%3d]", e.getIdxStart(), e.getIdxEnd())).append(" k: ").append(e.getText());
-            e = p.getValue();
-            if (e != null) {
-                sb.append(String.format(" - [%3d;%3d]", e.getIdxStart(), e.getIdxEnd())).append(" v: ").append(e.getText());
-            }
-            sb.append('\n');
-        }
-        return sb.toString();
     }
 
 }

@@ -19,7 +19,7 @@ package com.github.alexfalappa.nbspringboot.cfgprops.ast;
  *
  * @author Alessandro Falappa
  */
-public class PairElement {
+public class PairElement implements Comparable<PairElement> {
 
     private CfgElement key;
     private CfgElement value;
@@ -46,5 +46,10 @@ public class PairElement {
 
     public void setValue(CfgElement value) {
         this.value = value;
+    }
+
+    @Override
+    public int compareTo(PairElement o) {
+        return key.compareTo(o.key);
     }
 }

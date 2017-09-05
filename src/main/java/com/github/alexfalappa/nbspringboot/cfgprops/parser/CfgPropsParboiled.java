@@ -1,11 +1,14 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.parser;
 
 import java.util.Properties;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.parboiled.Action;
 import org.parboiled.BaseParser;
 import org.parboiled.Context;
 import org.parboiled.Rule;
+import org.parboiled.buffers.InputBuffer;
 import org.parboiled.support.StringBuilderVar;
 import org.parboiled.support.ValueStack;
 import org.parboiled.support.Var;
@@ -15,6 +18,8 @@ import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgFile;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.KeyElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.ValueElement;
+
+import static java.util.regex.Pattern.compile;
 
 /**
  * Spring Boot configuration properties parser based on Parboiled library.
@@ -32,6 +37,9 @@ import com.github.alexfalappa.nbspringboot.cfgprops.ast.ValueElement;
  */
 public class CfgPropsParboiled extends BaseParser<CfgElement> {
 
+    private static final Pattern PAT_UNICODES = compile("\\\\u[a-fA-F0-9]{4}");
+    private static final Pattern PAT_ESCAPES = compile("\\\\.");
+    private static final Pattern PAT_ESCAPED_NEWLINE = compile("\\\\\\n\\s*");
     private Properties parsedProps = new Properties();
 //    private Map<Integer, Pair<String, String>> propLines = new HashMap<>();
     private CfgFile cfgFile = new CfgFile();
@@ -59,9 +67,9 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
             if (!context.inErrorRecovery()) {
                 final int start = context.getMatchStartIndex();
                 final int end = context.getMatchEndIndex();
-                final String key = context.getInputBuffer().extract(start, end);
-                System.out.printf("[%3d;%3d] key: '%s'%n", start, end, key);
-                KeyElement elemKey = new KeyElement(start, end, key);
+                final InputBuffer ibuf = context.getInputBuffer();
+                final String key = ibuf.extract(start, end);
+                KeyElement elemKey = new KeyElement(ibuf.getOriginalIndex(start), ibuf.getOriginalIndex(end), key);
                 context.getValueStack().push(elemKey);
             }
             return true;
@@ -74,9 +82,9 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
             if (!context.inErrorRecovery()) {
                 final int start = context.getMatchStartIndex();
                 final int end = context.getMatchEndIndex();
-                final String value = context.getInputBuffer().extract(start, end);
-                System.out.printf("[%3d;%3d] value: '%s'%n", start, end, value);
-                ValueElement elemVal = new ValueElement(start, end, value);
+                final InputBuffer ibuf = context.getInputBuffer();
+                final String value = ibuf.extract(start, end);
+                ValueElement elemVal = new ValueElement(ibuf.getOriginalIndex(start), ibuf.getOriginalIndex(end), value);
                 context.getValueStack().push(elemVal);
             }
             return true;
@@ -93,7 +101,7 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
                 switch (size) {
                     case 1:
                         CfgElement elemKey = stack.pop();
-                        parsedProps.setProperty(elemKey.getText(), "");
+                        parsedProps.setProperty(unescape(elemKey.getText()), "");
                         pair.setKey(elemKey);
 //                        propLines.put(line, Pair.of(elem, ""));
                         break;
@@ -101,7 +109,7 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
                         // NOTE: stack popping order below is important!
                         final CfgElement elemValue = stack.pop();
                         elemKey = stack.pop();
-                        parsedProps.setProperty(elemKey.getText(), elemValue.getText());
+                        parsedProps.setProperty(unescape(elemKey.getText()), unescape(elemValue.getText()));
                         pair.setKey(elemKey);
                         pair.setValue(elemValue);
 //                        propLines.put(line, Pair.of(elemKey, elemValue));
@@ -298,8 +306,58 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
     }
 
     String uniToStr(String str) {
-        int codePoint = Integer.parseInt(str, 16);
-        return new String(Character.toChars(codePoint));
+        String ret = "";
+        int codePoint = 0;
+        try {
+            codePoint = Integer.parseInt(str, 16);
+            ret = new String(Character.toChars(codePoint));
+        } catch (NumberFormatException numberFormatException) {
+            // may happen while typing a partial edit. Ignore.
+        }
+        return ret;
     }
 
+    private String unescape(String text) {
+        StringBuffer sb = new StringBuffer();
+        Matcher m = PAT_UNICODES.matcher(text);
+        while (m.find()) {
+            m.appendReplacement(sb, uniToStr(m.group().substring(2)));
+        }
+        m.appendTail(sb);
+        m = PAT_ESCAPES.matcher(sb.toString());
+        sb = new StringBuffer();
+        while (m.find()) {
+            switch (m.group()) {
+                case "\\:":
+                    m.appendReplacement(sb, ":");
+                    break;
+                case "\\=":
+                    m.appendReplacement(sb, "=");
+                    break;
+                case "\\#":
+                    m.appendReplacement(sb, "#");
+                    break;
+                case "\\!":
+                    m.appendReplacement(sb, "!");
+                    break;
+                case "\\n":
+                    m.appendReplacement(sb, "\n");
+                    break;
+                case "\\t":
+                    m.appendReplacement(sb, "\t");
+                    break;
+                case "\\ ":
+                    m.appendReplacement(sb, " ");
+                    break;
+                case "\\\\":
+                    m.appendReplacement(sb, "\\\\");
+                    break;
+                default:
+                    m.appendReplacement(sb, m.group().substring(1));
+            }
+        }
+        m.appendTail(sb);
+        m = PAT_ESCAPED_NEWLINE.matcher(sb.toString());
+        return m.replaceAll("");
+    }
 }
