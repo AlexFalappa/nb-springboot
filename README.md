@@ -68,6 +68,9 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 ## Changelog
 
 -  **1.6.1** (??? 2017): Work In Progress
+    -  Quick fixes:
+        -  Removal of deprecated,unknown or duplicate properties
+        -  Substitution of deprecated properties with replacement (if present in metadata)
     -  Error highlighting in configuration properties editor:
         -  Added highlighting for deprecated properties according to their level in metadata
         -  Relaxed configuration properties name variants are recognized
