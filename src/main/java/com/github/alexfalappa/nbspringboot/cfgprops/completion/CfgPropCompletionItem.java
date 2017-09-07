@@ -117,7 +117,17 @@ public class CfgPropCompletionItem implements CompletionItem {
             }
             // remove characters from the property name start offset
             doc.remove(propStartOffset, lenToRemove);
-            doc.insertString(propStartOffset, getText(), null);
+            // add a useful char depending on data type
+            final String dataType = configurationMeta.getType();
+            StringBuilder sb = new StringBuilder(getText());
+            if (dataType.contains("Map")) {
+                sb.append(".");
+            } else if (!dataType.contains("List")
+                    && !dataType.contains("Set")
+                    && !dataType.contains("[]")) {
+                sb.append("=");
+            }
+            doc.insertString(propStartOffset, sb.toString(), null);
             // close the code completion box
             Completion.get().hideAll();
         } catch (BadLocationException ex) {
