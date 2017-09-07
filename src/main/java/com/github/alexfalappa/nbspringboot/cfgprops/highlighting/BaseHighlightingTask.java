@@ -45,6 +45,7 @@ public abstract class BaseHighlightingTask extends ParserResultTask<CfgPropsPars
 
     @Override
     public void run(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se) {
+        canceled = false;
         final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
         final int sevLevel = prefs.getInt(getHighlightPrefName(), getHighlightDefaultValue());
         List<ErrorDescription> errors = new ArrayList<>();
