@@ -46,4 +46,6 @@ public interface SpringBootService {
     List<ConfigurationMetadataProperty> queryPropertyMetadata(String filter);
 
     List<ValueHint> queryHintMetadata(String propertyName, String filter);
+
+    boolean hasPomDependency(String artifactId);
 }

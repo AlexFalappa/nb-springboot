@@ -83,6 +83,7 @@ public class SpringBootServiceImpl implements SpringBootService {
     private NbMavenProjectImpl mvnPrj;
     private ClassPath cpExec;
     private Map<String, ConfigurationMetadataProperty> cachedProperties;
+    private Map<String, Boolean> cachedDepsPresence = new HashMap<>();
     private final Set<String> collectionProperties = new HashSet<>();
     private final Set<String> mapProperties = new HashSet<>();
 
@@ -91,58 +92,6 @@ public class SpringBootServiceImpl implements SpringBootService {
             this.mvnPrj = (NbMavenProjectImpl) p;
         }
         logger.log(Level.INFO, "Creating Spring Boot service for project {0}", FileUtil.getFileDisplayName(p.getProjectDirectory()));
-    }
-
-    private void init() {
-        if (mvnPrj == null) {
-            return;
-        }
-        logger.info("Initializing SpringBoot service");
-        // check maven project has a dependency starting with 'spring-boot'
-        logger.fine("Checking maven project has a spring boot dependency");
-        springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
-        // early exit if no spring boot dependency detected
-        if (!springBootAvailable) {
-            return;
-        }
-        logger.log(INFO, "Initializing SpringBootService for project {0}", new Object[]{mvnPrj.toString()});
-        // set up a reference to the execute classpath object
-        Sources srcs = ProjectUtils.getSources(mvnPrj);
-        SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
-        boolean srcGroupFound = false;
-        for (SourceGroup group : srcGroups) {
-            if (group.getName().toLowerCase().contains("source")) {
-                srcGroupFound = true;
-                cpExec = ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
-                break;
-            }
-        }
-        if (!srcGroupFound) {
-            logger.log(WARNING, "No sources found for project: {0}", new Object[]{mvnPrj.toString()});
-        }
-        if (cpExec != null) {
-            // check if completion of configuration properties is possible
-            try {
-                logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
-                cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
-            } catch (ClassNotFoundException ex) {
-                // no completion
-            }
-            // listen for pom changes
-            logger.info("Adding maven pom listener...");
-            mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    final String propertyName = String.valueOf(evt.getPropertyName());
-                    logger.log(FINE, "Maven pom change ({0})", propertyName);
-                    if (propertyName.equals("MavenProject")) {
-                        refresh();
-                    }
-                }
-            });
-            // build configuration properties maps
-            updateConfigRepo();
-        }
     }
 
     @Override
@@ -158,6 +107,7 @@ public class SpringBootServiceImpl implements SpringBootService {
             mapProperties.clear();
             return;
         }
+        cachedDepsPresence.clear();
         if (cpExec == null) {
             init();
         } else {
@@ -184,6 +134,16 @@ public class SpringBootServiceImpl implements SpringBootService {
             init();
         }
         return cachedProperties.keySet();
+    }
+
+    @Override
+    public Set<String> getCollectionPropertyNames() {
+        return collectionProperties;
+    }
+
+    @Override
+    public Set<String> getMapPropertyNames() {
+        return mapProperties;
     }
 
     @Override
@@ -244,6 +204,70 @@ public class SpringBootServiceImpl implements SpringBootService {
         return ret;
     }
 
+    @Override
+    public boolean hasPomDependency(String artifactId) {
+        if (cpExec == null) {
+            init();
+        }
+        if (!cachedDepsPresence.containsKey(artifactId)) {
+            cachedDepsPresence.put(artifactId, dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), artifactId));
+        }
+        return cachedDepsPresence.get(artifactId);
+    }
+
+    private void init() {
+        if (mvnPrj == null) {
+            return;
+        }
+        logger.info("Initializing SpringBoot service");
+        // check maven project has a dependency starting with 'spring-boot'
+        springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
+        logger.fine("Checking maven project has a spring boot dependency");
+        // early exit if no spring boot dependency detected
+        if (!springBootAvailable) {
+            return;
+        }
+        logger.log(INFO, "Initializing SpringBootService for project {0}", new Object[]{mvnPrj.toString()});
+        cachedDepsPresence.clear();
+        // set up a reference to the execute classpath object
+        Sources srcs = ProjectUtils.getSources(mvnPrj);
+        SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
+        boolean srcGroupFound = false;
+        for (SourceGroup group : srcGroups) {
+            if (group.getName().toLowerCase().contains("source")) {
+                srcGroupFound = true;
+                cpExec = ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
+                break;
+            }
+        }
+        if (!srcGroupFound) {
+            logger.log(WARNING, "No sources found for project: {0}", new Object[]{mvnPrj.toString()});
+        }
+        if (cpExec != null) {
+            // check if completion of configuration properties is possible
+            try {
+                logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
+                cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
+            } catch (ClassNotFoundException ex) {
+                // no completion
+            }
+            // listen for pom changes
+            logger.info("Adding maven pom listener...");
+            mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    final String propertyName = String.valueOf(evt.getPropertyName());
+                    logger.log(FINE, "Maven pom change ({0})", propertyName);
+                    if (propertyName.equals("MavenProject")) {
+                        refresh();
+                    }
+                }
+            });
+            // build configuration properties maps
+            updateConfigRepo();
+        }
+    }
+
     // Update internal configuration metadata repository
     private void updateConfigRepo() {
         logger.fine("Updating config metadata repo");
@@ -301,13 +325,4 @@ public class SpringBootServiceImpl implements SpringBootService {
         return false;
     }
 
-    @Override
-    public Set<String> getCollectionPropertyNames() {
-        return collectionProperties;
-    }
-
-    @Override
-    public Set<String> getMapPropertyNames() {
-        return mapProperties;
-    }
 }
