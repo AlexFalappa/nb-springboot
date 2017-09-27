@@ -21,6 +21,9 @@ To perform a manual install download the desired `nbm` package from the [release
     -  error highlighting for: syntax errors, duplicate properties, data type mismatches and unknown properties
     -  completion and documentation of configuration properties names
     -  completion and documentation of configuration properties values (`hints` in configuration metadata)
+-  Java editor error highlighting and fixes for missing starter dependencies:
+    - @ConfigurationProperties annotation without `spring-boot-configuration-processor` dependency
+    - Imports of Spring MVC annotations and Spring Data interfaces without relevant starter dependencies (e.g. `JpaRepository` without `spring-boot-starter-data-jpa` dependency)
 -  *Spring Boot* file templates:
     -  `CommandlineRunner` annotated classes
     -  `ApplicationRunner` annotated classes
@@ -68,13 +71,16 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 ## Changelog
 
 -  **1.6.1** (??? 2017): Work In Progress
+    -  Java editor hints:
+        -  Warning and fix on use of `@ConfigurationProperties` annotation without `spring-boot-configuration-processor` dependency
+        -  Warning and fixes on import of annotations/interfaces of Spring MVC/Spring Data without relevant dependencies
     -  Quick fixes:
         -  Removal of deprecated,unknown or duplicate properties
         -  Substitution of deprecated properties with replacement (if present in metadata)
     -  Error highlighting in configuration properties editor:
         -  Added highlighting for deprecated properties according to their level in metadata
         -  Relaxed configuration properties name variants are recognized
-    -  Upgrade to Spring Boot 1.5.6
+    -  Upgrade to Spring Boot 1.5.7
     -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/12?closed=1)
 
 -  **1.6** (Jul 2017): Configuration properties highlighting
