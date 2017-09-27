@@ -79,7 +79,6 @@ public class SpringBootServiceImpl implements SpringBootService {
     private final Pattern pArrayNotation = compile("(.+)\\[\\d+\\]");
     private SimpleConfigurationMetadataRepository repo = new SimpleConfigurationMetadataRepository();
     private final Map<String, ConfigurationMetadataRepository> reposInJars = new HashMap<>();
-    private boolean springBootAvailable = false;
     private NbMavenProjectImpl mvnPrj;
     private ClassPath cpExec;
     private Map<String, ConfigurationMetadataProperty> cachedProperties;
@@ -99,7 +98,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         logger.info("Refreshing SpringBoot service");
         // check maven project has a dependency starting with 'spring-boot'
         logger.fine("Checking maven project has a spring boot dependency");
-        springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
+        boolean springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
         // clear and exit if no spring boot dependency detected
         if (!springBootAvailable) {
             reposInJars.clear();
@@ -221,7 +220,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
         logger.info("Initializing SpringBoot service");
         // check maven project has a dependency starting with 'spring-boot'
-        springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
+        boolean springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
         logger.fine("Checking maven project has a spring boot dependency");
         // early exit if no spring boot dependency detected
         if (!springBootAvailable) {
