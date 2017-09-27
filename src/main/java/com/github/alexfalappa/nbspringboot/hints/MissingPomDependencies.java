@@ -48,6 +48,7 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 import com.sun.source.util.TreePath;
 
 import static com.sun.source.tree.Tree.Kind.ANNOTATION;
+import static com.sun.source.tree.Tree.Kind.IMPORT;
 
 public class MissingPomDependencies {
 
@@ -61,36 +62,33 @@ public class MissingPomDependencies {
         "DESC_CfgProcMissingHint=Warns if @ConfigurationProperties and @EnableConfigurationProperties annotations are used without the <i>spring-boot-configuration-processor</i> dependency in the project pom",
         "ERR_CfgProcMissingHint=Missing Spring Boot configuration processor in project pom"
     })
-    public static ErrorDescription cfgProperties(HintContext ctx) {
-        return warningFor(ctx, "spring-boot-configuration-processor", Bundle.ERR_CfgProcMissingHint(), true);
+    public static ErrorDescription cfgProps(HintContext ctx) {
+        return annotationWarning(ctx, "spring-boot-configuration-processor", Bundle.ERR_CfgProcMissingHint(), true);
     }
 
     @Hint(displayName = "#DN_MvcMissingHint", description = "#DESC_MvcMissingHint", category = "Spring Boot")
     @TriggerPattern("org.springframework.stereotype.Controller")
     @Messages({
         "DN_MvcMissingHint=Missing Spring Boot MVC starter",
-        "DESC_MvcMissingHint=Warns if an @Controller annotation is used without the <i>spring-boot-starter-web</i> dependency in the project pom",
-        "ERR_MvcMissingHint=Missing Spring Boot MVC starter in project pom"
+        "DESC_MvcMissingHint=Warns if @Controller annotation is used without the <i>spring-boot-starter-web</i> dependency in the project pom",
+        "ERR_MvcMissingHint=Missing Spring MVC boot starter in project pom"
     })
-    public static ErrorDescription controller(HintContext ctx) {
-        return warningFor(ctx, "spring-boot-starter-web", Bundle.ERR_MvcMissingHint(), false);
+    public static ErrorDescription controllers(HintContext ctx) {
+        return annotationWarning(ctx, "spring-boot-starter-web", Bundle.ERR_MvcMissingHint(), false);
     }
 
-    private static ErrorDescription warningFor(HintContext ctx, String artifactId, String hintMex, boolean optional) {
+    private static ErrorDescription annotationWarning(HintContext ctx, String artifactId, String hintMex, boolean optional) {
         final TreePath tp = ctx.getPath();
         final TreePath tpParent = tp.getParentPath();
         if (tpParent != null) {
             if (tpParent.getLeaf().getKind() == ANNOTATION) {
                 Project prj = FileOwnerQuery.getOwner(ctx.getInfo().getFileObject());
-
                 if (prj != null) {
-                    SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class
-                    );
-
+                    SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
                     if (sbs != null) {
-                        if (!sbs.hasPomDependency(artifactId)) {
-                            NbMavenProject mPrj = prj.getLookup().lookup(NbMavenProject.class
-                            );
+                        // check first if the pom has at least one spring boot dependencies
+                        if (sbs.hasPomDependency("spring-boot") && !sbs.hasPomDependency(artifactId)) {
+                            NbMavenProject mPrj = prj.getLookup().lookup(NbMavenProject.class);
                             if (mPrj != null) {
                                 return ErrorDescriptionFactory.forName(ctx, tp, hintMex, new AddDepFix(mPrj, artifactId, optional));
                             } else {
@@ -102,7 +100,91 @@ public class MissingPomDependencies {
             }
         }
         return null;
+    }
 
+    @Hint(displayName = "#DN_RstMissingHint", description = "#DESC_RstMissingHint", category = "Spring Boot")
+    @TriggerPattern("org.springframework.web.bind.annotation.RestController")
+    @Messages({
+        "DN_RstMissingHint=Missing Spring MVC starter (alternative)",
+        "DESC_RstMissingHint=Warns if @RestController annotation is used without the <i>spring-boot-starter-web</i> dependency in the project pom"
+    })
+    public static ErrorDescription rstCtrl(HintContext ctx) {
+        return importWarning(ctx, "spring-boot-starter-web", Bundle.ERR_MvcMissingHint(), new String[]{"spring-boot-starter-web"});
+    }
+
+    @Hint(displayName = "#DN_DataMissingHint", description = "#DESC_DataMissingHint", category = "Spring Boot")
+    @TriggerPatterns({
+        @TriggerPattern("org.springframework.data.repository.Repository")
+        ,@TriggerPattern("org.springframework.data.repository.CrudRepository")
+        ,@TriggerPattern("org.springframework.data.repository.PagingAndSortingRepository")
+    })
+    @Messages({
+        "DN_DataMissingHint=Missing one of Spring Data starters",
+        "DESC_DataMissingHint=Warns if Spring Data repository annotations are used without one of the <i>spring-boot-starter-data-###</i> dependencies in the project pom",
+        "ERR_DataMissingHint=Missing one of the Spring Data boot starters in project pom"
+    })
+    public static ErrorDescription dataRepos(HintContext ctx) {
+        return importWarning(ctx, "spring-boot-starter-data", Bundle.ERR_DataMissingHint(),
+                new String[]{
+                    "spring-boot-starter-data-jpa",
+                    "spring-boot-starter-data-mongodb",
+                    "spring-boot-starter-data-cassandra",
+                    "spring-boot-starter-data-redis",
+                    "spring-boot-starter-data-solr",
+                    "spring-boot-starter-data-couchbase"
+                });
+    }
+
+    @Hint(displayName = "#DN_JpaMissingHint", description = "#DESC_JpaMissingHint", category = "Spring Boot")
+    @TriggerPattern("org.springframework.data.jpa.repository.JpaRepository")
+    @Messages({
+        "DN_JpaMissingHint=Missing Spring Data JPA starter",
+        "DESC_JpaMissingHint=Warns if Spring Data JPA repository annotations are used without the <i>spring-boot-starter-data-jpa</i> dependency in the project pom",
+        "ERR_JpaMissingHint=Missing Spring Data JPA boot starter in project pom"
+    })
+    public static ErrorDescription jpaRepos(HintContext ctx) {
+        return importWarning(ctx, "spring-boot-starter-data-jpa", Bundle.ERR_JpaMissingHint(), new String[]{"spring-boot-starter-data-jpa"});
+    }
+
+    @Hint(displayName = "#DN_MongoMissingHint", description = "#DESC_MongoMissingHint", category = "Spring Boot")
+    @TriggerPattern("org.springframework.data.mongodb.repository.MongoRepository")
+    @Messages({
+        "DN_MongoMissingHint=Missing Spring Data Mongo starter",
+        "DESC_MongoMissingHint=Warns if Spring Data @MongoRepository annotations are used without the <i>spring-boot-starter-data-mongodb</i> dependency in the project pom",
+        "ERR_MongoMissingHint=Missing Spring Data Mongo boot starter in project pom"
+    })
+    public static ErrorDescription mongoRepos(HintContext ctx) {
+        return importWarning(ctx, "spring-boot-starter-data-mongodb", Bundle.ERR_MongoMissingHint(),
+                new String[]{"spring-boot-starter-data-mongodb"});
+    }
+
+    private static ErrorDescription importWarning(HintContext ctx, String artifactId, String hintMex, String[] fixArtifactIds) {
+        final TreePath tp = ctx.getPath();
+        final TreePath tpParent = tp.getParentPath();
+        if (tpParent != null) {
+            if (tpParent.getLeaf().getKind() == IMPORT) {
+                Project prj = FileOwnerQuery.getOwner(ctx.getInfo().getFileObject());
+                if (prj != null) {
+                    SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
+                    if (sbs != null) {
+                        // check first if the pom has at least one spring boot dependencies
+                        if (sbs.hasPomDependency("spring-boot") && !sbs.hasPomDependency(artifactId)) {
+                            NbMavenProject mPrj = prj.getLookup().lookup(NbMavenProject.class);
+                            if (mPrj != null) {
+                                Fix[] fixes = new Fix[fixArtifactIds.length];
+                                for (int i = 0; i < fixArtifactIds.length; i++) {
+                                    fixes[i] = new AddDepFix(mPrj, fixArtifactIds[i], false);
+                                }
+                                return ErrorDescriptionFactory.forName(ctx, tp, hintMex, fixes);
+                            } else {
+                                return ErrorDescriptionFactory.forName(ctx, tp, hintMex);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        return null;
     }
 
     private static final class AddDepFix implements Fix {
@@ -155,6 +237,7 @@ public class MissingPomDependencies {
                 if (sv != null) {
                     sv.save();
                 }
+                mvnPrj.triggerDependencyDownload();
                 if (ed != null) {
                     Position pos = ed.getDocument().createPosition(caretPos);
                     return new ChangeInfo(foPom, pos, pos);
