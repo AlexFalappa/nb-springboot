@@ -71,6 +71,8 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 ## Changelog
 
+-  **1.6.2-SNAPSHOT** (??? 2017): Work In Progress
+
 -  **1.6.1** (Oct 2017): Hints and quick fixes
     -  Java editor hints:
         -  Warning and fix on use of `@ConfigurationProperties` annotation without `spring-boot-configuration-processor` dependency
