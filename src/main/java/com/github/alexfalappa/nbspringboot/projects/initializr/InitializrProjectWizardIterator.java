@@ -51,13 +51,10 @@ import org.openide.util.NbBundle.Messages;
 import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
 import org.openide.xml.XMLUtil;
-import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.InputSource;
-import org.xml.sax.SAXException;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
@@ -132,26 +129,10 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
             handle.progress(3);
             // parse pom.xml
             final FileObject foPom = foDir.getFileObject("pom.xml");
-            Document pomDoc = XMLUtil.parse(new InputSource(foPom.getInputStream()), false, false, null, null);
-            boolean pomModified = false;
             // manage run/debug trough maven plugin
             if ((boolean) wiz.getProperty(WIZ_USE_SB_MVN_PLUGIN)) {
                 // create nbactions.xml file with custom maven actions configuration
                 createNbActions(pkg, mvnName, foDir);
-                // modify pom.xml content and add forking flag to plugin configuration
-                pomConfigMvnPlugin(pomDoc);
-                pomModified = true;
-            }
-            // tweak dev tools dependency if present
-            if (deps.contains("devtools")) {
-                pomDevTools(pomDoc);
-                pomModified = true;
-            }
-            // save pom document if modified
-            if (pomModified) {
-                try (OutputStream out = foPom.getOutputStream()) {
-                    XMLUtil.write(pomDoc, out, "UTF-8");
-                }
             }
             // clear non project cache
             ProjectManager.getDefault().clearNonProjectCache();
@@ -365,46 +346,6 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
                 .param("manualRestart", bManualRestart)
                 .param("vmOpts", strVmOpts)
                 .build();
-    }
-
-    private void pomConfigMvnPlugin(Document doc) throws DOMException, SAXException, IOException {
-        // modify pom.xml content and add cfg to spring maven plugin
-        NodeList nl = doc.getElementsByTagName("plugin");
-        if (nl != null && nl.getLength() > 0) {
-            for (int i = 0; i < nl.getLength(); i++) {
-                Element el = (Element) nl.item(i);
-                NodeList grpId = el.getElementsByTagName("groupId");
-                NodeList artId = el.getElementsByTagName("artifactId");
-                if (grpId.getLength() > 0 && artId.getLength() > 0
-                        && "org.springframework.boot".equals(grpId.item(0).getTextContent())
-                        && "spring-boot-maven-plugin".equals(artId.item(0).getTextContent())) {
-                    Node cfg = doc.createElement("configuration");
-                    Node frk = doc.createElement("fork");
-                    frk.setTextContent("true");
-                    cfg.appendChild(frk);
-                    el.appendChild(cfg);
-                }
-            }
-        }
-    }
-
-    private void pomDevTools(Document doc) {
-        // modify pom.xml content and add cfg dependency snippet
-        NodeList nl = doc.getElementsByTagName("dependency");
-        if (nl != null && nl.getLength() > 0) {
-            for (int i = 0; i < nl.getLength(); i++) {
-                Element el = (Element) nl.item(i);
-                NodeList grpId = el.getElementsByTagName("groupId");
-                NodeList artId = el.getElementsByTagName("artifactId");
-                if (grpId.getLength() > 0 && artId.getLength() > 0
-                        && "org.springframework.boot".equals(grpId.item(0).getTextContent())
-                        && "spring-boot-devtools".equals(artId.item(0).getTextContent())) {
-                    Node opt = doc.createElement("optional");
-                    opt.setTextContent("true");
-                    el.appendChild(opt);
-                }
-            }
-        }
     }
 
     @Override
