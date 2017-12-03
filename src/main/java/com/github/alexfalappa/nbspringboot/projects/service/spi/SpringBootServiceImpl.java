@@ -17,6 +17,8 @@ package com.github.alexfalappa.nbspringboot.projects.service.spi;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -39,6 +41,7 @@ import org.netbeans.api.project.Sources;
 import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.spi.project.ProjectServiceProvider;
+import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
@@ -104,6 +107,7 @@ public class SpringBootServiceImpl implements SpringBootService {
             reposInJars.clear();
             collectionProperties.clear();
             mapProperties.clear();
+            // TODO delete nbactions.xml file from project dir
             return;
         }
         cachedDepsPresence.clear();
@@ -120,6 +124,8 @@ public class SpringBootServiceImpl implements SpringBootService {
             // build configuration metadata repository
             updateConfigRepo();
         }
+        // TODO adjust in nbactions.xml file the restart env variable
+        adjustNbActions();
     }
 
     @Override
@@ -212,6 +218,19 @@ public class SpringBootServiceImpl implements SpringBootService {
             cachedDepsPresence.put(artifactId, dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), artifactId));
         }
         return cachedDepsPresence.get(artifactId);
+    }
+
+    @Override
+    public String getRestartEnvVarName() {
+        String envName = null;
+        if (mvnPrj != null) {
+            // retrieve boot version from parent pom declaration if present
+            // TODO also look into parent hierarchy
+            // TODO also try to look in dependency management section (inclusion of spring boot BOM)
+            String mprj = mvnPrj.getOriginalMavenProject().getParentArtifact().getVersion();
+            envName = mprj.startsWith("2") ? ENV_RESTART_20 : ENV_RESTART_15;
+        }
+        return envName;
     }
 
     private void init() {
@@ -322,6 +341,30 @@ public class SpringBootServiceImpl implements SpringBootService {
             }
         }
         return false;
+    }
+
+    private void adjustNbActions() {
+        final FileObject foPrjDir = mvnPrj.getProjectDirectory();
+        FileObject foNbAct = foPrjDir.getFileObject("nbactions.xml");
+        try (FileLock lock = foNbAct.lock()) {
+            FileObject foTmp = foNbAct.move(lock, foPrjDir, "nbactions", "tmp");
+            try (PrintWriter pw = new PrintWriter(foPrjDir.createAndOpen("nbactions.xml"))) {
+                final String env = String.format("Env.%s", getRestartEnvVarName());
+                Pattern regex = Pattern.compile("Env\\.SPRING_DEVTOOLS_RESTART[^>]*");
+                for (String line : foTmp.asLines()) {
+                    Matcher m = regex.matcher(line);
+                    if (!m.find()) {
+                        pw.println(line);
+                    } else {
+                        String replaced = m.replaceAll(env);
+                        pw.println(replaced);
+                    }
+                }
+            }
+            foTmp.delete(lock);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
     }
 
 }

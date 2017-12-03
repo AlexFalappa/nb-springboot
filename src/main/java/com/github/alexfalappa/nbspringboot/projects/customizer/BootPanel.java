@@ -36,7 +36,6 @@ import org.openide.util.NbBundle;
 
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
-import static com.github.alexfalappa.nbspringboot.actions.RestartAction.PROP_RESTART;
 import static com.github.alexfalappa.nbspringboot.actions.RestartAction.TRIGGER_FILE;
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
@@ -64,6 +63,7 @@ public class BootPanel extends javax.swing.JPanel {
     private boolean active = false;
     private final CfgParamsTableModel tmOverrides = new CfgParamsTableModel();
     private SpringBootService bootService;
+    private String propRestart;
 
     /** Creates new form BootPanel */
     public BootPanel() {
@@ -78,6 +78,8 @@ public class BootPanel extends javax.swing.JPanel {
 
     public void setSpringBootService(SpringBootService sbs) {
         this.bootService = sbs;
+        propRestart = String.format("Env.%s", bootService.getRestartEnvVarName());
+        chDevtools.setSelected(runProps.containsKey(propRestart));
     }
 
     public void setDevToolsEnabled(boolean enabled) {
@@ -131,7 +133,7 @@ public class BootPanel extends javax.swing.JPanel {
             parseVmOptions();
             chDebugMode.setSelected(runProps.containsKey(PROP_DEBUG_MODE));
             chForceColor.setSelected(runProps.containsKey(PROP_FORCE_COLOR));
-            chDevtools.setSelected(runProps.containsKey(PROP_RESTART));
+            chDevtools.setSelected(runProps.containsKey(propRestart));
             // listen to widget changes
             txArgs.getDocument().addDocumentListener(new DocumentListener() {
                 @Override
@@ -375,11 +377,11 @@ public class BootPanel extends javax.swing.JPanel {
 
     private void chDevtoolsActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_chDevtoolsActionPerformed
         if (chDevtools.isSelected()) {
-            runProps.put(PROP_RESTART, TRIGGER_FILE);
-            debugProps.put(PROP_RESTART, TRIGGER_FILE);
+            runProps.put(propRestart, TRIGGER_FILE);
+            debugProps.put(propRestart, TRIGGER_FILE);
         } else {
-            runProps.remove(PROP_RESTART);
-            debugProps.remove(PROP_RESTART);
+            runProps.remove(propRestart);
+            debugProps.remove(propRestart);
         }
         mh2.markAsModified(mh2.getActionMappings());
     }//GEN-LAST:event_chDevtoolsActionPerformed

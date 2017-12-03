@@ -31,6 +31,9 @@ import org.springframework.boot.configurationmetadata.ValueHint;
  */
 public interface SpringBootService {
 
+    public static final String ENV_RESTART_15 = "SPRING_DEVTOOLS_RESTART_TRIGGER_FILE";
+    public static final String ENV_RESTART_20 = "SPRING_DEVTOOLS_RESTART_TRIGGERFILE";
+
     void refresh();
 
     ClassPath getManagedClassPath();
@@ -48,4 +51,6 @@ public interface SpringBootService {
     List<ValueHint> queryHintMetadata(String propertyName, String filter);
 
     boolean hasPomDependency(String artifactId);
+
+    String getRestartEnvVarName();
 }

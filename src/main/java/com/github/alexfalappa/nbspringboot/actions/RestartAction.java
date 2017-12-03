@@ -39,6 +39,8 @@ import org.openide.awt.StatusDisplayer;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
+
 import static java.util.logging.Level.FINE;
 
 @ActionID(
@@ -58,7 +60,6 @@ import static java.util.logging.Level.FINE;
 public final class RestartAction implements ActionListener {
 
     public static final String TRIGGER_FILE = ".nbRestartTrigger";
-    public static final String PROP_RESTART = "Env.SPRING_DEVTOOLS_RESTART_TRIGGER_FILE";
     private static final Logger logger = Logger.getLogger(RestartAction.class.getName());
     private final NbMavenProjectImpl proj;
 
@@ -70,14 +71,16 @@ public final class RestartAction implements ActionListener {
     public void actionPerformed(ActionEvent e) {
         File outDir = proj.getProjectWatcher().getOutputDirectory(false);
         M2ConfigProvider cp = proj.getLookup().lookup(M2ConfigProvider.class);
+        SpringBootService sbs = proj.getLookup().lookup(SpringBootService.class);
         boolean enabled = false;
-        if (cp != null) {
+        if (cp != null && sbs != null) {
             M2Configuration m2 = cp.getActiveConfiguration();
             List<NetbeansActionMapping> nams = m2.getRawMappings().getActions();
             if (!nams.isEmpty()) {
+                String propRestart = String.format("Env.%s", sbs.getRestartEnvVarName());
                 for (NetbeansActionMapping nam : nams) {
                     if (nam.getActionName().equals(ActionProvider.COMMAND_RUN)) {
-                        enabled = nam.getProperties().containsKey(PROP_RESTART);
+                        enabled = nam.getProperties().containsKey(propRestart);
                         break;
                     }
                 }

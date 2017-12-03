@@ -17,7 +17,7 @@
             <Env.SPRING_OUTPUT_ANSI_ENABLED>always</Env.SPRING_OUTPUT_ANSI_ENABLED>
 </#if>
 <#if manualRestart?? && manualRestart>
-            <Env.SPRING_DEVTOOLS_RESTART_TRIGGER_FILE>.nbRestartTrigger</Env.SPRING_DEVTOOLS_RESTART_TRIGGER_FILE>
+            <Env.${restartTriggerFileEnv}>.nbRestartTrigger</Env.${restartTriggerFileEnv}>
 </#if>
         </properties>
     </action>
@@ -40,7 +40,7 @@
             <Env.SPRING_OUTPUT_ANSI_ENABLED>always</Env.SPRING_OUTPUT_ANSI_ENABLED>
 </#if>
 <#if manualRestart?? && manualRestart>
-            <Env.SPRING_DEVTOOLS_RESTART_TRIGGER_FILE>.nbRestartTrigger</Env.SPRING_DEVTOOLS_RESTART_TRIGGER_FILE>
+            <Env.${restartTriggerFileEnv}>.nbRestartTrigger</Env.${restartTriggerFileEnv}>
 </#if>
             <jpda.listen>true</jpda.listen>
         </properties>

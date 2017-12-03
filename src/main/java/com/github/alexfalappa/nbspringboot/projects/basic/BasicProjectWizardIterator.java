@@ -52,6 +52,7 @@ import org.openide.util.NbPreferences;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_RESTART;
@@ -255,12 +256,15 @@ public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInst
         final boolean bForceColor = prefs.getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
         final boolean bManualRestart = prefs.getBoolean(PREF_MANUAL_RESTART, false);
         final String strVmOpts = Utils.vmOptsFromPrefs();
+        // compute name of devtools restart trigger file
+        String triggerFileEnv = BOOTVERSION.startsWith("2") ? SpringBootService.ENV_RESTART_20 : SpringBootService.ENV_RESTART_15;
         // create nbactions.xml from template
         FileObject foTmpl = Templates.getTemplate(wiz);
         new FileBuilder(foTmpl, dir)
                 .name("nbactions")
                 .param("forceColor", bForceColor)
                 .param("manualRestart", bManualRestart)
+                .param("restartTriggerFileEnv", triggerFileEnv)
                 .param("vmOpts", strVmOpts)
                 .build();
     }
