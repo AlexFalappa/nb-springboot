@@ -120,7 +120,7 @@ public class InitializrService {
             timeoutFromPrefs();
             // prepare request
             final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
-            UriTemplate template = new UriTemplate(serviceUrl.concat("/dependencies?{bootVersion}"));
+            UriTemplate template = new UriTemplate(serviceUrl.concat("/dependencies?bootVersion={bootVersion}"));
             RequestEntity<Void> req = RequestEntity
                     .get(template.expand(bootVersion))
                     .accept(MediaType.valueOf("application/vnd.initializr.v2.1+json"))
