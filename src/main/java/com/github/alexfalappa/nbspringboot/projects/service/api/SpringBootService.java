@@ -53,4 +53,6 @@ public interface SpringBootService {
     boolean hasPomDependency(String artifactId);
 
     String getRestartEnvVarName();
+
+    public String getPluginPropsPrefix();
 }

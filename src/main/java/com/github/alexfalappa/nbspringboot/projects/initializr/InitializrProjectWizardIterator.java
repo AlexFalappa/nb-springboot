@@ -58,7 +58,6 @@ import org.xml.sax.InputSource;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
-import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_RESTART;
@@ -338,8 +337,6 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
         final boolean bForceColor = prefs.getBoolean(PREF_FORCE_COLOR_OUTPUT, true);
         final boolean bManualRestart = prefs.getBoolean(PREF_MANUAL_RESTART, false);
         final String strVmOpts = Utils.vmOptsFromPrefs();
-        // compute name of devtools restart trigger file
-        String triggerFileEnv = bootVersion.startsWith("2") ? SpringBootService.ENV_RESTART_20 : SpringBootService.ENV_RESTART_15;
         // create nbactions.xml from template
         FileObject foTmpl = Templates.getTemplate(wiz);
         new FileBuilder(foTmpl, dir)
@@ -347,7 +344,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
                 .param("mainClass", mainClass.toString())
                 .param("forceColor", bForceColor)
                 .param("manualRestart", bManualRestart)
-                .param("restartTriggerFileEnv", triggerFileEnv)
+                .param("isBoot2", bootVersion.startsWith("2"))
                 .param("vmOpts", strVmOpts)
                 .build();
     }

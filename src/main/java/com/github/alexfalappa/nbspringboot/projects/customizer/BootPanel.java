@@ -48,9 +48,6 @@ import static java.util.logging.Level.WARNING;
  */
 public class BootPanel extends javax.swing.JPanel {
 
-    public static final String PROP_RUN_ARGS = "run.arguments";
-    public static final String PROP_DISABLED_OVERRIDES = "run.disabledArguments";
-    public static final String PROP_RUN_VMOPTIONS = "run.jvmArguments";
     public static final String PROP_DEBUG_MODE = "Env.DEBUG";
     public static final String PROP_FORCE_COLOR = "Env.SPRING_OUTPUT_ANSI_ENABLED";
     public static final String PROP_JPDA = "jpda.listen";
@@ -64,6 +61,9 @@ public class BootPanel extends javax.swing.JPanel {
     private final CfgParamsTableModel tmOverrides = new CfgParamsTableModel();
     private SpringBootService bootService;
     private String propRestart;
+    private String propRunArgs;
+    private String propRunVmOptions;
+    private String propDisablebArgs;
 
     /** Creates new form BootPanel */
     public BootPanel() {
@@ -76,23 +76,16 @@ public class BootPanel extends javax.swing.JPanel {
         tbCfgOverrides.getTableHeader().setReorderingAllowed(false);
     }
 
-    public void setSpringBootService(SpringBootService sbs) {
-        this.bootService = sbs;
+    public void init(ModelHandle2 mh2, SpringBootService bootService) {
+        // store reference to project properties model and to boot service
+        this.mh2 = Objects.requireNonNull(mh2);
+        this.bootService = Objects.requireNonNull(bootService);
+        // initialize some strings that depends on boot version
         propRestart = String.format("Env.%s", bootService.getRestartEnvVarName());
-        chDevtools.setSelected(runProps.containsKey(propRestart));
-    }
-
-    public void setDevToolsEnabled(boolean enabled) {
-        if (active) {
-            lDevtools.setEnabled(enabled);
-            chDevtools.setEnabled(enabled);
-        }
-    }
-
-    public void setModelHandle(ModelHandle2 mh2) {
-        Objects.requireNonNull(mh2);
-        // store reference to project properties model and to properties of maven actions for run/debug
-        this.mh2 = mh2;
+        propRunVmOptions = String.format("%s.jvmArguments", bootService.getPluginPropsPrefix());
+        propRunArgs = String.format("%s.arguments", bootService.getPluginPropsPrefix());
+        propDisablebArgs = String.format("%s.disabledArguments", bootService.getPluginPropsPrefix());
+        // store reference to properties of maven actions for run/debug
         boolean sbRun = false;
         boolean sbDebug = false;
         ActionToGoalMapping mapps = mh2.getActionMappings();
@@ -107,11 +100,11 @@ public class BootPanel extends javax.swing.JPanel {
                 sbDebug = map.getGoals().contains("spring-boot:run");
                 this.debugProps = map.getProperties();
                 // ensure debug properties contain 'run.jvmArguments' for debug
-                final String debugVmOpts = debugProps.get(PROP_RUN_VMOPTIONS);
+                final String debugVmOpts = debugProps.get(propRunVmOptions);
                 if (debugVmOpts == null) {
-                    debugProps.put(PROP_RUN_VMOPTIONS, VMOPTS_DEBUG);
+                    debugProps.put(propRunVmOptions, VMOPTS_DEBUG);
                 } else if (!debugVmOpts.startsWith(VMOPTS_DEBUG)) {
-                    debugProps.put(PROP_RUN_VMOPTIONS, String.format("%s %s", VMOPTS_DEBUG, debugVmOpts));
+                    debugProps.put(propRunVmOptions, String.format("%s %s", VMOPTS_DEBUG, debugVmOpts));
                 }
                 // ensure debug properties contain 'jpda.listen' prop set to true
                 debugProps.put(PROP_JPDA, "true");
@@ -192,6 +185,13 @@ public class BootPanel extends javax.swing.JPanel {
             active = true;
         } else {
             lWarning.setText(NbBundle.getMessage(BootPanel.class, "BootPanel.lWarning.panelinactive.text")); // NOI18N
+        }
+    }
+
+    public void setDevToolsEnabled(boolean enabled) {
+        if (active) {
+            lDevtools.setEnabled(enabled);
+            chDevtools.setEnabled(enabled);
         }
     }
 
@@ -476,32 +476,32 @@ public class BootPanel extends javax.swing.JPanel {
         }
         if (sbEnabled.length() > 0) {
             final String csv = sbEnabled.toString().trim().replaceAll("\\s+", ",");
-            runProps.put(PROP_RUN_ARGS, csv);
-            debugProps.put(PROP_RUN_ARGS, csv);
+            runProps.put(propRunArgs, csv);
+            debugProps.put(propRunArgs, csv);
         } else {
-            runProps.remove(PROP_RUN_ARGS);
-            debugProps.remove(PROP_RUN_ARGS);
+            runProps.remove(propRunArgs);
+            debugProps.remove(propRunArgs);
         }
         if (sbDisabled.length() > 0) {
             final String csv = sbDisabled.toString().trim().replaceAll("\\s+", ",");
-            runProps.put(PROP_DISABLED_OVERRIDES, csv);
-            debugProps.put(PROP_DISABLED_OVERRIDES, csv);
+            runProps.put(propDisablebArgs, csv);
+            debugProps.put(propDisablebArgs, csv);
         } else {
-            runProps.remove(PROP_DISABLED_OVERRIDES);
-            debugProps.remove(PROP_DISABLED_OVERRIDES);
+            runProps.remove(propDisablebArgs);
+            debugProps.remove(propDisablebArgs);
         }
         mh2.markAsModified(mh2.getActionMappings());
-        logger.log(FINER, "Command line args: {0}", runProps.get(PROP_RUN_ARGS));
+        logger.log(FINER, "Command line args: {0}", runProps.get(propRunArgs));
     }
 
     private void parseCmdLineArgs() {
-        if (runProps.containsKey(PROP_RUN_ARGS) && runProps.get(PROP_RUN_ARGS) != null) {
+        if (runProps.containsKey(propRunArgs) && runProps.get(propRunArgs) != null) {
             StringBuilder sb = new StringBuilder();
-            parseProperty(sb, runProps.get(PROP_RUN_ARGS), true);
+            parseProperty(sb, runProps.get(propRunArgs), true);
             txArgs.setText(sb.toString());
         }
-        if (runProps.containsKey(PROP_DISABLED_OVERRIDES) && runProps.get(PROP_DISABLED_OVERRIDES) != null) {
-            parseProperty(new StringBuilder(), runProps.get(PROP_DISABLED_OVERRIDES), false);
+        if (runProps.containsKey(propDisablebArgs) && runProps.get(propDisablebArgs) != null) {
+            parseProperty(new StringBuilder(), runProps.get(propDisablebArgs), false);
         }
     }
 
@@ -540,24 +540,24 @@ public class BootPanel extends javax.swing.JPanel {
         sb.append(txVmOpts.getText().trim());
         final String strVmOpts = sb.toString();
         if (strVmOpts == null || strVmOpts.isEmpty()) {
-            runProps.remove(PROP_RUN_VMOPTIONS);
-            debugProps.put(PROP_RUN_VMOPTIONS, VMOPTS_DEBUG);
+            runProps.remove(propRunVmOptions);
+            debugProps.put(propRunVmOptions, VMOPTS_DEBUG);
         } else {
-            runProps.put(PROP_RUN_VMOPTIONS, strVmOpts);
-            debugProps.put(PROP_RUN_VMOPTIONS, String.format("%s %s", VMOPTS_DEBUG, strVmOpts));
+            runProps.put(propRunVmOptions, strVmOpts);
+            debugProps.put(propRunVmOptions, String.format("%s %s", VMOPTS_DEBUG, strVmOpts));
         }
         mh2.markAsModified(mh2.getActionMappings());
-        logger.log(FINER, "VM options: {0}", runProps.get(PROP_RUN_VMOPTIONS));
+        logger.log(FINER, "VM options: {0}", runProps.get(propRunVmOptions));
     }
 
     private void parseVmOptions() {
-        if (runProps.containsKey(PROP_RUN_VMOPTIONS) && runProps.get(PROP_RUN_VMOPTIONS) != null) {
-            boolean isVmOptsLaunch = runProps.get(PROP_RUN_VMOPTIONS).startsWith(VMOPTS_OPTIMIZE);
+        if (runProps.containsKey(propRunVmOptions) && runProps.get(propRunVmOptions) != null) {
+            boolean isVmOptsLaunch = runProps.get(propRunVmOptions).startsWith(VMOPTS_OPTIMIZE);
             chVmOptsLaunch.setSelected(isVmOptsLaunch);
             if (isVmOptsLaunch) {
-                txVmOpts.setText(runProps.get(PROP_RUN_VMOPTIONS).substring(VMOPTS_OPTIMIZE.length()).trim());
+                txVmOpts.setText(runProps.get(propRunVmOptions).substring(VMOPTS_OPTIMIZE.length()).trim());
             } else {
-                txVmOpts.setText(runProps.get(PROP_RUN_VMOPTIONS));
+                txVmOpts.setText(runProps.get(propRunVmOptions));
             }
         }
     }

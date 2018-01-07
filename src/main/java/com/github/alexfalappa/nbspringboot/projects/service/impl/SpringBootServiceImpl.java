@@ -62,7 +62,7 @@ import static java.util.regex.Pattern.compile;
 /**
  * Project wide {@link SpringBootService} implementation.
  * <p>
- * It reads Spring Boot configuration properties metadata and maintaining indexed structures extracted out of it.
+ * It reads Spring Boot configuration properties metadata and maintains indexed structures extracted out of it.
  * <p>
  * Registered for maven projects.
  *
@@ -107,7 +107,7 @@ public class SpringBootServiceImpl implements SpringBootService {
             reposInJars.clear();
             collectionProperties.clear();
             mapProperties.clear();
-            // TODO delete nbactions.xml file from project dir
+            // TODO delete nbactions.xml file from project dir ?
             return;
         }
         cachedDepsPresence.clear();
@@ -124,7 +124,7 @@ public class SpringBootServiceImpl implements SpringBootService {
             // build configuration metadata repository
             updateConfigRepo();
         }
-        // TODO adjust in nbactions.xml file the restart env variable
+        // adjust the nbactions.xml file depending on boot version
         adjustNbActions();
     }
 
@@ -222,15 +222,12 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public String getRestartEnvVarName() {
-        String envName = null;
-        if (mvnPrj != null) {
-            // retrieve boot version from parent pom declaration if present
-            // TODO also look into parent hierarchy
-            // TODO also try to look in dependency management section (inclusion of spring boot BOM)
-            String mprj = mvnPrj.getOriginalMavenProject().getParentArtifact().getVersion();
-            envName = mprj.startsWith("2") ? ENV_RESTART_20 : ENV_RESTART_15;
-        }
-        return envName;
+        return isBoot2() ? ENV_RESTART_20 : ENV_RESTART_15;
+    }
+
+    @Override
+    public String getPluginPropsPrefix() {
+        return isBoot2() ? "spring-boot.run" : "run";
     }
 
     private void init() {
@@ -332,6 +329,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
     }
 
+    // check if any of the project dependencies artifact ids contains the given string
     private boolean dependencyArtifactIdContains(NbMavenProject nbMvn, String artifactId) {
         MavenProject mPrj = nbMvn.getMavenProject();
         for (Object o : mPrj.getDependencies()) {
@@ -343,25 +341,50 @@ public class SpringBootServiceImpl implements SpringBootService {
         return false;
     }
 
+    // tell if the project currently uses Spring Boot 2.x
+    private boolean isBoot2() {
+        boolean flag = false;
+        if (mvnPrj != null) {
+            // retrieve boot version from parent pom declaration if present
+            // TODO also look into parent hierarchy
+            // TODO also try to look in dependency management section (inclusion of spring boot BOM)
+            String bootVer = mvnPrj.getOriginalMavenProject().getParentArtifact().getVersion();
+            flag = bootVer.startsWith("2");
+        }
+        return flag;
+    }
+
     private void adjustNbActions() {
+        logger.fine("Adjusting nbactions.xml file");
         final FileObject foPrjDir = mvnPrj.getProjectDirectory();
         FileObject foNbAct = foPrjDir.getFileObject("nbactions.xml");
-        try (FileLock lock = foNbAct.lock()) {
-            FileObject foTmp = foNbAct.move(lock, foPrjDir, "nbactions", "tmp");
-            try (PrintWriter pw = new PrintWriter(foPrjDir.createAndOpen("nbactions.xml"))) {
-                final String env = String.format("Env.%s", getRestartEnvVarName());
-                Pattern regex = Pattern.compile("Env\\.SPRING_DEVTOOLS_RESTART[^>]*");
-                for (String line : foTmp.asLines()) {
-                    Matcher m = regex.matcher(line);
-                    if (!m.find()) {
-                        pw.println(line);
-                    } else {
-                        String replaced = m.replaceAll(env);
-                        pw.println(replaced);
-                    }
+        try (PrintWriter pw = new PrintWriter(foPrjDir.createAndOpen("nbactions.tmp"))) {
+            if (isBoot2()) {
+                for (String line : foNbAct.asLines()) {
+                    line = line.replace(ENV_RESTART_15, ENV_RESTART_20);
+                    line = line.replace("<run.", "<spring-boot.run.");
+                    line = line.replace("</run.", "</spring-boot.run.");
+                    pw.println(line);
+                }
+            } else {
+                for (String line : foNbAct.asLines()) {
+                    line = line.replace(ENV_RESTART_20, ENV_RESTART_15);
+                    line = line.replace("<spring-boot.run.", "<run.");
+                    line = line.replace("</spring-boot.run.", "</run.");
+                    pw.println(line);
                 }
             }
-            foTmp.delete(lock);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        try (FileLock lock = foNbAct.lock()) {
+            foNbAct.delete(lock);
+        } catch (IOException ex) {
+            Exceptions.printStackTrace(ex);
+        }
+        FileObject foTmp = foPrjDir.getFileObject("nbactions.tmp");
+        try (FileLock lock = foTmp.lock()) {
+            foTmp.move(lock, foPrjDir, "nbactions", "xml");
         } catch (IOException ex) {
             Exceptions.printStackTrace(ex);
         }

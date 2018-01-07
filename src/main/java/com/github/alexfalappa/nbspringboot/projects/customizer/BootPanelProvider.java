@@ -45,11 +45,10 @@ public class BootPanelProvider implements ProjectCustomizer.CompositeCategoryPro
 
     @Override
     public JComponent createComponent(ProjectCustomizer.Category category, Lookup context) {
-        ModelHandle2 mh2 = context.lookup(ModelHandle2.class);
         final BootPanel bootPanel = new BootPanel();
-        bootPanel.setModelHandle(mh2);
+        // NOTE order of invocations is important here!
+        bootPanel.init(context.lookup(ModelHandle2.class), prjBootService(context));
         bootPanel.setDevToolsEnabled(prjHasDepContaining(context, "devtools"));
-        bootPanel.setSpringBootService(prjBootService(context));
         return bootPanel;
     }
 
