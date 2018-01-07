@@ -156,20 +156,22 @@ public class SpringBootServiceImpl implements SpringBootService {
         if (cpExec == null) {
             init();
         }
-        // generate and try relaxed variants
-        for (String relaxedName : new RelaxedNames(propertyName)) {
-            if (cachedProperties.containsKey(relaxedName)) {
-                return cachedProperties.get(relaxedName);
-            } else {
-                // try to interpret array notation (strip '[index]' from pName)
-                Matcher mArrNot = pArrayNotation.matcher(relaxedName);
-                if (mArrNot.matches()) {
-                    return cachedProperties.get(mArrNot.group(1));
+        if (cachedProperties != null) {
+            // generate and try relaxed variants
+            for (String relaxedName : new RelaxedNames(propertyName)) {
+                if (cachedProperties.containsKey(relaxedName)) {
+                    return cachedProperties.get(relaxedName);
                 } else {
-                    // try to interpret map notation (see if pName starts with a set of known map props)
-                    for (String mapPropertyName : getMapPropertyNames()) {
-                        if (relaxedName.startsWith(mapPropertyName)) {
-                            return cachedProperties.get(mapPropertyName);
+                    // try to interpret array notation (strip '[index]' from pName)
+                    Matcher mArrNot = pArrayNotation.matcher(relaxedName);
+                    if (mArrNot.matches()) {
+                        return cachedProperties.get(mArrNot.group(1));
+                    } else {
+                        // try to interpret map notation (see if pName starts with a set of known map props)
+                        for (String mapPropertyName : getMapPropertyNames()) {
+                            if (relaxedName.startsWith(mapPropertyName)) {
+                                return cachedProperties.get(mapPropertyName);
+                            }
                         }
                     }
                 }
@@ -184,9 +186,11 @@ public class SpringBootServiceImpl implements SpringBootService {
             init();
         }
         List<ConfigurationMetadataProperty> ret = new LinkedList<>();
-        for (String propName : getPropertyNames()) {
-            if (filter == null || propName.contains(filter)) {
-                ret.add(cachedProperties.get(propName));
+        if (cachedProperties != null) {
+            for (String propName : getPropertyNames()) {
+                if (filter == null || propName.contains(filter)) {
+                    ret.add(cachedProperties.get(propName));
+                }
             }
         }
         return ret;
@@ -214,10 +218,13 @@ public class SpringBootServiceImpl implements SpringBootService {
         if (cpExec == null) {
             init();
         }
-        if (!cachedDepsPresence.containsKey(artifactId)) {
-            cachedDepsPresence.put(artifactId, dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), artifactId));
+        if (cachedDepsPresence != null) {
+            if (!cachedDepsPresence.containsKey(artifactId)) {
+                cachedDepsPresence.put(artifactId, dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), artifactId));
+            }
+            return cachedDepsPresence.get(artifactId);
         }
-        return cachedDepsPresence.get(artifactId);
+        return false;
     }
 
     @Override
