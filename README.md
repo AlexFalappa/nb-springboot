@@ -75,6 +75,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
     -  Changes in maven `pom.xml` management in the *Spring Initializr* project wizard:
         -  Do not make `spring-boot-devtools` dependency optional by default (use the [`excludeDevtools` option of the spring boot maven plugin](https://docs.spring.io/spring-boot/docs/current/maven-plugin/repackage-mojo.html) to control inclusion of devtools in repackaged archive)
         -  Do not set `fork` to true to `spring-boot-maven-plugin` configuration section (forking a jvm is automatic when needed)
+    -  Show deprecated configuration properties of level error by default (only effective if no previous plugin preferences found)
 
 -  **1.6.1** (Oct 2017): Hints and quick fixes
     -  Java editor hints:

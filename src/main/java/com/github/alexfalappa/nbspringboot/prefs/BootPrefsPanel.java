@@ -287,7 +287,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
         chDevtoolsTrigger.setSelected(prefs.getBoolean(PrefConstants.PREF_MANUAL_RESTART, false));
         chVmOptsLaunch.setSelected(prefs.getBoolean(PrefConstants.PREF_VM_OPTS_LAUNCH, true));
         chDeprSortLast.setSelected(prefs.getBoolean(PrefConstants.PREF_DEPR_SORT_LAST, true));
-        chDeprErrorShow.setSelected(prefs.getBoolean(PrefConstants.PREF_DEPR_ERROR_SHOW, false));
+        chDeprErrorShow.setSelected(prefs.getBoolean(PrefConstants.PREF_DEPR_ERROR_SHOW, true));
         cbDtMismatch.setSelectedIndex(prefs.getInt(PrefConstants.PREF_HLIGHT_LEV_DTMISMATCH, 2));
         cbDupl.setSelectedIndex(prefs.getInt(PrefConstants.PREF_HLIGHT_LEV_DUPLICATES, 1));
         cbSynErr.setSelectedIndex(prefs.getInt(PrefConstants.PREF_HLIGHT_LEV_SYNERR, 2));
