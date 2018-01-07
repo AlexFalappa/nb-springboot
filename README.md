@@ -72,7 +72,8 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 ## Changelog
 
 -  **2.0-SNAPSHOT** (??? 2018): Work In Progress
-    -  Improved support for Spring Boot 2.x
+    -  Improved internal support for projects based on Spring Boot 2.x
+    -  New File template for reactive `@RestController` classes
     -  Changes in maven `pom.xml` management in the *Spring Initializr* project wizard:
         -  Do not make `spring-boot-devtools` dependency optional by default (use the [`excludeDevtools` option of the spring boot maven plugin](https://docs.spring.io/spring-boot/docs/current/maven-plugin/repackage-mojo.html) to control inclusion of devtools in repackaged archive)
         -  Do not set `fork` to true to `spring-boot-maven-plugin` configuration section (forking a jvm is automatic when needed)

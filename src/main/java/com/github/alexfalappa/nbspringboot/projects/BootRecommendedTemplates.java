@@ -30,6 +30,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGO
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_DATA;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_FRAMEWORK;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_MVC;
+import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_REACT;
 
 /**
  * Provides recommended template types for Spring Boot to maven projects.
@@ -43,7 +44,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGO
 public class BootRecommendedTemplates implements RecommendedTemplates {
 
     private enum SpringDeps {
-        BOOT, CONTEXT, WEB, DATA
+        BOOT, CONTEXT, WEB, DATA, WEBFLUX
     }
 
     private Project prj;
@@ -72,6 +73,9 @@ public class BootRecommendedTemplates implements RecommendedTemplates {
                         case "spring-web":
                             deps.add(SpringDeps.WEB);
                             break;
+                        case "spring-webflux":
+                            deps.add(SpringDeps.WEBFLUX);
+                            break;
                         case "spring-boot":
                             deps.add(SpringDeps.BOOT);
                             break;
@@ -91,6 +95,9 @@ public class BootRecommendedTemplates implements RecommendedTemplates {
         }
         if (deps.contains(SpringDeps.CONTEXT) && deps.contains(SpringDeps.WEB)) {
             recomTypes.add(CATEGORY_SPRING_MVC);
+        }
+        if (deps.contains(SpringDeps.CONTEXT) && deps.contains(SpringDeps.WEBFLUX)) {
+            recomTypes.add(CATEGORY_SPRING_REACT);
         }
         return recomTypes.toArray(new String[0]);
     }

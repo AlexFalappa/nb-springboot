@@ -36,6 +36,7 @@ public class FileTemplates {
     public static final String CATEGORY_SPRING_BOOT = "spring-boot-types";
     public static final String CATEGORY_SPRING_MVC = "spring-mvc-types";
     public static final String CATEGORY_SPRING_DATA = "spring-data-types";
+    public static final String CATEGORY_SPRING_REACT = "spring-reactive-types";
     public static final String FOLDER_SPRING_FRAMEWORK = "SpringFramework";
     public static final String FOLDER_SPRING_BOOT = "springboot";
     public static final String ICON_BOOT_CLASS = "com/github/alexfalappa/nbspringboot/templates/boot-class.png";
@@ -150,6 +151,20 @@ public class FileTemplates {
             position = 800)
     @NbBundle.Messages(value = "rest_displayName=REST Controller Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> restController() {
+        return JavaTemplates.createJavaTemplateIterator();
+    }
+
+    @TemplateRegistration(
+            folder = FOLDER_SPRING_FRAMEWORK,
+            iconBase = ICON_SPRING_CLASS,
+            displayName = "#reactrestcontroller_displayName",
+            content = "ReactRestController.java.template",
+            description = "ReactRestController.html",
+            scriptEngine = "freemarker",
+            category = {CATEGORY_SPRING_REACT},
+            position = 900)
+    @NbBundle.Messages(value = "reactrestcontroller_displayName=Reactive REST Controller Class")
+    public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> reactRestController() {
         return JavaTemplates.createJavaTemplateIterator();
     }
 
