@@ -68,7 +68,7 @@ public class CfgPropsDialog extends javax.swing.JDialog {
         // retrieve some flads from prefs
         final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
         final boolean bDeprLast = prefs.getBoolean(PREF_DEPR_SORT_LAST, true);
-        bDeprErrorShow = prefs.getBoolean(PREF_DEPR_ERROR_SHOW, false);
+        bDeprErrorShow = prefs.getBoolean(PREF_DEPR_ERROR_SHOW, true);
         // setup props sorting
         this.sortedProps = new TreeSet<>(new ConfigurationMetadataComparator(bDeprLast));
         // setup property list

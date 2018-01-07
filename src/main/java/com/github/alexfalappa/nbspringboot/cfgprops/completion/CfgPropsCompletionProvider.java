@@ -136,10 +136,11 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
     }
 
     // Create a completion result list of config properties based on a filter string, classpath and document offsets.
-    private void completePropName(SpringBootService sbs, CompletionResultSet completionResultSet, String filter, int startOffset, int caretOffset) {
+    private void completePropName(SpringBootService sbs, CompletionResultSet completionResultSet, String filter, int startOffset,
+            int caretOffset) {
         final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
         final boolean bDeprLast = prefs.getBoolean(PREF_DEPR_SORT_LAST, true);
-        final boolean bErrorShow = prefs.getBoolean(PREF_DEPR_ERROR_SHOW, false);
+        final boolean bErrorShow = prefs.getBoolean(PREF_DEPR_ERROR_SHOW, true);
         long mark = System.currentTimeMillis();
         logger.log(FINER, "Completing property name: {0}", filter);
         for (ConfigurationMetadataProperty propMeta : sbs.queryPropertyMetadata(filter)) {
@@ -157,7 +158,8 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
     }
 
     // Create a completion result list of properties values based on a property name, filter string, classpath and document offsets.
-    public void completePropValue(SpringBootService sbs, CompletionResultSet completionResultSet, String propName, String filter, int startOffset, int caretOffset) {
+    public void completePropValue(SpringBootService sbs, CompletionResultSet completionResultSet, String propName, String filter,
+            int startOffset, int caretOffset) {
         long mark = System.currentTimeMillis();
         logger.log(FINER, "Completing property value: {0}", filter);
         for (ValueHint valueHint : sbs.queryHintMetadata(propName, filter)) {
