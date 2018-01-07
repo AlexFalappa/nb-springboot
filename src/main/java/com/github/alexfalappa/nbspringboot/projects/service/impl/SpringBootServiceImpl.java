@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.projects.service.spi;
+package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
