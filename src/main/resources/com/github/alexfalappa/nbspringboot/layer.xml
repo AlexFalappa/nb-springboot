@@ -53,6 +53,11 @@ limitations under the License.
                     -->
                 </folder>
             </folder>
+            <folder name="x-java">
+                <folder name="CodeTemplates">
+                    <file name="spring-templates.xml" url="templates/javaeditor/spring-templates.xml"/>
+                </folder>
+            </folder>
         </folder>
     </folder>
 

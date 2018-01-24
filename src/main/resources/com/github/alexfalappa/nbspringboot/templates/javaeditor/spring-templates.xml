@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE codetemplates PUBLIC "-//NetBeans//DTD Editor Code Templates settings 1.0//EN" "https://netbeans.org/dtds/EditorCodeTemplates-1_0.dtd">
+<codetemplates>
+    <codetemplate abbreviation="endg">
+        <code><![CDATA[@GetMapping()
+public ${retobj} ${method}() {
+        ${cursor}
+        return null;
+}]]></code>
+        <description><![CDATA[SpringMVC HTTP GET RestController method]]></description>
+    </codetemplate>
+    <codetemplate abbreviation="gmp">
+        <code><![CDATA[@GetMapping("${url}")]]></code>
+        <description><![CDATA[SpringMVC GetMapping annotation]]></description>
+    </codetemplate>
+    <codetemplate abbreviation="psmp">
+        <code><![CDATA[@PostMapping("${url}")]]></code>
+        <description><![CDATA[SpringMVC PostMapping annotation]]></description>
+    </codetemplate>
+    <codetemplate abbreviation="ptmp">
+        <code><![CDATA[@PutMapping("${url}")]]></code>
+        <description><![CDATA[SpringMVC PutMapping annotation]]></description>
+    </codetemplate>
+    <codetemplate abbreviation="dmp">
+        <code><![CDATA[@DeleteMapping("${url}")]]></code>
+        <description><![CDATA[SpringMVC DeleteMapping annotation]]></description>
+    </codetemplate>
+</codetemplates>
