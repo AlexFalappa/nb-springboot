@@ -39,17 +39,17 @@ public class ${name} {
     }
 
     @PutMapping("/{id}")
-    public Mono<Object> put(@PathVariable String id, @RequestBody Object input) {
+    public Mono<ResponseEntity<?>> put(@PathVariable String id, @RequestBody Object input) {
         return null;
     }
 
-    @PostMapping()
-    public Mono<Object> post(@RequestBody Object input) {
+    @PostMapping
+    public Mono<ResponseEntity<?>> post(@RequestBody Object input) {
         return null;
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<?> delete(@PathVariable String id) {
+    public Mono<ResponseEntity<?>> delete(@PathVariable String id) {
         return null;
     }
 
