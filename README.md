@@ -39,6 +39,8 @@ To perform a manual install download the desired `nbm` package from the [release
     -  `Service` annotated classes
     -  `Controller` annotated classes (Spring MVC)
     -  `RestController` annotated classes (Spring MVC)
+    -  Reactive `RestController` annotated classes (Spring Webflux)
+    -  Reactive handler classes (Spring Webflux)
     -  interfaces extending `Repository` (Spring Data)
 -  Additional code generators in `pom.xml` files:
     -  Add Spring Boot dependencies (dependency metadata is taken from the *Spring Initializr* web service)
@@ -75,7 +77,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 -  **2.0-SNAPSHOT** (??? 2018): Work In Progress
     -  Improved internal support for projects based on Spring Boot 2.x
-    -  New File template for reactive `@RestController` classes
+    -  New File template for reactive `@RestController` and reactive handler classes
     -  New code templates:
         - in Java files for web request mapping annotations and webflux router functions beans
         - in configuration properties files for commonly used sets of properties 

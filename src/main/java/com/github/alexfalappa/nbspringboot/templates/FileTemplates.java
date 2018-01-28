@@ -168,4 +168,18 @@ public class FileTemplates {
         return JavaTemplates.createJavaTemplateIterator();
     }
 
+    @TemplateRegistration(
+            folder = FOLDER_SPRING_FRAMEWORK,
+            iconBase = ICON_SPRING_CLASS,
+            displayName = "#funchandler_displayName",
+            content = "ReactHandler.java.template",
+            description = "ReactHandler.html",
+            scriptEngine = "freemarker",
+            category = {CATEGORY_SPRING_REACT},
+            position = 1000)
+    @NbBundle.Messages(value = "funchandler_displayName=Reactive Handler Class")
+    public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> reactHandler() {
+        return JavaTemplates.createJavaTemplateIterator();
+    }
+
 }
