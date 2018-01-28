@@ -100,6 +100,20 @@ public class FileTemplates {
     }
 
     @TemplateRegistration(
+            folder = FOLDER_SPRING_BOOT,
+            iconBase = ICON_BOOT_CLASS,
+            displayName = "#healthindicator_displayName",
+            content = "HealthIndicator.java.template",
+            description = "HealthIndicator.html",
+            scriptEngine = "freemarker",
+            category = {CATEGORY_SPRING_BOOT_ACTUATOR},
+            position = 360)
+    @NbBundle.Messages(value = "healthindicator_displayName=HealthIndicator Class")
+    public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> healthIndicator() {
+        return JavaTemplates.createJavaTemplateIterator();
+    }
+
+    @TemplateRegistration(
             folder = FOLDER_SPRING_FRAMEWORK,
             iconBase = ICON_SPRING_CLASS,
             displayName = "#config_displayName",
