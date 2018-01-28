@@ -52,6 +52,9 @@ limitations under the License.
                     </folder>
                     -->
                 </folder>
+                <folder name="CodeTemplates">
+                    <file name="cfgprops-templates.xml" url="templates/javaeditor/cfgprops-templates.xml"/>
+                </folder>
             </folder>
             <folder name="x-java">
                 <folder name="CodeTemplates">

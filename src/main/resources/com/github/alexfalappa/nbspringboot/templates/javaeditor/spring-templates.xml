@@ -2,27 +2,58 @@
 <!DOCTYPE codetemplates PUBLIC "-//NetBeans//DTD Editor Code Templates settings 1.0//EN" "https://netbeans.org/dtds/EditorCodeTemplates-1_0.dtd">
 <codetemplates>
     <codetemplate abbreviation="endg">
-        <code><![CDATA[@GetMapping()
-public ${retobj} ${method}() {
-        ${cursor}
+        <code><![CDATA[@${ANNO type="org.springframework.web.bind.annotation.GetMapping" default="GetMapping" editable="false"}("${url}")
+public ${retobj} ${method}(${cursor}) {
         return null;
 }]]></code>
-        <description><![CDATA[SpringMVC HTTP GET RestController method]]></description>
+        <description><![CDATA[HTTP GET RestController endpoint method]]></description>
+    </codetemplate>
+    <codetemplate abbreviation="endps">
+        <code><![CDATA[@${ANNO type="org.springframework.web.bind.annotation.PostMapping" default="PostMapping" editable="false"}("${url}")
+public ${RET type="org.springframework.http.ResponseEntity" default="ResponseEntity" editable="false"}<${retobj}> ${method}(${cursor}) {
+        return null;
+}]]></code>
+        <description><![CDATA[HTTP POST RestController endpoint method]]></description>
+    </codetemplate>
+    <codetemplate abbreviation="endpt">
+        <code><![CDATA[@${ANNO type="org.springframework.web.bind.annotation.PutMapping" default="PutMapping" editable="false"}("${url}")
+public ${RET type="org.springframework.http.ResponseEntity" default="ResponseEntity" editable="false"}<${retobj}> ${method}(${cursor}) {
+        return null;
+}]]></code>
+        <description><![CDATA[HTTP PUT RestController endpoint method]]></description>
+    </codetemplate>
+    <codetemplate abbreviation="endd">
+        <code><![CDATA[@${ANNO type="org.springframework.web.bind.annotation.DeleteMapping" default="DeleteMapping" editable="false"}("${url}")
+public ${RET type="org.springframework.http.ResponseEntity" default="ResponseEntity" editable="false"}<${retobj}> ${method}(${cursor}) {
+        return null;
+}]]></code>
+        <description><![CDATA[HTTP DELETE RestController endpoint method]]></description>
+    </codetemplate>
+    <codetemplate abbreviation="rmp">
+        <code><![CDATA[@${ANNO type="org.springframework.web.bind.annotation.RequestMapping" default="RequestMapping" editable="false"}(value = "${url}", method = ${meth instanceof="org.springframework.web.bind.annotation.RequestMethod" default="RequestMethod.GET"})]]></code>
+        <description><![CDATA[Spring Web @RequestMapping annotation]]></description>
     </codetemplate>
     <codetemplate abbreviation="gmp">
-        <code><![CDATA[@GetMapping("${url}")]]></code>
-        <description><![CDATA[SpringMVC GetMapping annotation]]></description>
+        <code><![CDATA[@${ANNO type="org.springframework.web.bind.annotation.GetMapping" default="GetMapping" editable="false"}("${url}")]]></code>
+        <description><![CDATA[Spring Web @GetMapping annotation]]></description>
     </codetemplate>
     <codetemplate abbreviation="psmp">
-        <code><![CDATA[@PostMapping("${url}")]]></code>
-        <description><![CDATA[SpringMVC PostMapping annotation]]></description>
+        <code><![CDATA[@${ANNO type="org.springframework.web.bind.annotation.PostMapping" default="PostMapping" editable="false"}("${url}")]]></code>
+        <description><![CDATA[Spring Web @PostMapping annotation]]></description>
     </codetemplate>
     <codetemplate abbreviation="ptmp">
-        <code><![CDATA[@PutMapping("${url}")]]></code>
-        <description><![CDATA[SpringMVC PutMapping annotation]]></description>
+        <code><![CDATA[@${ANNO type="org.springframework.web.bind.annotation.PutMapping" default="PutMapping" editable="false"}("${url}")]]></code>
+        <description><![CDATA[Spring Web @PutMapping annotation]]></description>
     </codetemplate>
     <codetemplate abbreviation="dmp">
-        <code><![CDATA[@DeleteMapping("${url}")]]></code>
-        <description><![CDATA[SpringMVC DeleteMapping annotation]]></description>
+        <code><![CDATA[@${ANNO type="org.springframework.web.bind.annotation.DeleteMapping" default="DeleteMapping" editable="false"}("${url}")]]></code>
+        <description><![CDATA[Spring Web @DeleteMapping annotation]]></description>
+    </codetemplate>
+    <codetemplate abbreviation="rtrf">
+        <code><![CDATA[@${ANNO type="org.springframework.context.annotation.Bean" default="Bean" editable="false"}
+public ${RET type="org.springframework.web.reactive.function.server.RouterFunction" default="RouterFunction" editable="false"}<${GEN type="org.springframework.web.reactive.function.server.ServerResponse" default="ServerResponse" editable="false"}> routes() {
+	return ${FUN type="org.springframework.web.reactive.function.server.RouterFunctions" default="RouterFunctions" editable="false"}.route(${PRED type="org.springframework.web.reactive.function.server.RequestPredicates" default="RequestPredicates" editable="false"}.GET("${url}"), ${HandlerClass}::${method})${cursor};
+}]]></code>
+        <description><![CDATA[Spring Webflux router function bean]]></description>
     </codetemplate>
 </codetemplates>

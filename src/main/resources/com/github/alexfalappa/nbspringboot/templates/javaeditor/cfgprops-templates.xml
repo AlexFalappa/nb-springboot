@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE codetemplates PUBLIC "-//NetBeans//DTD Editor Code Templates settings 1.0//EN" "https://netbeans.org/dtds/EditorCodeTemplates-1_0.dtd">
+<codetemplates>
+    <codetemplate abbreviation="dsrc">
+        <code><![CDATA[spring.datasource.platform=${platform-name}
+spring.datasource.driver-class-name=${class}
+spring.datasource.url=jdbc:${url}
+spring.datasource.username=${user}
+spring.datasource.password=${password}]]>
+        </code>
+        <description><![CDATA[Datasource configuration]]></description>
+    </codetemplate>
+    <codetemplate abbreviation="shsql">
+        <code><![CDATA[spring.jpa.show-sql=true]]></code>
+        <description><![CDATA[Log JPA SQL statements]]></description>
+    </codetemplate>
+</codetemplates>

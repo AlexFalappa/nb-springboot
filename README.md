@@ -25,6 +25,8 @@ To perform a manual install download the desired `nbm` package from the [release
 -  Java editor error highlighting and fixes for missing starter dependencies:
     - @ConfigurationProperties annotation without `spring-boot-configuration-processor` dependency
     - Imports of Spring MVC annotations and Spring Data interfaces without relevant starter dependencies (e.g. `JpaRepository` without `spring-boot-starter-data-jpa` dependency)
+-  Code templates:
+    - Java templates for web request mapping annotations and Webflux router functions
 -  *Spring Boot* file templates:
     -  `CommandlineRunner` annotated classes
     -  `ApplicationRunner` annotated classes
@@ -65,7 +67,7 @@ The plugin and its source code are licensed under [Apache 2.0 license](http://ww
 
 Completion of Spring Boot configuration properties feature is based on [Keevosh plugin](https://github.com/keevosh/nb-springboot-configuration-support).
 
-Template and code generator were inspired by those found on [Spring Boot Tools 4 NetBeans](https://github.com/GeertjanWielenga/SpringBootTools4NetBeans).
+Templates and code generators were inspired by those found on [Spring Boot Tools 4 NetBeans](https://github.com/GeertjanWielenga/SpringBootTools4NetBeans).
 
 Requestmappings navigator panel feature contributed by [Michael Simons](https://github.com/michael-simons).
 
@@ -74,6 +76,9 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 -  **2.0-SNAPSHOT** (??? 2018): Work In Progress
     -  Improved internal support for projects based on Spring Boot 2.x
     -  New File template for reactive `@RestController` classes
+    -  New code templates:
+        - in Java files for web request mapping annotations and webflux router functions beans
+        - in configuration properties files for commonly used sets of properties 
     -  Changes in maven `pom.xml` management in the *Spring Initializr* project wizard:
         -  Do not make `spring-boot-devtools` dependency optional by default (use the [`excludeDevtools` option of the spring boot maven plugin](https://docs.spring.io/spring-boot/docs/current/maven-plugin/repackage-mojo.html) to control inclusion of devtools in repackaged archive)
         -  Do not set `fork` to true to `spring-boot-maven-plugin` configuration section (forking a jvm is automatic when needed)
