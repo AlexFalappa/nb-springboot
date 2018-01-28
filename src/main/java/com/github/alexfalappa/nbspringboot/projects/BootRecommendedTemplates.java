@@ -27,6 +27,7 @@ import org.netbeans.spi.project.ProjectServiceProvider;
 import org.netbeans.spi.project.ui.RecommendedTemplates;
 
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_BOOT;
+import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_BOOT_ACTUATOR;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_DATA;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_FRAMEWORK;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_MVC;
@@ -44,7 +45,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGO
 public class BootRecommendedTemplates implements RecommendedTemplates {
 
     private enum SpringDeps {
-        BOOT, CONTEXT, WEB, DATA, WEBFLUX
+        BOOT, CONTEXT, WEB, DATA, WEBFLUX, ACTUATOR
     }
 
     private Project prj;
@@ -79,6 +80,9 @@ public class BootRecommendedTemplates implements RecommendedTemplates {
                         case "spring-boot":
                             deps.add(SpringDeps.BOOT);
                             break;
+                        case "spring-boot-actuator":
+                            deps.add(SpringDeps.ACTUATOR);
+                            break;
                     }
                 }
             }
@@ -98,6 +102,9 @@ public class BootRecommendedTemplates implements RecommendedTemplates {
         }
         if (deps.contains(SpringDeps.CONTEXT) && deps.contains(SpringDeps.WEBFLUX)) {
             recomTypes.add(CATEGORY_SPRING_REACT);
+        }
+        if (deps.contains(SpringDeps.ACTUATOR)) {
+            recomTypes.add(CATEGORY_SPRING_BOOT_ACTUATOR);
         }
         return recomTypes.toArray(new String[0]);
     }

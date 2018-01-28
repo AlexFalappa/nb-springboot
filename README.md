@@ -28,8 +28,9 @@ To perform a manual install download the desired `nbm` package from the [release
 -  Code templates:
     - Java templates for web request mapping annotations and Webflux router functions
 -  *Spring Boot* file templates:
-    -  `CommandlineRunner` annotated classes
-    -  `ApplicationRunner` annotated classes
+    -  `CommandlineRunner` components
+    -  `ApplicationRunner` components
+    -  `InfoContributor` components
     -  `application.properties` files
     -  `ConfigurationProperties` annotated classes
     -  `additional-spring-configuration-metadata.json` files
@@ -77,7 +78,10 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 -  **2.0-SNAPSHOT** (??? 2018): Work In Progress
     -  Improved internal support for projects based on Spring Boot 2.x
-    -  New File template for reactive `@RestController` and reactive handler classes
+    -  New File templates for:
+        - reactive `@RestController` annotated class
+        - reactive handler class
+        - class implementing `InfoContributor`
     -  New code templates:
         - in Java files for web request mapping annotations and webflux router functions beans
         - in configuration properties files for commonly used sets of properties 

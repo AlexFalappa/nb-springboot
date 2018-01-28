@@ -34,6 +34,7 @@ public class FileTemplates {
 
     public static final String CATEGORY_SPRING_FRAMEWORK = "spring-framework-types";
     public static final String CATEGORY_SPRING_BOOT = "spring-boot-types";
+    public static final String CATEGORY_SPRING_BOOT_ACTUATOR = "spring-boot-actuator-types";
     public static final String CATEGORY_SPRING_MVC = "spring-mvc-types";
     public static final String CATEGORY_SPRING_DATA = "spring-data-types";
     public static final String CATEGORY_SPRING_REACT = "spring-reactive-types";
@@ -81,6 +82,20 @@ public class FileTemplates {
             position = 300)
     @NbBundle.Messages(value = "applrunner_displayName=ApplicationRunner Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> applicationRunner() {
+        return JavaTemplates.createJavaTemplateIterator();
+    }
+
+    @TemplateRegistration(
+            folder = FOLDER_SPRING_BOOT,
+            iconBase = ICON_BOOT_CLASS,
+            displayName = "#infocontributor_displayName",
+            content = "InfoContributor.java.template",
+            description = "InfoContributor.html",
+            scriptEngine = "freemarker",
+            category = {CATEGORY_SPRING_BOOT_ACTUATOR},
+            position = 330)
+    @NbBundle.Messages(value = "infocontributor_displayName=InfoContributor Class")
+    public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> infoContributor() {
         return JavaTemplates.createJavaTemplateIterator();
     }
 
