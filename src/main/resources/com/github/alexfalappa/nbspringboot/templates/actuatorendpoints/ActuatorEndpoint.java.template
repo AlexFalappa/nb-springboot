@@ -1,0 +1,62 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "${project.licensePath}">
+
+<#if package?? && package != "">
+package ${package};
+
+</#if>
+<#switch technology>
+  <#case 0>
+import org.springframework.boot.actuate.endpoint.annotation.Endpoint;
+  <#break>
+  <#case 1>
+import org.springframework.boot.actuate.endpoint.web.annotation.WebEndpoint;
+  <#break>
+  <#case 2>
+import org.springframework.boot.actuate.endpoint.jmx.annotation.JmxEndpoint;
+  <#break>
+</#switch>
+<#if sampleOperations>
+import org.springframework.boot.actuate.endpoint.annotation.DeleteOperation;
+import org.springframework.boot.actuate.endpoint.annotation.ReadOperation;
+import org.springframework.boot.actuate.endpoint.annotation.Selector;
+import org.springframework.boot.actuate.endpoint.annotation.WriteOperation;
+</#if>
+import org.springframework.stereotype.Component;
+
+/**
+ *
+ * @author ${user}
+ */
+@Component
+<#switch technology>
+  <#case 0>
+@Endpoint(id="endpoint-name")
+  <#break>
+  <#case 1>
+@WebEndpoint(id="endpoint-name")
+  <#break>
+  <#case 2>
+@JmxEndpoint(id="endpoint-name")
+  <#break>
+</#switch>
+public class ${name} {
+
+<#if sampleOperations>
+    @ReadOperation
+    public String readOp(@Selector String param) {
+        return "someValue";
+    }
+
+    @WriteOperation
+    public void writeOp(@Selector String param, String value) {
+    }
+
+    @DeleteOperation
+    public void deleteOp(@Selector String param) {
+    }
+</#if>
+    
+}
