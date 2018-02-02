@@ -93,7 +93,8 @@ public class SpringBootServiceImpl implements SpringBootService {
         if (p instanceof NbMavenProjectImpl) {
             this.mvnPrj = (NbMavenProjectImpl) p;
         }
-        logger.log(Level.INFO, "Creating Spring Boot service for project {0}", FileUtil.getFileDisplayName(p.getProjectDirectory()));
+        logger.log(Level.INFO, "Creating Spring Boot service for project {0}",
+                FileUtil.getFileDisplayName(p.getProjectDirectory()));
     }
 
     @Override
@@ -266,13 +267,6 @@ public class SpringBootServiceImpl implements SpringBootService {
             logger.log(WARNING, "No sources found for project: {0}", new Object[]{mvnPrj.toString()});
         }
         if (cpExec != null) {
-            // check if completion of configuration properties is possible
-            try {
-                logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
-                cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
-            } catch (ClassNotFoundException ex) {
-                // no completion
-            }
             // listen for pom changes
             logger.info("Adding maven pom listener...");
             mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
