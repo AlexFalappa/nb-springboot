@@ -50,8 +50,8 @@ import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 /**
  * The Spring Boot configuration property names implementation of {@code CompletionItem}.
  * <p>
- * It utilizes an {@code ConfigurationMetadataProperty} and the project classpath to render the completion item and spawn the documentation
- * display.
+ * It utilizes an {@code ConfigurationMetadataProperty} and the project classpath to render the completion item and spawn the
+ * documentation display.
  *
  * @author Aggelos Karalias
  * @author Alessandro Falappa
@@ -100,16 +100,21 @@ public class CfgPropCompletionItem implements CompletionItem {
             StyledDocument doc = (StyledDocument) jtc.getDocument();
             // calculate the amount of chars to remove (by default from property start up to caret position)
             int lenToRemove = caretOffset - propStartOffset;
+            int equalSignIndex = -1;
             if (overwrite) {
                 // NOTE: the editor removes by itself the word at caret when ctrl + enter is pressed
                 // the document state here is different from when the completion was invoked thus we have to
                 // find again the offset of the equal sign in the line
                 Element lineElement = doc.getParagraphElement(caretOffset);
                 String line = doc.getText(lineElement.getStartOffset(), lineElement.getEndOffset() - lineElement.getStartOffset());
-                int equalSignIndex = line.indexOf('=');
+                equalSignIndex = line.indexOf('=');
+                int colonIndex = line.indexOf(':');
                 if (equalSignIndex >= 0) {
                     // from property start to equal sign
                     lenToRemove = lineElement.getStartOffset() + equalSignIndex - propStartOffset;
+                } else if (colonIndex >= 0) {
+                    // from property start to colon
+                    lenToRemove = lineElement.getStartOffset() + colonIndex - propStartOffset;
                 } else {
                     // from property start to end of line (except line terminator)
                     lenToRemove = lineElement.getEndOffset() - 1 - propStartOffset;
@@ -124,7 +129,8 @@ public class CfgPropCompletionItem implements CompletionItem {
                 sb.append(".");
             } else if (!dataType.contains("List")
                     && !dataType.contains("Set")
-                    && !dataType.contains("[]")) {
+                    && !dataType.contains("[]")
+                    && !(overwrite && equalSignIndex >= 0)) {
                 sb.append("=");
             }
             doc.insertString(propStartOffset, sb.toString(), null);
