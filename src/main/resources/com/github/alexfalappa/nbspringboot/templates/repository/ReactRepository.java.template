@@ -1,0 +1,18 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "${project.licensePath}">
+
+<#if package?? && package != "">
+package ${package};
+
+</#if>
+import org.springframework.data.repository.reactive.${baseInterface};
+
+/**
+ *
+ * @author ${user}
+ */
+public interface ${name} extends ${baseInterface}<${entityClass}, ${idClass}> {
+
+}
