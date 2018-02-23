@@ -115,13 +115,6 @@ public class SpringBootServiceImpl implements SpringBootService {
         if (cpExec == null) {
             init();
         } else {
-            // check if completion of configuration properties is possible
-            try {
-                logger.fine("Checking spring boot ConfigurationProperties class is on the project execution classpath");
-                cpExec.getClassLoader(false).loadClass("org.springframework.boot.context.properties.ConfigurationProperties");
-            } catch (ClassNotFoundException ex) {
-                // no completion
-            }
             // build configuration metadata repository
             updateConfigRepo();
         }
