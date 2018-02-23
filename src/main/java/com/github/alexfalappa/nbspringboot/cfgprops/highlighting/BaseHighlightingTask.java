@@ -50,12 +50,14 @@ public abstract class BaseHighlightingTask extends ParserResultTask<CfgPropsPars
         final int sevLevel = prefs.getInt(getHighlightPrefName(), getHighlightDefaultValue());
         List<ErrorDescription> errors = new ArrayList<>();
         final Document document = cfgResult.getSnapshot().getSource().getDocument(false);
-        // skip error calculation if preference set to "None"
-        if (sevLevel > 0) {
-            Severity severity = decodeSeverity(sevLevel);
-            internalRun(cfgResult, se, document, errors, severity);
+        if (document != null) {
+            // skip error calculation if preference set to "None"
+            if (sevLevel > 0) {
+                Severity severity = decodeSeverity(sevLevel);
+                internalRun(cfgResult, se, document, errors, severity);
+            }
+            HintsController.setErrors(document, getErrorLayerName(), errors);
         }
-        HintsController.setErrors(document, getErrorLayerName(), errors);
     }
 
     @Override
