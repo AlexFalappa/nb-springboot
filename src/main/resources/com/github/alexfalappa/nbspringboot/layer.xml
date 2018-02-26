@@ -30,7 +30,7 @@ limitations under the License.
                 <folder name="FontsColors">
                     <folder name="NetBeans">
                         <folder name="Defaults">
-                            <file name="FontAndColors.xml" url="cfgprops/lexer/FontAndColors.xml">
+                            <file name="org-github-alexfalappa-nbspringboot-cfgeditor-token-colorings.xml" url="cfgprops/lexer/FontAndColors.xml">
                                 <attr name="SystemFileSystem.localizingBundle" stringvalue="com.github.alexfalappa.nbspringboot.cfgprops.lexer.Bundle"/>
                             </file>
                         </folder>

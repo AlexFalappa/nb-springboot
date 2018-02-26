@@ -327,6 +327,7 @@
                 <artifactId>jflex-maven-plugin</artifactId>
                 <version>1.6.1</version>
                 <configuration>
+                    <!-uncomment following line when running tests->
                     <skeleton>src/main/jflex/skeleton.netbeans</skeleton>
                     <lexDefinitions>
                         <lexDefinition>src/main/jflex/BootCfgProperties.flex</lexDefinition>

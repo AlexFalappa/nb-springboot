@@ -16,12 +16,10 @@
 /*
  * Based on Java Properties lexer found on https://upsource.jetbrains.com/idea-ce/file/idea-ce-083f663c71f761cb0cb398a2d5ae4a42163507d1/plugins/properties/src/com/intellij/lang/properties/parsing/Properties.flex
  */
-package com.github.alexfalappa.nbspringboot.filetype.lexer;
+package com.github.alexfalappa.nbspringboot.cfgprops.lexer;
 
 import org.netbeans.spi.lexer.LexerInput;
 import org.netbeans.spi.lexer.LexerRestartInfo;
-import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsTokenId;
-import com.github.alexfalappa.nbspringboot.cfgprops.lexer.StateStack;
 
 %%
 
@@ -31,6 +29,7 @@ import com.github.alexfalappa.nbspringboot.cfgprops.lexer.StateStack;
 %unicode
 %char
 
+// uncomment following section when generating for running tests
 %eofval{
         if(input.readLength() > 0) {
             // backup eof
@@ -142,6 +141,7 @@ VALUE_CHARACTERS_AFTER_SEP=([^\ \t\n\r\f\\] | "\\"{CRLF} | "\\".)({VALUE_CHARACT
 
 %state IN_VALUE
 %state IN_KEY
+%state IN_KEY_INDEX
 %state IN_KEY_VALUE_SEPARATOR_HEAD
 %state IN_KEY_VALUE_SEPARATOR_TAIL
 
@@ -153,13 +153,22 @@ VALUE_CHARACTERS_AFTER_SEP=([^\ \t\n\r\f\\] | "\\"{CRLF} | "\\".)({VALUE_CHARACT
 
 <IN_KEY> {
     {KEY_DOT}                            { yybegin(IN_KEY); return CfgPropsTokenId.DOT; }
-    {KEY_OBRACKET}                       { yybegin(IN_KEY); return CfgPropsTokenId.BRACKET; }
-    {KEY_ARR_IDX}                        { yybegin(IN_KEY); return CfgPropsTokenId.ARRAY_IDX; }
+    {KEY_OBRACKET}                       { yybegin(IN_KEY_INDEX); return CfgPropsTokenId.BRACKET; }
     {KEY_CBRACKET}                       { yybegin(IN_KEY); return CfgPropsTokenId.BRACKET; }
     {KEY_CHARACTER}+                     { yybegin(IN_KEY); return CfgPropsTokenId.KEY; }
     {KEY_SEPARATOR_SPACE}+               { yybegin(IN_KEY_VALUE_SEPARATOR_HEAD); return CfgPropsTokenId.WHITESPACE; }
     {KEY_SEPARATOR}                      { yybegin(IN_KEY_VALUE_SEPARATOR_TAIL); return CfgPropsTokenId.SEPARATOR; }
     {END_OF_LINE_COMMENT}                { yybegin(YYINITIAL); return CfgPropsTokenId.COMMENT; }
+    {CRLF}                               { yybegin(YYINITIAL); return CfgPropsTokenId.WHITESPACE; }
+}
+
+<IN_KEY_INDEX> {
+    {KEY_ARR_IDX}                        { yybegin(IN_KEY_INDEX); return CfgPropsTokenId.ARRAY_IDX; }
+    {KEY_CHARACTER}+                     { yybegin(IN_KEY_INDEX); return CfgPropsTokenId.MAP_KEY; }
+    {KEY_CBRACKET}                       { yybegin(IN_KEY); return CfgPropsTokenId.BRACKET; }
+    {KEY_SEPARATOR_SPACE}+               { yybegin(IN_KEY_VALUE_SEPARATOR_HEAD); return CfgPropsTokenId.WHITESPACE; }
+    {KEY_SEPARATOR}                      { yybegin(IN_KEY_VALUE_SEPARATOR_TAIL); return CfgPropsTokenId.SEPARATOR; }
+    {CRLF}                               { yybegin(YYINITIAL); return CfgPropsTokenId.WHITESPACE; }
 }
 
 <IN_KEY_VALUE_SEPARATOR_HEAD> {

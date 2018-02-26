@@ -21,6 +21,9 @@ limitations under the License.
     <fontcolor name="array_idx" default="field">
         <font style="bold"/>
     </fontcolor>
+    <fontcolor name="map_key" default="keyword">
+        <font style="bold"/>
+    </fontcolor>
     <fontcolor name="bracket" default="field"/>
     <fontcolor name="key" default="keyword" />
     <fontcolor name="separator" default="operator"/>

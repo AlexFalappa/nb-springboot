@@ -24,7 +24,7 @@ import static java.util.regex.Pattern.compile;
  * Spring Boot configuration properties parser based on Parboiled library.
  * <p>
  * This parser implements a grammar accepting the Java Properties format (with some minor exceptions) and adding dot separated keys, array
- * notation ({@code array[index]=value}.
+ * notation ({@code array[index]=value} and map notation ({@code map[key]=value}.
  * <p>
  * Differences with base Java Properties syntax:
  * <ul>
@@ -181,7 +181,7 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
                                 literal()
                         )
                 ),
-                Optional(arrayIndex())
+                Optional(collectionIndex())
         );
     }
 
@@ -227,10 +227,10 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
         );
     }
 
-    Rule arrayIndex() {
+    Rule collectionIndex() {
         return Sequence(
                 Ch('['),
-                integer(),
+                literal(),
                 Ch(']')
         );
     }
@@ -285,10 +285,6 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
 
     Rule malformedEscape() {
         return Sequence(Ch('\\'), NoneOf("ntu \t\f\r\n=:#!\\"));
-    }
-
-    Rule integer() {
-        return FirstOf('0', Sequence(CharRange('1', '9'), ZeroOrMore(digit())));
     }
 
     Rule hexDigit() {

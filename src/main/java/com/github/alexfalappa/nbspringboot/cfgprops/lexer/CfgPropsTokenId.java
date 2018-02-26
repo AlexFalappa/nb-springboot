@@ -35,6 +35,7 @@ public enum CfgPropsTokenId implements TokenId {
     COMMENT("comment"), // NOI18N
     DOT("dot"), // NOI18N
     ARRAY_IDX("array_idx"), // NOI18N
+    MAP_KEY("map_key"), // NOI18N
     BRACKET("bracket"), // NOI18N
     KEY("key"), // NOI18N
     SEPARATOR("separator"), // NOI18N
