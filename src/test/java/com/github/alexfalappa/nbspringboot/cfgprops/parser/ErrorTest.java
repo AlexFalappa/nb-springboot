@@ -26,26 +26,20 @@ public class ErrorTest extends TestBase {
     }
 
     @Test
-    public void testInvalidArrayNotation1() throws URISyntaxException, IOException {
-        System.out.println("\n-- invalid array notation 1");
-        parseNoMatch(" \t array[00] =\tval1\n");
-    }
-
-    @Test
-    public void testInvalidArrayNotation2() throws URISyntaxException, IOException {
-        System.out.println("\n-- invalid array notation 2");
-        parseNoMatch(" prefix.array[01]= val2\n");
-    }
-
-    @Test
-    public void testInvalidArrayNotation3() throws URISyntaxException, IOException {
-        System.out.println("\n-- invalid array notation 3");
-        parseNoMatch(" prefix.arr[a]:v3");
-    }
-
-    @Test
     public void testSpaceInKey() throws URISyntaxException, IOException {
         System.out.println("\n-- space in key");
         parseNoMatch(" \t space key :\tval1");
+    }
+
+    @Test
+    public void testOnlyOpeningBracket() {
+        System.out.println("\n-- only opening bracket");
+        parseNoMatch(" \t key[0 :\tval1");
+    }
+
+    @Test
+    public void testOnlyClosingBracket() {
+        System.out.println("\n-- only closing bracket");
+        parseNoMatch(" \t key0] :\tval1");
     }
 }

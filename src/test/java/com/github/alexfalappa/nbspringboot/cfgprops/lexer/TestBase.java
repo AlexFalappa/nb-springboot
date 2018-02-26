@@ -16,7 +16,7 @@ import com.github.alexfalappa.nbspringboot.cfgprops.LexerTests;
 import static org.junit.Assert.fail;
 
 /**
- * Base test class to factor out parsing methods.
+ * Base test class to factor out lexing methods.
  *
  * @author Alessandro Falappa
  */

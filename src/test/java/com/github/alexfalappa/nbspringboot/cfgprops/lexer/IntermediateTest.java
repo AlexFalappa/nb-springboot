@@ -6,7 +6,7 @@ import java.net.URISyntaxException;
 import org.junit.Test;
 
 /**
- * Syntax test suite for BootCfgParser.
+ * Syntax test suite for CfgPropsScanner.
  *
  * @author Alessandro Falappa
  */
@@ -166,6 +166,19 @@ public class IntermediateTest extends TestBase {
         System.out.println("\n-- multiple array notation");
         parseMatch(" \t array[0] =\tval1\n"
                 + " prefix.array[1]=val2");
+    }
+
+    @Test
+    public void testMapNotation() throws URISyntaxException, IOException {
+        System.out.println("\n-- map notation");
+        parseMatch(" \t map[key] =\tval1");
+    }
+
+    @Test
+    public void testMultipleMapNotation() throws URISyntaxException, IOException {
+        System.out.println("\n-- multiple map notation");
+        parseMatch(" \t map[one] =\tval1\n"
+                + " prefix.map[two]=val2");
     }
 
 }

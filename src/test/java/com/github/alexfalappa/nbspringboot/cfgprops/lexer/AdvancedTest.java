@@ -6,6 +6,7 @@ import java.net.URISyntaxException;
 import org.junit.Test;
 
 /**
+ * Syntax test suite for CfgPropsScanner.
  *
  * @author Alessandro Falappa
  */
