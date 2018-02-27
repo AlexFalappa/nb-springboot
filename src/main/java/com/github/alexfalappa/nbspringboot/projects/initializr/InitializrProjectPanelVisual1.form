@@ -202,6 +202,9 @@
         <Property name="columns" type="int" value="20"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txNameKeyTyped"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JTextField" name="txDesc">
       <Properties>
@@ -214,6 +217,9 @@
         <Property name="columns" type="int" value="20"/>
         <Property name="enabled" type="boolean" value="false"/>
       </Properties>
+      <Events>
+        <EventHandler event="keyTyped" listener="java.awt.event.KeyListener" parameters="java.awt.event.KeyEvent" handler="txPackageKeyTyped"/>
+      </Events>
     </Component>
     <Component class="javax.swing.JComboBox" name="cbPackaging">
       <Properties>
