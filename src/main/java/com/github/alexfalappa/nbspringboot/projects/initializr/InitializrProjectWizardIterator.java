@@ -121,8 +121,8 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
         handle.progress(1);
         try {
             // invoke initializr webservice
-            InputStream stream = InitializrService.getInstance()
-                    .getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
+            InputStream stream = InitializrService.getInstance().getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, 
+                    mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
             handle.progress(2);
             // unzip response
             unZipFile(stream, foDir, (boolean) wiz.getProperty(WIZ_REMOVE_MVN_WRAPPER));
@@ -152,6 +152,13 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
             File parent = dirF.getParentFile();
             if (parent != null && parent.exists()) {
                 ProjectChooser.setProjectsFolder(parent);
+            }
+            // remember used deps
+            final Preferences prefs = BootDependenciesPanel.depsCountPrefNode();
+            String[] splitDeps = deps.split(",");
+            // add to counts in prefs
+            for (String depName : splitDeps) {
+                prefs.putInt(depName, prefs.getInt(depName,0) + 1);
             }
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
