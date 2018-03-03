@@ -158,48 +158,6 @@ public class FileTemplates {
     @TemplateRegistration(
             folder = FOLDER_SPRING_FRAMEWORK,
             iconBase = ICON_SPRING_CLASS,
-            displayName = "#controller_displayName",
-            content = "Controller.java.template",
-            description = "Controller.html",
-            scriptEngine = "freemarker",
-            category = {CATEGORY_SPRING_MVC},
-            position = 700)
-    @NbBundle.Messages(value = "controller_displayName=Controller Class")
-    public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> controller() {
-        return JavaTemplates.createJavaTemplateIterator();
-    }
-
-    @TemplateRegistration(
-            folder = FOLDER_SPRING_FRAMEWORK,
-            iconBase = ICON_SPRING_CLASS,
-            displayName = "#rest_displayName",
-            content = "RestController.java.template",
-            description = "RestController.html",
-            scriptEngine = "freemarker",
-            category = {CATEGORY_SPRING_MVC},
-            position = 800)
-    @NbBundle.Messages(value = "rest_displayName=REST Controller Class")
-    public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> restController() {
-        return JavaTemplates.createJavaTemplateIterator();
-    }
-
-    @TemplateRegistration(
-            folder = FOLDER_SPRING_FRAMEWORK,
-            iconBase = ICON_SPRING_CLASS,
-            displayName = "#reactrestcontroller_displayName",
-            content = "ReactRestController.java.template",
-            description = "ReactRestController.html",
-            scriptEngine = "freemarker",
-            category = {CATEGORY_SPRING_REACT},
-            position = 900)
-    @NbBundle.Messages(value = "reactrestcontroller_displayName=Reactive REST Controller Class")
-    public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> reactRestController() {
-        return JavaTemplates.createJavaTemplateIterator();
-    }
-
-    @TemplateRegistration(
-            folder = FOLDER_SPRING_FRAMEWORK,
-            iconBase = ICON_SPRING_CLASS,
             displayName = "#funchandler_displayName",
             content = "ReactHandler.java.template",
             description = "ReactHandler.html",

@@ -33,19 +33,19 @@ To perform a manual install download the desired `nbm` package from the [release
     -  `ApplicationRunner` components
     -  `InfoContributor` components
     -  `application.properties` files
-    -  `ConfigurationProperties` annotated classes
+    -  `@ConfigurationProperties` annotated classes
     -  `additional-spring-configuration-metadata.json` files
 -  *Spring Boot Actuator* file templates:
     -  Actuator endpoints 
     -  Classes implementing `InfoContributor`
     -  Classes implementing `HealthIndicator`
 -  Additional *Spring Framework* file templates:
-    -  `Component` annotated classes
-    -  `Configuration` annotated classes
-    -  `Service` annotated classes
-    -  `Controller` annotated classes (Spring MVC)
-    -  `RestController` annotated classes (Spring MVC)
-    -  Reactive `RestController` annotated classes (Spring Webflux)
+    -  `@Component` annotated classes
+    -  `@Configuration` annotated classes
+    -  `@Service` annotated classes
+    -  `@Controller` annotated classes (Spring MVC)
+    -  `@RestController` annotated classes (Spring MVC)
+    -  Reactive `@RestController` annotated classes (Spring Webflux)
     -  Reactive handler classes (Spring Webflux)
     -  Interfaces extending `Repository` both imperative and reactive (Spring Data)
 -  Additional code generators in `pom.xml` files:
@@ -93,6 +93,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
         - reactive handler classes
         - classes implementing `InfoContributor`
         - classes implementing `HealthIndicator`
+    -  File templates for `@Controller` and `@RestController` annotated classes allow to generate error handling methods
     -  New code templates:
         - in Java files for web request mapping annotations and webflux router functions beans
         - in configuration properties files for commonly used sets of properties 

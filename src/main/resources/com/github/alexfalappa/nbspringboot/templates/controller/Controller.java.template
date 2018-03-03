@@ -1,0 +1,70 @@
+<#assign licenseFirst = "/*">
+<#assign licensePrefix = " * ">
+<#assign licenseLast = " */">
+<#include "${project.licensePath}">
+
+<#if package?? && package != "">
+package ${package};
+
+</#if>
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.RequestMapping;
+<#switch errorHandling>
+  <#case 1>
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseStatus;
+  <#break>
+  <#case 2>
+import org.springframework.web.bind.annotation.ExceptionHandler;
+  <#break>
+  <#case 3>
+import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.servlet.ModelAndView;
+  <#break>
+</#switch>
+
+/**
+ *
+ * @author ${user}
+ */
+@Controller
+public class ${name} {
+
+    @RequestMapping("/url")
+    public String page(Model model) {
+        model.addAttribute("attribute", "value");
+        return "view.name";
+    }
+<#switch errorHandling>
+  <#case 1>
+
+    @ExceptionHandler(Exception.class)
+    @ResponseStatus(value=HttpStatus.INTERNAL_SERVER_ERROR, reason="Error message")
+    public void handleError() {
+    }
+  <#break>
+  <#case 2>
+
+    @ExceptionHandler({Exception.class})
+    public String databaseError() {
+      return "error-view-name";
+    }
+  <#break>
+  <#case 3>
+
+    @ExceptionHandler(Exception.class)
+    public ModelAndView handleError(HttpServletRequest req, Exception ex) {
+      ModelAndView modelAndView = new ModelAndView();
+      modelAndView.addObject("exception", ex);
+      modelAndView.addObject("url", req.getRequestURL());
+      // add other objects to the model here
+      modelAndView.setViewName("error-view-name");
+      return modelAndView;
+    }
+  <#break>
+</#switch>
+
+}

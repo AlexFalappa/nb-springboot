@@ -57,6 +57,6 @@ public class ${name} {
     @DeleteOperation
     public void deleteOp(@Selector String param) {
     }
-</#if>
     
+</#if>
 }
