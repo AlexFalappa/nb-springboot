@@ -27,6 +27,7 @@ To perform a manual install download the desired `nbm` package from the [release
     - Imports of Spring MVC annotations and Spring Data interfaces without relevant starter dependencies (e.g. `JpaRepository` without `spring-boot-starter-data-jpa` dependency)
 -  Code templates:
     - Java templates for web request mapping annotations and Webflux router functions
+    - Configuration properties templates for commonly used sets of properties 
 -  *Spring Boot* file templates:
     -  `CommandlineRunner` components
     -  `ApplicationRunner` components
@@ -34,6 +35,10 @@ To perform a manual install download the desired `nbm` package from the [release
     -  `application.properties` files
     -  `ConfigurationProperties` annotated classes
     -  `additional-spring-configuration-metadata.json` files
+-  *Spring Boot Actuator* file templates:
+    -  Actuator endpoints 
+    -  Classes implementing `InfoContributor`
+    -  Classes implementing `HealthIndicator`
 -  Additional *Spring Framework* file templates:
     -  `Component` annotated classes
     -  `Configuration` annotated classes
@@ -42,7 +47,7 @@ To perform a manual install download the desired `nbm` package from the [release
     -  `RestController` annotated classes (Spring MVC)
     -  Reactive `RestController` annotated classes (Spring Webflux)
     -  Reactive handler classes (Spring Webflux)
-    -  interfaces extending `Repository` (Spring Data)
+    -  Interfaces extending `Repository` both imperative and reactive (Spring Data)
 -  Additional code generators in `pom.xml` files:
     -  Add Spring Boot dependencies (dependency metadata is taken from the *Spring Initializr* web service)
     -  Add basic Spring Boot setup
@@ -77,11 +82,17 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 ## Changelog
 
 -  **2.0-SNAPSHOT** (??? 2018): Work In Progress
-    -  Improved internal support for projects based on Spring Boot 2.x
+    -  Support for projects based on Spring Boot 2.x
+    -  Refined the *Spring Initializr* project wizard:
+        - presents frequently used starter dependencies first
+        - linked editing of some base project properties (i.e. artifactId linked to name and package)
     -  New File templates for:
-        - reactive `@RestController` annotated class
-        - reactive handler class
-        - class implementing `InfoContributor`
+        - actuator endpoints 
+        - reactive `@RestController` annotated classes
+        - reactive repository interfaces
+        - reactive handler classes
+        - classes implementing `InfoContributor`
+        - classes implementing `HealthIndicator`
     -  New code templates:
         - in Java files for web request mapping annotations and webflux router functions beans
         - in configuration properties files for commonly used sets of properties 
