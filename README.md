@@ -81,7 +81,7 @@ Requestmappings navigator panel feature contributed by [Michael Simons](https://
 
 ## Changelog
 
--  **2.0-SNAPSHOT** (??? 2018): Work In Progress
+-  **2.0** (Mar 2018): Reactive Goodies
     -  Support for projects based on Spring Boot 2.x
     -  Refined the *Spring Initializr* project wizard:
         - presents frequently used starter dependencies first
