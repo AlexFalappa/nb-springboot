@@ -1,6 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE codetemplates PUBLIC "-//NetBeans//DTD Editor Code Templates settings 1.0//EN" "https://netbeans.org/dtds/EditorCodeTemplates-1_0.dtd">
 <codetemplates>
+    <codetemplate abbreviation="cmdlr">
+        <code><![CDATA[@${ANNO type="org.springframework.context.annotation.Bean" default="Bean" editable="false"}
+public ${RET type="org.springframework.boot.CommandLineRunner" default="CommandLineRunner" editable="false"} ${cmdLineRunner}(){
+    return (args)->{
+        ${cursor}
+    };
+}]]></code>
+        <description><![CDATA[Spring Boot CommandLineRunner bean]]></description>
+    </codetemplate>
     <codetemplate abbreviation="endg">
         <code><![CDATA[@${ANNO type="org.springframework.web.bind.annotation.GetMapping" default="GetMapping" editable="false"}("${url}")
 public ${retobj} ${method}(${cursor}) {
