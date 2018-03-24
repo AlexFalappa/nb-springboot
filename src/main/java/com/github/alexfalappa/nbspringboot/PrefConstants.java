@@ -23,7 +23,7 @@ package com.github.alexfalappa.nbspringboot;
 public final class PrefConstants {
 
     public static final String PREF_INITIALIZR_TIMEOUT = "nbspringboot.initializr.timeout";
-    public static final String PREF_INITIALIZR_URL = "nbspringboot.initializr.url";
+    public static final String PREF_INITIALIZR_URL = "nbspringboot.initializr-service.url";
     public static final String PREF_FORCE_COLOR_OUTPUT = "nbspringboot.defaultopts.force-color";
     public static final String PREF_MANUAL_RESTART = "nbspringboot.defaultopts.manual-restart";
     public static final String PREF_VM_OPTS = "nbspringboot.defaultopts.vm-options";
@@ -35,6 +35,8 @@ public final class PrefConstants {
     public static final String PREF_HLIGHT_LEV_DTMISMATCH = "nbspringboot.highlight-level.data-type-mismatches";
     public static final String PREF_HLIGHT_LEV_UNKNOWN = "nbspringboot.highlight-level.unknown-props";
     public static final String PREF_HLIGHT_LEV_DEPRECATED = "nbspringboot.highlight-level.deprecated-props";
+
+    public static final String DEFAULT_INITIALIZR_URL = "https://start.spring.io";
 
     // prevent instantiation
     private PrefConstants() {

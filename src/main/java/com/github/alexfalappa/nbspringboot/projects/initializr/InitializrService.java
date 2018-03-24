@@ -82,7 +82,7 @@ public class InitializrService {
             // set connection timeouts
             timeoutFromPrefs();
             // prepare request
-            final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
+            final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, PrefConstants.DEFAULT_INITIALIZR_URL);
             RequestEntity<Void> req = RequestEntity
                     .get(new URI(serviceUrl))
                     .accept(MediaType.valueOf("application/vnd.initializr.v2.1+json"))
@@ -119,7 +119,7 @@ public class InitializrService {
             // set connection timeouts
             timeoutFromPrefs();
             // prepare request
-            final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
+            final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, PrefConstants.DEFAULT_INITIALIZR_URL);
             UriTemplate template = new UriTemplate(serviceUrl.concat("/dependencies?bootVersion={bootVersion}"));
             RequestEntity<Void> req = RequestEntity
                     .get(template.expand(bootVersion))
@@ -159,7 +159,7 @@ public class InitializrService {
         // set connection timeouts
         timeoutFromPrefs();
         // prepare parameterized url
-        final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, "http://start.spring.io");
+        final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, PrefConstants.DEFAULT_INITIALIZR_URL);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUrl.concat("/starter.zip"))
                 .queryParam("type", "maven-project")
                 .queryParam("bootVersion", bootVersion)

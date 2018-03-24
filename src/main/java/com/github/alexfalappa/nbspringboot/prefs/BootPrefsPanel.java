@@ -280,7 +280,7 @@ final class BootPrefsPanel extends javax.swing.JPanel implements DocumentListene
     void load() {
         // read settings and initialize GUI
         final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
-        txInitializrUrl.setText(prefs.get(PrefConstants.PREF_INITIALIZR_URL, "http://start.spring.io"));
+        txInitializrUrl.setText(prefs.get(PrefConstants.PREF_INITIALIZR_URL, PrefConstants.DEFAULT_INITIALIZR_URL));
         txVmOpts.setText(prefs.get(PrefConstants.PREF_VM_OPTS, ""));
         spInitializrTimeout.setValue(prefs.getInt(PrefConstants.PREF_INITIALIZR_TIMEOUT, 30));
         chColorOutput.setSelected(prefs.getBoolean(PrefConstants.PREF_FORCE_COLOR_OUTPUT, true));
