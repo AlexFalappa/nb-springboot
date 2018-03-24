@@ -263,7 +263,7 @@ public class DependencyToggleBox extends javax.swing.JPanel {
                     } else if (verRange.startsWith("(")) {
                         sb.append(" &lt; ");
                     }
-                    sb.append("Boot version");
+                    sb.append("Spring Boot version");
                     if (verRange.endsWith("]")) {
                         sb.append(" &lt;= ");
                     } else if (verRange.endsWith(")")) {
@@ -273,7 +273,7 @@ public class DependencyToggleBox extends javax.swing.JPanel {
                 }
             } else {
                 // unbounded range
-                sb.append("Boot version &gt;= ").append(verRange);
+                sb.append("Spring Boot version &gt;= ").append(verRange);
             }
         }
         return sb.toString();

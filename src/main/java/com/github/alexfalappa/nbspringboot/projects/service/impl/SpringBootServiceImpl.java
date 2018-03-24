@@ -99,7 +99,7 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public void refresh() {
-        logger.info("Refreshing SpringBoot service");
+        logger.info("Refreshing Spring Boot service");
         // check maven project has a dependency starting with 'spring-boot'
         logger.fine("Checking maven project has a spring boot dependency");
         boolean springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
@@ -235,7 +235,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         if (mvnPrj == null) {
             return;
         }
-        logger.info("Initializing SpringBoot service");
+        logger.info("Initializing Spring Boot service");
         // check maven project has a dependency starting with 'spring-boot'
         boolean springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
         logger.fine("Checking maven project has a spring boot dependency");
