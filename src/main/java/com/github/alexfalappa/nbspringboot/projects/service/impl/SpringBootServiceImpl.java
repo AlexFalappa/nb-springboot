@@ -349,38 +349,38 @@ public class SpringBootServiceImpl implements SpringBootService {
     }
 
     private void adjustNbActions() {
-        logger.fine("Adjusting nbactions.xml file");
         final FileObject foPrjDir = mvnPrj.getProjectDirectory();
         FileObject foNbAct = foPrjDir.getFileObject("nbactions.xml");
-        try (PrintWriter pw = new PrintWriter(foPrjDir.createAndOpen("nbactions.tmp"))) {
-            if (isBoot2()) {
-                for (String line : foNbAct.asLines()) {
-                    line = line.replace(ENV_RESTART_15, ENV_RESTART_20);
-                    line = line.replace("<run.", "<spring-boot.run.");
-                    line = line.replace("</run.", "</spring-boot.run.");
-                    pw.println(line);
+        if (foNbAct != null) {
+            logger.fine("Adjusting nbactions.xml file");
+            try (FileLock lock = foNbAct.lock()) {
+                try (PrintWriter pw = new PrintWriter(foPrjDir.createAndOpen("nbactions.tmp"))) {
+                    if (isBoot2()) {
+                        for (String line : foNbAct.asLines()) {
+                            line = line.replace(ENV_RESTART_15, ENV_RESTART_20);
+                            line = line.replace("<run.", "<spring-boot.run.");
+                            line = line.replace("</run.", "</spring-boot.run.");
+                            pw.println(line);
+                        }
+                    } else {
+                        for (String line : foNbAct.asLines()) {
+                            line = line.replace(ENV_RESTART_20, ENV_RESTART_15);
+                            line = line.replace("<spring-boot.run.", "<run.");
+                            line = line.replace("</spring-boot.run.", "</run.");
+                            pw.println(line);
+                        }
+                    }
                 }
-            } else {
-                for (String line : foNbAct.asLines()) {
-                    line = line.replace(ENV_RESTART_20, ENV_RESTART_15);
-                    line = line.replace("<spring-boot.run.", "<run.");
-                    line = line.replace("</spring-boot.run.", "</run.");
-                    pw.println(line);
-                }
+                foNbAct.delete(lock);
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
             }
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        try (FileLock lock = foNbAct.lock()) {
-            foNbAct.delete(lock);
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
-        }
-        FileObject foTmp = foPrjDir.getFileObject("nbactions.tmp");
-        try (FileLock lock = foTmp.lock()) {
-            foTmp.move(lock, foPrjDir, "nbactions", "xml");
-        } catch (IOException ex) {
-            Exceptions.printStackTrace(ex);
+            FileObject foTmp = foPrjDir.getFileObject("nbactions.tmp");
+            try (FileLock lock = foTmp.lock()) {
+                foTmp.move(lock, foPrjDir, "nbactions", "xml");
+            } catch (IOException ex) {
+                Exceptions.printStackTrace(ex);
+            }
         }
     }
 
