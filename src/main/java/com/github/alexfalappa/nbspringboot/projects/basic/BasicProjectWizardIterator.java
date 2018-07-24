@@ -69,7 +69,7 @@ import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_REST
 @Messages("BasicSpringbootProject_displayName=Spring Boot basic project")
 public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInstantiatingIterator {
 
-    private static final String BOOTVERSION = "2.0.0.RELEASE";
+    private static final String BOOTVERSION = "2.0.3.RELEASE";
 
     private int index;
     private WizardDescriptor.Panel[] panels;
