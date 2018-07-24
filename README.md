@@ -26,7 +26,7 @@ To perform a manual install download the desired `nbm` package from the [release
     - @ConfigurationProperties annotation without `spring-boot-configuration-processor` dependency
     - Imports of Spring MVC annotations and Spring Data interfaces without relevant starter dependencies (e.g. `JpaRepository` without `spring-boot-starter-data-jpa` dependency)
 -  Code templates:
-    - Java templates for web request mapping annotations and Webflux router functions
+    - Java templates for web request mapping annotations, Webflux router functions and `CommandLineRunner` beans
     - Configuration properties templates for commonly used sets of properties 
 -  *Spring Boot* file templates:
     -  `CommandlineRunner` components

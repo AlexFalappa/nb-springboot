@@ -1,6 +1,10 @@
 # Changelog
 
--  **2.1** (??? 2018): Work In Progress
+-  **2.0.1** (July 2018): Polishing
+    -  Use HTTPS protocol when contacting Spring Initializr service
+    -  New Java files code template for command line runner beans
+    -  Small behavior change: the Spring Boot Restart action in the toolbar is enabled only if a project node is selected in the Projects view or its _Dependencies_, _Runtime Dependencies_ or _Test Dependencies_ inner nodes
+    -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/15?closed=1)
 
 -  **2.0** (Mar 2018): Reactive Goodies
     -  Support for projects based on Spring Boot 2.x
@@ -22,6 +26,7 @@
         -  Do not make `spring-boot-devtools` dependency optional by default (use the [`excludeDevtools` option of the spring boot maven plugin](https://docs.spring.io/spring-boot/docs/current/maven-plugin/repackage-mojo.html) to control inclusion of devtools in repackaged archive)
         -  Do not set `fork` to true to `spring-boot-maven-plugin` configuration section (forking a jvm is automatic when needed)
     -  Show deprecated configuration properties of level error by default (only effective if no previous plugin preferences found)
+    -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/13?closed=1)
 
 -  **1.6.1** (Oct 2017): Hints and quick fixes
     -  Java editor hints:
