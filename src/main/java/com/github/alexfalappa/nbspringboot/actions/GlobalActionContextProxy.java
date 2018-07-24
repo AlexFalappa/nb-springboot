@@ -38,7 +38,6 @@ import org.openide.util.LookupListener;
 import org.openide.util.lookup.AbstractLookup;
 import org.openide.util.lookup.InstanceContent;
 import org.openide.util.lookup.ProxyLookup;
-import org.openide.util.lookup.ServiceProvider;
 import org.openide.windows.TopComponent;
 import org.openide.windows.WindowManager;
 
@@ -59,7 +58,7 @@ import static java.util.logging.Level.SEVERE;
  * @see GlobalActionContextImpl
  * @author Bruce Schubert
  */
-@ServiceProvider(service = ContextGlobalProvider.class, supersedes = "org.netbeans.modules.openide.windows.GlobalActionContextImpl")
+//@ServiceProvider(service = ContextGlobalProvider.class, supersedes = "org.netbeans.modules.openide.windows.GlobalActionContextImpl")
 public class GlobalActionContextProxy implements ContextGlobalProvider {
 
     /** The native NetBeans global context Lookup provider */
