@@ -24,6 +24,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
+import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectInformation;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.modules.maven.NbMavenProjectImpl;
@@ -36,9 +37,11 @@ import org.openide.awt.ActionReference;
 import org.openide.awt.ActionReferences;
 import org.openide.awt.ActionRegistration;
 import org.openide.awt.StatusDisplayer;
+import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static java.util.logging.Level.FINE;
@@ -61,22 +64,31 @@ public final class RestartAction implements ActionListener {
 
     public static final String TRIGGER_FILE = ".nbRestartTrigger";
     private static final Logger logger = Logger.getLogger(RestartAction.class.getName());
-    private final NbMavenProjectImpl proj;
+    private final DataObject unused;
 
-    public RestartAction(NbMavenProjectImpl context) {
-        this.proj = context;
+    public RestartAction(DataObject context) {
+        this.unused = context;
     }
 
     @Override
     public void actionPerformed(ActionEvent e) {
+        final StatusDisplayer stDisp = StatusDisplayer.getDefault();
+        Project p = Utils.getActiveProject();
+        if (!(p instanceof NbMavenProjectImpl)) {
+            String mex = "No maven project to restart!";
+            stDisp.setStatusText(mex);
+            logger.info(mex);
+            return;
+        }
+        NbMavenProjectImpl proj = (NbMavenProjectImpl) p;
         File outDir = proj.getProjectWatcher().getOutputDirectory(false);
         M2ConfigProvider cp = proj.getLookup().lookup(M2ConfigProvider.class);
         SpringBootService sbs = proj.getLookup().lookup(SpringBootService.class);
-        boolean enabled = false;
         if (cp != null && sbs != null) {
+            boolean enabled = sbs.hasPomDependency("spring-boot-devtools");
             M2Configuration m2 = cp.getActiveConfiguration();
             List<NetbeansActionMapping> nams = m2.getRawMappings().getActions();
-            if (!nams.isEmpty()) {
+            if (enabled && !nams.isEmpty()) {
                 String propRestart = String.format("Env.%s", sbs.getRestartEnvVarName());
                 for (NetbeansActionMapping nam : nams) {
                     if (nam.getActionName().equals(ActionProvider.COMMAND_RUN)) {
@@ -86,7 +98,6 @@ public final class RestartAction implements ActionListener {
                 }
             }
             ProjectInformation prjInfo = ProjectUtils.getInformation(proj);
-            final StatusDisplayer stDisp = StatusDisplayer.getDefault();
             StringBuilder sb = new StringBuilder("Project [").append(prjInfo.getDisplayName()).append("]: ");
             if (enabled) {
                 File f = new File(outDir, TRIGGER_FILE);
