@@ -3,7 +3,7 @@
 -  **2.0.1** (July 2018): Polishing
     -  Use HTTPS protocol when contacting Spring Initializr service
     -  New Java files code template for command line runner beans
-    -  Small behavior change: the Spring Boot Restart action in the toolbar is enabled only if a project node is selected in the Projects view or its _Dependencies_, _Runtime Dependencies_ or _Test Dependencies_ inner nodes
+    -  Improved Spring Boot Restart action enablement and logic
     -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/15?closed=1)
 
 -  **2.0** (Mar 2018): Reactive Goodies
