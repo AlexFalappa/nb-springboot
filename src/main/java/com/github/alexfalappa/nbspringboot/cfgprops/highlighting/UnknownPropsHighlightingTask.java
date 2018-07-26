@@ -30,10 +30,10 @@ import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Fix;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Exceptions;
-import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.fixes.DeletePropFix;
@@ -68,9 +68,10 @@ public class UnknownPropsHighlightingTask extends BaseHighlightingTask {
     }
 
     @Override
-    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity) {
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document,
+            List<ErrorDescription> errors, Severity severity) {
         logger.fine("Highlighting unknown properties");
-        final Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
+        final Project prj = Utils.getActiveProject();
         if (prj != null) {
             final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
             if (sbs != null) {

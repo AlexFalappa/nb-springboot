@@ -17,7 +17,14 @@ package com.github.alexfalappa.nbspringboot;
 
 import java.util.regex.Pattern;
 
+import org.netbeans.api.project.FileOwnerQuery;
+import org.netbeans.api.project.Project;
+import org.openide.filesystems.FileObject;
+import org.openide.loaders.DataObject;
+import org.openide.util.Lookup;
 import org.openide.util.NbPreferences;
+import org.openide.util.Utilities;
+import org.openide.windows.TopComponent;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.Deprecation;
 
@@ -118,5 +125,29 @@ public final class Utils {
     public static boolean isErrorDeprecated(ConfigurationMetadataProperty meta) {
         Deprecation depr = meta.getDeprecation();
         return depr != null && depr.getLevel() != null && depr.getLevel().equals(Deprecation.Level.ERROR);
+    }
+
+    /**
+     * Tries to retrieve the most appropriate {@link Project}.
+     * <p>
+     * Looks first in the global action context, then in the active {@link TopComponent} context and finally tries to discover the project
+     * where the currently edited file is.
+     *
+     * @return the active projetc or null if no active project found
+     */
+    public static Project getActiveProject() {
+        Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
+        if (prj == null) {
+            final Lookup tcLookup = TopComponent.getRegistry().getActivated().getLookup();
+            prj = tcLookup.lookup(Project.class);
+            if (prj == null) {
+                DataObject dob = tcLookup.lookup(DataObject.class);
+                if (dob != null) {
+                    FileObject fo = dob.getPrimaryFile();
+                    prj = FileOwnerQuery.getOwner(fo);
+                }
+            }
+        }
+        return prj;
     }
 }

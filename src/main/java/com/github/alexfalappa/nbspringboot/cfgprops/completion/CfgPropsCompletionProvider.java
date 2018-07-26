@@ -37,7 +37,6 @@ import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
-import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
@@ -77,7 +76,7 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
         if (queryType != CompletionProvider.COMPLETION_QUERY_TYPE) {
             return null;
         }
-        Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
+        Project prj = Utils.getActiveProject();
         if (prj == null) {
             return null;
         }

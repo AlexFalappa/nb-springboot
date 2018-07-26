@@ -34,11 +34,11 @@ import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Exceptions;
-import org.openide.util.Utilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.util.ClassUtils;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
@@ -79,9 +79,10 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
     }
 
     @Override
-    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity) {
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document,
+            List<ErrorDescription> errors, Severity severity) {
         logger.fine("Highlighting data type mismatches");
-        final Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
+        final Project prj = Utils.getActiveProject();
         if (prj != null) {
             final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
             final ClassPath cp = getProjectClasspath(prj);
@@ -156,7 +157,8 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
         return null;
     }
 
-    private void check(String type, String text, Document document, CfgElement elem, List<ErrorDescription> errors, ClassLoader cl, Severity severity) throws BadLocationException {
+    private void check(String type, String text, Document document, CfgElement elem, List<ErrorDescription> errors, ClassLoader cl,
+            Severity severity) throws BadLocationException {
         if (text == null || text.isEmpty()) {
             return;
         }
