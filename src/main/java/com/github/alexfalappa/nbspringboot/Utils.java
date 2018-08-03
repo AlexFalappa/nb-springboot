@@ -15,6 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
 import org.netbeans.api.project.FileOwnerQuery;
@@ -130,24 +132,64 @@ public final class Utils {
     /**
      * Tries to retrieve the most appropriate {@link Project}.
      * <p>
-     * Looks first in the global action context, then in the active {@link TopComponent} context and finally tries to discover the project
-     * where the currently edited file is.
+     * Looks first in the global action context, then in the active {@link TopComponent} context. In each case tries first a direct
+     * reference then via the owner of a file object and lastly via a data object.
      *
-     * @return the active projetc or null if no active project found
+     * @return the active project or null if no active project found
      */
     public static Project getActiveProject() {
+        final Logger logger = Logger.getLogger(Utils.class.getName());
+        // lookup in global context
         Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
-        if (prj == null) {
-            final Lookup tcLookup = TopComponent.getRegistry().getActivated().getLookup();
+        if (prj != null) {
+            logger.log(Level.FINE, "Found project reference in actions global context");
+            return prj;
+        }
+        FileObject foobj = Utilities.actionsGlobalContext().lookup(FileObject.class);
+        if (foobj != null) {
+            prj = FileOwnerQuery.getOwner(foobj);
+            if (prj != null) {
+                logger.log(Level.FINE, "Found project reference via file object in actions global context");
+                return prj;
+            }
+        }
+        DataObject dobj = Utilities.actionsGlobalContext().lookup(DataObject.class);
+        if (dobj != null) {
+            FileObject fo = dobj.getPrimaryFile();
+            prj = FileOwnerQuery.getOwner(fo);
+            if (prj != null) {
+                logger.log(Level.FINE, "Found project reference via data object in actions global context");
+                return prj;
+            }
+        }
+        // lookup in active editor
+        final TopComponent activeEditor = TopComponent.getRegistry().getActivated();
+        if (activeEditor != null) {
+            final Lookup tcLookup = activeEditor.getLookup();
             prj = tcLookup.lookup(Project.class);
-            if (prj == null) {
-                DataObject dob = tcLookup.lookup(DataObject.class);
-                if (dob != null) {
-                    FileObject fo = dob.getPrimaryFile();
-                    prj = FileOwnerQuery.getOwner(fo);
+            if (prj != null) {
+                logger.log(Level.FINE, "Found project reference in lookup of active editor");
+                return prj;
+            }
+            foobj = tcLookup.lookup(FileObject.class);
+            if (foobj != null) {
+                prj = FileOwnerQuery.getOwner(foobj);
+                if (prj != null) {
+                    logger.log(Level.FINE, "Found project reference in lookup of active editor via file object");
+                    return prj;
+                }
+            }
+            dobj = tcLookup.lookup(DataObject.class);
+            if (dobj != null) {
+                FileObject fo = dobj.getPrimaryFile();
+                prj = FileOwnerQuery.getOwner(fo);
+                if (prj != null) {
+                    logger.log(Level.FINE, "Found project reference in lookup of active editor via data object");
+                    return prj;
                 }
             }
         }
-        return prj;
+        logger.log(Level.FINE, "Couldn't find active project reference");
+        return null;
     }
 }
