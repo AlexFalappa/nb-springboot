@@ -46,6 +46,12 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 
 import static java.util.logging.Level.FINE;
 
+/*
+ * NOTE: an alternative way to obtain an action that operates on the currently active project is using
+ * ProjectSensitiveActions.projectSensitiveAction(...) from projectuiapi module as indicated by Jan Lahoda on
+ * Apache NetBeans devs mailing lists:
+ * http://mail-archives.apache.org/mod_mbox/netbeans-dev/201807.mbox/%3CCALd%3D3dEa815Kik-cgZ6Cdymwnqd6FELruJoLesALxJac1SmofA%40mail.gmail.com%3E
+ */
 @ActionID(
         category = "Build",
         id = "com.github.alexfalappa.nbspringboot.actions.RestartAction"
