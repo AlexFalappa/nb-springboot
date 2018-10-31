@@ -334,16 +334,27 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
         return false;
     }
+    
+    private boolean dependencyArtifactIdStartsWithAndVersionStartsWith(NbMavenProject nbMvn, String artifactId, String version) {
+        MavenProject mPrj = nbMvn.getMavenProject();
+        for (Object o : mPrj.getDependencies()) {
+            Dependency d = (Dependency) o;
+            if (d.getArtifactId().startsWith(artifactId) && d.getVersion().startsWith(version)) {
+                return true;
+            }
+        }
+        return false;
+    }
 
     // tell if the project currently uses Spring Boot 2.x
     private boolean isBoot2() {
-        boolean flag = false;
+        // consider spring-boot 2.x as default
+        boolean flag = true;
         if (mvnPrj != null) {
             // retrieve boot version from parent pom declaration if present
             // TODO also look into parent hierarchy
             // TODO also try to look in dependency management section (inclusion of spring boot BOM)
-            String bootVer = mvnPrj.getOriginalMavenProject().getParentArtifact().getVersion();
-            flag = bootVer.startsWith("2");
+            flag = !dependencyArtifactIdStartsWithAndVersionStartsWith(mvnPrj.getProjectWatcher(), "spring-boot", "1");
         }
         return flag;
     }
