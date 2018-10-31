@@ -42,7 +42,8 @@ public class InitializrProjectPanelVisual2 extends JPanel {
 
     private final DefaultComboBoxModel<NamedItem> dcbmBootVersion = new DefaultComboBoxModel<>();
     private boolean initialized = false;
-
+    private String fixedBootVersion = null;
+    
     public InitializrProjectPanelVisual2() {
         initComponents();
         // setup key listener on search field linked to dependencies panel
@@ -75,6 +76,19 @@ public class InitializrProjectPanelVisual2 extends JPanel {
         txFilter.requestFocusInWindow();
         initialized = true;
     }
+    
+    public String getBootVersion(){
+        if(fixedBootVersion != null) {
+            return fixedBootVersion;
+        } else {
+            NamedItem selectedBootVersion = (NamedItem) dcbmBootVersion.getSelectedItem();
+            if(selectedBootVersion != null) {
+                return selectedBootVersion.getId();
+            } else {
+                return null;
+            }
+        }
+    }
 
     /**
      * Fixes the boot version of the dependencies.
@@ -86,6 +100,7 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     public void fixBootVersion(String bootVersion) {
         Objects.requireNonNull(bootVersion);
         if (initialized) {
+            fixedBootVersion = bootVersion;
             // substitute combo with label
             javax.swing.GroupLayout layout = (javax.swing.GroupLayout) this.getLayout();
             final JLabel label = new JLabel(bootVersion);

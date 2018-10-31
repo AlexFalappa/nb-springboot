@@ -135,7 +135,7 @@ public class SpringDependenciesGenerator implements CodeGenerator {
             sdd.setVisible(true);
             // if OK pressed add selected dependencies
             if (sdd.getReturnStatus() == SpringDependencyDialog.RET_OK) {
-                addDeps(bootVersion, sdd.getSelectedDeps());
+                addDeps(sdd.getBootVersion(), sdd.getSelectedDeps());
             }
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);

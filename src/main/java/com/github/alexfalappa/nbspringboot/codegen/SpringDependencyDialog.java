@@ -74,6 +74,10 @@ public class SpringDependencyDialog extends javax.swing.JDialog {
         return returnStatus;
     }
 
+    public String getBootVersion(){
+        return ippvDeps.getBootVersion();
+    }
+    
     public Set<String> getSelectedDeps() {
         return new HashSet<>(ippvDeps.getSelectedDeps());
     }
