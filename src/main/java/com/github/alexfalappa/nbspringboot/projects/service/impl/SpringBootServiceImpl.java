@@ -59,6 +59,7 @@ import static java.util.logging.Level.INFO;
 import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.project.ProjectBuildingRequest;
 
 /**
  * Project wide {@link SpringBootService} implementation.
@@ -350,16 +351,21 @@ public class SpringBootServiceImpl implements SpringBootService {
     // tell if the project currently uses Spring Boot 2.x
     private boolean isBoot2() {
         if (mvnPrj != null) {
+            // prepare maven project to resolve parents recursively
+            ProjectBuildingRequest req = mvnPrj.getEmbedder().createMavenExecutionRequest().getProjectBuildingRequest();
+            MavenProject mavenProject = mvnPrj.getOriginalMavenProject();            
+            mavenProject.setProjectBuildingRequest(req);
+            
             // retrieve boot version from parent pom declaration if present
-            String springBootParentVersion = lookupSpringBootParentVersion(mvnPrj.getProjectWatcher().getMavenProject());
+            String springBootParentVersion = lookupSpringBootParentVersion(mavenProject);
             if(springBootParentVersion != null) {
                 return springBootParentVersion.startsWith("2");
             }
             // look in dependency management section (inclusion of spring boot BOM)
-            String springBootBOMVersion = lookupSpringBootBOMVersion(mvnPrj.getProjectWatcher().getMavenProject());
+            String springBootBOMVersion = lookupSpringBootBOMVersion(mavenProject);
             if(springBootBOMVersion != null) {
                 return springBootBOMVersion.startsWith("2");
-            }            
+            }
             // consider spring-boot 2.x if not 1.x dependencies found
             return !hasDependencyArtifactIdStartsWithAndVersionStartsWith(mvnPrj.getProjectWatcher(), "spring-boot", "1");
         }        
@@ -387,6 +393,10 @@ public class SpringBootServiceImpl implements SpringBootService {
             if("org.springframework.boot".equals(d.getGroupId()) && "spring-boot-dependencies".equals(d.getArtifactId())){
                 return d.getVersion();
             }
+        }
+        // lookup also in the inherited dependency management
+        if(mavenProject.hasParent()){
+            return lookupSpringBootBOMVersion(mavenProject.getParent());
         }
         return null;
     }
