@@ -11,7 +11,7 @@
     <description>Spring Boot framework support for NetBeans</description>
 
     <properties>
-        <netbeans.api.version>RELEASE81</netbeans.api.version>
+        <netbeans.api.version>RELEASE110</netbeans.api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <skipTests>true</skipTests>
     </properties>
@@ -361,8 +361,8 @@
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>2.5.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
@@ -424,16 +424,5 @@
             <url>http://opensource.org/licenses/Apache-2.0</url>
         </license>
     </licenses>
-
-    <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>netbeans</id>
-            <name>Repository hosting NetBeans modules</name>
-            <url>http://bits.netbeans.org/nexus/content/groups/netbeans</url>
-        </repository>
-    </repositories>
 
 </project>
