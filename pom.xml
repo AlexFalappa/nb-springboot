@@ -11,7 +11,9 @@
     <description>Spring Boot framework support for NetBeans</description>
 
     <properties>
-        <netbeans.api.version>RELEASE81</netbeans.api.version>
+        <netbeans.api.version>RELEASE110</netbeans.api.version>
+        <!--to move in ~/.m2/settings.xml-->
+        <netbeans.installation>C:/Users/falappa/PortableApps/netbeans-11.1</netbeans.installation>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <skipTests>true</skipTests>
     </properties>
@@ -301,7 +303,7 @@
                 <!-- Keep pom.xml sorted -->
                 <groupId>com.github.ekryd.sortpom</groupId>
                 <artifactId>sortpom-maven-plugin</artifactId>
-                <version>2.4.0</version>
+                <version>2.10.0</version>
                 <configuration>
                     <predefinedSortOrder>custom_1</predefinedSortOrder>
                     <nrOfIndentSpace>4</nrOfIndentSpace>
@@ -343,9 +345,9 @@
             </plugin>
             -->
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>4.1</version>
+                <version>4.2</version>
                 <extensions>true</extensions>
                 <configuration>
                     <licenseFile>LICENSE</licenseFile>
@@ -359,24 +361,26 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>2.5.1</version>
+                <version>3.8.1</version>
                 <configuration>
-                    <source>1.7</source>
-                    <target>1.7</target>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.4</version>
+                <version>3.1.2</version>
                 <configuration>
-                    <useDefaultManifestFile>true</useDefaultManifestFile>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
-                <version>2.10</version>
+                <version>3.1.1</version>
                 <executions>
                     <execution>
                         <id>unpack</id>
@@ -401,7 +405,7 @@
             </plugin>
             <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.20</version>
+                <version>2.22.2</version>
                 <configuration>
                     <groups>com.github.alexfalappa.nbspringboot.cfgprops.ParserTests</groups>
                     <!--uncomment following group to execute lexer tests-->
@@ -424,16 +428,5 @@
             <url>http://opensource.org/licenses/Apache-2.0</url>
         </license>
     </licenses>
-
-    <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>netbeans</id>
-            <name>Repository hosting NetBeans modules</name>
-            <url>http://bits.netbeans.org/nexus/content/groups/netbeans</url>
-        </repository>
-    </repositories>
 
 </project>
