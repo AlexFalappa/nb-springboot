@@ -49,8 +49,10 @@ import org.springframework.boot.bind.RelaxedNames;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepository;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepositoryJsonBuilder;
+import org.springframework.boot.configurationmetadata.Hints;
 import org.springframework.boot.configurationmetadata.SimpleConfigurationMetadataRepository;
 import org.springframework.boot.configurationmetadata.ValueHint;
+import org.springframework.boot.configurationmetadata.ValueProvider;
 
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
@@ -198,7 +200,33 @@ public class SpringBootServiceImpl implements SpringBootService {
         List<ValueHint> ret = new LinkedList<>();
         ConfigurationMetadataProperty cfgMeta = getPropertyMetadata(propertyName);
         if (cfgMeta != null) {
-            for (ValueHint valueHint : cfgMeta.getHints().getValueHints()) {
+            // special case: chack if data type is an enum
+            try {
+                Object[] enumvals = cpExec.getClassLoader(true).loadClass(cfgMeta.getType()).getEnumConstants();
+                if (enumvals != null) {
+                    for (Object val : enumvals) {
+                        final String valName = val.toString().toLowerCase();
+                        if (filter == null || valName.contains(filter)) {
+                            ValueHint valueHint = new ValueHint();
+                            valueHint.setValue(valName);
+                            valueHint.setDescription(String.format("Enumeration value %s", valName.toUpperCase()));
+                            ret.add(valueHint);
+                        }
+                    }
+                }
+            } catch (ClassNotFoundException ex) {
+                // enum not available in project classpath, no completion possible
+            }
+            // log value providers
+            final Hints hints = cfgMeta.getHints();
+            if (!hints.getValueProviders().isEmpty()) {
+                logger.info(String.format("Value providers for %s:", propertyName));
+                for (ValueProvider vp : hints.getValueProviders()) {
+                    logger.info(vp.getName());
+                }
+            }
+            // add defined value hints to completion lists
+            for (ValueHint valueHint : hints.getValueHints()) {
                 if (filter == null || valueHint.getValue().toString().contains(filter)) {
                     ret.add(valueHint);
                 }
