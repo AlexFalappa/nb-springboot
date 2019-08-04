@@ -209,7 +209,6 @@ public class SpringBootServiceImpl implements SpringBootService {
                         if (filter == null || valName.contains(filter)) {
                             ValueHint valueHint = new ValueHint();
                             valueHint.setValue(valName);
-                            valueHint.setDescription(String.format("Enumeration value %s", valName.toUpperCase()));
                             ret.add(valueHint);
                         }
                     }

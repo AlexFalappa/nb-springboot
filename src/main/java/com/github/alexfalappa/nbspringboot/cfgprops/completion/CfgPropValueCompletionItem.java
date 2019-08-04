@@ -104,13 +104,17 @@ public class CfgPropValueCompletionItem implements CompletionItem {
 
     @Override
     public CompletionTask createDocumentationTask() {
-        return new AsyncCompletionTask(new AsyncCompletionQuery() {
-            @Override
-            protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                completionResultSet.setDocumentation(new CfgPropValueCompletionDocumentation(CfgPropValueCompletionItem.this));
-                completionResultSet.finish();
-            }
-        });
+        if (hint.getDescription() != null) {
+            return new AsyncCompletionTask(new AsyncCompletionQuery() {
+                @Override
+                protected void query(CompletionResultSet completionResultSet, Document document, int i) {
+                    completionResultSet.setDocumentation(new CfgPropValueCompletionDocumentation(CfgPropValueCompletionItem.this));
+                    completionResultSet.finish();
+                }
+            });
+        } else {
+            return null;
+        }
     }
 
     @Override
