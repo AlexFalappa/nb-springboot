@@ -1,5 +1,10 @@
 # Changelog
 
+-  **2.1** (??? 2019): Work in Progress
+    -  Minimum required NetBeans version is now **8.2**, minimum required JDK version is now **8**.
+    -  Complete value of configuration properties whose data type is a Java enumeration.
+    -  Upgrade internal dependencies
+
 -  **2.0.1** (July 2018): Polishing
     -  Use HTTPS protocol when contacting Spring Initializr service
     -  New Java files code template for command line runner beans
