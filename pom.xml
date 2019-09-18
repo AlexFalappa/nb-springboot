@@ -328,26 +328,46 @@
                 </executions>
             </plugin>
             <!--use only when generating scanner class
+			<plugin>
+				<groupId>de.jflex</groupId>
+				<artifactId>jflex-maven-plugin</artifactId>
+				<version>1.6.1</version>
+				<configuration>
+					<!-uncomment following line when running tests->
+					<skeleton>src/main/jflex/skeleton.netbeans</skeleton>
+					<lexDefinitions>
+						<lexDefinition>src/main/jflex/BootCfgProperties.flex</lexDefinition>
+					</lexDefinitions>
+				</configuration>
+				<executions>
+					<execution>
+						<goals>
+							<goal>generate</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			-->
             <plugin>
-                <groupId>de.jflex</groupId>
-                <artifactId>jflex-maven-plugin</artifactId>
-                <version>1.6.1</version>
-                <configuration>
-                    <!-uncomment following line when running tests->
-                    <skeleton>src/main/jflex/skeleton.netbeans</skeleton>
-                    <lexDefinitions>
-                        <lexDefinition>src/main/jflex/BootCfgProperties.flex</lexDefinition>
-                    </lexDefinitions>
-                </configuration>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M2</version>
                 <executions>
                     <execution>
+                        <id>enforce-java</id>
                         <goals>
-                            <goal>generate</goal>
+                            <goal>enforce</goal>
                         </goals>
+                        <configuration>
+                            <rules>
+                                <requireJavaVersion>
+                                    <version>1.8.0</version>
+                                </requireJavaVersion>
+                            </rules>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
-            -->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
