@@ -15,9 +15,6 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.filetype;
 
-
-import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
-
 import java.io.IOException;
 
 import org.netbeans.core.spi.multiview.MultiViewElement;
@@ -37,6 +34,8 @@ import org.openide.nodes.Node;
 import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
+
+import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
 
 @Messages({
     "MimeTypeDisplayName=Spring Boot Configuration Properties"

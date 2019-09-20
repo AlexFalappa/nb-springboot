@@ -38,8 +38,8 @@ import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 /**
  * The Spring Boot Configuration implementation of CompletionDocumentation.
  * <p>
- * It utilizes a {@link CfgPropCompletionItem} to display the documentation for that item and actions like opening the source type of a
- * property in editor and navigate to a general spring boot configuration documentation page.
+ * It utilizes a {@link CfgPropCompletionItem} to display the documentation for that item and actions like opening the source type
+ * of a property in editor and navigate to a general spring boot configuration documentation page.
  *
  * @author Aggelos Karalias
  * @author Alessandro Falappa

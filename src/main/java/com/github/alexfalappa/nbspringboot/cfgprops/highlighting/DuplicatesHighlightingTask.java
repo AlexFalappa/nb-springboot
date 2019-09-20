@@ -67,7 +67,8 @@ public class DuplicatesHighlightingTask extends BaseHighlightingTask {
     }
 
     @Override
-    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity) {
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document,
+            List<ErrorDescription> errors, Severity severity) {
         logger.fine("Highlighting duplicate props");
         Map<String, Integer> firstOccur = new HashMap<>();
         for (PairElement pair : cfgResult.getCfgFile().getElements()) {

@@ -54,7 +54,8 @@ import static java.util.logging.Logger.getLogger;
 /**
  * Maven POM code generator to convert an existing maven project into a basic Spring Boot project.
  * <p>
- * Adds a parent pom, some essential Spring Boot dependencies and the maven spring boot plugin invocation to repackage the final artifact.
+ * Adds a parent pom, some essential Spring Boot dependencies and the maven spring boot plugin invocation to repackage the final
+ * artifact.
  *
  * @author Alessandro Falappa
  */

@@ -66,7 +66,8 @@ public class SyntaxErrorHighlightingTask extends BaseHighlightingTask {
     }
 
     @Override
-    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity) {
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document,
+            List<ErrorDescription> errors, Severity severity) {
         logger.fine("Highlighting syntax errors");
         try {
             final InputBuffer ibuf = cfgResult.getParbResult().inputBuffer;

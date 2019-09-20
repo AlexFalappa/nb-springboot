@@ -97,7 +97,8 @@ public class CfgPropValueCompletionItem implements CompletionItem {
     }
 
     @Override
-    public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height, boolean selected) {
+    public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height,
+            boolean selected) {
         CompletionUtilities.renderHtml(fieldIcon, getText(), getTextRight(), g, defaultFont, (selected ? UIManager.getColor(
                 "List.selectionForeground") : UIManager.getColor("List.foreground")), width, height, selected);
     }

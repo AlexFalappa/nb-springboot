@@ -30,8 +30,8 @@ public final class TemplateUtils {
     /**
      * Merge the steps list to set in visual components of wizard pages.
      * <p>
-     * This is usually used in initialize(WizardDescriptor wz) methods of Iterators classes when preparing the wizard pages and related
-     * visual components.
+     * This is usually used in initialize(WizardDescriptor wz) methods of Iterators classes when preparing the wizard pages and
+     * related visual components.
      *
      * @param before previous step names
      * @param after step names of the wizard
@@ -60,8 +60,8 @@ public final class TemplateUtils {
     /**
      * Merge the steps list to set in visual components of wizard pages.
      * <p>
-     * This is usually used in initialize(WizardDescriptor wz) methods of Iterators classes when preparing the wizard pages and related
-     * visual components.
+     * This is usually used in initialize(WizardDescriptor wz) methods of Iterators classes when preparing the wizard pages and
+     * related visual components.
      *
      * @param wizard the wizard descriptor to take previous step names from
      * @param after step names of the wizard

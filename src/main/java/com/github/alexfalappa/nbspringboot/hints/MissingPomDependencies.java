@@ -90,7 +90,8 @@ public class MissingPomDependencies {
                         if (sbs.hasPomDependency("spring-boot") && !sbs.hasPomDependency(artifactId)) {
                             NbMavenProject mPrj = prj.getLookup().lookup(NbMavenProject.class);
                             if (mPrj != null) {
-                                return ErrorDescriptionFactory.forName(ctx, tp, hintMex, new AddDepFix(mPrj, artifactId, optional));
+                                return ErrorDescriptionFactory
+                                        .forName(ctx, tp, hintMex, new AddDepFix(mPrj, artifactId, optional));
                             } else {
                                 return ErrorDescriptionFactory.forName(ctx, tp, hintMex);
                             }
@@ -143,7 +144,8 @@ public class MissingPomDependencies {
         "ERR_JpaMissingHint=Missing Spring Data JPA boot starter in project pom"
     })
     public static ErrorDescription jpaRepos(HintContext ctx) {
-        return importWarning(ctx, "spring-boot-starter-data-jpa", Bundle.ERR_JpaMissingHint(), new String[]{"spring-boot-starter-data-jpa"});
+        return importWarning(ctx, "spring-boot-starter-data-jpa", Bundle.ERR_JpaMissingHint(),
+                new String[]{"spring-boot-starter-data-jpa"});
     }
 
     @Hint(displayName = "#DN_MongoMissingHint", description = "#DESC_MongoMissingHint", category = "Spring Boot")

@@ -82,7 +82,8 @@ public class InitializrService {
             // set connection timeouts
             timeoutFromPrefs();
             // prepare request
-            final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, PrefConstants.DEFAULT_INITIALIZR_URL);
+            final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL,
+                    PrefConstants.DEFAULT_INITIALIZR_URL);
             RequestEntity<Void> req = RequestEntity
                     .get(new URI(serviceUrl))
                     .accept(MediaType.valueOf("application/vnd.initializr.v2.1+json"))
@@ -98,14 +99,15 @@ public class InitializrService {
             if (statusCode == OK) {
                 ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
                 metadata = mapper.readTree(respEntity.getBody());
-                logger.log(INFO, "Retrieved Spring Initializr service metadata. Took {0} msec", System.currentTimeMillis() - start);
+                logger.log(INFO, "Retrieved Spring Initializr service metadata. Took {0} msec",
+                        System.currentTimeMillis() - start);
                 if (logger.isLoggable(FINE)) {
                     logger.fine(mapper.writeValueAsString(metadata));
                 }
             } else {
                 // log status code
-                final String errMessage = String.format("Spring initializr service connection problem. HTTP status code: %s", statusCode
-                        .toString());
+                final String errMessage = String.format("Spring initializr service connection problem. HTTP status code: %s",
+                        statusCode.toString());
                 logger.severe(errMessage);
                 // throw exception in order to set error message
                 throw new RuntimeException(errMessage);
@@ -119,7 +121,8 @@ public class InitializrService {
             // set connection timeouts
             timeoutFromPrefs();
             // prepare request
-            final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, PrefConstants.DEFAULT_INITIALIZR_URL);
+            final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL,
+                    PrefConstants.DEFAULT_INITIALIZR_URL);
             UriTemplate template = new UriTemplate(serviceUrl.concat("/dependencies?bootVersion={bootVersion}"));
             RequestEntity<Void> req = RequestEntity
                     .get(template.expand(bootVersion))
@@ -144,8 +147,8 @@ public class InitializrService {
                 dependencyMetaMap.put(bootVersion, depMeta);
             } else {
                 // log status code
-                final String errMessage = String.format("Spring initializr service connection problem. HTTP status code: %s", statusCode
-                        .toString());
+                final String errMessage = String.format("Spring initializr service connection problem. HTTP status code: %s",
+                        statusCode.toString());
                 logger.severe(errMessage);
                 // throw exception in order to set error message
                 throw new RuntimeException(errMessage);
@@ -154,12 +157,13 @@ public class InitializrService {
         return dependencyMetaMap.get(bootVersion);
     }
 
-    public InputStream getProject(String bootVersion, String mvnGroup, String mvnArtifact, String mvnVersion, String mvnName, String mvnDesc,
-            String packaging, String pkg, String lang, String javaVersion, String deps) throws Exception {
+    public InputStream getProject(String bootVersion, String mvnGroup, String mvnArtifact, String mvnVersion, String mvnName,
+            String mvnDesc, String packaging, String pkg, String lang, String javaVersion, String deps) throws Exception {
         // set connection timeouts
         timeoutFromPrefs();
         // prepare parameterized url
-        final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL, PrefConstants.DEFAULT_INITIALIZR_URL);
+        final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL,
+                PrefConstants.DEFAULT_INITIALIZR_URL);
         UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUrl.concat("/starter.zip"))
                 .queryParam("type", "maven-project")
                 .queryParam("bootVersion", bootVersion)
@@ -194,8 +198,8 @@ public class InitializrService {
             return stream;
         } else {
             // log status code
-            final String errMessage = String.format("Spring initializr service connection problem. HTTP status code: %s", statusCode
-                    .toString());
+            final String errMessage = String.format("Spring initializr service connection problem. HTTP status code: %s",
+                    statusCode.toString());
             logger.severe(errMessage);
             // throw exception in order to set error message
             throw new RuntimeException(errMessage);

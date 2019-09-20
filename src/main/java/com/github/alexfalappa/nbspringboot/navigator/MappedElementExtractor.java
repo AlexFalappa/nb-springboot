@@ -46,9 +46,9 @@ import com.sun.source.util.Trees;
 
 /**
  * This scanner does the heavy lifting of extracting methods that have been mapped to URLs.
- *
- * I reassambled the Spring way as much at is possible without firing up a context: {@link RequestMapping} at type level does - if present -
- * restrict all other mappings.
+ * <p>
+ * I reassambled the Spring way as much at is possible without firing up a context: {@link RequestMapping} at type level does - if
+ * present - restrict all other mappings.
  *
  * @author Michael J. Simons, 2016-09-16
  * @author Alessandro Falappa
@@ -65,7 +65,8 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
     private final TreePath rootPath;
     private volatile boolean canceled = false;
 
-    public MappedElementExtractor(final FileObject fileObject, final CompilationUnitTree compilationUnitTree, final Trees trees, final TreePath rootPath) {
+    public MappedElementExtractor(final FileObject fileObject, final CompilationUnitTree compilationUnitTree, final Trees trees,
+            final TreePath rootPath) {
         this.fileObject = fileObject;
         this.compilationUnitTree = compilationUnitTree;
         this.trees = trees;
@@ -103,7 +104,8 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
             final Map<String, List<RequestMethod>> elementUrls = new TreeMap<>();
             final RequestMapping requestMapping = enclosedElement.getAnnotation(RequestMapping.class);
             if (requestMapping != null) {
-                extractMethodLevelMappings(elementUrls, concatValues(requestMapping.value(), requestMapping.path()), requestMapping.method());
+                extractMethodLevelMappings(elementUrls, concatValues(requestMapping.value(), requestMapping.path()),
+                        requestMapping.method());
             }
             final DeleteMapping deleteMapping = enclosedElement.getAnnotation(DeleteMapping.class);
             if (deleteMapping != null) {
@@ -173,7 +175,8 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
     }
 
     /**
-     * Extracts the type level mapping if any. Makes sure that at least "/" is mapped and restricted to the given methods, if there any.
+     * Extracts the type level mapping if any. Makes sure that at least "/" is mapped and restricted to the given methods, if
+     * there any.
      *
      * @param parentRequestMapping
      * @return
@@ -205,7 +208,8 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
      * @param urls
      * @param methods
      */
-    void extractMethodLevelMappings(final Map<String, List<RequestMethod>> target, final List<String> urls, final RequestMethod[] methods) {
+    void extractMethodLevelMappings(final Map<String, List<RequestMethod>> target, final List<String> urls,
+            final RequestMethod[] methods) {
         final List<String> usedUrls = urls.isEmpty() ? Arrays.asList("/") : urls;
         for (String url : usedUrls) {
             final String usedUrl = url.startsWith("/") ? url : "/" + url;

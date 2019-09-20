@@ -74,7 +74,8 @@ public final class Utils {
     }
 
     /**
-     * Builds an HTML formatted string with details on a Spring Boot configuration property extracted from its {@code ItemMetadata}.
+     * Builds an HTML formatted string with details on a Spring Boot configuration property extracted from its
+     * {@code ItemMetadata}.
      *
      * @param cfgMeta the configuration property metadata object
      * @return the HTML formatted configuration property details
@@ -132,8 +133,8 @@ public final class Utils {
     /**
      * Tries to retrieve the most appropriate {@link Project}.
      * <p>
-     * Looks first in the global action context, then in the active {@link TopComponent} context. In each case tries first a direct
-     * reference then via the owner of a file object and lastly via a data object.
+     * Looks first in the global action context, then in the active {@link TopComponent} context. In each case tries first a
+     * direct reference then via the owner of a file object and lastly via a data object.
      *
      * @return the active project or null if no active project found
      */

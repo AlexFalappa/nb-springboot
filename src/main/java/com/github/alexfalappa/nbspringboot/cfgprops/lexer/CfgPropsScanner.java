@@ -45,8 +45,8 @@ class CfgPropsScanner {
     public static final int IN_KEY_VALUE_SEPARATOR_TAIL = 10;
 
     /**
-     * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l ZZ_LEXSTATE[l+1] is the state in the DFA for the lexical state l at
-     * the beginning of a line l is of the form l = 2*k, k a non negative integer
+     * ZZ_LEXSTATE[l] is the state in the DFA for the lexical state l ZZ_LEXSTATE[l+1] is the state in the DFA for the lexical
+     * state l at the beginning of a line l is of the form l = 2*k, k a non negative integer
      */
     private static final int ZZ_LEXSTATE[] = {
         0, 0, 1, 1, 2, 2, 3, 3, 4, 4, 5, 5
@@ -275,8 +275,8 @@ class CfgPropsScanner {
     private boolean zzAtEOF = false;
 
     /**
-     * The number of occupied positions in zzBuffer beyond zzEndRead. When a lead/high surrogate has been read from the input stream into
-     * the final zzBuffer position, this will have a value of 1; otherwise, it will have a value of 0.
+     * The number of occupied positions in zzBuffer beyond zzEndRead. When a lead/high surrogate has been read from the input
+     * stream into the final zzBuffer position, this will have a value of 1; otherwise, it will have a value of 0.
      */
     private int zzFinalHighSurrogate = 0;
 
@@ -476,9 +476,9 @@ class CfgPropsScanner {
     /**
      * Reports an error that occured while scanning.
      * <p>
-     * In a wellformed scanner (no or only correct usage of yypushback(int) and a match-all fallback rule) this method will only be called
-     * with things that "Can't Possibly Happen". If this method is called, something is seriously wrong (e.g. a JFlex bug producing a faulty
-     * scanner etc.).
+     * In a wellformed scanner (no or only correct usage of yypushback(int) and a match-all fallback rule) this method will only
+     * be called with things that "Can't Possibly Happen". If this method is called, something is seriously wrong (e.g. a JFlex
+     * bug producing a faulty scanner etc.).
      * <p>
      * Usual syntax/scanner level error handling should be done in error fallback rules.
      *

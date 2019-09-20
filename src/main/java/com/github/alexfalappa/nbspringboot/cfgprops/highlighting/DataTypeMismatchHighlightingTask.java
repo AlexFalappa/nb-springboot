@@ -102,7 +102,8 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                                 Matcher mMap = pTwoGenTypeArgs.matcher(type);
                                 if (mMap.matches() && mMap.groupCount() == 3) {
                                     String keyType = mMap.group(2);
-                                    check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, key, errors, cl, severity);
+                                    check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, key, errors, cl,
+                                            severity);
                                     String valueType = mMap.group(3);
                                     check(valueType, pValue, document, value, errors, cl, severity);
                                 }

@@ -200,7 +200,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         List<ValueHint> ret = new LinkedList<>();
         ConfigurationMetadataProperty cfgMeta = getPropertyMetadata(propertyName);
         if (cfgMeta != null) {
-            // special case: chack if data type is an enum
+            // special case: check if data type is an enum
             try {
                 Object[] enumvals = cpExec.getClassLoader(true).loadClass(cfgMeta.getType()).getEnumConstants();
                 if (enumvals != null) {

@@ -79,7 +79,8 @@ public abstract class BaseHighlightingTask extends ParserResultTask<CfgPropsPars
 
     protected abstract String getErrorLayerName();
 
-    protected abstract void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity);
+    protected abstract void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document,
+            List<ErrorDescription> errors, Severity severity);
 
     private Severity decodeSeverity(int level) {
         switch (level) {

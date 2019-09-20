@@ -53,14 +53,15 @@ import static java.util.logging.Level.FINER;
 /**
  * The Spring Boot Configuration implementation of {@code CompletionProvider}.
  * <p>
- * The entry point of completion support. This provider is registered for text/x-properties files and is enabled if spring-boot is available
- * on the classpath.
+ * The entry point of completion support. This provider is registered for text/x-properties files and is enabled if spring-boot is
+ * available on the classpath.
  * <p>
- * It scans the classpath for {@code META-INF/spring-configuration-metadata.json} files, then unmarshals the files into the corresponding {@link
- * ConfigurationMetadata} classes and later in the query task scans for items and fills the {@link CompletionResultSet}.
+ * It scans the classpath for {@code META-INF/spring-configuration-metadata.json} files, then unmarshals the files into the
+ * corresponding {@link ConfigurationMetadata} classes and later in the query task scans for items and fills the
+ * {@link CompletionResultSet}.
  * <p>
- * The provider organizes properties, groups and hints in maps indexed by name. It also maintains a cache of configuration metadata parsed
- * from JSON files in jars to speed up completion.
+ * The provider organizes properties, groups and hints in maps indexed by name. It also maintains a cache of configuration
+ * metadata parsed from JSON files in jars to speed up completion.
  *
  * @author Aggelos Karalias
  * @author Alessandro Falappa
@@ -110,8 +111,8 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
                         if (parts.length > 1) {
                             //value completion
                             String valPrefix = parts[1].trim();
-                            completePropValue(sbs, completionResultSet, propPrefix, valPrefix, lineStartOffset + lineToCaret.indexOf(
-                                    valPrefix, equalSignOffset), caretOffset);
+                            completePropValue(sbs, completionResultSet, propPrefix, valPrefix, lineStartOffset
+                                    + lineToCaret.indexOf(valPrefix, equalSignOffset), caretOffset);
                         } else if (equalSignOffset >= 0) {
                             //value completion with empty filter
                             completePropValue(sbs, completionResultSet, propPrefix, null, lineStartOffset + equalSignOffset + 1,

@@ -30,8 +30,8 @@ import com.sun.source.tree.CompilationUnitTree;
 import com.sun.source.util.TreePath;
 
 /**
- * This factory triggers the scanning of compilation units. If it is active, it uses the {@link ElementScanningTask}, otherwise an empty
- * task.
+ * This factory triggers the scanning of compilation units. If it is active, it uses the {@link ElementScanningTask}, otherwise an
+ * empty task.
  *
  * @author Michael J. Simons, 2016-09-16
  * @author Alessandro Falappa

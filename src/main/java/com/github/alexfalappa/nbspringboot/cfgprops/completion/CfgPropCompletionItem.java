@@ -68,7 +68,8 @@ public class CfgPropCompletionItem implements CompletionItem {
     private final String type;
     private final boolean sortDeprLast;
 
-    public CfgPropCompletionItem(ConfigurationMetadataProperty configurationMeta, SpringBootService bootService, int propStartOffset, int caretOffset, boolean sortDeprLast) {
+    public CfgPropCompletionItem(ConfigurationMetadataProperty configurationMeta, SpringBootService bootService,
+            int propStartOffset, int caretOffset, boolean sortDeprLast) {
         this.overwrite = false;
         this.configurationMeta = configurationMeta;
         if (configurationMeta.getType() != null) {
@@ -153,7 +154,8 @@ public class CfgPropCompletionItem implements CompletionItem {
     }
 
     @Override
-    public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height, boolean selected) {
+    public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height,
+            boolean selected) {
         String leftHtmlText = getText();
         if (configurationMeta.isDeprecated()) {
             leftHtmlText = "<s>" + leftHtmlText + "</s>";

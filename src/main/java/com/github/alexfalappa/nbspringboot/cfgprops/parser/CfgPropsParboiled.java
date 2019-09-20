@@ -23,13 +23,13 @@ import static java.util.regex.Pattern.compile;
 /**
  * Spring Boot configuration properties parser based on Parboiled library.
  * <p>
- * This parser implements a grammar accepting the Java Properties format (with some minor exceptions) and adding dot separated keys, array
- * notation ({@code array[index]=value} and map notation ({@code map[key]=value}.
+ * This parser implements a grammar accepting the Java Properties format (with some minor exceptions) and adding dot separated
+ * keys, array notation ({@code array[index]=value} and map notation ({@code map[key]=value}.
  * <p>
  * Differences with base Java Properties syntax:
  * <ul>
- * <li>values must be explicitly separated from keys by a <tt>=</tt> (equal sign) or <tt>:</tt> (colon), first occurring whitespace as
- * separator is not supported.
+ * <li>values must be explicitly separated from keys by a <tt>=</tt> (equal sign) or <tt>:</tt> (colon), first occurring
+ * whitespace as separator is not supported.
  * </ul>
  *
  * @author Alessandro Falappa
