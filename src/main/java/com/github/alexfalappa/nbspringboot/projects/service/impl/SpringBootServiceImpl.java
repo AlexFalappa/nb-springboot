@@ -201,6 +201,15 @@ public class SpringBootServiceImpl implements SpringBootService {
         List<ValueHint> ret = new LinkedList<>();
         ConfigurationMetadataProperty cfgMeta = getPropertyMetadata(propertyName);
         if (cfgMeta != null) {
+            // special case: check if data type is boolean
+            if (cfgMeta.getType().equals("java.lang.Boolean")) {
+                ValueHint valueHint = new ValueHint();
+                valueHint.setValue("true");
+                ret.add(valueHint);
+                valueHint = new ValueHint();
+                valueHint.setValue("false");
+                ret.add(valueHint);
+            }
             // special case: check if data type is an enum
             try {
                 Object[] enumvals = cpExec.getClassLoader(true).loadClass(cfgMeta.getType()).getEnumConstants();
