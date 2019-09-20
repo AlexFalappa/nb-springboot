@@ -64,9 +64,10 @@ import static java.util.regex.Pattern.compile;
 /**
  * Project wide {@link SpringBootService} implementation.
  * <p>
- * It reads Spring Boot configuration properties metadata and maintains indexed structures extracted out of it.
+ * It scans the classpath for {@code META-INF/spring-configuration-metadata.json} files, then unmarshals the files into the
+ * corresponding {@link ConfigurationMetadata} classes and maintains indexed structures extracted out of it.
  * <p>
- * Registered for maven projects.
+ * Registered for maven projects with jar and war packaging.
  *
  * @author Alessandro Falappa
  */
