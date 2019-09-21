@@ -109,7 +109,7 @@ public class CfgPropValueCompletionItem implements CompletionItem {
             return new AsyncCompletionTask(new AsyncCompletionQuery() {
                 @Override
                 protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                    completionResultSet.setDocumentation(new CfgPropValueCompletionDocumentation(CfgPropValueCompletionItem.this));
+                    completionResultSet.setDocumentation(new CfgPropValueCompletionDocumentation(hint));
                     completionResultSet.finish();
                 }
             });

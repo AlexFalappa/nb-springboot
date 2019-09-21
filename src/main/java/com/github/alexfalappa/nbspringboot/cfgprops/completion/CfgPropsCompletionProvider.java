@@ -61,7 +61,7 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
         }
         switch (queryType) {
             case CompletionProvider.COMPLETION_QUERY_TYPE:
-                return new AsyncCompletionTask(new CfgPropsCompletionQuery(sbs), jtc);
+                return new AsyncCompletionTask(new CfgPropsCompletionQuery(sbs, prj), jtc);
             case CompletionProvider.DOCUMENTATION_QUERY_TYPE:
                 return new AsyncCompletionTask(new CfgPropsDocAndTooltipQuery(sbs, false), jtc);
             case CompletionProvider.TOOLTIP_QUERY_TYPE:

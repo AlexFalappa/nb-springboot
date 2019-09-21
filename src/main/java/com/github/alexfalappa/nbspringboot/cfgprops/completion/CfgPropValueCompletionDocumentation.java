@@ -29,15 +29,14 @@ import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
  */
 public class CfgPropValueCompletionDocumentation implements CompletionDocumentation {
 
-    private final CfgPropValueCompletionItem item;
+    private final ValueHint valueHint;
 
-    public CfgPropValueCompletionDocumentation(CfgPropValueCompletionItem item) {
-        this.item = item;
+    public CfgPropValueCompletionDocumentation(ValueHint valueHint) {
+        this.valueHint = valueHint;
     }
 
     @Override
     public String getText() {
-        ValueHint valueHint = item.getHint();
         StringBuilder sb = new StringBuilder();
         // name and type
         sb.append("<b>").append(valueHint.getValue()).append("</b>");

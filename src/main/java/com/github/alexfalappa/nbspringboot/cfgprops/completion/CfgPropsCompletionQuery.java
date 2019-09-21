@@ -26,12 +26,16 @@ import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.StyledDocument;
 
+import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.project.Project;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
 import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+import org.springframework.boot.configurationmetadata.Hints;
 import org.springframework.boot.configurationmetadata.ValueHint;
+import org.springframework.boot.configurationmetadata.ValueProvider;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
@@ -42,7 +46,7 @@ import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_SORT_L
 import static java.util.logging.Level.FINER;
 
 /**
- * Completion query used in {@link CfgPropsCompletionProvider}.
+ * Completion query for normal completion used in {@link CfgPropsCompletionProvider}.
  *
  * @author Alessandro Falappa
  */
@@ -51,9 +55,11 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
     private static final Logger logger = Logger.getLogger(CfgPropsCompletionQuery.class.getName());
     private static final Pattern PATTERN_PROP_NAME = Pattern.compile("[^=\\s]+");
     private final SpringBootService sbs;
+    private final Project proj;
 
-    public CfgPropsCompletionQuery(SpringBootService sbs) {
+    public CfgPropsCompletionQuery(SpringBootService sbs, Project proj) {
         this.sbs = Objects.requireNonNull(sbs);
+        this.proj = proj;
     }
 
     @Override
@@ -104,14 +110,24 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
         final boolean bErrorShow = prefs.getBoolean(PREF_DEPR_ERROR_SHOW, true);
         long mark = System.currentTimeMillis();
         logger.log(FINER, "Completing property name: {0}", filter);
+        if (filter != null) {
+            for (String mapProp : sbs.getMapPropertyNames()) {
+                if (filter.startsWith(mapProp)) {
+                    String key = filter.substring(mapProp.length());
+                    if (key.startsWith(".")) {
+                        logger.log(FINER, "Completing map property key: {0}", key.substring(1));
+                    }
+                }
+            }
+        }
         for (ConfigurationMetadataProperty propMeta : sbs.queryPropertyMetadata(filter)) {
             if (Utils.isErrorDeprecated(propMeta)) {
                 // show error level deprecated props based on pref
                 if (bErrorShow) {
-                    completionResultSet.addItem(new CfgPropCompletionItem(propMeta, sbs, startOffset, caretOffset, bDeprLast));
+                    completionResultSet.addItem(new CfgPropCompletionItem(propMeta, startOffset, caretOffset, bDeprLast));
                 }
             } else {
-                completionResultSet.addItem(new CfgPropCompletionItem(propMeta, sbs, startOffset, caretOffset, bDeprLast));
+                completionResultSet.addItem(new CfgPropCompletionItem(propMeta, startOffset, caretOffset, bDeprLast));
             }
         }
         final long elapsed = System.currentTimeMillis() - mark;
@@ -123,8 +139,48 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             int startOffset, int caretOffset) {
         long mark = System.currentTimeMillis();
         logger.log(FINER, "Completing property value: {0}", filter);
-        for (ValueHint valueHint : sbs.queryHintMetadata(propName, filter)) {
-            completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
+        ConfigurationMetadataProperty propMeta = sbs.getPropertyMetadata(propName);
+        if (propMeta != null) {
+            // special case: check if data type is boolean
+            if (propMeta.getType().equals("java.lang.Boolean")) {
+                ValueHint valueHint = new ValueHint();
+                valueHint.setValue("true");
+                completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
+                valueHint = new ValueHint();
+                valueHint.setValue("false");
+                completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
+            }
+            // special case: check if data type is an enum
+            try {
+                ClassPath cpExec = Utils.execClasspathForProj(proj);
+                Object[] enumvals = cpExec.getClassLoader(true).loadClass(propMeta.getType()).getEnumConstants();
+                if (enumvals != null) {
+                    for (Object val : enumvals) {
+                        final String valName = val.toString().toLowerCase();
+                        if (filter == null || valName.contains(filter)) {
+                            ValueHint valueHint = new ValueHint();
+                            valueHint.setValue(valName);
+                            completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
+                        }
+                    }
+                }
+            } catch (ClassNotFoundException ex) {
+                // enum not available in project classpath, no completion possible
+            }
+            // add metadata defined value hints to completion list
+            final Hints hints = propMeta.getHints();
+            for (ValueHint valueHint : hints.getValueHints()) {
+                if (filter == null || valueHint.getValue().toString().contains(filter)) {
+                    completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
+                }
+            }
+            // log value providers
+            if (!hints.getValueProviders().isEmpty()) {
+                logger.info(String.format("Value providers for %s:", propName));
+                for (ValueProvider vp : hints.getValueProviders()) {
+                    logger.info(vp.getName());
+                }
+            }
         }
         final long elapsed = System.currentTimeMillis() - mark;
         logger.log(FINER, "Value completion of ''{0}'' on ''{1}'' took: {2} msecs", new Object[]{filter, propName, elapsed});

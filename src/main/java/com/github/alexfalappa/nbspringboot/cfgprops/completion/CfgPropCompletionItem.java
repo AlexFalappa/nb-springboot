@@ -42,7 +42,6 @@ import org.openide.util.ImageUtilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.Utils;
-import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.Utils.shortenJavaType;
 import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
@@ -61,15 +60,14 @@ public class CfgPropCompletionItem implements CompletionItem {
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-property.png"));
     private final ConfigurationMetadataProperty configurationMeta;
-    private final SpringBootService bootService;
     private final int caretOffset;
     private final int propStartOffset;
     private boolean overwrite;
     private final String type;
     private final boolean sortDeprLast;
 
-    public CfgPropCompletionItem(ConfigurationMetadataProperty configurationMeta, SpringBootService bootService,
-            int propStartOffset, int caretOffset, boolean sortDeprLast) {
+    public CfgPropCompletionItem(ConfigurationMetadataProperty configurationMeta, int propStartOffset, int caretOffset,
+            boolean sortDeprLast) {
         this.overwrite = false;
         this.configurationMeta = configurationMeta;
         if (configurationMeta.getType() != null) {
@@ -77,7 +75,6 @@ public class CfgPropCompletionItem implements CompletionItem {
         } else {
             type = null;
         }
-        this.bootService = bootService;
         this.propStartOffset = propStartOffset;
         this.caretOffset = caretOffset;
         this.sortDeprLast = sortDeprLast;
@@ -172,8 +169,7 @@ public class CfgPropCompletionItem implements CompletionItem {
         return new AsyncCompletionTask(new AsyncCompletionQuery() {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                completionResultSet
-                        .setDocumentation(new CfgPropCompletionDocumentation(CfgPropCompletionItem.this.configurationMeta));
+                completionResultSet.setDocumentation(new CfgPropCompletionDocumentation(configurationMeta));
                 completionResultSet.finish();
             }
         });

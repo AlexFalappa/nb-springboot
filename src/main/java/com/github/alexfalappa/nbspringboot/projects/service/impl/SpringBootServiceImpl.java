@@ -33,11 +33,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.api.project.SourceGroup;
-import org.netbeans.api.project.Sources;
 import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.spi.project.ProjectServiceProvider;
@@ -54,11 +50,11 @@ import org.springframework.boot.configurationmetadata.SimpleConfigurationMetadat
 import org.springframework.boot.configurationmetadata.ValueHint;
 import org.springframework.boot.configurationmetadata.ValueProvider;
 
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
 
 /**
@@ -82,7 +78,7 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     private static final Logger logger = Logger.getLogger(SpringBootServiceImpl.class.getName());
     private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
-    private final Pattern pArrayNotation = compile("(.+)\\[\\d+\\]");
+    private static final Pattern PATTERN_ARRAY_NOTATION = compile("(.+)\\[\\d+\\]");
     private SimpleConfigurationMetadataRepository repo = new SimpleConfigurationMetadataRepository();
     private final Map<String, ConfigurationMetadataRepository> reposInJars = new HashMap<>();
     private NbMavenProjectImpl mvnPrj;
@@ -160,7 +156,7 @@ public class SpringBootServiceImpl implements SpringBootService {
                     return cachedProperties.get(relaxedName);
                 } else {
                     // try to interpret array notation (strip '[index]' from pName)
-                    Matcher mArrNot = pArrayNotation.matcher(relaxedName);
+                    Matcher mArrNot = PATTERN_ARRAY_NOTATION.matcher(relaxedName);
                     if (mArrNot.matches()) {
                         return cachedProperties.get(mArrNot.group(1));
                     } else {
@@ -283,19 +279,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         logger.log(INFO, "Initializing SpringBootService for project {0}", new Object[]{mvnPrj.toString()});
         cachedDepsPresence.clear();
         // set up a reference to the execute classpath object
-        Sources srcs = ProjectUtils.getSources(mvnPrj);
-        SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
-        boolean srcGroupFound = false;
-        for (SourceGroup group : srcGroups) {
-            if (group.getName().toLowerCase().contains("source")) {
-                srcGroupFound = true;
-                cpExec = ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
-                break;
-            }
-        }
-        if (!srcGroupFound) {
-            logger.log(WARNING, "No sources found for project: {0}", new Object[]{mvnPrj.toString()});
-        }
+        cpExec = Utils.execClasspathForProj(mvnPrj);
         if (cpExec != null) {
             // listen for pom changes
             logger.info("Adding maven pom listener...");

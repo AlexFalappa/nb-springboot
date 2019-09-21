@@ -19,8 +19,13 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
 
+import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.FileOwnerQuery;
 import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.api.project.SourceGroup;
+import org.netbeans.api.project.Sources;
 import org.openide.filesystems.FileObject;
 import org.openide.loaders.DataObject;
 import org.openide.util.Lookup;
@@ -34,6 +39,7 @@ import com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
+import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
 
 /**
@@ -43,6 +49,7 @@ import static java.util.regex.Pattern.compile;
  */
 public final class Utils {
 
+    private static final Logger logger = Logger.getLogger(Utils.class.getName());
     private static final Pattern p = compile("(\\w+\\.)+(\\w+)");
 
     // prevent instantiation
@@ -139,7 +146,6 @@ public final class Utils {
      * @return the active project or null if no active project found
      */
     public static Project getActiveProject() {
-        final Logger logger = Logger.getLogger(Utils.class.getName());
         // lookup in global context
         Project prj = Utilities.actionsGlobalContext().lookup(Project.class);
         if (prj != null) {
@@ -191,6 +197,23 @@ public final class Utils {
             }
         }
         logger.log(Level.FINE, "Couldn't find active project reference");
+        return null;
+    }
+
+    /**
+     * Retrieves the execute {@code ClassPath} object for the given project.
+     *
+     * @param proj the project
+     * @return found ClassPath object or null
+     */
+    public static ClassPath execClasspathForProj(Project proj) {
+        Sources srcs = ProjectUtils.getSources(proj);
+        SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
+        if (srcGroups.length > 0) {
+            return ClassPath.getClassPath(srcGroups[0].getRootFolder(), ClassPath.EXECUTE);
+        } else {
+            logger.log(WARNING, "No sources found for project: {0}", new Object[]{proj.toString()});
+        }
         return null;
     }
 }
