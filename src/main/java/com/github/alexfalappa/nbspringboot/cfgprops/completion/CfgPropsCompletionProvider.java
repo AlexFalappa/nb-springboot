@@ -47,7 +47,7 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
 
     @Override
     public CompletionTask createTask(int queryType, JTextComponent jtc) {
-        if (queryType != CompletionProvider.COMPLETION_QUERY_TYPE) {
+        if (queryType == CompletionProvider.COMPLETION_ALL_QUERY_TYPE) {
             return null;
         }
         Project prj = Utils.getActiveProject();
@@ -59,7 +59,16 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
         if (sbs == null) {
             return null;
         }
-        return new AsyncCompletionTask(new CfgPropsCompletionQuery(sbs), jtc);
+        switch (queryType) {
+            case CompletionProvider.COMPLETION_QUERY_TYPE:
+                return new AsyncCompletionTask(new CfgPropsCompletionQuery(sbs), jtc);
+            case CompletionProvider.DOCUMENTATION_QUERY_TYPE:
+                logger.finer("DOCUMENTATION_QUERY_TYPE");
+                break;
+            case CompletionProvider.TOOLTIP_QUERY_TYPE:
+                return new AsyncCompletionTask(new CfgPropsTooltipQuery(sbs), jtc);
+        }
+        return null;
     }
 
     @Override
