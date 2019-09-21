@@ -173,7 +173,7 @@ public class CfgPropCompletionItem implements CompletionItem {
             @Override
             protected void query(CompletionResultSet completionResultSet, Document document, int i) {
                 completionResultSet
-                        .setDocumentation(new CfgPropCompletionDocumentation(CfgPropCompletionItem.this, bootService));
+                        .setDocumentation(new CfgPropCompletionDocumentation(CfgPropCompletionItem.this.configurationMeta));
                 completionResultSet.finish();
             }
         });

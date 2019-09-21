@@ -63,10 +63,9 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
             case CompletionProvider.COMPLETION_QUERY_TYPE:
                 return new AsyncCompletionTask(new CfgPropsCompletionQuery(sbs), jtc);
             case CompletionProvider.DOCUMENTATION_QUERY_TYPE:
-                logger.finer("DOCUMENTATION_QUERY_TYPE");
-                break;
+                return new AsyncCompletionTask(new CfgPropsDocAndTooltipQuery(sbs, false), jtc);
             case CompletionProvider.TOOLTIP_QUERY_TYPE:
-                return new AsyncCompletionTask(new CfgPropsTooltipQuery(sbs), jtc);
+                return new AsyncCompletionTask(new CfgPropsDocAndTooltipQuery(sbs, true), jtc);
         }
         return null;
     }

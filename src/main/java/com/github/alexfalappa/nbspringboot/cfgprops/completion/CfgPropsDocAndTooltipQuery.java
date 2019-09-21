@@ -37,18 +37,20 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 import static java.util.logging.Level.FINER;
 
 /**
- * Completion query for tooltip completion used in {@link CfgPropsCompletionProvider}.
+ * Completion query for tooltip and documentation completion used in {@link CfgPropsCompletionProvider}.
  *
  * @author Alessandro Falappa
  */
-public class CfgPropsTooltipQuery extends AsyncCompletionQuery {
+public class CfgPropsDocAndTooltipQuery extends AsyncCompletionQuery {
 
-    private static final Logger logger = Logger.getLogger(CfgPropsTooltipQuery.class.getName());
+    private static final Logger logger = Logger.getLogger(CfgPropsDocAndTooltipQuery.class.getName());
     private static final Pattern PATTERN_PROP_NAME = Pattern.compile("\\s*([^=\\s]+)\\s*[=:]?.*");
     private final SpringBootService sbs;
+    private final boolean showTooltip;
 
-    public CfgPropsTooltipQuery(SpringBootService sbs) {
+    public CfgPropsDocAndTooltipQuery(SpringBootService sbs, boolean showTooltip) {
         this.sbs = Objects.requireNonNull(sbs);
+        this.showTooltip = showTooltip;
     }
 
     @Override
@@ -62,7 +64,11 @@ public class CfgPropsTooltipQuery extends AsyncCompletionQuery {
             if (line.endsWith("\n")) {
                 line = line.substring(0, line.length() - 1);
             }
-            logger.log(FINER, "Tooltip on: {0}", line);
+            if (showTooltip) {
+                logger.log(FINER, "Tooltip on: {0}", line);
+            } else {
+                logger.log(FINER, "Documentation on: {0}", line);
+            }
             if (!line.contains("#")) {
                 //property name extraction from line
                 Matcher matcher = PATTERN_PROP_NAME.matcher(line);
@@ -70,9 +76,13 @@ public class CfgPropsTooltipQuery extends AsyncCompletionQuery {
                     String propPrefix = matcher.group(1);
                     ConfigurationMetadataProperty propMeta = sbs.getPropertyMetadata(propPrefix);
                     if (propMeta != null) {
-                        final JToolTip toolTip = new JToolTip();
-                        toolTip.setTipText(Utils.shortenJavaType(propMeta.getType()));
-                        completionResultSet.setToolTip(toolTip);
+                        if (showTooltip) {
+                            final JToolTip toolTip = new JToolTip();
+                            toolTip.setTipText(Utils.shortenJavaType(propMeta.getType()));
+                            completionResultSet.setToolTip(toolTip);
+                        } else {
+                            completionResultSet.setDocumentation(new CfgPropCompletionDocumentation(propMeta));
+                        }
                     }
                 }
             }

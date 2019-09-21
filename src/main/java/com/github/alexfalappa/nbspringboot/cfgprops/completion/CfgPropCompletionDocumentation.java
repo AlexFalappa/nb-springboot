@@ -31,7 +31,6 @@ import org.springframework.boot.configurationmetadata.Hints;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
 import com.github.alexfalappa.nbspringboot.Utils;
-import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 
@@ -46,17 +45,14 @@ import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
  */
 public class CfgPropCompletionDocumentation implements CompletionDocumentation {
 
-    private final CfgPropCompletionItem item;
-    private final SpringBootService bootService;
+    private final ConfigurationMetadataProperty configurationMeta;
 
-    public CfgPropCompletionDocumentation(CfgPropCompletionItem item, SpringBootService sbs) {
-        this.item = item;
-        this.bootService = sbs;
+    public CfgPropCompletionDocumentation(ConfigurationMetadataProperty configurationMeta) {
+        this.configurationMeta = configurationMeta;
     }
 
     @Override
     public String getText() {
-        ConfigurationMetadataProperty configurationMeta = item.getConfigurationMetadata();
         StringBuilder sb = new StringBuilder();
         // name and type
         sb.append("<b>").append(configurationMeta.getId()).append("</b>");
