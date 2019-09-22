@@ -1,8 +1,14 @@
 # Changelog
 
 -  **2.1** (??? 2019): Work in Progress
-    -  Minimum required NetBeans version is now **8.2**, minimum required JDK version is now **8**.
-    -  Complete value of configuration properties whose data type is a Java enumeration.
+    -  Configuration properties completion enhanced:
+		- Completion of values whose data type is a Java enumeration
+		- Completion of values whose data type is a Java boolean
+		- Completion of booleans and enumerations as map keys and values in properties whose data type is a java.util.Map
+		- Completion of map key hints in properties whose data type is a java.util.Map
+		- Implemented 'Show Method Parameters' (Ctrl+P) to show data type of property under cursor in a tooltip
+		- Implemented 'Show Documentation' (Ctrl+Shift+Space Bar) to show the documentation popup of property under cursor
+    -  Minimum required NetBeans version is now **8.2**, minimum required JDK version is now **8**
     -  Upgrade internal dependencies
 
 -  **2.0.1** (July 2018): Polishing

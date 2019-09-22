@@ -40,21 +40,21 @@ import org.openide.util.ImageUtilities;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
 /**
- * The Spring Boot configuration property values implementation of {@code CompletionItem}.
+ * The Spring Boot configuration property key implementation of {@code CompletionItem}.
  * <p>
  * It utilizes an {@code ValueHint} to render the completion item and spawn the documentation display.
  *
  * @author Alessandro Falappa
  */
-public class CfgPropValueCompletionItem implements CompletionItem {
+public class CfgPropKeyCompletionItem implements CompletionItem {
 
     private final ValueHint hint;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
-            "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-value.png"));
+            "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-key.png"));
     private final int caretOffset;
     private final int dotOffset;
 
-    public CfgPropValueCompletionItem(ValueHint hint, int dotOffset, int caretOffset) {
+    public CfgPropKeyCompletionItem(ValueHint hint, int dotOffset, int caretOffset) {
         this.hint = hint;
         this.dotOffset = dotOffset;
         this.caretOffset = caretOffset;

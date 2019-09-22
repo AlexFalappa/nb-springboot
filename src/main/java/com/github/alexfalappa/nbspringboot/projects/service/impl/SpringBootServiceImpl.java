@@ -334,10 +334,12 @@ public class SpringBootServiceImpl implements SpringBootService {
             final String type = entry.getValue().getType();
             if (type != null) {
                 final String key = entry.getKey();
-                if (type.contains("Map<")) {
+                if (type.startsWith("java.util.Map<")) {
                     mapProperties.add(key);
                 }
-                if (type.contains("List<") || type.contains("Set<") || type.contains("Collection<")) {
+                if (type.startsWith("java.util.List<")
+                        || type.startsWith("java.util.Set<")
+                        || type.startsWith("java.util.Collection<")) {
                     collectionProperties.add(key);
                 }
             }
