@@ -333,26 +333,26 @@
                 </executions>
             </plugin>
             <!--use only when generating scanner class
-			<plugin>
-				<groupId>de.jflex</groupId>
-				<artifactId>jflex-maven-plugin</artifactId>
-				<version>1.6.1</version>
-				<configuration>
-					<!-uncomment following line when running tests->
-					<skeleton>src/main/jflex/skeleton.netbeans</skeleton>
-					<lexDefinitions>
-						<lexDefinition>src/main/jflex/BootCfgProperties.flex</lexDefinition>
-					</lexDefinitions>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			-->
+            <plugin>
+                    <groupId>de.jflex</groupId>
+                    <artifactId>jflex-maven-plugin</artifactId>
+                    <version>1.6.1</version>
+                    <configuration>
+                            <!-uncomment following line when running tests->
+                            <skeleton>src/main/jflex/skeleton.netbeans</skeleton>
+                            <lexDefinitions>
+                                    <lexDefinition>src/main/jflex/BootCfgProperties.flex</lexDefinition>
+                            </lexDefinitions>
+                    </configuration>
+                    <executions>
+                            <execution>
+                                    <goals>
+                                            <goal>generate</goal>
+                                    </goals>
+                            </execution>
+                    </executions>
+            </plugin>
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
@@ -366,7 +366,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>1.8.0</version>
+                                    <version>[1.8,1.9)</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
