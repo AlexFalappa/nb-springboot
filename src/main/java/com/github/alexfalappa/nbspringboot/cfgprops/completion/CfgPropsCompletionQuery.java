@@ -77,7 +77,6 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
         int lineStartOffset = lineElement.getStartOffset();
         try {
             String lineToCaret = styDoc.getText(lineStartOffset, caretOffset - lineStartOffset);
-            logger.log(FINER, "Completion on: {0}", lineToCaret);
             if (!lineToCaret.contains("#")) {
                 String[] parts = lineToCaret.split("=");
                 //property name extraction from part before =
@@ -116,7 +115,6 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
         final boolean bDeprLast = prefs.getBoolean(PREF_DEPR_SORT_LAST, true);
         final boolean bErrorShow = prefs.getBoolean(PREF_DEPR_ERROR_SHOW, true);
         long mark = System.currentTimeMillis();
-        logger.log(FINER, "Completing property name from: {0}", filter);
         // check if completing a property map key
         if (filter != null) {
             for (String mapProp : sbs.getMapPropertyNames()) {
@@ -177,6 +175,14 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
         if (propMeta != null) {
             final String propType = propMeta.getType();
             final String mapValueType = extractMapValueType(propMeta);
+            // if data type is collection or array adjust filter and startOffset to part after last comma
+            if (propType.contains("List<") || propType.contains("Set<") || propType.contains("[]")) {
+                int idx = filter.lastIndexOf(',');
+                if (idx > 0) {
+                    startOffset = startOffset + idx + 1;
+                    filter = filter.substring(idx + 1);
+                }
+            }
             // check if data type or map value type is boolean
             if (propType.equals("java.lang.Boolean") || mapValueType.equals("java.lang.Boolean")) {
                 ValueHint valueHint = new ValueHint();
@@ -187,13 +193,10 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
             }
             // check if data type is an enum
-            completeEnum(propType, filter,
-                    valueHint -> completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset)));
+            completeValueEnum(propType, filter, completionResultSet, startOffset, caretOffset);
             // check if map value data type is an enum (not for collections)
             if (!mapValueType.contains("<")) {
-                completeEnum(mapValueType, filter,
-                        valueHint -> completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset,
-                                caretOffset)));
+                completeValueEnum(mapValueType, filter, completionResultSet, startOffset, caretOffset);
             }
             // add metadata defined value hints to completion list
             final Hints hints = propMeta.getHints();
@@ -207,6 +210,8 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 logger.log(FINER, "Value providers for {0}:", propName);
                 for (ValueProvider vp : hints.getValueProviders()) {
                     logger.log(FINER, "{0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
+                    bootProviders.getProvider(vp.getName()).provide(propMeta, filter, completionResultSet, startOffset,
+                            caretOffset);
                 }
             }
         }
@@ -225,6 +230,26 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                         ValueHint valueHint = new ValueHint();
                         valueHint.setValue(valName);
                         consumer.accept(valueHint);
+                    }
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            // enum not available in project classpath, no completion possible
+        }
+    }
+
+    private void completeValueEnum(String dataType, String filter, CompletionResultSet completionResultSet, int startOffset,
+            int caretOffset) {
+        try {
+            ClassPath cpExec = Utils.execClasspathForProj(proj);
+            Object[] enumvals = cpExec.getClassLoader(true).loadClass(dataType).getEnumConstants();
+            if (enumvals != null) {
+                for (Object val : enumvals) {
+                    final String valName = val.toString().toLowerCase();
+                    if (filter == null || valName.contains(filter)) {
+                        ValueHint valueHint = new ValueHint();
+                        valueHint.setValue(valName);
+                        completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
                     }
                 }
             }
