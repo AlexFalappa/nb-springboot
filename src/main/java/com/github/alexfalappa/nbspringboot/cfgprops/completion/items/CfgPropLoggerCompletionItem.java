@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Keevosh ULP.
+ * Copyright 2019 Alessandro Falappa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,59 +13,46 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.cfgprops.completion;
+package com.github.alexfalappa.nbspringboot.cfgprops.completion.items;
 
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
 
+import javax.lang.model.element.ElementKind;
 import javax.swing.ImageIcon;
-import javax.swing.JToolTip;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
 import org.netbeans.api.editor.completion.Completion;
+import org.netbeans.api.java.source.ui.ElementIcons;
 import org.netbeans.spi.editor.completion.CompletionItem;
-import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.editor.completion.CompletionTask;
-import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
-import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
 import org.openide.util.Exceptions;
-import org.openide.util.ImageUtilities;
-import org.springframework.boot.configurationmetadata.ValueHint;
 
 /**
- * The Spring Boot configuration property key implementation of {@code CompletionItem}.
- * <p>
- * It utilizes an {@code ValueHint} to render the completion item and spawn the documentation display.
+ * The Spring Boot logger package name implementation of {@code CompletionItem}.
  *
  * @author Alessandro Falappa
  */
-public class CfgPropKeyCompletionItem implements CompletionItem {
+public class CfgPropLoggerCompletionItem implements CompletionItem {
 
-    private final ValueHint hint;
-    private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
-            "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-key.png"));
-    private final int caretOffset;
+    private final String name;
     private final int dotOffset;
+    private final int caretOffset;
 
-    public CfgPropKeyCompletionItem(ValueHint hint, int dotOffset, int caretOffset) {
-        this.hint = hint;
+    public CfgPropLoggerCompletionItem(String name, int dotOffset, int caretOffset) {
+        this.name = name;
         this.dotOffset = dotOffset;
         this.caretOffset = caretOffset;
     }
 
-    public ValueHint getHint() {
-        return hint;
-    }
-
     public String getText() {
-        return hint.getValue().toString();
+        return name;
     }
 
     public String getTextRight() {
@@ -99,36 +86,19 @@ public class CfgPropKeyCompletionItem implements CompletionItem {
     @Override
     public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height,
             boolean selected) {
-        CompletionUtilities.renderHtml(fieldIcon, getText(), getTextRight(), g, defaultFont, (selected ? UIManager.getColor(
-                "List.selectionForeground") : UIManager.getColor("List.foreground")), width, height, selected);
+        final Color color = selected ? UIManager.getColor("List.selectionForeground") : UIManager.getColor("List.foreground");
+        CompletionUtilities.renderHtml((ImageIcon) ElementIcons.getElementIcon(ElementKind.PACKAGE, null), getText(),
+                getTextRight(), g, defaultFont, color, width, height, selected);
     }
 
     @Override
     public CompletionTask createDocumentationTask() {
-        if (hint.getDescription() != null) {
-            return new AsyncCompletionTask(new AsyncCompletionQuery() {
-                @Override
-                protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                    completionResultSet.setDocumentation(new CfgPropValueCompletionDocumentation(hint));
-                    completionResultSet.finish();
-                }
-            });
-        } else {
-            return null;
-        }
+        return null;
     }
 
     @Override
     public CompletionTask createToolTipTask() {
-        return new AsyncCompletionTask(new AsyncCompletionQuery() {
-            @Override
-            protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                JToolTip toolTip = new JToolTip();
-                toolTip.setTipText("Press Enter to insert \"" + getText() + "\"");
-                completionResultSet.setToolTip(toolTip);
-                completionResultSet.finish();
-            }
-        });
+        return null;
     }
 
     @Override
@@ -138,7 +108,7 @@ public class CfgPropKeyCompletionItem implements CompletionItem {
 
     @Override
     public int getSortPriority() {
-        return 0;
+        return 1;
     }
 
     @Override

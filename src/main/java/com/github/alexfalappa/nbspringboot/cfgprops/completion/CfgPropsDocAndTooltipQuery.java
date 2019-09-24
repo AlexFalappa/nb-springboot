@@ -15,6 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.completion;
 
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.doc.CfgPropCompletionDocumentation;
+
 import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;

@@ -24,7 +24,7 @@ import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.CfgPropLoggerCompletionItem;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropLoggerCompletionItem;
 
 /**
  *

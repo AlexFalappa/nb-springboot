@@ -40,6 +40,9 @@ import org.springframework.boot.configurationmetadata.ValueProvider;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropCompletionItem;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropKeyCompletionItem;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropValueCompletionItem;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_ERROR_SHOW;

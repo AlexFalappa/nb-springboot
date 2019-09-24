@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.cfgprops.completion;
+package com.github.alexfalappa.nbspringboot.cfgprops.completion.items;
 
 import java.awt.Color;
 import java.awt.Font;
@@ -42,6 +42,7 @@ import org.openide.util.ImageUtilities;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.doc.CfgPropCompletionDocumentation;
 
 import static com.github.alexfalappa.nbspringboot.Utils.shortenJavaType;
 import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
