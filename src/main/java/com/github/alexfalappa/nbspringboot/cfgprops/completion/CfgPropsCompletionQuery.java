@@ -59,10 +59,12 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
     private static final Pattern PATTERN_MAPVALUE_DATATYPE = Pattern.compile("java.util.Map<.*,(.*)>");
     private final SpringBootService sbs;
     private final Project proj;
+    private final BootProviders bootProviders;
 
     public CfgPropsCompletionQuery(SpringBootService sbs, Project proj) {
         this.sbs = Objects.requireNonNull(sbs);
         this.proj = proj;
+        this.bootProviders = new BootProviders(proj);
     }
 
     @Override
@@ -115,18 +117,20 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
         // check if completing a property map key
         if (filter != null) {
             for (String mapProp : sbs.getMapPropertyNames()) {
-                if (filter.startsWith(mapProp) && filter.length() > mapProp.length()) {
+                if (filter.length() > mapProp.length() && filter.startsWith(mapProp)) {
                     String key = filter.substring(mapProp.length() + 1);
                     logger.log(FINER, "Completing key for map property {0} from: {1}", new Object[]{mapProp, key});
+                    final ConfigurationMetadataProperty propMetadata = sbs.getPropertyMetadata(mapProp);
                     // if key data type is an enum complete with enum values
-                    final String keyDataType = extractMapKeyType(sbs.getPropertyMetadata(mapProp));
+                    final String keyDataType = extractMapKeyType(propMetadata);
                     if (!keyDataType.contains("<")) {
-                        completeEnum(keyDataType, key,
-                                valueHint -> completionResultSet.addItem(new CfgPropKeyCompletionItem(valueHint,
-                                        startOffset + mapProp.length() + 1, caretOffset)));
+                        completeEnum(keyDataType, key, valueHint -> {
+                            completionResultSet.addItem(
+                                    new CfgPropKeyCompletionItem(valueHint, startOffset + mapProp.length() + 1, caretOffset));
+                        });
                     }
                     // add metadata defined key hints to completion list
-                    final Hints hints = sbs.getPropertyMetadata(mapProp).getHints();
+                    final Hints hints = propMetadata.getHints();
                     if (!hints.getKeyHints().isEmpty()) {
                         for (ValueHint keyHint : hints.getKeyHints()) {
                             if (keyHint.getValue().toString().startsWith(key)) {
@@ -140,6 +144,8 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                         logger.log(FINER, "Key providers for {0}:", mapProp);
                         for (ValueProvider vp : hints.getKeyProviders()) {
                             logger.log(FINER, "{0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
+                            bootProviders.getProvider(vp.getName()).provide(propMetadata, key, completionResultSet,
+                                    startOffset + mapProp.length() + 1, caretOffset);
                         }
                     }
                 }
