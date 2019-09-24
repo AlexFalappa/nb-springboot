@@ -15,11 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.completion.providers;
 
-import java.util.function.Consumer;
-
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
-import org.springframework.boot.configurationmetadata.ValueHint;
 
 
 /**
@@ -30,17 +27,8 @@ import org.springframework.boot.configurationmetadata.ValueHint;
 public class NoopBootProvider implements BootProvider {
 
     @Override
-    public void provideKeys(ConfigurationMetadataProperty propMetadata, String filter, Consumer<ValueHint> consumer) {
-        // purposefully do nothing
-    }
-
-    @Override
-    public void provideValues(ConfigurationMetadataProperty propMetadata, String filter, Consumer<ValueHint> consumer) {
-        // purposefully do nothing
-    }
-
-    @Override
-    public void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet, int dotOffset, int caretOffset) {
+    public void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet,
+            int dotOffset, int caretOffset) {
         // purposefully do nothing
     }
 

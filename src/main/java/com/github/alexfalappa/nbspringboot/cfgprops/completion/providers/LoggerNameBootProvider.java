@@ -17,12 +17,10 @@ package com.github.alexfalappa.nbspringboot.cfgprops.completion.providers;
 
 import java.util.EnumSet;
 import java.util.Set;
-import java.util.function.Consumer;
 
 import org.netbeans.api.java.source.ClassIndex;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
-import org.springframework.boot.configurationmetadata.ValueHint;
 
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropLoggerCompletionItem;
 
@@ -39,27 +37,12 @@ public class LoggerNameBootProvider implements BootProvider {
     }
 
     @Override
-    public void provideKeys(ConfigurationMetadataProperty propMetadata, String filter, Consumer<ValueHint> consumer) {
-        Set<String> packageNames = classIndex.getPackageNames(filter, true, EnumSet.allOf(ClassIndex.SearchScope.class));
-        packageNames.stream()
-                .map((name) -> {
-                    ValueHint vh = new ValueHint();
-                    vh.setValue(name);
-                    return vh;
-                })
-                .forEach(consumer);
-    }
-
-    @Override
-    public void provideValues(ConfigurationMetadataProperty propMetadata, String filter, Consumer<ValueHint> consumer) {
-    }
-
-    @Override
-    public void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet, int dotOffset, int caretOffset) {
+    public void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet,
+            int dotOffset, int caretOffset) {
         Set<String> packageNames = classIndex.getPackageNames(filter, true, EnumSet.allOf(ClassIndex.SearchScope.class));
         for (String name : packageNames) {
             completionResultSet.addItem(new CfgPropLoggerCompletionItem(name, dotOffset, caretOffset));
         }
     }
-    
+
 }

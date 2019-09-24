@@ -15,11 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.completion.providers;
 
-import java.util.function.Consumer;
-
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
-import org.springframework.boot.configurationmetadata.ValueHint;
 
 /**
  * Spring Boot key/value provider interface.
@@ -28,10 +25,7 @@ import org.springframework.boot.configurationmetadata.ValueHint;
  */
 public interface BootProvider {
 
-    void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet, int dotOffset, int caretOffset);
-
-    void provideKeys(ConfigurationMetadataProperty propMetadata, String filter, Consumer<ValueHint> consumer);
-
-    void provideValues(ConfigurationMetadataProperty propMetadata, String filter, Consumer<ValueHint> consumer);
+    void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet,
+            int dotOffset, int caretOffset);
 
 }
