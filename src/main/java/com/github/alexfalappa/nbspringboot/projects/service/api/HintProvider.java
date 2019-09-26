@@ -13,24 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.projects.service.impl;
+package com.github.alexfalappa.nbspringboot.projects.service.api;
 
-import com.github.alexfalappa.nbspringboot.projects.service.api.BootProvider;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
-
 /**
- * A Spring Boot provider that does nothing.
+ * Spring Boot key/value hints provider interface.
  *
  * @author Alessandro Falappa
  */
-public class NoopBootProvider implements BootProvider {
+public interface HintProvider {
 
-    @Override
-    public void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet,
-            int dotOffset, int caretOffset) {
-        // purposefully do nothing
-    }
+    void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet,
+            int dotOffset, int caretOffset);
 
 }

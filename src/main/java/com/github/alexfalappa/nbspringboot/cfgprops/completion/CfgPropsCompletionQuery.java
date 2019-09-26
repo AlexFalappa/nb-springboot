@@ -15,7 +15,6 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.completion;
 
-import com.github.alexfalappa.nbspringboot.projects.service.impl.BootProviders;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
@@ -63,12 +62,10 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
     private static final Pattern PATTERN_MAPVALUE_DATATYPE = Pattern.compile("java.util.Map<.*,(.*)>");
     private final SpringBootService sbs;
     private final Project proj;
-    private final BootProviders bootProviders;
 
     public CfgPropsCompletionQuery(SpringBootService sbs, Project proj) {
         this.sbs = Objects.requireNonNull(sbs);
         this.proj = proj;
-        this.bootProviders = new BootProviders(proj);
     }
 
     @Override
@@ -146,7 +143,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                         logger.log(FINER, "Key providers for {0}:", mapProp);
                         for (ValueProvider vp : hints.getKeyProviders()) {
                             logger.log(FINER, "{0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
-                            bootProviders.getProvider(vp.getName()).provide(propMetadata, key, completionResultSet,
+                            sbs.getHintProvider(vp.getName()).provide(propMetadata, key, completionResultSet,
                                     startOffset + mapProp.length() + 1, caretOffset);
                         }
                     }
@@ -212,7 +209,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 logger.log(FINER, "Value providers for {0}:", propName);
                 for (ValueProvider vp : hints.getValueProviders()) {
                     logger.log(FINER, "{0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
-                    bootProviders.getProvider(vp.getName()).provide(propMeta, filter, completionResultSet, startOffset,
+                    sbs.getHintProvider(vp.getName()).provide(propMeta, filter, completionResultSet, startOffset,
                             caretOffset);
                 }
             }

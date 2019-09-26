@@ -45,17 +45,16 @@ import org.springframework.boot.bind.RelaxedNames;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepository;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepositoryJsonBuilder;
-import org.springframework.boot.configurationmetadata.Hints;
 import org.springframework.boot.configurationmetadata.SimpleConfigurationMetadataRepository;
-import org.springframework.boot.configurationmetadata.ValueHint;
-import org.springframework.boot.configurationmetadata.ValueProvider;
 
 import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 import static java.util.regex.Pattern.compile;
+import org.netbeans.api.java.source.ClasspathInfo;
 
 /**
  * Project wide {@link SpringBootService} implementation.
@@ -79,6 +78,7 @@ public class SpringBootServiceImpl implements SpringBootService {
     private static final Logger logger = Logger.getLogger(SpringBootServiceImpl.class.getName());
     private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
     private static final Pattern PATTERN_ARRAY_NOTATION = compile("(.+)\\[\\d+\\]");
+    private static final NoopHintProvider NOOP_HINT_PROVIDER = new NoopHintProvider();
     private SimpleConfigurationMetadataRepository repo = new SimpleConfigurationMetadataRepository();
     private final Map<String, ConfigurationMetadataRepository> reposInJars = new HashMap<>();
     private NbMavenProjectImpl mvnPrj;
@@ -87,13 +87,14 @@ public class SpringBootServiceImpl implements SpringBootService {
     private Map<String, Boolean> cachedDepsPresence = new HashMap<>();
     private final Set<String> collectionProperties = new HashSet<>();
     private final Set<String> mapProperties = new HashSet<>();
+    private final Map<String, HintProvider> providerMap = new HashMap<>();
 
     public SpringBootServiceImpl(Project p) {
         if (p instanceof NbMavenProjectImpl) {
             this.mvnPrj = (NbMavenProjectImpl) p;
         }
-        logger.log(Level.INFO, "Creating Spring Boot service for project {0}",
-                FileUtil.getFileDisplayName(p.getProjectDirectory()));
+        final FileObject projectDirectory = mvnPrj.getProjectDirectory();
+        logger.log(Level.INFO, "Creating Spring Boot service for project {0}", FileUtil.getFileDisplayName(projectDirectory));
     }
 
     @Override
@@ -145,6 +146,11 @@ public class SpringBootServiceImpl implements SpringBootService {
     }
 
     @Override
+    public HintProvider getHintProvider(String name) {
+        return providerMap.getOrDefault(name, NOOP_HINT_PROVIDER);
+    }
+
+    @Override
     public ConfigurationMetadataProperty getPropertyMetadata(String propertyName) {
         if (cpExec == null) {
             init();
@@ -190,57 +196,6 @@ public class SpringBootServiceImpl implements SpringBootService {
     }
 
     @Override
-    public List<ValueHint> queryHintMetadata(String propertyName, String filter) {
-        if (cpExec == null) {
-            init();
-        }
-        List<ValueHint> ret = new LinkedList<>();
-        ConfigurationMetadataProperty cfgMeta = getPropertyMetadata(propertyName);
-        if (cfgMeta != null) {
-            // special case: check if data type is boolean
-            if (cfgMeta.getType().equals("java.lang.Boolean")) {
-                ValueHint valueHint = new ValueHint();
-                valueHint.setValue("true");
-                ret.add(valueHint);
-                valueHint = new ValueHint();
-                valueHint.setValue("false");
-                ret.add(valueHint);
-            }
-            // special case: check if data type is an enum
-            try {
-                Object[] enumvals = cpExec.getClassLoader(true).loadClass(cfgMeta.getType()).getEnumConstants();
-                if (enumvals != null) {
-                    for (Object val : enumvals) {
-                        final String valName = val.toString().toLowerCase();
-                        if (filter == null || valName.contains(filter)) {
-                            ValueHint valueHint = new ValueHint();
-                            valueHint.setValue(valName);
-                            ret.add(valueHint);
-                        }
-                    }
-                }
-            } catch (ClassNotFoundException ex) {
-                // enum not available in project classpath, no completion possible
-            }
-            // log value providers
-            final Hints hints = cfgMeta.getHints();
-            if (!hints.getValueProviders().isEmpty()) {
-                logger.info(String.format("Value providers for %s:", propertyName));
-                for (ValueProvider vp : hints.getValueProviders()) {
-                    logger.info(vp.getName());
-                }
-            }
-            // add defined value hints to completion lists
-            for (ValueHint valueHint : hints.getValueHints()) {
-                if (filter == null || valueHint.getValue().toString().contains(filter)) {
-                    ret.add(valueHint);
-                }
-            }
-        }
-        return ret;
-    }
-
-    @Override
     public boolean hasPomDependency(String artifactId) {
         if (cpExec == null) {
             init();
@@ -278,6 +233,10 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
         logger.log(INFO, "Initializing SpringBootService for project {0}", new Object[]{mvnPrj.toString()});
         cachedDepsPresence.clear();
+        // populate hint providers map
+        ClasspathInfo cpInfo = ClasspathInfo.create(mvnPrj.getProjectDirectory());
+        providerMap.put("logger-name", new LoggerNameHintProvider(cpInfo.getClassIndex()));
+        ClassPath cpTest = cpInfo.getClassPath(ClasspathInfo.PathKind.COMPILE);
         // set up a reference to the execute classpath object
         cpExec = Utils.execClasspathForProj(mvnPrj);
         if (cpExec != null) {

@@ -15,7 +15,6 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
-import com.github.alexfalappa.nbspringboot.projects.service.api.BootProvider;
 import java.util.EnumSet;
 import java.util.Set;
 
@@ -24,17 +23,18 @@ import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropLoggerCompletionItem;
+import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 
 /**
- * Implementation of {@link BootProvider} for logger names.
+ * Implementation of {@link HintProvider} for logger names.
  *
  * @author Alessandro Falappa
  */
-public class LoggerNameBootProvider implements BootProvider {
+public class LoggerNameHintProvider implements HintProvider {
 
     private final ClassIndex classIndex;
 
-    public LoggerNameBootProvider(ClassIndex classIndex) {
+    public LoggerNameHintProvider(ClassIndex classIndex) {
         this.classIndex = classIndex;
     }
 

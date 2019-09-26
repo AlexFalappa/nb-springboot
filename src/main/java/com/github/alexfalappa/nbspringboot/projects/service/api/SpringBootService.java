@@ -20,7 +20,6 @@ import java.util.Set;
 
 import org.netbeans.api.java.classpath.ClassPath;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
-import org.springframework.boot.configurationmetadata.ValueHint;
 
 /**
  * Service API for implementing support of Spring Boot related functionalities.
@@ -48,7 +47,7 @@ public interface SpringBootService {
 
     List<ConfigurationMetadataProperty> queryPropertyMetadata(String filter);
 
-    List<ValueHint> queryHintMetadata(String propertyName, String filter);
+    HintProvider getHintProvider(String name);
 
     boolean hasPomDependency(String artifactId);
 
