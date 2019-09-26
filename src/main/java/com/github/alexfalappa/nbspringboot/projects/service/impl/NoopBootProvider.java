@@ -13,40 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.cfgprops.completion.providers;
+package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
-import java.util.EnumSet;
-import java.util.Set;
-
-import org.netbeans.api.java.source.ClassIndex;
+import com.github.alexfalappa.nbspringboot.projects.service.api.BootProvider;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropLoggerCompletionItem;
 
 /**
- * Implementation of {@link BootProvider} for logger names.
+ * A Spring Boot provider that does nothing.
  *
  * @author Alessandro Falappa
  */
-public class LoggerNameBootProvider implements BootProvider {
-
-    private final ClassIndex classIndex;
-
-    public LoggerNameBootProvider(ClassIndex classIndex) {
-        this.classIndex = classIndex;
-    }
+public class NoopBootProvider implements BootProvider {
 
     @Override
     public void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet,
             int dotOffset, int caretOffset) {
-        if (filter == null) {
-            filter = "";
-        }
-        Set<String> packageNames = classIndex.getPackageNames(filter, true, EnumSet.allOf(ClassIndex.SearchScope.class));
-        for (String name : packageNames) {
-            completionResultSet.addItem(new CfgPropLoggerCompletionItem(name, dotOffset, caretOffset));
-        }
+        // purposefully do nothing
     }
 
 }

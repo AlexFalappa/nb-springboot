@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.cfgprops.completion;
+package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,9 +21,9 @@ import java.util.Map;
 import org.netbeans.api.java.source.ClasspathInfo;
 import org.netbeans.api.project.Project;
 
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.providers.BootProvider;
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.providers.LoggerNameBootProvider;
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.providers.NoopBootProvider;
+import com.github.alexfalappa.nbspringboot.projects.service.api.BootProvider;
+import com.github.alexfalappa.nbspringboot.projects.service.impl.LoggerNameBootProvider;
+import com.github.alexfalappa.nbspringboot.projects.service.impl.NoopBootProvider;
 
 /**
  * SpringBoot key/value providers.

@@ -15,6 +15,7 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.completion;
 
+import com.github.alexfalappa.nbspringboot.projects.service.impl.BootProviders;
 import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.logging.Logger;
