@@ -176,7 +176,8 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             final String propType = propMeta.getType();
             final String mapValueType = extractMapValueType(propMeta);
             // if data type is collection or array adjust filter and startOffset to part after last comma
-            if (propType.contains("List<") || propType.contains("Set<") || propType.contains("[]")) {
+            if (filter != null
+                    && (propType.contains("List<") || propType.contains("Set<") || propType.contains("[]"))) {
                 int idx = filter.lastIndexOf(',');
                 if (idx > 0) {
                     startOffset = startOffset + idx + 1;

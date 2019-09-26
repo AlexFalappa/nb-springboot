@@ -25,6 +25,7 @@ import org.springframework.boot.configurationmetadata.ConfigurationMetadataPrope
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropLoggerCompletionItem;
 
 /**
+ * Implementation of {@link BootProvider} for logger names.
  *
  * @author Alessandro Falappa
  */
@@ -39,6 +40,9 @@ public class LoggerNameBootProvider implements BootProvider {
     @Override
     public void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet,
             int dotOffset, int caretOffset) {
+        if (filter == null) {
+            filter = "";
+        }
         Set<String> packageNames = classIndex.getPackageNames(filter, true, EnumSet.allOf(ClassIndex.SearchScope.class));
         for (String name : packageNames) {
             completionResultSet.addItem(new CfgPropLoggerCompletionItem(name, dotOffset, caretOffset));
