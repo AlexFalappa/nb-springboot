@@ -25,6 +25,7 @@ import javax.swing.JToolTip;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
@@ -55,6 +56,7 @@ public class CfgPropKeyCompletionItem implements CompletionItem {
             "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-key.png"));
     private final int caretOffset;
     private final int dotOffset;
+    private boolean overwrite;
 
     public CfgPropKeyCompletionItem(ValueHint hint, int dotOffset, int caretOffset) {
         this.hint = hint;
@@ -78,11 +80,35 @@ public class CfgPropKeyCompletionItem implements CompletionItem {
     public void defaultAction(JTextComponent jtc) {
         try {
             StyledDocument doc = (StyledDocument) jtc.getDocument();
-            //Here we remove the characters starting at the start offset
-            //and ending at the point where the caret is currently found:
-            doc.remove(dotOffset, caretOffset - dotOffset);
-            doc.insertString(dotOffset, String.format("%s=", getText()), null);
-            //This statement will close the code completion box:
+            // calculate the amount of chars to remove (by default from dot up to caret position)
+            int lenToRemove = caretOffset - dotOffset;
+            int equalSignIndex = -1;
+            int colonIndex = -1;
+            if (overwrite) {
+                // NOTE: the editor removes by itself the word at caret when ctrl + enter is pressed
+                // the document state here is different from when the completion was invoked thus we have to
+                // find again the offset of the equal sign in the line
+                Element lineElement = doc.getParagraphElement(caretOffset);
+                String line = doc.getText(lineElement.getStartOffset(), lineElement.getEndOffset() - lineElement.getStartOffset());
+                equalSignIndex = line.indexOf('=');
+                colonIndex = line.indexOf(':');
+                if (equalSignIndex >= 0) {
+                    // from dot to equal sign
+                    lenToRemove = lineElement.getStartOffset() + equalSignIndex - dotOffset;
+                } else if (colonIndex >= 0) {
+                    // from dot to colon
+                    lenToRemove = lineElement.getStartOffset() + colonIndex - dotOffset;
+                }
+            }
+            // add a final equal sign if not already detected
+            StringBuilder sb = new StringBuilder(getText());
+            if (equalSignIndex < 0 && colonIndex < 0) {
+                sb.append("=");
+            }
+            // remove characters from dot then insert new text
+            doc.remove(dotOffset, lenToRemove);
+            doc.insertString(dotOffset, sb.toString(), null);
+            // close the code completion box
             Completion.get().hideAll();
         } catch (BadLocationException ex) {
             Exceptions.printStackTrace(ex);
@@ -91,6 +117,8 @@ public class CfgPropKeyCompletionItem implements CompletionItem {
 
     @Override
     public void processKeyEvent(KeyEvent evt) {
+        // detect if Ctrl + Enter is pressed
+        overwrite = evt.getKeyCode() == KeyEvent.VK_ENTER && (evt.getModifiers() & KeyEvent.CTRL_MASK) != 0;
     }
 
     @Override
