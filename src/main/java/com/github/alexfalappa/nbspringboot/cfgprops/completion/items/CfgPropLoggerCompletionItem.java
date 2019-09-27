@@ -66,7 +66,7 @@ public class CfgPropLoggerCompletionItem implements CompletionItem {
             //Here we remove the characters starting at the start offset
             //and ending at the point where the caret is currently found:
             doc.remove(dotOffset, caretOffset - dotOffset);
-            doc.insertString(dotOffset, getText(), null);
+            doc.insertString(dotOffset, String.format("%s.", getText()), null);
             //This statement will close the code completion box:
             Completion.get().hideAll();
         } catch (BadLocationException ex) {
