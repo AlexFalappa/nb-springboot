@@ -33,6 +33,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.source.ClasspathInfo;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.modules.maven.api.NbMavenProject;
@@ -54,7 +55,6 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 import static java.util.regex.Pattern.compile;
-import org.netbeans.api.java.source.ClasspathInfo;
 
 /**
  * Project wide {@link SpringBootService} implementation.
@@ -236,7 +236,8 @@ public class SpringBootServiceImpl implements SpringBootService {
         // populate hint providers map
         ClasspathInfo cpInfo = ClasspathInfo.create(mvnPrj.getProjectDirectory());
         providerMap.put("logger-name", new LoggerNameHintProvider(cpInfo.getClassIndex()));
-        ClassPath cpTest = cpInfo.getClassPath(ClasspathInfo.PathKind.COMPILE);
+        providerMap.put("class-reference", new ClassReferenceHintProvider(cpInfo.getClassIndex()));
+        providerMap.put("handle-as", new HandleAsHintProvider(cpInfo.getClassIndex()));
         // set up a reference to the execute classpath object
         cpExec = Utils.execClasspathForProj(mvnPrj);
         if (cpExec != null) {
