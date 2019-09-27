@@ -2,14 +2,15 @@
 
 -  **2.1** (??? 2019): Work in Progress
     -  Configuration properties completion enhanced:
-		- Completion of values whose data type is a Java enumeration
-		- Completion of values whose data type is a Java boolean
+		- Logger name value 
+		- Proposals for properties whose data type is a Java enumeration or Java boolean
 		- Completion of booleans and enumerations as map keys and values in properties whose data type is a java.util.Map
-		- Completion of map key hints in properties whose data type is a java.util.Map
+		- Proposals from map key hints in properties whose data type is a java.util.Map
+		- Proposals for properties whose data type is a Java collection of enumeration or from value hints
 		- Implemented 'Show Method Parameters' (Ctrl+P) to show data type of property under cursor in a tooltip
 		- Implemented 'Show Documentation' (Ctrl+Shift+Space Bar) to show the documentation popup of property under cursor
     -  Minimum required NetBeans version is now **8.2**, minimum required JDK version is now **8**
-    -  Upgrade internal dependencies
+    -  Upgrade of internal dependencies
 
 -  **2.0.1** (July 2018): Polishing
     -  Use HTTPS protocol when contacting Spring Initializr service
