@@ -16,6 +16,7 @@
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
 
 import org.netbeans.api.java.source.ClassIndex;
@@ -39,8 +40,8 @@ public class LoggerNameHintProvider implements HintProvider {
     }
 
     @Override
-    public void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet,
-            int dotOffset, int caretOffset) {
+    public void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter,
+            CompletionResultSet completionResultSet, int dotOffset, int caretOffset) {
         if (filter == null) {
             filter = "";
         }

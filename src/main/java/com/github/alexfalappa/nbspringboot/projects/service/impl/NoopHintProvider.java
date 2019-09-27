@@ -15,8 +15,11 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
+import java.util.Map;
+
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+
 import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 
 /**
@@ -27,8 +30,8 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 public class NoopHintProvider implements HintProvider {
 
     @Override
-    public void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet,
-            int dotOffset, int caretOffset) {
+    public void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter,
+            CompletionResultSet completionResultSet, int dotOffset, int caretOffset) {
         // purposefully do nothing
     }
 

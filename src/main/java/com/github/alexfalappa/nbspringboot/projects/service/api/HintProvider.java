@@ -15,6 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.api;
 
+import java.util.Map;
+
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
@@ -25,7 +27,7 @@ import org.springframework.boot.configurationmetadata.ConfigurationMetadataPrope
  */
 public interface HintProvider {
 
-    void provide(ConfigurationMetadataProperty propMetadata, String filter, CompletionResultSet completionResultSet,
-            int dotOffset, int caretOffset);
+    void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter,
+            CompletionResultSet completionResultSet, int dotOffset, int caretOffset);
 
 }

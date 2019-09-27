@@ -143,7 +143,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                         logger.log(FINER, "Key providers for {0}:", mapProp);
                         for (ValueProvider vp : hints.getKeyProviders()) {
                             logger.log(FINER, "{0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
-                            sbs.getHintProvider(vp.getName()).provide(propMetadata, key, completionResultSet,
+                            sbs.getHintProvider(vp.getName()).provide(vp.getParameters(), propMetadata, key, completionResultSet,
                                     startOffset + mapProp.length() + 1, caretOffset);
                         }
                     }
@@ -209,8 +209,8 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 logger.log(FINER, "Value providers for {0}:", propName);
                 for (ValueProvider vp : hints.getValueProviders()) {
                     logger.log(FINER, "{0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
-                    sbs.getHintProvider(vp.getName()).provide(propMeta, filter, completionResultSet, startOffset,
-                            caretOffset);
+                    sbs.getHintProvider(vp.getName()).provide(vp.getParameters(), propMeta, filter, completionResultSet,
+                            startOffset, caretOffset);
                 }
             }
         }
