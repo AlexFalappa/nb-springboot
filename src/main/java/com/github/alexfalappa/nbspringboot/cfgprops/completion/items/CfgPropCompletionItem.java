@@ -48,10 +48,9 @@ import static com.github.alexfalappa.nbspringboot.Utils.shortenJavaType;
 import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 
 /**
- * The Spring Boot configuration property names implementation of {@code CompletionItem}.
+ * The implementation of {@code CompletionItem} for Spring Boot configuration property names.
  * <p>
- * It utilizes an {@code ConfigurationMetadataProperty} and the project classpath to render the completion item and spawn the
- * documentation display.
+ * Uses a {@code ConfigurationMetadataProperty} to render the completion item and spawn the documentation display.
  *
  * @author Aggelos Karalias
  * @author Alessandro Falappa

@@ -43,9 +43,9 @@ import org.springframework.boot.configurationmetadata.ValueHint;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.doc.CfgPropValueCompletionDocumentation;
 
 /**
- * The Spring Boot configuration property key implementation of {@code CompletionItem}.
+ * The implementation of {@code CompletionItem} for Spring Boot key hints.
  * <p>
- * It utilizes an {@code ValueHint} to render the completion item and spawn the documentation display.
+ * Uses an {@code ValueHint} to render the completion item and spawn the documentation display.
  *
  * @author Alessandro Falappa
  */
