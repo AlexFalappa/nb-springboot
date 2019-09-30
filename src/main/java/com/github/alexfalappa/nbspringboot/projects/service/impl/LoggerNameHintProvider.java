@@ -19,6 +19,8 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
@@ -38,6 +40,7 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
  */
 public class LoggerNameHintProvider implements HintProvider {
 
+    private final static Pattern PATTERN_ANONCLASSES = Pattern.compile(".*\\$\\d+");
     private final ClassIndex classIndex;
 
     public LoggerNameHintProvider(ClassIndex classIndex) {
@@ -63,9 +66,13 @@ public class LoggerNameHintProvider implements HintProvider {
             Set<ElementHandle<TypeElement>> types = classIndex.getDeclaredTypes(typeFilter,
                     ClassIndex.NameKind.CASE_INSENSITIVE_PREFIX, Collections.singleton(new SinglePackageScope(packageFilter)));
             types.forEach(type -> {
-                final String name = type.getQualifiedName().substring(type.getQualifiedName().lastIndexOf('.') + 1);
-                completionResultSet.addItem(new JavaTypeCompletionItem(name, type.getKind(),
-                        dotOffset + packageFilter.length() + 1, caretOffset));
+                final String binaryName = type.getBinaryName();
+                Matcher matcher = PATTERN_ANONCLASSES.matcher(binaryName);
+                if (!matcher.matches()) {
+                    final String name = binaryName.substring(binaryName.lastIndexOf('.') + 1);
+                    completionResultSet.addItem(new JavaTypeCompletionItem(name, type.getKind(),
+                            dotOffset + packageFilter.length() + 1, caretOffset));
+                }
             });
         }
     }
