@@ -41,8 +41,8 @@ import org.springframework.boot.configurationmetadata.ValueProvider;
 import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropCompletionItem;
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropKeyCompletionItem;
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropValueCompletionItem;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.KeyCompletionItem;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_ERROR_SHOW;
@@ -124,8 +124,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                     final String keyDataType = extractMapKeyType(propMetadata);
                     if (!keyDataType.contains("<")) {
                         completeEnum(keyDataType, key, valueHint -> {
-                            completionResultSet.addItem(
-                                    new CfgPropKeyCompletionItem(valueHint, startOffset + mapProp.length() + 1, caretOffset));
+                            completionResultSet.addItem(new KeyCompletionItem(valueHint, startOffset + mapProp.length() + 1, caretOffset));
                         });
                     }
                     // add metadata defined key hints to completion list
@@ -133,8 +132,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                     if (!hints.getKeyHints().isEmpty()) {
                         for (ValueHint keyHint : hints.getKeyHints()) {
                             if (keyHint.getValue().toString().startsWith(key)) {
-                                completionResultSet.addItem(
-                                        new CfgPropKeyCompletionItem(keyHint, startOffset + mapProp.length() + 1, caretOffset));
+                                completionResultSet.addItem(new KeyCompletionItem(keyHint, startOffset + mapProp.length() + 1, caretOffset));
                             }
                         }
                     }
@@ -186,10 +184,10 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             if (propType.equals("java.lang.Boolean") || mapValueType.equals("java.lang.Boolean")) {
                 ValueHint valueHint = new ValueHint();
                 valueHint.setValue("true");
-                completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
+                completionResultSet.addItem(new ValueCompletionItem(valueHint, startOffset, caretOffset));
                 valueHint = new ValueHint();
                 valueHint.setValue("false");
-                completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
+                completionResultSet.addItem(new ValueCompletionItem(valueHint, startOffset, caretOffset));
             }
             // check if data type is an enum
             completeValueEnum(propType, filter, completionResultSet, startOffset, caretOffset);
@@ -201,7 +199,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             final Hints hints = propMeta.getHints();
             for (ValueHint valueHint : hints.getValueHints()) {
                 if (filter == null || valueHint.getValue().toString().contains(filter)) {
-                    completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
+                    completionResultSet.addItem(new ValueCompletionItem(valueHint, startOffset, caretOffset));
                 }
             }
             // invoke value providers
@@ -248,7 +246,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                     if (filter == null || valName.contains(filter)) {
                         ValueHint valueHint = new ValueHint();
                         valueHint.setValue(valName);
-                        completionResultSet.addItem(new CfgPropValueCompletionItem(valueHint, startOffset, caretOffset));
+                        completionResultSet.addItem(new ValueCompletionItem(valueHint, startOffset, caretOffset));
                     }
                 }
             }

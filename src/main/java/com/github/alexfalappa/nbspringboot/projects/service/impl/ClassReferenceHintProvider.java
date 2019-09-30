@@ -30,7 +30,7 @@ import org.netbeans.api.java.source.ElementHandle;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropLoggerCompletionItem;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.JavaTypeCompletionItem;
 import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 
 /**
@@ -82,7 +82,7 @@ public class ClassReferenceHintProvider implements HintProvider {
                     Class<?> loadedClass = cpExec.getClassLoader(true).loadClass(qualifiedName);
                     boolean isAbstract = Modifier.isAbstract(loadedClass.getModifiers());
                     if (concrete ^ isAbstract) {
-                        completionResultSet.addItem(new CfgPropLoggerCompletionItem(qualifiedName, handle.getKind(), dotOffset,
+                        completionResultSet.addItem(new JavaTypeCompletionItem(qualifiedName, handle.getKind(), dotOffset,
                                 caretOffset));
                     }
                 } catch (ClassNotFoundException ex) {

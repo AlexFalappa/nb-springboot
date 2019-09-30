@@ -36,13 +36,13 @@ import org.netbeans.spi.editor.completion.support.CompletionUtilities;
 import org.openide.util.Exceptions;
 
 /**
- * The implementation of {@code CompletionItem} for Spring Boot logger name provider results.
+ * The implementation of {@code CompletionItem} representing Java packages or types.
  * <p>
- * The icon is based on the provided {@code ElementKind}.
+ * Used in logger name class reference and handle-ase provider results. The icon is based on the provided {@code ElementKind}.
  *
  * @author Alessandro Falappa
  */
-public class CfgPropLoggerCompletionItem implements CompletionItem {
+public class JavaTypeCompletionItem implements CompletionItem {
 
     private final String name;
     private final ElementKind elementKind;
@@ -50,7 +50,7 @@ public class CfgPropLoggerCompletionItem implements CompletionItem {
     private final int caretOffset;
     private boolean overwrite;
 
-    public CfgPropLoggerCompletionItem(String name, ElementKind elementKind, int dotOffset, int caretOffset) {
+    public JavaTypeCompletionItem(String name, ElementKind elementKind, int dotOffset, int caretOffset) {
         this.name = name;
         this.dotOffset = dotOffset;
         this.caretOffset = caretOffset;

@@ -28,7 +28,7 @@ import org.netbeans.api.java.source.ElementHandle;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropLoggerCompletionItem;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.JavaTypeCompletionItem;
 import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 
 /**
@@ -53,7 +53,7 @@ public class LoggerNameHintProvider implements HintProvider {
         // fill in packages
         Set<String> packageNames = classIndex.getPackageNames(filter, true, EnumSet.allOf(ClassIndex.SearchScope.class));
         packageNames.forEach(name -> {
-            completionResultSet.addItem(new CfgPropLoggerCompletionItem(name, ElementKind.PACKAGE, dotOffset, caretOffset));
+            completionResultSet.addItem(new JavaTypeCompletionItem(name, ElementKind.PACKAGE, dotOffset, caretOffset));
         });
         // fill in types
         if (filter.contains(".")) {
@@ -64,7 +64,7 @@ public class LoggerNameHintProvider implements HintProvider {
                     ClassIndex.NameKind.CASE_INSENSITIVE_PREFIX, Collections.singleton(new SinglePackageScope(packageFilter)));
             types.forEach(type -> {
                 final String name = type.getQualifiedName().substring(type.getQualifiedName().lastIndexOf('.') + 1);
-                completionResultSet.addItem(new CfgPropLoggerCompletionItem(name, type.getKind(),
+                completionResultSet.addItem(new JavaTypeCompletionItem(name, type.getKind(),
                         dotOffset + packageFilter.length() + 1, caretOffset));
             });
         }

@@ -49,7 +49,7 @@ import com.github.alexfalappa.nbspringboot.cfgprops.completion.doc.CfgPropValueC
  *
  * @author Alessandro Falappa
  */
-public class CfgPropKeyCompletionItem implements CompletionItem {
+public class KeyCompletionItem implements CompletionItem {
 
     private final ValueHint hint;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
@@ -58,7 +58,7 @@ public class CfgPropKeyCompletionItem implements CompletionItem {
     private final int dotOffset;
     private boolean overwrite;
 
-    public CfgPropKeyCompletionItem(ValueHint hint, int dotOffset, int caretOffset) {
+    public KeyCompletionItem(ValueHint hint, int dotOffset, int caretOffset) {
         this.hint = hint;
         this.dotOffset = dotOffset;
         this.caretOffset = caretOffset;
