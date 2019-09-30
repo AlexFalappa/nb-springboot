@@ -74,15 +74,17 @@ public class ClassReferenceHintProvider implements HintProvider {
         populate(elements, filter, concrete, completionResultSet, dotOffset, caretOffset);
     }
 
-    private void populate(Set<ElementHandle<TypeElement>> elements, String filter, boolean concrete, CompletionResultSet completionResultSet, int dotOffset, int caretOffset) throws IllegalStateException {
-        elements.forEach((handle) -> {
-            final String qualifiedName = handle.getQualifiedName();
-            if (qualifiedName.startsWith(filter)) {
+    private void populate(Set<ElementHandle<TypeElement>> elements, String filter, boolean concrete,
+            CompletionResultSet completionResultSet, int dotOffset, int caretOffset) throws IllegalStateException {
+        final ClassLoader classLoader = cpExec.getClassLoader(true);
+        elements.forEach(handle -> {
+            final String binaryName = handle.getBinaryName();
+            if (binaryName.startsWith(filter)) {
                 try {
-                    Class<?> loadedClass = cpExec.getClassLoader(true).loadClass(qualifiedName);
+                    Class<?> loadedClass = classLoader.loadClass(binaryName);
                     boolean isAbstract = Modifier.isAbstract(loadedClass.getModifiers());
                     if (concrete ^ isAbstract) {
-                        completionResultSet.addItem(new JavaTypeCompletionItem(qualifiedName, handle.getKind(), dotOffset,
+                        completionResultSet.addItem(new JavaTypeCompletionItem(binaryName, handle.getKind(), dotOffset,
                                 caretOffset));
                     }
                 } catch (ClassNotFoundException ex) {
