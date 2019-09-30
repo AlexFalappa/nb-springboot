@@ -15,12 +15,22 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
+import java.lang.reflect.Modifier;
+import java.util.Collections;
+import java.util.EnumSet;
 import java.util.Map;
+import java.util.Set;
 
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
+
+import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.source.ClassIndex;
+import org.netbeans.api.java.source.ElementHandle;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropLoggerCompletionItem;
 import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 
 /**
@@ -30,10 +40,14 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
  */
 public class ClassReferenceHintProvider implements HintProvider {
 
+    private static final EnumSet<ClassIndex.SearchScope> SEARCH_SCOPE = EnumSet.allOf(ClassIndex.SearchScope.class);
+    private final Set<ClassIndex.SearchKind> searchKind = Collections.singleton(ClassIndex.SearchKind.IMPLEMENTORS);
     private final ClassIndex classIndex;
+    private final ClassPath cpExec;
 
-    public ClassReferenceHintProvider(ClassIndex classIndex) {
+    public ClassReferenceHintProvider(ClassIndex classIndex, ClassPath cpExec) {
         this.classIndex = classIndex;
+        this.cpExec = cpExec;
     }
 
     @Override
@@ -43,14 +57,39 @@ public class ClassReferenceHintProvider implements HintProvider {
             filter = "";
         }
         String baseType = "java.lang.Object";
-        boolean concrete = true;
         if (params.containsKey("target")) {
             baseType = params.get("target").toString();
         }
+        boolean concrete = true;
         if (params.containsKey("concrete")) {
             concrete = Boolean.valueOf(params.get("concrete").toString());
         }
-        // TODO implement search of classes extending baseType
+        // search of classes extending class baseType
+        ElementHandle<TypeElement> element = ElementHandle.createTypeElementHandle(ElementKind.CLASS, baseType);
+        Set<ElementHandle<TypeElement>> elements = classIndex.getElements(element, searchKind, SEARCH_SCOPE);
+        populate(elements, filter, concrete, completionResultSet, dotOffset, caretOffset);
+        // search of classes implementing interface baseType
+        element = ElementHandle.createTypeElementHandle(ElementKind.INTERFACE, baseType);
+        elements = classIndex.getElements(element, searchKind, SEARCH_SCOPE);
+        populate(elements, filter, concrete, completionResultSet, dotOffset, caretOffset);
+    }
+
+    private void populate(Set<ElementHandle<TypeElement>> elements, String filter, boolean concrete, CompletionResultSet completionResultSet, int dotOffset, int caretOffset) throws IllegalStateException {
+        elements.forEach((handle) -> {
+            final String qualifiedName = handle.getQualifiedName();
+            if (qualifiedName.startsWith(filter)) {
+                try {
+                    Class<?> loadedClass = cpExec.getClassLoader(true).loadClass(qualifiedName);
+                    boolean isAbstract = Modifier.isAbstract(loadedClass.getModifiers());
+                    if (concrete ^ isAbstract) {
+                        completionResultSet.addItem(new CfgPropLoggerCompletionItem(qualifiedName, handle.getKind(), dotOffset,
+                                caretOffset));
+                    }
+                } catch (ClassNotFoundException ex) {
+                    // ignore unloadable classes
+                }
+            }
+        });
     }
 
 }

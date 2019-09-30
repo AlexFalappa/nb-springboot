@@ -233,11 +233,6 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
         logger.log(INFO, "Initializing SpringBootService for project {0}", new Object[]{mvnPrj.toString()});
         cachedDepsPresence.clear();
-        // populate hint providers map
-        ClasspathInfo cpInfo = ClasspathInfo.create(mvnPrj.getProjectDirectory());
-        providerMap.put("logger-name", new LoggerNameHintProvider(cpInfo.getClassIndex()));
-        providerMap.put("class-reference", new ClassReferenceHintProvider(cpInfo.getClassIndex()));
-        providerMap.put("handle-as", new HandleAsHintProvider(cpInfo.getClassIndex()));
         // set up a reference to the execute classpath object
         cpExec = Utils.execClasspathForProj(mvnPrj);
         if (cpExec != null) {
@@ -253,6 +248,11 @@ public class SpringBootServiceImpl implements SpringBootService {
                     }
                 }
             });
+            // populate hint providers map
+            ClasspathInfo cpInfo = ClasspathInfo.create(mvnPrj.getProjectDirectory());
+            providerMap.put("logger-name", new LoggerNameHintProvider(cpInfo.getClassIndex()));
+            providerMap.put("class-reference", new ClassReferenceHintProvider(cpInfo.getClassIndex(), cpExec));
+            providerMap.put("handle-as", new HandleAsHintProvider(cpInfo.getClassIndex()));
             // build configuration properties maps
             updateConfigRepo();
         }
