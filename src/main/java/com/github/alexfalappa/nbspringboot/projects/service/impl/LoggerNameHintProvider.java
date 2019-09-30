@@ -15,11 +15,16 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
+import java.util.Collections;
 import java.util.EnumSet;
 import java.util.Map;
 import java.util.Set;
 
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.TypeElement;
+
 import org.netbeans.api.java.source.ClassIndex;
+import org.netbeans.api.java.source.ElementHandle;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
@@ -45,10 +50,49 @@ public class LoggerNameHintProvider implements HintProvider {
         if (filter == null) {
             filter = "";
         }
+        // fill in packages
         Set<String> packageNames = classIndex.getPackageNames(filter, true, EnumSet.allOf(ClassIndex.SearchScope.class));
-        for (String name : packageNames) {
-            completionResultSet.addItem(new CfgPropLoggerCompletionItem(name, dotOffset, caretOffset));
+        packageNames.forEach(name -> {
+            completionResultSet.addItem(new CfgPropLoggerCompletionItem(name, ElementKind.PACKAGE, dotOffset, caretOffset));
+        });
+        // fill in types
+        if (filter.contains(".")) {
+            final int lastDotIdx = filter.lastIndexOf('.');
+            final String packageFilter = filter.substring(0, lastDotIdx);
+            final String typeFilter = filter.substring(lastDotIdx + 1);
+            Set<ElementHandle<TypeElement>> types = classIndex.getDeclaredTypes(typeFilter,
+                    ClassIndex.NameKind.CASE_INSENSITIVE_PREFIX, Collections.singleton(new SinglePackageScope(packageFilter)));
+            types.forEach(type -> {
+                final String name = type.getQualifiedName().substring(type.getQualifiedName().lastIndexOf('.') + 1);
+                completionResultSet.addItem(new CfgPropLoggerCompletionItem(name, type.getKind(),
+                        dotOffset + packageFilter.length() + 1, caretOffset));
+            });
         }
     }
 
+    // a scope for searching declared types in a specified package
+    private class SinglePackageScope implements ClassIndex.SearchScopeType {
+
+        private final Set<String> theSet;
+
+        public SinglePackageScope(String packagename) {
+            theSet = Collections.singleton(packagename);
+        }
+
+        @Override
+        public Set<? extends String> getPackages() {
+            return theSet;
+        }
+
+        @Override
+        public boolean isSources() {
+            return true;
+        }
+
+        @Override
+        public boolean isDependencies() {
+            return true;
+        }
+
+    }
 }

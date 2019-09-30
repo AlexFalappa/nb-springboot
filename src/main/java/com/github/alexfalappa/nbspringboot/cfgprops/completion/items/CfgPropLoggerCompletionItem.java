@@ -36,21 +36,25 @@ import org.netbeans.spi.editor.completion.support.CompletionUtilities;
 import org.openide.util.Exceptions;
 
 /**
- * The Spring Boot logger package name implementation of {@code CompletionItem}.
+ * The implementation of {@code CompletionItem} for Spring Boot logger name provider results.
+ * <p>
+ * The icon is based on the provided {@code ElementKind}.
  *
  * @author Alessandro Falappa
  */
 public class CfgPropLoggerCompletionItem implements CompletionItem {
 
     private final String name;
+    private final ElementKind elementKind;
     private final int dotOffset;
     private final int caretOffset;
     private boolean overwrite;
 
-    public CfgPropLoggerCompletionItem(String name, int dotOffset, int caretOffset) {
+    public CfgPropLoggerCompletionItem(String name, ElementKind elementKind, int dotOffset, int caretOffset) {
         this.name = name;
         this.dotOffset = dotOffset;
         this.caretOffset = caretOffset;
+        this.elementKind = elementKind;
     }
 
     public String getText() {
@@ -111,8 +115,8 @@ public class CfgPropLoggerCompletionItem implements CompletionItem {
     public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height,
             boolean selected) {
         final Color color = selected ? UIManager.getColor("List.selectionForeground") : UIManager.getColor("List.foreground");
-        CompletionUtilities.renderHtml((ImageIcon) ElementIcons.getElementIcon(ElementKind.PACKAGE, null), getText(),
-                getTextRight(), g, defaultFont, color, width, height, selected);
+        CompletionUtilities.renderHtml((ImageIcon) ElementIcons.getElementIcon(elementKind, null), getText(), getTextRight(),
+                g, defaultFont, color, width, height, selected);
     }
 
     @Override
@@ -132,7 +136,7 @@ public class CfgPropLoggerCompletionItem implements CompletionItem {
 
     @Override
     public int getSortPriority() {
-        return 1;
+        return elementKind == ElementKind.PACKAGE ? 1 : 0;
     }
 
     @Override
