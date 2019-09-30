@@ -79,12 +79,16 @@ public class CfgPropLoggerCompletionItem implements CompletionItem {
                 String line = doc.getText(lineElement.getStartOffset(), lineElement.getEndOffset() - lineElement.getStartOffset());
                 int equalSignIndex = line.indexOf('=');
                 int colonIndex = line.indexOf(':');
-                if (equalSignIndex >= 0) {
+                int commaIndex = line.indexOf(',', dotOffset - lineElement.getStartOffset());
+                if (equalSignIndex >= 0 && dotOffset < equalSignIndex) {
                     // from dot to equal sign
                     lenToRemove = lineElement.getStartOffset() + equalSignIndex - dotOffset;
-                } else if (colonIndex >= 0) {
+                } else if (colonIndex >= 0 && dotOffset < colonIndex) {
                     // from dot to colon
                     lenToRemove = lineElement.getStartOffset() + colonIndex - dotOffset;
+                } else if (commaIndex >= 0) {
+                    // from dot to comma
+                    lenToRemove = lineElement.getStartOffset() + commaIndex - dotOffset;
                 } else {
                     // from dot to end of line (except line terminator)
                     lenToRemove = lineElement.getEndOffset() - 1 - dotOffset;
