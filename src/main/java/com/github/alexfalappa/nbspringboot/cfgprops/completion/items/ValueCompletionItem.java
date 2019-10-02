@@ -40,6 +40,7 @@ import org.openide.util.ImageUtilities;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.doc.CfgPropValueCompletionDocumentation;
+import javax.swing.text.Element;
 
 /**
  * The implementation of {@code CompletionItem} for Spring Boot value hints.
@@ -55,6 +56,7 @@ public class ValueCompletionItem implements CompletionItem {
             "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-value.png"));
     private final int caretOffset;
     private final int dotOffset;
+    private boolean overwrite;
 
     public ValueCompletionItem(ValueHint hint, int dotOffset, int caretOffset) {
         this.hint = hint;
@@ -78,11 +80,35 @@ public class ValueCompletionItem implements CompletionItem {
     public void defaultAction(JTextComponent jtc) {
         try {
             StyledDocument doc = (StyledDocument) jtc.getDocument();
-            //Here we remove the characters starting at the start offset
-            //and ending at the point where the caret is currently found:
-            doc.remove(dotOffset, caretOffset - dotOffset);
+            // calculate the amount of chars to remove (by default from dot up to caret position)
+            int lenToRemove = caretOffset - dotOffset;
+            if (overwrite) {
+                // NOTE: the editor removes by itself the word at caret when ctrl + enter is pressed
+                // the document state here is different from when the completion was invoked thus we have to
+                // find again the offset of the equal sign in the line
+                Element lineElement = doc.getParagraphElement(caretOffset);
+                String line = doc.getText(lineElement.getStartOffset(), lineElement.getEndOffset() - lineElement.getStartOffset());
+                int equalSignIndex = line.indexOf('=');
+                int colonIndex = line.indexOf(':');
+                int commaIndex = line.indexOf(',', dotOffset - lineElement.getStartOffset());
+                if (equalSignIndex >= 0 && dotOffset < equalSignIndex) {
+                    // from dot to equal sign
+                    lenToRemove = lineElement.getStartOffset() + equalSignIndex - dotOffset;
+                } else if (colonIndex >= 0 && dotOffset < colonIndex) {
+                    // from dot to colon
+                    lenToRemove = lineElement.getStartOffset() + colonIndex - dotOffset;
+                } else if (commaIndex >= 0) {
+                    // from dot to comma
+                    lenToRemove = lineElement.getStartOffset() + commaIndex - dotOffset;
+                } else {
+                    // from dot to end of line (except line terminator)
+                    lenToRemove = lineElement.getEndOffset() - 1 - dotOffset;
+                }
+            }
+            // remove characters from dot then insert new text
+            doc.remove(dotOffset, lenToRemove);
             doc.insertString(dotOffset, getText(), null);
-            //This statement will close the code completion box:
+            // close the code completion box
             Completion.get().hideAll();
         } catch (BadLocationException ex) {
             Exceptions.printStackTrace(ex);
@@ -91,6 +117,8 @@ public class ValueCompletionItem implements CompletionItem {
 
     @Override
     public void processKeyEvent(KeyEvent evt) {
+        // detect if Ctrl + Enter is pressed
+        overwrite = evt.getKeyCode() == KeyEvent.VK_ENTER && (evt.getModifiers() & KeyEvent.CTRL_MASK) != 0;
     }
 
     @Override
