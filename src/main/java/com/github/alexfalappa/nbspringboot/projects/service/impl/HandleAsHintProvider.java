@@ -16,10 +16,10 @@
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
 import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.FileObjectCompletionItem;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
 import java.util.Map;
 
-import org.netbeans.api.java.source.ClassIndex;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
@@ -27,6 +27,12 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 import java.util.HashSet;
 import java.util.Set;
 import org.netbeans.api.java.classpath.ClassPath;
+import org.netbeans.api.java.project.JavaProjectConstants;
+import org.netbeans.api.project.Project;
+import org.netbeans.api.project.ProjectUtils;
+import org.netbeans.api.project.SourceGroup;
+import org.netbeans.api.project.Sources;
+import org.openide.filesystems.FileObject;
 
 /**
  * Implementation of {@link HintProvider} for 'handle-as' clauses.
@@ -35,14 +41,24 @@ import org.netbeans.api.java.classpath.ClassPath;
  */
 public class HandleAsHintProvider implements HintProvider {
 
+    private static final String PREFIX_CLASSPATH = "classpath:";
     private final Set<String> resourcePrefixes = new HashSet<>();
-    private final ClassIndex classIndex;
-    private final ClassPath cpExec;
+    private ClassPath cpExec = null;
+    private FileObject resourcesFolder = null;
 
-    public HandleAsHintProvider(ClassIndex classIndex, ClassPath cpExec) {
-        this.classIndex = classIndex;
-        this.cpExec = cpExec;
-        resourcePrefixes.add("classpath:");
+    public HandleAsHintProvider(Project prj) {
+        Sources srcs = ProjectUtils.getSources(prj);
+        SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
+        if (srcGroups.length > 0) {
+            // the first sourcegroup is src/main/java (the second is src/test/java)
+            this.cpExec = ClassPath.getClassPath(srcGroups[0].getRootFolder(), ClassPath.EXECUTE);
+        }
+        srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_RESOURCES);
+        if (srcGroups.length > 0) {
+            // the first sourcegroup is src/main/resources (the second is src/test/resources)
+            this.resourcesFolder = srcGroups[0].getRootFolder();
+        }
+        resourcePrefixes.add(PREFIX_CLASSPATH);
         resourcePrefixes.add("file://");
         resourcePrefixes.add("http://");
         resourcePrefixes.add("https://");
@@ -61,9 +77,20 @@ public class HandleAsHintProvider implements HintProvider {
         String targetType = params.get("target").toString();
         switch (targetType) {
             case "org.springframework.core.io.Resource":
-                for (String rp : resourcePrefixes) {
-                    if (rp.startsWith(filter)) {
-                        completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(rp), dotOffset, caretOffset));
+                if (filter.startsWith(PREFIX_CLASSPATH)) {
+                    String resFilter = filter.substring(PREFIX_CLASSPATH.length());
+                    for (FileObject fObj : resourcesFolder.getChildren()) {
+                        String fname = fObj.getNameExt();
+                        if (fname.startsWith(resFilter)) {
+                            completionResultSet.addItem(
+                                    new FileObjectCompletionItem(fObj, dotOffset + PREFIX_CLASSPATH.length(), caretOffset));
+                        }
+                    }
+                } else {
+                    for (String rp : resourcePrefixes) {
+                        if (rp.startsWith(filter)) {
+                            completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(rp), dotOffset, caretOffset));
+                        }
                     }
                 }
                 break;
