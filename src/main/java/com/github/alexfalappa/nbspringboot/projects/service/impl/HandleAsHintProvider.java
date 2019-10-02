@@ -15,6 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
+import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
 import java.util.Map;
 
 import org.netbeans.api.java.source.ClassIndex;
@@ -22,18 +24,28 @@ import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
+import java.util.HashSet;
+import java.util.Set;
+import org.netbeans.api.java.classpath.ClassPath;
 
 /**
- * Implementation of {@link HintProvider} for 'handle as' clauses.
+ * Implementation of {@link HintProvider} for 'handle-as' clauses.
  *
  * @author Alessandro Falappa
  */
 public class HandleAsHintProvider implements HintProvider {
 
+    private final Set<String> resourcePrefixes = new HashSet<>();
     private final ClassIndex classIndex;
+    private final ClassPath cpExec;
 
-    public HandleAsHintProvider(ClassIndex classIndex) {
+    public HandleAsHintProvider(ClassIndex classIndex, ClassPath cpExec) {
         this.classIndex = classIndex;
+        this.cpExec = cpExec;
+        resourcePrefixes.add("classpath:");
+        resourcePrefixes.add("file://");
+        resourcePrefixes.add("http://");
+        resourcePrefixes.add("https://");
     }
 
     @Override
@@ -47,6 +59,20 @@ public class HandleAsHintProvider implements HintProvider {
             filter = "";
         }
         String targetType = params.get("target").toString();
+        switch (targetType) {
+            case "org.springframework.core.io.Resource":
+                for (String rp : resourcePrefixes) {
+                    if (rp.startsWith(filter)) {
+                        completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(rp), dotOffset, caretOffset));
+                    }
+                }
+                break;
+            default:
+                // try to interpret the targetType as an enum
+                Utils.completeEnum(cpExec, targetType, filter, hint -> {
+                    completionResultSet.addItem(new ValueCompletionItem(hint, dotOffset, caretOffset));
+                });
+        }
         // TODO try to support one of the following
         /*
         Any java.lang.Enum: Lists the possible values for the property. (We recommend defining the property with the Enum type, as no further hint should be required for the IDE to auto-complete the values)

@@ -39,8 +39,10 @@ import com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
+import java.util.function.Consumer;
 import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
+import org.springframework.boot.configurationmetadata.ValueHint;
 
 /**
  * Utility methods used in the plugin.
@@ -215,5 +217,35 @@ public final class Utils {
             logger.log(WARNING, "No sources found for project: {0}", new Object[]{proj.toString()});
         }
         return null;
+    }
+
+    public static void completeEnum(ClassPath cp, String dataType, String filter, Consumer<ValueHint> consumer) {
+        try {
+            Object[] enumvals = cp.getClassLoader(true).loadClass(dataType).getEnumConstants();
+            if (enumvals != null) {
+                for (Object val : enumvals) {
+                    final String valName = val.toString().toLowerCase();
+                    if (filter == null || valName.contains(filter)) {
+                        consumer.accept(createHint(valName));
+                    }
+                }
+            }
+        } catch (ClassNotFoundException ex) {
+            // enum not available in project classpath, no completion possible
+        }
+    }
+
+    /**
+     * Create a {@code ValueHint} object from the given value.
+     * <p>
+     * Created hint has no description.
+     *
+     * @param value the value to use
+     * @return a ValueHint object
+     */
+    public static ValueHint createHint(String value) {
+        ValueHint vh = new ValueHint();
+        vh.setValue(value);
+        return vh;
     }
 }

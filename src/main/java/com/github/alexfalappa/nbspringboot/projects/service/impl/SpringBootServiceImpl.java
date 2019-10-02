@@ -252,7 +252,7 @@ public class SpringBootServiceImpl implements SpringBootService {
             ClasspathInfo cpInfo = ClasspathInfo.create(mvnPrj.getProjectDirectory());
             providerMap.put("logger-name", new LoggerNameHintProvider(cpInfo.getClassIndex()));
             providerMap.put("class-reference", new ClassReferenceHintProvider(cpInfo.getClassIndex(), cpExec));
-            providerMap.put("handle-as", new HandleAsHintProvider(cpInfo.getClassIndex()));
+            providerMap.put("handle-as", new HandleAsHintProvider(cpInfo.getClassIndex(), cpExec));
             // build configuration properties maps
             updateConfigRepo();
         }

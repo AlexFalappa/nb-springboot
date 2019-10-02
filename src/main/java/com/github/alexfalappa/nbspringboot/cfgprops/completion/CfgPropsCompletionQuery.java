@@ -16,7 +16,6 @@
 package com.github.alexfalappa.nbspringboot.cfgprops.completion;
 
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
@@ -115,6 +114,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
         long mark = System.currentTimeMillis();
         // check if completing a property map key
         if (filter != null) {
+            ClassPath cpExec = Utils.execClasspathForProj(proj);
             for (String mapProp : sbs.getMapPropertyNames()) {
                 if (filter.length() > mapProp.length() && filter.startsWith(mapProp)) {
                     String key = filter.substring(mapProp.length() + 1);
@@ -123,7 +123,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                     // if key data type is an enum complete with enum values
                     final String keyDataType = extractMapKeyType(propMetadata);
                     if (!keyDataType.contains("<")) {
-                        completeEnum(keyDataType, key, valueHint -> {
+                        Utils.completeEnum(cpExec, keyDataType, key, valueHint -> {
                             completionResultSet.addItem(new KeyCompletionItem(valueHint, startOffset + mapProp.length() + 1, caretOffset));
                         });
                     }
@@ -214,25 +214,6 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
         }
         final long elapsed = System.currentTimeMillis() - mark;
         logger.log(FINER, "Value completion of ''{0}'' on ''{1}'' took: {2} msecs", new Object[]{filter, propName, elapsed});
-    }
-
-    private void completeEnum(String dataType, String filter, Consumer<ValueHint> consumer) {
-        try {
-            ClassPath cpExec = Utils.execClasspathForProj(proj);
-            Object[] enumvals = cpExec.getClassLoader(true).loadClass(dataType).getEnumConstants();
-            if (enumvals != null) {
-                for (Object val : enumvals) {
-                    final String valName = val.toString().toLowerCase();
-                    if (filter == null || valName.contains(filter)) {
-                        ValueHint valueHint = new ValueHint();
-                        valueHint.setValue(valName);
-                        consumer.accept(valueHint);
-                    }
-                }
-            }
-        } catch (ClassNotFoundException ex) {
-            // enum not available in project classpath, no completion possible
-        }
     }
 
     private void completeValueEnum(String dataType, String filter, CompletionResultSet completionResultSet, int startOffset,
