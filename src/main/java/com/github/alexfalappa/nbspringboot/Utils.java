@@ -15,9 +15,20 @@
  */
 package com.github.alexfalappa.nbspringboot;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
+
+import javax.swing.AbstractButton;
+import javax.swing.DefaultButtonModel;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JPanel;
+import javax.swing.UIManager;
 
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.project.JavaProjectConstants;
@@ -34,15 +45,14 @@ import org.openide.util.Utilities;
 import org.openide.windows.TopComponent;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.Deprecation;
+import org.springframework.boot.configurationmetadata.ValueHint;
 
 import com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
-import java.util.function.Consumer;
 import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
-import org.springframework.boot.configurationmetadata.ValueHint;
 
 /**
  * Utility methods used in the plugin.
@@ -247,5 +257,56 @@ public final class Utils {
         ValueHint vh = new ValueHint();
         vh.setValue(value);
         return vh;
+    }
+
+    /**
+     * Converts an icon from the current L&F defaults into an ImageIcon by painting it.
+     * <p>
+     * Some ui-icons misbehave in that they unconditionally class-cast to the component type they are mostly painted on.
+     * Consequently they blow up if we are trying to paint them anywhere else (f.i. in a renderer). This method tries to
+     * instantiate a component of the type expected by the icon.
+     * <p>
+     * This method is an adaption of a cool trick by Darryl Burke/Rob Camick found at
+     * http://tips4java.wordpress.com/2008/12/18/icon-table-cell-renderer/#comment-120
+     *
+     * @param iconName the name of the icon in UIManager
+     * @return an ImageIcon with the Icon image
+     */
+    public static ImageIcon lafDefaultIcon(String iconName) {
+        Icon ico = UIManager.getIcon(iconName);
+        BufferedImage image = new BufferedImage(ico.getIconWidth(), ico.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = image.createGraphics();
+        try {
+            // paint with a generic java.awt.Component
+            ico.paintIcon(new JPanel(), g2, 0, 0);
+        } catch (ClassCastException e) {
+            try {
+                // try to instantiate the needed java.awt.Component
+                String className = e.getMessage();
+                className = className.substring(className.lastIndexOf(" ") + 1);
+                Class<?> clazz = Class.forName(className);
+                JComponent standInComponent = getSubstitute(clazz);
+                ico.paintIcon(standInComponent, g2, 0, 0);
+            } catch (ClassNotFoundException | IllegalAccessException ex) {
+                // fallback
+                g2.drawRect(0, 0, 16, 16);
+                g2.drawLine(0, 0, 16, 16);
+                g2.drawLine(16, 0, 0, 16);
+            }
+        }
+        g2.dispose();
+        return new ImageIcon(image);
+    }
+
+    private static JComponent getSubstitute(Class<?> clazz) throws IllegalAccessException {
+        JComponent standInComponent;
+        try {
+            standInComponent = (JComponent) clazz.newInstance();
+        } catch (InstantiationException e) {
+            standInComponent = new AbstractButton() {
+            };
+            ((AbstractButton) standInComponent).setModel(new DefaultButtonModel());
+        }
+        return standInComponent;
     }
 }

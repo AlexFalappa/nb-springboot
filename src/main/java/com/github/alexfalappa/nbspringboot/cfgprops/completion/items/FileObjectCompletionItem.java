@@ -25,6 +25,7 @@ import javax.swing.JToolTip;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
@@ -35,9 +36,10 @@ import org.netbeans.spi.editor.completion.CompletionTask;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
-import org.openide.util.Exceptions;
-import javax.swing.text.Element;
 import org.openide.filesystems.FileObject;
+import org.openide.util.Exceptions;
+
+import com.github.alexfalappa.nbspringboot.Utils;
 
 /**
  * The implementation of {@code CompletionItem} for file objects.
@@ -46,9 +48,8 @@ import org.openide.filesystems.FileObject;
  */
 public class FileObjectCompletionItem implements CompletionItem {
 
-    // TODO: the icons below are Metal Look&Feel, should be of the current Look&Feel
-    private static final ImageIcon FILE = (ImageIcon) UIManager.getIcon("FileView.fileIcon");
-    private static final ImageIcon FOLDER = (ImageIcon) UIManager.getIcon("FileView.directoryIcon");
+    private final ImageIcon FILE = Utils.lafDefaultIcon("Tree.leafIcon");
+    private final ImageIcon FOLDER = Utils.lafDefaultIcon("Tree.closedIcon");
     private final int caretOffset;
     private final FileObject fileObj;
     private final int dotOffset;
@@ -99,7 +100,11 @@ public class FileObjectCompletionItem implements CompletionItem {
             }
             // remove characters from dot then insert new text
             doc.remove(dotOffset, lenToRemove);
-            doc.insertString(dotOffset, getText(), null);
+            StringBuilder sb = new StringBuilder(getText());
+            if (fileObj.isFolder()) {
+                sb.append('/');
+            }
+            doc.insertString(dotOffset, sb.toString(), null);
             // close the code completion box
             Completion.get().hideAll();
         } catch (BadLocationException ex) {
@@ -151,7 +156,7 @@ public class FileObjectCompletionItem implements CompletionItem {
 
     @Override
     public int getSortPriority() {
-        return 0;
+        return fileObj.isFolder() ? 0 : 1;
     }
 
     @Override

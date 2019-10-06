@@ -15,24 +15,24 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
-import com.github.alexfalappa.nbspringboot.Utils;
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.FileObjectCompletionItem;
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
-import java.util.Map;
-
-import org.netbeans.spi.editor.completion.CompletionResultSet;
-import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
-
-import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
+import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.openide.filesystems.FileObject;
+import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+
+import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.FileObjectCompletionItem;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
+import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 
 /**
  * Implementation of {@link HintProvider} for 'handle-as' clauses.
@@ -79,11 +79,20 @@ public class HandleAsHintProvider implements HintProvider {
             case "org.springframework.core.io.Resource":
                 if (filter.startsWith(PREFIX_CLASSPATH)) {
                     String resFilter = filter.substring(PREFIX_CLASSPATH.length());
-                    for (FileObject fObj : resourcesFolder.getChildren()) {
+                    int startOffset = dotOffset + PREFIX_CLASSPATH.length();
+                    String filePart = resFilter;
+                    FileObject foBase = resourcesFolder;
+                    if (resFilter.contains("/")) {
+                        final int slashIdx = resFilter.lastIndexOf('/');
+                        final String basePart = resFilter.substring(0, slashIdx);
+                        filePart = resFilter.substring(slashIdx + 1);
+                        startOffset += slashIdx + 1;
+                        foBase = resourcesFolder.getFileObject(basePart);
+                    }
+                    for (FileObject fObj : foBase.getChildren()) {
                         String fname = fObj.getNameExt();
-                        if (fname.startsWith(resFilter)) {
-                            completionResultSet.addItem(
-                                    new FileObjectCompletionItem(fObj, dotOffset + PREFIX_CLASSPATH.length(), caretOffset));
+                        if (fname.startsWith(filePart)) {
+                            completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
                         }
                     }
                 } else {
