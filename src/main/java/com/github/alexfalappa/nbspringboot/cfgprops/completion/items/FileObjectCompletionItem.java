@@ -101,7 +101,7 @@ public class FileObjectCompletionItem implements CompletionItem {
             // remove characters from dot then insert new text
             doc.remove(dotOffset, lenToRemove);
             StringBuilder sb = new StringBuilder(getText());
-            if (fileObj.isFolder()) {
+            if (fileObj.isFolder() && !fileObj.isRoot()) {
                 sb.append('/');
             }
             doc.insertString(dotOffset, sb.toString(), null);

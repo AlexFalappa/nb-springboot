@@ -15,6 +15,9 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
+import java.io.File;
+import java.nio.file.FileSystems;
+import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -27,6 +30,7 @@ import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.Utils;
@@ -42,6 +46,7 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 public class HandleAsHintProvider implements HintProvider {
 
     private static final String PREFIX_CLASSPATH = "classpath:";
+    private static final String PREFIX_FILE = "file://";
     private final Set<String> resourcePrefixes = new HashSet<>();
     private ClassPath cpExec = null;
     private FileObject resourcesFolder = null;
@@ -59,7 +64,7 @@ public class HandleAsHintProvider implements HintProvider {
             this.resourcesFolder = srcGroups[0].getRootFolder();
         }
         resourcePrefixes.add(PREFIX_CLASSPATH);
-        resourcePrefixes.add("file://");
+        resourcePrefixes.add(PREFIX_FILE);
         resourcePrefixes.add("http://");
         resourcePrefixes.add("https://");
     }
@@ -93,6 +98,35 @@ public class HandleAsHintProvider implements HintProvider {
                         String fname = fObj.getNameExt();
                         if (fname.startsWith(filePart)) {
                             completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
+                        }
+                    }
+                } else if (filter.startsWith(PREFIX_FILE)) {
+                    String fileFilter = filter.substring(PREFIX_FILE.length());
+                    int startOffset = dotOffset + PREFIX_FILE.length();
+                    String filePart = fileFilter;
+                    if (fileFilter.isEmpty()) {
+                        Iterable<Path> rootDirs = FileSystems.getDefault().getRootDirectories();
+                        for (Path rootDir : rootDirs) {
+                            FileObject foRoot = FileUtil.toFileObject(rootDir.toFile());
+                            completionResultSet.addItem(new FileObjectCompletionItem(foRoot, startOffset, caretOffset));
+                        }
+                    } else {
+                        FileObject foBase = FileUtil.toFileObject(new File(fileFilter));
+                        if (foBase.isRoot()) {
+                            filePart = "";
+                            startOffset += 1;
+                        } else if (fileFilter.contains("/")) {
+                            final int slashIdx = fileFilter.lastIndexOf('/');
+                            final String basePart = fileFilter.substring(0, slashIdx);
+                            filePart = fileFilter.substring(slashIdx + 1);
+                            startOffset += slashIdx + 1;
+                            foBase = FileUtil.toFileObject(new File(basePart));
+                        }
+                        for (FileObject fObj : foBase.getChildren()) {
+                            String fname = fObj.getNameExt();
+                            if (fname.startsWith(filePart)) {
+                                completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
+                            }
                         }
                     }
                 } else {
