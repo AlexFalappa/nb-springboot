@@ -42,6 +42,7 @@ import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropCompletionItem;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.KeyCompletionItem;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
+import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_ERROR_SHOW;
@@ -49,7 +50,7 @@ import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_SORT_L
 import static java.util.logging.Level.FINER;
 
 /**
- * Completion query for normal completion used in {@link CfgPropsCompletionProvider}.
+ * Completion query for normal (i.e. Ctrl+Space) completion used in {@link CfgPropsCompletionProvider}.
  *
  * @author Alessandro Falappa
  */
@@ -124,7 +125,8 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                     final String keyDataType = extractMapKeyType(propMetadata);
                     if (!keyDataType.contains("<")) {
                         Utils.completeEnum(cpExec, keyDataType, key, valueHint -> {
-                            completionResultSet.addItem(new KeyCompletionItem(valueHint, startOffset + mapProp.length() + 1, caretOffset));
+                            completionResultSet.addItem(new KeyCompletionItem(valueHint, startOffset + mapProp.length() + 1,
+                                    caretOffset));
                         });
                     }
                     // add metadata defined key hints to completion list
@@ -132,7 +134,8 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                     if (!hints.getKeyHints().isEmpty()) {
                         for (ValueHint keyHint : hints.getKeyHints()) {
                             if (keyHint.getValue().toString().startsWith(key)) {
-                                completionResultSet.addItem(new KeyCompletionItem(keyHint, startOffset + mapProp.length() + 1, caretOffset));
+                                completionResultSet.addItem(new KeyCompletionItem(keyHint, startOffset + mapProp.length() + 1,
+                                        caretOffset));
                             }
                         }
                     }
@@ -188,6 +191,14 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 valueHint = new ValueHint();
                 valueHint.setValue("false");
                 completionResultSet.addItem(new ValueCompletionItem(valueHint, startOffset, caretOffset));
+            }
+            // check if data type or map value type is CharSet
+            if (propType.equals("java.nio.charset.Charset") || mapValueType.equals("java.nio.charset.Charset")) {
+                for (String chrsName : HintSupport.getAllCharsets()) {
+                    if (filter == null || chrsName.toLowerCase().startsWith(filter.toLowerCase())) {
+                        completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(chrsName), startOffset, caretOffset));
+                    }
+                }
             }
             // check if data type is an enum
             completeValueEnum(propType, filter, completionResultSet, startOffset, caretOffset);

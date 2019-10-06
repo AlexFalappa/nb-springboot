@@ -260,6 +260,20 @@ public final class Utils {
     }
 
     /**
+     * Create a {@code ValueHint} object from the given value and description.
+     *
+     * @param value the value to use
+     * @param description the description to use
+     * @return a ValueHint object
+     */
+    public static ValueHint createHint(String value, String description) {
+        ValueHint vh = new ValueHint();
+        vh.setValue(value);
+        vh.setDescription(description);
+        return vh;
+    }
+
+    /**
      * Converts an icon from the current L&F defaults into an ImageIcon by painting it.
      * <p>
      * Some ui-icons misbehave in that they unconditionally class-cast to the component type they are mostly painted on.
