@@ -15,8 +15,9 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
-import java.io.File;
 import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Map;
@@ -48,6 +49,7 @@ public class HandleAsHintProvider implements HintProvider {
 
     private static final String PREFIX_CLASSPATH = "classpath:";
     private static final String PREFIX_FILE = "file://";
+//    private static final Pattern PATTERN_WINDRIVES = Pattern.compile("[A-Z]:/");
     private final Set<String> resourcePrefixes = new HashSet<>();
     private ClassPath cpExec = null;
     private FileObject resourcesFolder = null;
@@ -104,25 +106,46 @@ public class HandleAsHintProvider implements HintProvider {
                 } else if (filter.startsWith(PREFIX_FILE)) {
                     String fileFilter = filter.substring(PREFIX_FILE.length());
                     int startOffset = dotOffset + PREFIX_FILE.length();
-                    String filePart = fileFilter;
                     if (fileFilter.isEmpty()) {
                         Iterable<Path> rootDirs = FileSystems.getDefault().getRootDirectories();
                         for (Path rootDir : rootDirs) {
                             FileObject foRoot = FileUtil.toFileObject(rootDir.toFile());
-                            completionResultSet.addItem(new FileObjectCompletionItem(foRoot, startOffset, caretOffset));
+                            // filter out CD/DVD drives letter on Windows
+                            if (foRoot != null) {
+                                completionResultSet.addItem(new FileObjectCompletionItem(foRoot, startOffset, caretOffset));
+                            }
                         }
                     } else {
-                        FileObject foBase = FileUtil.toFileObject(new File(fileFilter));
-                        if (foBase.isRoot()) {
-                            filePart = "";
-                            startOffset += 1;
-                        } else if (fileFilter.contains("/")) {
-                            final int slashIdx = fileFilter.lastIndexOf('/');
-                            final String basePart = fileFilter.substring(0, slashIdx);
-                            filePart = fileFilter.substring(slashIdx + 1);
-                            startOffset += slashIdx + 1;
-                            foBase = FileUtil.toFileObject(new File(basePart));
+                        Path pTest = Paths.get(fileFilter);
+                        startOffset += fileFilter.length();
+                        String filePart = "";
+                        if (!Files.exists(pTest)) {
+                            filePart = pTest.getFileName().toString();
+                            pTest = pTest.getParent();
+                            startOffset -= filePart.length();
                         }
+                        FileObject foBase = FileUtil.toFileObject(pTest.toFile());
+
+//                        File fileTest = new File(fileFilter);
+//                        startOffset += fileFilter.length();
+//                        String filePart = "";
+//                        if (!fileTest.exists()) {
+//                            filePart = fileTest.getName();
+//                            fileTest = fileTest.getParentFile();
+//                            startOffset -= filePart.length();
+//                        }
+//                        FileObject foBase = FileUtil.toFileObject(fileTest);
+//                        Matcher matcher = PATTERN_WINDRIVES.matcher(fileFilter);
+//                        if (foBase.isRoot() || matcher.matches()) {
+//                            startOffset += filePart.length();
+//                            filePart = "";
+//                        } else if (fileFilter.contains("/")) {
+//                            final int slashIdx = fileFilter.lastIndexOf('/');
+//                            final String basePart = fileFilter.substring(0, slashIdx);
+//                            filePart = fileFilter.substring(slashIdx + 1);
+//                            startOffset += slashIdx + 1;
+//                            foBase = FileUtil.toFileObject(FileUtil.normalizeFile(new File(basePart)));
+//                        }
                         for (FileObject fObj : foBase.getChildren()) {
                             String fname = fObj.getNameExt();
                             if (fname.startsWith(filePart)) {
