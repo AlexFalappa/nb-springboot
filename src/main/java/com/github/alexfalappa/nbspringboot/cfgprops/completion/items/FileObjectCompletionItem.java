@@ -40,6 +40,12 @@ import org.openide.filesystems.FileObject;
 import org.openide.util.Exceptions;
 
 import com.github.alexfalappa.nbspringboot.Utils;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import javax.swing.Icon;
+import javax.swing.JPanel;
+import javax.swing.filechooser.FileSystemView;
+import org.openide.filesystems.FileUtil;
 
 /**
  * The implementation of {@code CompletionItem} for file objects.
@@ -48,12 +54,13 @@ import com.github.alexfalappa.nbspringboot.Utils;
  */
 public class FileObjectCompletionItem implements CompletionItem {
 
-    private final ImageIcon FILE = Utils.lafDefaultIcon("Tree.leafIcon");
-    private final ImageIcon FOLDER = Utils.lafDefaultIcon("Tree.closedIcon");
+    private final ImageIcon FILE = Utils.lafDefaultIcon("FileView.directoryIcon");
+    private final ImageIcon FOLDER = Utils.lafDefaultIcon("FileView.fileIcon");
     private final int caretOffset;
     private final FileObject fileObj;
     private final int dotOffset;
     private boolean overwrite;
+    private final static FileSystemView fsView = FileSystemView.getFileSystemView();
 
     public FileObjectCompletionItem(FileObject fileObj, int dotOffset, int caretOffset) {
         this.fileObj = fileObj;
@@ -126,9 +133,19 @@ public class FileObjectCompletionItem implements CompletionItem {
     @Override
     public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height,
             boolean selected) {
-        ImageIcon ico = fileObj.isFolder() ? FOLDER : FILE;
+        Icon ico = fsView.getSystemIcon(FileUtil.toFile(fileObj));
+        ImageIcon imgIco;
+        if (ico instanceof ImageIcon) {
+            imgIco = (ImageIcon) ico;
+        } else {
+            BufferedImage image = new BufferedImage(ico.getIconWidth(), ico.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g2 = image.createGraphics();
+            ico.paintIcon(new JPanel(), g2, 0, 0);
+            g2.dispose();
+            imgIco = new ImageIcon(image);
+        }
         final Color color = selected ? UIManager.getColor("List.selectionForeground") : UIManager.getColor("List.foreground");
-        CompletionUtilities.renderHtml(ico, getText(), getTextRight(), g, defaultFont, color, width, height, selected);
+        CompletionUtilities.renderHtml(imgIco, getText(), getTextRight(), g, defaultFont, color, width, height, selected);
     }
 
     @Override
