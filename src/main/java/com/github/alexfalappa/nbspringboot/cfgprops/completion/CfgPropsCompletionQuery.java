@@ -94,7 +94,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                             + lineToCaret.indexOf(valPrefix, equalSignOffset), caretOffset);
                 } else if (equalSignOffset >= 0) {
                     //value completion with empty filter
-                    completePropValue(completionResultSet, propPrefix, null, lineStartOffset + equalSignOffset + 1,
+                    completePropValue(completionResultSet, propPrefix, "", lineStartOffset + equalSignOffset + 1,
                             caretOffset);
                 } else {
                     // property completion
@@ -169,14 +169,13 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
     public void completePropValue(CompletionResultSet completionResultSet, String propName, String filter, int startOffset,
             int caretOffset) {
         long mark = System.currentTimeMillis();
-        logger.log(FINER, "Completing property value from: {0}", filter);
+        logger.log(FINER, "Completing property value from: ''{0}''", filter);
         ConfigurationMetadataProperty propMeta = sbs.getPropertyMetadata(propName);
         if (propMeta != null) {
             final String propType = propMeta.getType();
             final String mapValueType = extractMapValueType(propMeta);
             // if data type is collection or array adjust filter and startOffset to part after last comma
-            if (filter != null
-                    && (propType.contains("List<") || propType.contains("Set<") || propType.contains("[]"))) {
+            if (propType.contains("List<") || propType.contains("Set<") || propType.contains("[]")) {
                 int idx = filter.lastIndexOf(',');
                 if (idx > 0) {
                     startOffset = startOffset + idx + 1;
@@ -195,7 +194,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             // check if data type or map value type is CharSet
             if (propType.equals("java.nio.charset.Charset") || mapValueType.equals("java.nio.charset.Charset")) {
                 for (String chrsName : HintSupport.getAllCharsets()) {
-                    if (filter == null || chrsName.toLowerCase().startsWith(filter.toLowerCase())) {
+                    if (chrsName.toLowerCase().startsWith(filter.toLowerCase())) {
                         completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(chrsName), startOffset, caretOffset));
                     }
                 }
@@ -209,7 +208,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             // add metadata defined value hints to completion list
             final Hints hints = propMeta.getHints();
             for (ValueHint valueHint : hints.getValueHints()) {
-                if (filter == null || valueHint.getValue().toString().contains(filter)) {
+                if (valueHint.getValue().toString().contains(filter)) {
                     completionResultSet.addItem(new ValueCompletionItem(valueHint, startOffset, caretOffset));
                 }
             }

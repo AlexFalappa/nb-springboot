@@ -48,6 +48,7 @@ import org.springframework.boot.configurationmetadata.Deprecation;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
 import com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel;
+import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
@@ -227,6 +228,14 @@ public final class Utils {
             logger.log(WARNING, "No sources found for project: {0}", new Object[]{proj.toString()});
         }
         return null;
+    }
+
+    public static void completeCharset(String filter, Consumer<ValueHint> consumer) {
+        HintSupport.getAllCharsets().stream()
+                .filter((chrsName) -> (chrsName.toLowerCase().startsWith(filter.toLowerCase())))
+                .forEachOrdered((chrsName) -> {
+                    consumer.accept(Utils.createHint(chrsName));
+                });
     }
 
     public static void completeEnum(ClassPath cp, String dataType, String filter, Consumer<ValueHint> consumer) {

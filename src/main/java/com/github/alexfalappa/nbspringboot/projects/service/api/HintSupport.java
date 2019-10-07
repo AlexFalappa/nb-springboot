@@ -53,7 +53,6 @@ public final class HintSupport {
     public static synchronized ImageIcon getIconFor(File file) {
         Icon ico = fsView.getSystemIcon(file);
         if (iconCache.containsKey(ico.toString())) {
-            System.out.format("Hit: %s%n", ico.toString());
             return iconCache.get(ico.toString());
         } else {
             ImageIcon imgIco;
@@ -66,7 +65,6 @@ public final class HintSupport {
                 g2.dispose();
                 imgIco = new ImageIcon(image);
             }
-            System.out.format("Miss: %s%n", ico.toString());
             iconCache.put(ico.toString(), imgIco);
             return imgIco;
         }

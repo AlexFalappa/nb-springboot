@@ -38,7 +38,6 @@ import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.FileObjectCompletionItem;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
 import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
-import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
 
 /**
  * Implementation of {@link HintProvider} for 'handle-as' clauses.
@@ -141,11 +140,9 @@ public class HandleAsHintProvider implements HintProvider {
                 }
                 break;
             case "java.nio.charset.Charset":
-                for (String chrsName : HintSupport.getAllCharsets()) {
-                    if (chrsName.toLowerCase().startsWith(filter.toLowerCase())) {
-                        completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(chrsName), dotOffset, caretOffset));
-                    }
-                }
+                Utils.completeCharset(filter, hint -> {
+                    completionResultSet.addItem(new ValueCompletionItem(hint, dotOffset, caretOffset));
+                });
                 break;
             default:
                 // try to interpret the targetType as an enum
