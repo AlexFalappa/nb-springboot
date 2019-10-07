@@ -17,8 +17,8 @@ package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -125,27 +125,6 @@ public class HandleAsHintProvider implements HintProvider {
                             startOffset -= filePart.length();
                         }
                         FileObject foBase = FileUtil.toFileObject(pTest.toFile());
-
-//                        File fileTest = new File(fileFilter);
-//                        startOffset += fileFilter.length();
-//                        String filePart = "";
-//                        if (!fileTest.exists()) {
-//                            filePart = fileTest.getName();
-//                            fileTest = fileTest.getParentFile();
-//                            startOffset -= filePart.length();
-//                        }
-//                        FileObject foBase = FileUtil.toFileObject(fileTest);
-//                        Matcher matcher = PATTERN_WINDRIVES.matcher(fileFilter);
-//                        if (foBase.isRoot() || matcher.matches()) {
-//                            startOffset += filePart.length();
-//                            filePart = "";
-//                        } else if (fileFilter.contains("/")) {
-//                            final int slashIdx = fileFilter.lastIndexOf('/');
-//                            final String basePart = fileFilter.substring(0, slashIdx);
-//                            filePart = fileFilter.substring(slashIdx + 1);
-//                            startOffset += slashIdx + 1;
-//                            foBase = FileUtil.toFileObject(FileUtil.normalizeFile(new File(basePart)));
-//                        }
                         for (FileObject fObj : foBase.getChildren()) {
                             String fname = fObj.getNameExt();
                             if (fname.startsWith(filePart)) {

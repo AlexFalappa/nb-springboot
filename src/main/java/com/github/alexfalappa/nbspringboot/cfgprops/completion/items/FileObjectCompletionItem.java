@@ -130,17 +130,6 @@ public class FileObjectCompletionItem implements CompletionItem {
     @Override
     public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height,
             boolean selected) {
-//        Icon ico = fsView.getSystemIcon(FileUtil.toFile(fileObj));
-//        ImageIcon imgIco;
-//        if (ico instanceof ImageIcon) {
-//            imgIco = (ImageIcon) ico;
-//        } else {
-//            BufferedImage image = new BufferedImage(ico.getIconWidth(), ico.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-//            Graphics2D g2 = image.createGraphics();
-//            ico.paintIcon(new JPanel(), g2, 0, 0);
-//            g2.dispose();
-//            imgIco = new ImageIcon(image);
-//        }
         final Color color = selected ? UIManager.getColor("List.selectionForeground") : UIManager.getColor("List.foreground");
         CompletionUtilities
                 .renderHtml(HintSupport.getIconFor(FileUtil.toFile(fileObj)), getText(), getTextRight(), g, defaultFont, color,
