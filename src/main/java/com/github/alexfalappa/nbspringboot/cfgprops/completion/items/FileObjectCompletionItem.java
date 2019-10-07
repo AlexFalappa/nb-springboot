@@ -23,6 +23,7 @@ import java.awt.event.KeyEvent;
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
 import javax.swing.UIManager;
+import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 import javax.swing.text.Element;
@@ -37,15 +38,11 @@ import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
 import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 
 import com.github.alexfalappa.nbspringboot.Utils;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import javax.swing.Icon;
-import javax.swing.JPanel;
-import javax.swing.filechooser.FileSystemView;
-import org.openide.filesystems.FileUtil;
+import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
 
 /**
  * The implementation of {@code CompletionItem} for file objects.
@@ -133,19 +130,21 @@ public class FileObjectCompletionItem implements CompletionItem {
     @Override
     public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height,
             boolean selected) {
-        Icon ico = fsView.getSystemIcon(FileUtil.toFile(fileObj));
-        ImageIcon imgIco;
-        if (ico instanceof ImageIcon) {
-            imgIco = (ImageIcon) ico;
-        } else {
-            BufferedImage image = new BufferedImage(ico.getIconWidth(), ico.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics2D g2 = image.createGraphics();
-            ico.paintIcon(new JPanel(), g2, 0, 0);
-            g2.dispose();
-            imgIco = new ImageIcon(image);
-        }
+//        Icon ico = fsView.getSystemIcon(FileUtil.toFile(fileObj));
+//        ImageIcon imgIco;
+//        if (ico instanceof ImageIcon) {
+//            imgIco = (ImageIcon) ico;
+//        } else {
+//            BufferedImage image = new BufferedImage(ico.getIconWidth(), ico.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+//            Graphics2D g2 = image.createGraphics();
+//            ico.paintIcon(new JPanel(), g2, 0, 0);
+//            g2.dispose();
+//            imgIco = new ImageIcon(image);
+//        }
         final Color color = selected ? UIManager.getColor("List.selectionForeground") : UIManager.getColor("List.foreground");
-        CompletionUtilities.renderHtml(imgIco, getText(), getTextRight(), g, defaultFont, color, width, height, selected);
+        CompletionUtilities
+                .renderHtml(HintSupport.getIconFor(FileUtil.toFile(fileObj)), getText(), getTextRight(), g, defaultFont, color,
+                        width, height, selected);
     }
 
     @Override
