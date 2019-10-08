@@ -82,18 +82,17 @@ public class HandleAsHintProvider implements HintProvider {
                     completionResultSet.addItem(new ValueCompletionItem(hint, dotOffset, caretOffset));
                 });
                 break;
+            case "org.springframework.util.MimeType":
+                Utils.completeMimetype(filter, hint -> {
+                    completionResultSet.addItem(new ValueCompletionItem(hint, dotOffset, caretOffset));
+                });
+                break;
             default:
                 // try to interpret the targetType as an enum
                 Utils.completeEnum(cpExec, targetType, filter, hint -> {
                     completionResultSet.addItem(new ValueCompletionItem(hint, dotOffset, caretOffset));
                 });
         }
-        // TODO try to support one of the following
-        /*
-        java.util.Locale: auto-completion of locales (such as en_US)
-        org.springframework.util.MimeType: Supports auto-completion of content type values (such as text/plain)
-        [Tip] If multiple values can be provided, use a Collection or Array type to teach the IDE about it.
-         */
     }
 
 }

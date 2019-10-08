@@ -41,9 +41,23 @@ public final class HintSupport {
     private static Set<String> cachedLocales = null;
     private final static FileSystemView fsView = FileSystemView.getFileSystemView();
     private final static Map<String, ImageIcon> iconCache = new HashMap<>();
+    public final static Set<String> MIMETYPES = new HashSet<>();
 
     // prevent instantiation
     private HintSupport() {
+    }
+
+    static {
+        MIMETYPES.add("*/*");
+        MIMETYPES.add("application/json");
+        MIMETYPES.add("application/octet-stream");
+        MIMETYPES.add("application/xml");
+        MIMETYPES.add("image/gif");
+        MIMETYPES.add("image/jpeg");
+        MIMETYPES.add("image/png");
+        MIMETYPES.add("text/html");
+        MIMETYPES.add("text/plain");
+        MIMETYPES.add("text/xml");
     }
 
     /**

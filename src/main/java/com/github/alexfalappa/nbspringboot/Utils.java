@@ -285,6 +285,14 @@ public final class Utils {
                 });
     }
 
+    public static void completeMimetype(String filter, Consumer<ValueHint> consumer) {
+        HintSupport.MIMETYPES.stream()
+                .filter(mime -> mime.toLowerCase().contains(filter.toLowerCase()))
+                .forEachOrdered(mime -> {
+                    consumer.accept(Utils.createHint(mime));
+                });
+    }
+
     public static void completeEnum(ClassPath cp, String dataType, String filter, Consumer<ValueHint> consumer) {
         try {
             Object[] enumvals = cp.getClassLoader(true).loadClass(dataType).getEnumConstants();

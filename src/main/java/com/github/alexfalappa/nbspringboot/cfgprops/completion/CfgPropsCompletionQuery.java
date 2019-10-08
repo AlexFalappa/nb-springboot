@@ -146,13 +146,6 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                                     caretOffset));
                         });
                     }
-                    // check if key data type is Locale
-                    if (keyDataType.equals("java.util.Locale")) {
-                        Utils.completeLocale(key, hint -> {
-                            completionResultSet.addItem(new KeyCompletionItem(hint, startOffset + mapProp.length() + 1,
-                                    caretOffset));
-                        });
-                    }
                     // add metadata defined key hints to completion list
                     final Hints hints = propMetadata.getHints();
                     if (!hints.getKeyHints().isEmpty()) {
@@ -230,6 +223,14 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 for (String lclName : HintSupport.getAllLocales()) {
                     if (lclName.toLowerCase().contains(filterLowcase)) {
                         completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(lclName), startOffset, caretOffset));
+                    }
+                }
+            }
+            // check if data type or map value type is MimeType
+            if (propType.equals("org.springframework.util.MimeType") || mapValueType.equals("org.springframework.util.MimeType")) {
+                for (String mime : HintSupport.MIMETYPES) {
+                    if (mime.toLowerCase().contains(filterLowcase)) {
+                        completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(mime), startOffset, caretOffset));
                     }
                 }
             }
