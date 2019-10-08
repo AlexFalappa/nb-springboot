@@ -48,6 +48,7 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_ERROR_SHOW;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_SORT_LAST;
 import static java.util.logging.Level.FINER;
+import org.openide.filesystems.FileObject;
 
 /**
  * Completion query for normal (i.e. Ctrl+Space) completion used in {@link CfgPropsCompletionProvider}.
@@ -62,10 +63,12 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
     private static final Pattern PATTERN_MAPVALUE_DATATYPE = Pattern.compile("java.util.Map<.*,(.*)>");
     private final SpringBootService sbs;
     private final Project proj;
+    private final FileObject resourcesFolder;
 
     public CfgPropsCompletionQuery(SpringBootService sbs, Project proj) {
         this.sbs = Objects.requireNonNull(sbs);
         this.proj = proj;
+        this.resourcesFolder=Utils.resourcesFolderForProj(proj);
     }
 
     @Override
@@ -204,6 +207,10 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                         completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(chrsName), startOffset, caretOffset));
                     }
                 }
+            }
+            // check if data type or map value type is a Spring Resource
+            if (propType.equals("org.springframework.core.io.Resource") || mapValueType.equals("org.springframework.core.io.Resource")) {
+                Utils.completeSrpingResource(resourcesFolder, filter, completionResultSet, startOffset, caretOffset);
             }
             // check if data type is an enum
             completeValueEnum(propType, filter, completionResultSet, startOffset, caretOffset);

@@ -15,13 +15,7 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.project.JavaProjectConstants;
@@ -31,11 +25,9 @@ import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.openide.filesystems.FileObject;
-import org.openide.filesystems.FileUtil;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.Utils;
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.FileObjectCompletionItem;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
 import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 
@@ -46,12 +38,8 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
  */
 public class HandleAsHintProvider implements HintProvider {
 
-    private static final String PREFIX_CLASSPATH = "classpath:";
-    private static final String PREFIX_FILE = "file://";
-//    private static final Pattern PATTERN_WINDRIVES = Pattern.compile("[A-Z]:/");
-    private final Set<String> resourcePrefixes = new HashSet<>();
     private ClassPath cpExec = null;
-    private FileObject resourcesFolder = null;
+    private final FileObject resourcesFolder;
 
     public HandleAsHintProvider(Project prj) {
         Sources srcs = ProjectUtils.getSources(prj);
@@ -60,15 +48,7 @@ public class HandleAsHintProvider implements HintProvider {
             // the first sourcegroup is src/main/java (the second is src/test/java)
             this.cpExec = ClassPath.getClassPath(srcGroups[0].getRootFolder(), ClassPath.EXECUTE);
         }
-        srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_RESOURCES);
-        if (srcGroups.length > 0) {
-            // the first sourcegroup is src/main/resources (the second is src/test/resources)
-            this.resourcesFolder = srcGroups[0].getRootFolder();
-        }
-        resourcePrefixes.add(PREFIX_CLASSPATH);
-        resourcePrefixes.add(PREFIX_FILE);
-        resourcePrefixes.add("http://");
-        resourcePrefixes.add("https://");
+        this.resourcesFolder=Utils.resourcesFolderForProj(prj);
     }
 
     @Override
@@ -84,62 +64,7 @@ public class HandleAsHintProvider implements HintProvider {
         String targetType = params.get("target").toString();
         switch (targetType) {
             case "org.springframework.core.io.Resource":
-                if (filter.startsWith(PREFIX_CLASSPATH)) {
-                    String resFilter = filter.substring(PREFIX_CLASSPATH.length());
-                    int startOffset = dotOffset + PREFIX_CLASSPATH.length();
-                    String filePart = resFilter;
-                    FileObject foBase = resourcesFolder;
-                    if (resFilter.contains("/")) {
-                        final int slashIdx = resFilter.lastIndexOf('/');
-                        final String basePart = resFilter.substring(0, slashIdx);
-                        filePart = resFilter.substring(slashIdx + 1);
-                        startOffset += slashIdx + 1;
-                        foBase = resourcesFolder.getFileObject(basePart);
-                    }
-                    for (FileObject fObj : foBase.getChildren()) {
-                        String fname = fObj.getNameExt();
-                        if (fname.contains(filePart)) {
-                            completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
-                        }
-                    }
-                } else if (filter.startsWith(PREFIX_FILE)) {
-                    String fileFilter = filter.substring(PREFIX_FILE.length());
-                    int startOffset = dotOffset + PREFIX_FILE.length();
-                    if (fileFilter.isEmpty()) {
-                        Iterable<Path> rootDirs = FileSystems.getDefault().getRootDirectories();
-                        for (Path rootDir : rootDirs) {
-                            FileObject foRoot = FileUtil.toFileObject(rootDir.toFile());
-                            // filter out CD/DVD drives letter on Windows
-                            if (foRoot != null) {
-                                completionResultSet.addItem(new FileObjectCompletionItem(foRoot, startOffset, caretOffset));
-                            }
-                        }
-                    } else {
-                        Path pTest = Paths.get(fileFilter);
-                        startOffset += fileFilter.length();
-                        String filePart = "";
-                        if (!Files.exists(pTest)) {
-                            filePart = pTest.getFileName().toString();
-                            pTest = pTest.getParent();
-                            startOffset -= filePart.length();
-                        }
-                        if (pTest!=null) {
-                            FileObject foBase = FileUtil.toFileObject(pTest.toFile());
-                            for (FileObject fObj : foBase.getChildren()) {
-                                String fname = fObj.getNameExt();
-                                if (fname.contains(filePart)) {
-                                    completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
-                                }
-                            }
-                        }
-                    }
-                } else {
-                    for (String rp : resourcePrefixes) {
-                        if (rp.contains(filter)) {
-                            completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(rp), dotOffset, caretOffset));
-                        }
-                    }
-                }
+                Utils.completeSrpingResource(resourcesFolder, filter, completionResultSet, dotOffset, caretOffset);
                 break;
             case "java.nio.charset.Charset":
                 Utils.completeCharset(filter, hint -> {

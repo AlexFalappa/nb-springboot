@@ -52,8 +52,18 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.FileObjectCompletionItem;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
+import org.netbeans.spi.editor.completion.CompletionResultSet;
+import org.openide.filesystems.FileUtil;
 
 /**
  * Utility methods used in the plugin.
@@ -63,10 +73,20 @@ import static java.util.regex.Pattern.compile;
 public final class Utils {
 
     private static final Logger logger = Logger.getLogger(Utils.class.getName());
-    private static final Pattern p = compile("(\\w+\\.)+(\\w+)");
+    private static final Pattern PATTERN_JAVATYPE = compile("(\\w+\\.)+(\\w+)");
+    private static final String PREFIX_CLASSPATH = "classpath:";
+    private static final String PREFIX_FILE = "file://";
+    private static final Set<String> resourcePrefixes = new HashSet<>();
 
     // prevent instantiation
     private Utils() {
+    }
+
+    static {
+        resourcePrefixes.add(PREFIX_CLASSPATH);
+        resourcePrefixes.add(PREFIX_FILE);
+        resourcePrefixes.add("http://");
+        resourcePrefixes.add("https://");
     }
 
     /**
@@ -90,7 +110,7 @@ public final class Utils {
      * @return the shortened type
      */
     public static String shortenJavaType(String type) {
-        return p.matcher(type).replaceAll("$2");
+        return PATTERN_JAVATYPE.matcher(type).replaceAll("$2");
     }
 
     /**
@@ -230,12 +250,22 @@ public final class Utils {
         return null;
     }
 
+    public static FileObject resourcesFolderForProj(Project proj) {
+        Sources srcs = ProjectUtils.getSources(proj);
+        SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_RESOURCES);
+        if (srcGroups.length > 0) {
+            // the first sourcegroup is src/main/resources (the second is src/test/resources)
+            return srcGroups[0].getRootFolder();
+        }
+        return proj.getProjectDirectory();
+    }
+
     public static void completeBoolean(String filter, Consumer<ValueHint> consumer) {
         if ("true".contains(filter)) {
-                    consumer.accept(Utils.createHint("true"));
+            consumer.accept(Utils.createHint("true"));
         }
         if ("false".contains(filter)) {
-                    consumer.accept(Utils.createHint("false"));
+            consumer.accept(Utils.createHint("false"));
         }
     }
 
@@ -260,6 +290,66 @@ public final class Utils {
             }
         } catch (ClassNotFoundException ex) {
             // enum not available in project classpath, no completion possible
+        }
+    }
+
+    public static void completeSrpingResource(FileObject resourcesFolder, String filter, CompletionResultSet completionResultSet,
+            int dotOffset, int caretOffset) {
+        if (filter.startsWith(PREFIX_CLASSPATH)) {
+            String resFilter = filter.substring(PREFIX_CLASSPATH.length());
+            int startOffset = dotOffset + PREFIX_CLASSPATH.length();
+            String filePart = resFilter;
+            FileObject foBase = resourcesFolder;
+            if (resFilter.contains("/")) {
+                final int slashIdx = resFilter.lastIndexOf('/');
+                final String basePart = resFilter.substring(0, slashIdx);
+                filePart = resFilter.substring(slashIdx + 1);
+                startOffset += slashIdx + 1;
+                foBase = resourcesFolder.getFileObject(basePart);
+            }
+            for (FileObject fObj : foBase.getChildren()) {
+                String fname = fObj.getNameExt();
+                if (fname.contains(filePart)) {
+                    completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
+                }
+            }
+        } else if (filter.startsWith(PREFIX_FILE)) {
+            String fileFilter = filter.substring(PREFIX_FILE.length());
+            int startOffset = dotOffset + PREFIX_FILE.length();
+            if (fileFilter.isEmpty()) {
+                Iterable<Path> rootDirs = FileSystems.getDefault().getRootDirectories();
+                for (Path rootDir : rootDirs) {
+                    FileObject foRoot = FileUtil.toFileObject(rootDir.toFile());
+                    // filter out CD/DVD drives letter on Windows
+                    if (foRoot != null) {
+                        completionResultSet.addItem(new FileObjectCompletionItem(foRoot, startOffset, caretOffset));
+                    }
+                }
+            } else {
+                Path pTest = Paths.get(fileFilter);
+                startOffset += fileFilter.length();
+                String filePart = "";
+                if (!Files.exists(pTest)) {
+                    filePart = pTest.getFileName().toString();
+                    pTest = pTest.getParent();
+                    startOffset -= filePart.length();
+                }
+                if (pTest != null) {
+                    FileObject foBase = FileUtil.toFileObject(pTest.toFile());
+                    for (FileObject fObj : foBase.getChildren()) {
+                        String fname = fObj.getNameExt();
+                        if (fname.contains(filePart)) {
+                            completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
+                        }
+                    }
+                }
+            }
+        } else {
+            for (String rp : resourcePrefixes) {
+                if (rp.contains(filter)) {
+                    completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(rp), dotOffset, caretOffset));
+                }
+            }
         }
     }
 
