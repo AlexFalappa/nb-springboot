@@ -98,7 +98,7 @@ public class HandleAsHintProvider implements HintProvider {
                     }
                     for (FileObject fObj : foBase.getChildren()) {
                         String fname = fObj.getNameExt();
-                        if (fname.startsWith(filePart)) {
+                        if (fname.contains(filePart)) {
                             completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
                         }
                     }
@@ -127,7 +127,7 @@ public class HandleAsHintProvider implements HintProvider {
                             FileObject foBase = FileUtil.toFileObject(pTest.toFile());
                             for (FileObject fObj : foBase.getChildren()) {
                                 String fname = fObj.getNameExt();
-                                if (fname.startsWith(filePart)) {
+                                if (fname.contains(filePart)) {
                                     completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
                                 }
                             }
@@ -135,7 +135,7 @@ public class HandleAsHintProvider implements HintProvider {
                     }
                 } else {
                     for (String rp : resourcePrefixes) {
-                        if (rp.startsWith(filter)) {
+                        if (rp.contains(filter)) {
                             completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(rp), dotOffset, caretOffset));
                         }
                     }

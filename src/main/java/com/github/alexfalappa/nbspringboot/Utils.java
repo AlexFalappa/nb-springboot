@@ -230,9 +230,18 @@ public final class Utils {
         return null;
     }
 
+    public static void completeBoolean(String filter, Consumer<ValueHint> consumer) {
+        if ("true".contains(filter)) {
+                    consumer.accept(Utils.createHint("true"));
+        }
+        if ("false".contains(filter)) {
+                    consumer.accept(Utils.createHint("false"));
+        }
+    }
+
     public static void completeCharset(String filter, Consumer<ValueHint> consumer) {
         HintSupport.getAllCharsets().stream()
-                .filter((chrsName) -> (chrsName.toLowerCase().startsWith(filter.toLowerCase())))
+                .filter((chrsName) -> (chrsName.toLowerCase().contains(filter.toLowerCase())))
                 .forEachOrdered((chrsName) -> {
                     consumer.accept(Utils.createHint(chrsName));
                 });

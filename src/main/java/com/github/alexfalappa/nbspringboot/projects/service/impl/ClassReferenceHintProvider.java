@@ -79,7 +79,7 @@ public class ClassReferenceHintProvider implements HintProvider {
         final ClassLoader classLoader = cpExec.getClassLoader(true);
         elements.forEach(handle -> {
             final String binaryName = handle.getBinaryName();
-            if (binaryName.startsWith(filter)) {
+            if (binaryName.toLowerCase().contains(filter)) {
                 try {
                     Class<?> loadedClass = classLoader.loadClass(binaryName);
                     boolean isAbstract = Modifier.isAbstract(loadedClass.getModifiers());

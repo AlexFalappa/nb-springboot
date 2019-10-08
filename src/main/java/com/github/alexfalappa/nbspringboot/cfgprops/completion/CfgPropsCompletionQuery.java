@@ -117,23 +117,28 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
         if (filter != null) {
             ClassPath cpExec = Utils.execClasspathForProj(proj);
             for (String mapProp : sbs.getMapPropertyNames()) {
-                if (filter.length() > mapProp.length() && filter.startsWith(mapProp)) {
-                    String key = filter.substring(mapProp.length() + 1);
+                if (filter.length() > mapProp.length() && filter.contains(mapProp)) {
+                    String key = filter.substring(mapProp.length() + 1).toLowerCase();
                     logger.log(FINER, "Completing key for map property {0} from: {1}", new Object[]{mapProp, key});
                     final ConfigurationMetadataProperty propMetadata = sbs.getPropertyMetadata(mapProp);
                     // if key data type is an enum complete with enum values
                     final String keyDataType = extractMapKeyType(propMetadata);
                     if (!keyDataType.contains("<")) {
-                        Utils.completeEnum(cpExec, keyDataType, key, valueHint -> {
-                            completionResultSet.addItem(new KeyCompletionItem(valueHint, startOffset + mapProp.length() + 1,
-                                    caretOffset));
+                        Utils.completeEnum(cpExec, keyDataType, key, hint -> {
+                            completionResultSet.addItem(new KeyCompletionItem(hint, startOffset + mapProp.length() + 1, caretOffset));
+                        });
+                    }
+                    // check if key data type is boolean
+                    if (keyDataType.equals("java.lang.Boolean")) {
+                        Utils.completeBoolean(key, hint -> {
+                            completionResultSet.addItem(new KeyCompletionItem(hint, startOffset + mapProp.length() + 1, caretOffset));
                         });
                     }
                     // add metadata defined key hints to completion list
                     final Hints hints = propMetadata.getHints();
                     if (!hints.getKeyHints().isEmpty()) {
                         for (ValueHint keyHint : hints.getKeyHints()) {
-                            if (keyHint.getValue().toString().startsWith(key)) {
+                            if (keyHint.getValue().toString().toLowerCase().contains(key)) {
                                 completionResultSet.addItem(new KeyCompletionItem(keyHint, startOffset + mapProp.length() + 1,
                                         caretOffset));
                             }
@@ -169,6 +174,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
     public void completePropValue(CompletionResultSet completionResultSet, String propName, String filter, int startOffset,
             int caretOffset) {
         long mark = System.currentTimeMillis();
+        filter = filter.toLowerCase();
         logger.log(FINER, "Completing property value from: ''{0}''", filter);
         ConfigurationMetadataProperty propMeta = sbs.getPropertyMetadata(propName);
         if (propMeta != null) {
@@ -184,17 +190,17 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             }
             // check if data type or map value type is boolean
             if (propType.equals("java.lang.Boolean") || mapValueType.equals("java.lang.Boolean")) {
-                ValueHint valueHint = new ValueHint();
-                valueHint.setValue("true");
-                completionResultSet.addItem(new ValueCompletionItem(valueHint, startOffset, caretOffset));
-                valueHint = new ValueHint();
-                valueHint.setValue("false");
-                completionResultSet.addItem(new ValueCompletionItem(valueHint, startOffset, caretOffset));
+                if ("true".contains(filter)) {
+                    completionResultSet.addItem(new ValueCompletionItem(Utils.createHint("true"), startOffset, caretOffset));
+                }
+                if ("false".contains(filter)) {
+                    completionResultSet.addItem(new ValueCompletionItem(Utils.createHint("false"), startOffset, caretOffset));
+                }
             }
             // check if data type or map value type is CharSet
             if (propType.equals("java.nio.charset.Charset") || mapValueType.equals("java.nio.charset.Charset")) {
                 for (String chrsName : HintSupport.getAllCharsets()) {
-                    if (chrsName.toLowerCase().startsWith(filter.toLowerCase())) {
+                    if (chrsName.toLowerCase().contains(filter)) {
                         completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(chrsName), startOffset, caretOffset));
                     }
                 }
@@ -208,7 +214,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             // add metadata defined value hints to completion list
             final Hints hints = propMeta.getHints();
             for (ValueHint valueHint : hints.getValueHints()) {
-                if (valueHint.getValue().toString().contains(filter)) {
+                if (valueHint.getValue().toString().toLowerCase().contains(filter)) {
                     completionResultSet.addItem(new ValueCompletionItem(valueHint, startOffset, caretOffset));
                 }
             }
@@ -234,7 +240,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             if (enumvals != null) {
                 for (Object val : enumvals) {
                     final String valName = val.toString().toLowerCase();
-                    if (filter == null || valName.contains(filter)) {
+                    if (valName.contains(filter)) {
                         ValueHint valueHint = new ValueHint();
                         valueHint.setValue(valName);
                         completionResultSet.addItem(new ValueCompletionItem(valueHint, startOffset, caretOffset));
