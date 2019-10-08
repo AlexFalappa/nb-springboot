@@ -123,11 +123,13 @@ public class HandleAsHintProvider implements HintProvider {
                             pTest = pTest.getParent();
                             startOffset -= filePart.length();
                         }
-                        FileObject foBase = FileUtil.toFileObject(pTest.toFile());
-                        for (FileObject fObj : foBase.getChildren()) {
-                            String fname = fObj.getNameExt();
-                            if (fname.startsWith(filePart)) {
-                                completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
+                        if (pTest!=null) {
+                            FileObject foBase = FileUtil.toFileObject(pTest.toFile());
+                            for (FileObject fObj : foBase.getChildren()) {
+                                String fname = fObj.getNameExt();
+                                if (fname.startsWith(filePart)) {
+                                    completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
+                                }
                             }
                         }
                     }

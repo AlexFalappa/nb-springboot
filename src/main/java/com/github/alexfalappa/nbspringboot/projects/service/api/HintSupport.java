@@ -43,6 +43,11 @@ public final class HintSupport {
     private HintSupport() {
     }
 
+    /**
+     * Returns the set of all available {@link Charset} ids caching them.
+     *
+     * @return the Set of Charset ids
+     */
     public static synchronized Set<String> getAllCharsets() {
         if (cachedCharsets == null) {
             cachedCharsets = Charset.availableCharsets().keySet();
@@ -50,10 +55,19 @@ public final class HintSupport {
         return cachedCharsets;
     }
 
+    /**
+     * Returns the system icon for a given file, caching it and converting it to {@link ImageIcon} if necessary.
+     * <p>
+     * Depending on the platform file type specific icons might be returned.
+     *
+     * @param file a {@link File} object
+     * @return the possibly cached {@link ImageIcon} for the given file
+     */
     public static synchronized ImageIcon getIconFor(File file) {
         Icon ico = fsView.getSystemIcon(file);
-        if (iconCache.containsKey(ico.toString())) {
-            return iconCache.get(ico.toString());
+        final String key = ico.toString();
+        if (iconCache.containsKey(key)) {
+            return iconCache.get(key);
         } else {
             ImageIcon imgIco;
             if (ico instanceof ImageIcon) {
@@ -65,7 +79,7 @@ public final class HintSupport {
                 g2.dispose();
                 imgIco = new ImageIcon(image);
             }
-            iconCache.put(ico.toString(), imgIco);
+            iconCache.put(key, imgIco);
             return imgIco;
         }
     }
