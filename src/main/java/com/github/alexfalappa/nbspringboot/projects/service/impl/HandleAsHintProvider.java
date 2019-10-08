@@ -64,6 +64,8 @@ public class HandleAsHintProvider implements HintProvider {
         String targetType = params.get("target").toString();
         String filterLowcase = filter.toLowerCase();
         switch (targetType) {
+            case "java.util.List<org.springframework.core.io.Resource>":
+            case "java.util.Set<org.springframework.core.io.Resource>":
             case "org.springframework.core.io.Resource":
                 Utils.completeSrpingResource(resourcesFolder, filter, completionResultSet, dotOffset, caretOffset);
                 break;
@@ -80,11 +82,8 @@ public class HandleAsHintProvider implements HintProvider {
         }
         // TODO try to support one of the following
         /*
-        Any java.lang.Enum: Lists the possible values for the property. (We recommend defining the property with the Enum type, as no further hint should be required for the IDE to auto-complete the values)
-        java.nio.charset.Charset: Supports auto-completion of charset/encoding values (such as UTF-8)
         java.util.Locale: auto-completion of locales (such as en_US)
         org.springframework.util.MimeType: Supports auto-completion of content type values (such as text/plain)
-        org.springframework.core.io.Resource: Supports auto-completion of Spring’s Resource abstraction to refer to a file on the filesystem or on the classpath (such as classpath:/sample.properties)
         [Tip] If multiple values can be provided, use a Collection or Array type to teach the IDE about it.
          */
     }
