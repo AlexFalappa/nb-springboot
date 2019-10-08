@@ -77,9 +77,10 @@ public class ClassReferenceHintProvider implements HintProvider {
     private void populate(Set<ElementHandle<TypeElement>> elements, String filter, boolean concrete,
             CompletionResultSet completionResultSet, int dotOffset, int caretOffset) throws IllegalStateException {
         final ClassLoader classLoader = cpExec.getClassLoader(true);
+        String filterLowcase = filter.toLowerCase();
         elements.forEach(handle -> {
             final String binaryName = handle.getBinaryName();
-            if (binaryName.toLowerCase().contains(filter)) {
+            if (binaryName.toLowerCase().contains(filterLowcase)) {
                 try {
                     Class<?> loadedClass = classLoader.loadClass(binaryName);
                     boolean isAbstract = Modifier.isAbstract(loadedClass.getModifiers());

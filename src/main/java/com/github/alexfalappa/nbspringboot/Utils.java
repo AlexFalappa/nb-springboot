@@ -17,6 +17,12 @@ package com.github.alexfalappa.nbspringboot;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -37,7 +43,9 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
+import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
 import org.openide.util.Lookup;
 import org.openide.util.NbPreferences;
@@ -47,23 +55,15 @@ import org.springframework.boot.configurationmetadata.ConfigurationMetadataPrope
 import org.springframework.boot.configurationmetadata.Deprecation;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.FileObjectCompletionItem;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
 import com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel;
 import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.FileObjectCompletionItem;
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
-import java.nio.file.FileSystems;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.HashSet;
-import java.util.Set;
 import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
-import org.netbeans.spi.editor.completion.CompletionResultSet;
-import org.openide.filesystems.FileUtil;
 
 /**
  * Utility methods used in the plugin.
@@ -337,7 +337,7 @@ public final class Utils {
                 if (pTest != null) {
                     FileObject foBase = FileUtil.toFileObject(pTest.toFile());
                     for (FileObject fObj : foBase.getChildren()) {
-                        String fname = fObj.getNameExt();
+                        String fname = fObj.getNameExt().toLowerCase();
                         if (fname.contains(filePart)) {
                             completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
                         }

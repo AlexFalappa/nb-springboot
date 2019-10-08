@@ -62,18 +62,19 @@ public class HandleAsHintProvider implements HintProvider {
             filter = "";
         }
         String targetType = params.get("target").toString();
+        String filterLowcase = filter.toLowerCase();
         switch (targetType) {
             case "org.springframework.core.io.Resource":
                 Utils.completeSrpingResource(resourcesFolder, filter, completionResultSet, dotOffset, caretOffset);
                 break;
             case "java.nio.charset.Charset":
-                Utils.completeCharset(filter, hint -> {
+                Utils.completeCharset(filterLowcase, hint -> {
                     completionResultSet.addItem(new ValueCompletionItem(hint, dotOffset, caretOffset));
                 });
                 break;
             default:
                 // try to interpret the targetType as an enum
-                Utils.completeEnum(cpExec, targetType, filter, hint -> {
+                Utils.completeEnum(cpExec, targetType, filterLowcase, hint -> {
                     completionResultSet.addItem(new ValueCompletionItem(hint, dotOffset, caretOffset));
                 });
         }
