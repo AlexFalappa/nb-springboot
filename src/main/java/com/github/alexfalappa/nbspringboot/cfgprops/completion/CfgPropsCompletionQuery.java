@@ -68,7 +68,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
     public CfgPropsCompletionQuery(SpringBootService sbs, Project proj) {
         this.sbs = Objects.requireNonNull(sbs);
         this.proj = proj;
-        this.resourcesFolder=Utils.resourcesFolderForProj(proj);
+        this.resourcesFolder = Utils.resourcesFolderForProj(proj);
     }
 
     @Override
@@ -122,25 +122,41 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             for (String mapProp : sbs.getMapPropertyNames()) {
                 if (filter.length() > mapProp.length() && filter.contains(mapProp)) {
                     String key = filter.substring(mapProp.length() + 1);
-                    String keyLowcase = key.toLowerCase();
                     logger.log(FINER, "Completing key for map property {0} from: {1}", new Object[]{mapProp, key});
                     final ConfigurationMetadataProperty propMetadata = sbs.getPropertyMetadata(mapProp);
                     // if key data type is an enum complete with enum values
                     final String keyDataType = extractMapKeyType(propMetadata);
                     if (!keyDataType.contains("<")) {
-                        Utils.completeEnum(cpExec, keyDataType, keyLowcase, hint -> {
-                            completionResultSet.addItem(new KeyCompletionItem(hint, startOffset + mapProp.length() + 1, caretOffset));
+                        Utils.completeEnum(cpExec, keyDataType, key, hint -> {
+                            completionResultSet.addItem(new KeyCompletionItem(hint, startOffset + mapProp.length() + 1,
+                                    caretOffset));
                         });
                     }
                     // check if key data type is boolean
                     if (keyDataType.equals("java.lang.Boolean")) {
-                        Utils.completeBoolean(keyLowcase, hint -> {
-                            completionResultSet.addItem(new KeyCompletionItem(hint, startOffset + mapProp.length() + 1, caretOffset));
+                        Utils.completeBoolean(key, hint -> {
+                            completionResultSet.addItem(new KeyCompletionItem(hint, startOffset + mapProp.length() + 1,
+                                    caretOffset));
+                        });
+                    }
+                    // check if key data type is Charset
+                    if (keyDataType.equals("java.nio.charset.Charset")) {
+                        Utils.completeCharset(key, hint -> {
+                            completionResultSet.addItem(new KeyCompletionItem(hint, startOffset + mapProp.length() + 1,
+                                    caretOffset));
+                        });
+                    }
+                    // check if key data type is Locale
+                    if (keyDataType.equals("java.util.Locale")) {
+                        Utils.completeLocale(key, hint -> {
+                            completionResultSet.addItem(new KeyCompletionItem(hint, startOffset + mapProp.length() + 1,
+                                    caretOffset));
                         });
                     }
                     // add metadata defined key hints to completion list
                     final Hints hints = propMetadata.getHints();
                     if (!hints.getKeyHints().isEmpty()) {
+                        String keyLowcase = key.toLowerCase();
                         for (ValueHint keyHint : hints.getKeyHints()) {
                             if (keyHint.getValue().toString().toLowerCase().contains(keyLowcase)) {
                                 completionResultSet.addItem(new KeyCompletionItem(keyHint, startOffset + mapProp.length() + 1,
@@ -209,8 +225,17 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                     }
                 }
             }
+            // check if data type or map value type is Locale
+            if (propType.equals("java.util.Locale") || mapValueType.equals("java.util.Locale")) {
+                for (String lclName : HintSupport.getAllLocales()) {
+                    if (lclName.toLowerCase().contains(filterLowcase)) {
+                        completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(lclName), startOffset, caretOffset));
+                    }
+                }
+            }
             // check if data type or map value type is a Spring Resource
-            if (propType.equals("org.springframework.core.io.Resource") || mapValueType.equals("org.springframework.core.io.Resource")) {
+            if (propType.equals("org.springframework.core.io.Resource")
+                    || mapValueType.equals("org.springframework.core.io.Resource")) {
                 Utils.completeSrpingResource(resourcesFolder, filter, completionResultSet, startOffset, caretOffset);
             }
             // check if data type is an enum

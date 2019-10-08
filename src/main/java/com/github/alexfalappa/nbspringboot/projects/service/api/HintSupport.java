@@ -20,6 +20,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
@@ -36,6 +38,7 @@ import javax.swing.filechooser.FileSystemView;
 public final class HintSupport {
 
     private static Set<String> cachedCharsets = null;
+    private static Set<String> cachedLocales = null;
     private final static FileSystemView fsView = FileSystemView.getFileSystemView();
     private final static Map<String, ImageIcon> iconCache = new HashMap<>();
 
@@ -45,6 +48,8 @@ public final class HintSupport {
 
     /**
      * Returns the set of all available {@link Charset} ids caching them.
+     * <p>
+     * Further calls get the cached set.
      *
      * @return the Set of Charset ids
      */
@@ -53,6 +58,27 @@ public final class HintSupport {
             cachedCharsets = Charset.availableCharsets().keySet();
         }
         return cachedCharsets;
+    }
+
+    /**
+     * Returns the set of all available {@link Locale} ids caching them.
+     * <p>
+     * Further calls get the cached set.
+     *
+     * @return the Set of Charset ids
+     */
+    public static synchronized Set<String> getAllLocales() {
+        if (cachedLocales == null) {
+            final Locale[] availableLocales = Locale.getAvailableLocales();
+            cachedLocales = new HashSet<>(availableLocales.length);
+            for (Locale loc : availableLocales) {
+                final String locName = loc.toString();
+                if (!locName.isEmpty()) {
+                    cachedLocales.add(locName);
+                }
+            }
+        }
+        return cachedLocales;
     }
 
     /**

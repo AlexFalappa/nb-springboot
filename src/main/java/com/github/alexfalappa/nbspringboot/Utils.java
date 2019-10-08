@@ -271,9 +271,17 @@ public final class Utils {
 
     public static void completeCharset(String filter, Consumer<ValueHint> consumer) {
         HintSupport.getAllCharsets().stream()
-                .filter((chrsName) -> (chrsName.toLowerCase().contains(filter.toLowerCase())))
-                .forEachOrdered((chrsName) -> {
+                .filter(chrsName -> chrsName.toLowerCase().contains(filter.toLowerCase()))
+                .forEachOrdered(chrsName -> {
                     consumer.accept(Utils.createHint(chrsName));
+                });
+    }
+
+    public static void completeLocale(String filter, Consumer<ValueHint> consumer) {
+        HintSupport.getAllLocales().stream()
+                .filter(lclName -> lclName.toLowerCase().contains(filter.toLowerCase()))
+                .forEachOrdered(lclName -> {
+                    consumer.accept(Utils.createHint(lclName));
                 });
     }
 
