@@ -62,8 +62,13 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
+import java.nio.file.attribute.BasicFileAttributes;
+import java.nio.file.attribute.PosixFileAttributes;
 import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
+import org.openide.util.Exceptions;
 
 /**
  * Utility methods used in the plugin.
@@ -310,7 +315,7 @@ public final class Utils {
     }
 
     public static void completeSrpingResource(FileObject resourcesFolder, String filter, CompletionResultSet completionResultSet,
-            int dotOffset, int caretOffset) {
+            int dotOffset, int caretOffset) throws IOException {
         if (filter.startsWith(PREFIX_CLASSPATH)) {
             String resFilter = filter.substring(PREFIX_CLASSPATH.length());
             int startOffset = dotOffset + PREFIX_CLASSPATH.length();
@@ -351,12 +356,17 @@ public final class Utils {
                     startOffset -= filePart.length();
                 }
                 if (pTest != null) {
-                    FileObject foBase = FileUtil.toFileObject(pTest.toFile());
-                    for (FileObject fObj : foBase.getChildren()) {
-                        String fname = fObj.getNameExt().toLowerCase();
-                        if (fname.contains(filePart)) {
-                            completionResultSet.addItem(new FileObjectCompletionItem(fObj, startOffset, caretOffset));
+                    try (DirectoryStream<Path> stream = Files.newDirectoryStream(pTest)) {
+                        for (Path p : stream) {
+                            if (Files.isReadable(p)) {
+                                String fname = p.toString().toLowerCase();
+                                if (fname.contains(filePart)) {
+                                    completionResultSet.addItem(new FileObjectCompletionItem(FileUtil.toFileObject(p.toFile()), startOffset, caretOffset));
+                                }
+                            }
                         }
+                    } catch (IOException ex) {
+                        Exceptions.printStackTrace(ex);
                     }
                 }
             }

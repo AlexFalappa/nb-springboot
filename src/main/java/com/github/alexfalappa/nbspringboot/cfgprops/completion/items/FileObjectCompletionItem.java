@@ -51,8 +51,6 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
  */
 public class FileObjectCompletionItem implements CompletionItem {
 
-    private final ImageIcon FILE = Utils.lafDefaultIcon("FileView.directoryIcon");
-    private final ImageIcon FOLDER = Utils.lafDefaultIcon("FileView.fileIcon");
     private final int caretOffset;
     private final FileObject fileObj;
     private final int dotOffset;
