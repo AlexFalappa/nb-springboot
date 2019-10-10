@@ -79,7 +79,7 @@ public final class Utils {
 
     private static final Logger logger = Logger.getLogger(Utils.class.getName());
     private static final Pattern PATTERN_JAVATYPE = compile("(\\w+\\.)+(\\w+)");
-    private static final String PREFIX_CLASSPATH = "classpath:";
+    private static final String PREFIX_CLASSPATH = "classpath:/";
     private static final String PREFIX_FILE = "file://";
     private static final Set<String> resourcePrefixes = new HashSet<>();
 
