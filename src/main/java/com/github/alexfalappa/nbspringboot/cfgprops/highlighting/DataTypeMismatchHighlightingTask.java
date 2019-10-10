@@ -15,6 +15,7 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -23,19 +24,18 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
+import org.apache.commons.lang.LocaleUtils;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.api.project.SourceGroup;
-import org.netbeans.api.project.Sources;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Exceptions;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+import org.springframework.boot.convert.DurationStyle;
 import org.springframework.util.ClassUtils;
+import org.springframework.util.unit.DataSize;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
@@ -85,7 +85,7 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
         final Project prj = Utils.getActiveProject();
         if (prj != null) {
             final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
-            final ClassPath cp = getProjectClasspath(prj);
+            final ClassPath cp = Utils.execClasspathForProj(prj);
             if (sbs != null && cp != null) {
                 final ClassLoader cl = cp.getClassLoader(true);
                 for (PairElement pair : cfgResult.getCfgFile().getElements()) {
@@ -147,17 +147,6 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
         }
     }
 
-    private ClassPath getProjectClasspath(Project prj) {
-        Sources srcs = ProjectUtils.getSources(prj);
-        SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
-        for (SourceGroup group : srcGroups) {
-            if (group.getName().toLowerCase().contains("source")) {
-                return ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
-            }
-        }
-        return null;
-    }
-
     private void check(String type, String text, Document document, CfgElement elem, List<ErrorDescription> errors, ClassLoader cl,
             Severity severity) throws BadLocationException {
         if (text == null || text.isEmpty()) {
@@ -193,10 +182,31 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                         return false;
                     }
                 } else {
-                    return false;
+                    try {
+                        // handle a few specific cases where no direct constructor from string or converter exist
+                        switch (type) {
+                            case "java.nio.file.Path":
+                                Paths.get(text);
+                                return true;
+                            case "java.util.Locale":
+                                LocaleUtils.toLocale(text);
+                                return true;
+                            case "java.time.Duration":
+                                DurationStyle.detectAndParse(text);
+                                return true;
+                            case "org.springframework.util.unit.DataSize":
+                                DataSize.parse(text);
+                                return true;
+                            default:
+                                return false;
+                        }
+                    } catch (Exception e3) {
+                        return false;
+                    }
                 }
             }
         }
+        // unresolvable/unknown class, assume user knows what is doing
         return true;
     }
 }
