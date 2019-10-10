@@ -237,7 +237,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             // check if data type or map value type is a Spring Resource
             if (propType.equals("org.springframework.core.io.Resource")
                     || mapValueType.equals("org.springframework.core.io.Resource")) {
-                Utils.completeSrpingResource(resourcesFolder, filter, completionResultSet, startOffset, caretOffset);
+                Utils.completeSpringResource(resourcesFolder, filter, completionResultSet, startOffset, caretOffset);
             }
             // check if data type is an enum
             completeValueEnum(propType, filterLowcase, completionResultSet, startOffset, caretOffset);

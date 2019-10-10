@@ -314,7 +314,7 @@ public final class Utils {
         }
     }
 
-    public static void completeSrpingResource(FileObject resourcesFolder, String filter, CompletionResultSet completionResultSet,
+    public static void completeSpringResource(FileObject resourcesFolder, String filter, CompletionResultSet completionResultSet,
             int dotOffset, int caretOffset) {
         if (filter.startsWith(PREFIX_CLASSPATH)) {
             String resFilter = filter.substring(PREFIX_CLASSPATH.length());

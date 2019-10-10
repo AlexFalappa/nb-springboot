@@ -66,7 +66,7 @@ public class HandleAsHintProvider implements HintProvider {
             case "java.util.List<org.springframework.core.io.Resource>":
             case "java.util.Set<org.springframework.core.io.Resource>":
             case "org.springframework.core.io.Resource":
-                Utils.completeSrpingResource(resourcesFolder, filter, completionResultSet, dotOffset, caretOffset);
+                Utils.completeSpringResource(resourcesFolder, filter, completionResultSet, dotOffset, caretOffset);
                 break;
             case "java.util.List<java.nio.charset.Charset>":
             case "java.util.Set<java.nio.charset.Charset>":
