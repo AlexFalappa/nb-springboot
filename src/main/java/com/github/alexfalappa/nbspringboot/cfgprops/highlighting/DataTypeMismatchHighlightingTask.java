@@ -203,6 +203,9 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                             case "org.springframework.util.unit.DataSize":
                                 DataSize.parse(text);
                                 return true;
+                            case "java.lang.Class":
+                                cl.loadClass(text);
+                                return true;
                             default:
                                 return false;
                         }
