@@ -315,7 +315,7 @@ public final class Utils {
     }
 
     public static void completeSrpingResource(FileObject resourcesFolder, String filter, CompletionResultSet completionResultSet,
-            int dotOffset, int caretOffset) throws IOException {
+            int dotOffset, int caretOffset) {
         if (filter.startsWith(PREFIX_CLASSPATH)) {
             String resFilter = filter.substring(PREFIX_CLASSPATH.length());
             int startOffset = dotOffset + PREFIX_CLASSPATH.length();
