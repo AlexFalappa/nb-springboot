@@ -15,6 +15,8 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.completion;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
@@ -61,9 +63,27 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
     private static final Pattern PATTERN_PROP_NAME = Pattern.compile("[^=\\s]+");
     private static final Pattern PATTERN_MAPKEY_DATATYPE = Pattern.compile("java.util.Map<([^,]+),.*>");
     private static final Pattern PATTERN_MAPVALUE_DATATYPE = Pattern.compile("java.util.Map<.*,(.*)>");
+    private static final Pattern PATTERN_NUMBER_UNIT = Pattern.compile("\\d+(\\w*)");
+    private static final Map<String, String> DURATION_SUFFIXES = new HashMap<>();
+    private static final Map<String, String> DATASIZE_SUFFIXES = new HashMap<>();
     private final SpringBootService sbs;
     private final Project proj;
     private final FileObject resourcesFolder;
+
+    static {
+        DURATION_SUFFIXES.put("ns", "nanoseconds");
+        DURATION_SUFFIXES.put("us", "microseconds");
+        DURATION_SUFFIXES.put("ms", "milliseconds");
+        DURATION_SUFFIXES.put("s", "seconds");
+        DURATION_SUFFIXES.put("m", "minutes");
+        DURATION_SUFFIXES.put("h", "hours");
+        DURATION_SUFFIXES.put("d", "days");
+        DATASIZE_SUFFIXES.put("B", "bytes");
+        DATASIZE_SUFFIXES.put("KB", "kilobytes");
+        DATASIZE_SUFFIXES.put("MB", "megabytes");
+        DATASIZE_SUFFIXES.put("GB", "gigabytes");
+        DATASIZE_SUFFIXES.put("TB", "terabytes");
+    }
 
     public CfgPropsCompletionQuery(SpringBootService sbs, Project proj) {
         this.sbs = Objects.requireNonNull(sbs);
@@ -244,6 +264,30 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             // check if map value data type is an enum (not for collections)
             if (!mapValueType.contains("<")) {
                 completeValueEnum(mapValueType, filterLowcase, completionResultSet, startOffset, caretOffset);
+            }
+            // check if filter is a number with unit
+            Matcher m = PATTERN_NUMBER_UNIT.matcher(filter);
+            if (m.matches()) {
+                String unitPart = m.group(1).toLowerCase();
+                final int newStartOffset = startOffset + filter.length() - unitPart.length();
+                // if data type is java.time.Duration offer simple form suffixes
+                if (propType.equals("java.time.Duration")) {
+                    for (Map.Entry<String, String> entry : DURATION_SUFFIXES.entrySet()) {
+                        if (entry.getKey().toLowerCase().startsWith(unitPart)) {
+                            completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(entry.getKey(), entry.getValue()),
+                                    newStartOffset, caretOffset));
+                        }
+                    }
+                }
+                // if data type is org.springframework.util.unit.DataSize offer size suffixes
+                if (propType.equals("org.springframework.util.unit.DataSize")) {
+                    for (Map.Entry<String, String> entry : DATASIZE_SUFFIXES.entrySet()) {
+                        if (entry.getKey().toLowerCase().startsWith(unitPart)) {
+                            completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(entry.getKey(), entry.getValue()),
+                                    newStartOffset, caretOffset));
+                        }
+                    }
+                }
             }
             // add metadata defined value hints to completion list
             final Hints hints = propMeta.getHints();
