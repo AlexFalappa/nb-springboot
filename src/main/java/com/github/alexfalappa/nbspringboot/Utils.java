@@ -305,7 +305,7 @@ public final class Utils {
                 for (Object val : enumvals) {
                     final String valName = val.toString().toLowerCase();
                     if (filter == null || valName.contains(filter)) {
-                        consumer.accept(createHint(valName));
+                        consumer.accept(createEnumHint(valName));
                     }
                 }
             }
@@ -390,6 +390,20 @@ public final class Utils {
     public static ValueHint createHint(String value) {
         ValueHint vh = new ValueHint();
         vh.setValue(value);
+        return vh;
+    }
+
+    /**
+     * Create a {@code ValueHint} object from the given java enumeration value.
+     * <p>
+     * Created hint has no description and has a Spring Boot property name canonical format.
+     *
+     * @param value the value to use
+     * @return a ValueHint object
+     */
+    public static ValueHint createEnumHint(String value) {
+        ValueHint vh = new ValueHint();
+        vh.setValue(value.replaceAll("_", "-"));
         return vh;
     }
 

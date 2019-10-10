@@ -32,6 +32,7 @@ import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Exceptions;
+import org.springframework.boot.bind.RelaxedNames;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.convert.DurationStyle;
 import org.springframework.util.ClassUtils;
@@ -173,14 +174,19 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
         Class<?> clazz = ClassUtils.resolveClassName(type, cl);
         if (clazz != null) {
             try {
-                Object parsed = parser.parseType(text, clazz);
+                parser.parseType(text, clazz);
             } catch (Exception e1) {
                 if (clazz.isEnum()) {
-                    try {
-                        Object parsed = parser.parseType(text.toUpperCase(), clazz);
-                    } catch (Exception e2) {
-                        return false;
+                    // generate and try relaxed variants of value
+                    for (String relaxedName : new RelaxedNames(text)) {
+                        try {
+                            parser.parseType(relaxedName, clazz);
+                            return true;
+                        } catch (Exception e2) {
+                            // try another variant
+                        }
                     }
+                    return false;
                 } else {
                     try {
                         // handle a few specific cases where no direct constructor from string or converter exist

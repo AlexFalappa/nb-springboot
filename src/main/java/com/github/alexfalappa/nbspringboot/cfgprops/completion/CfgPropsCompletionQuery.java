@@ -275,7 +275,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 for (Object val : enumvals) {
                     final String valName = val.toString().toLowerCase();
                     if (valName.contains(filter)) {
-                        completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(valName), startOffset, caretOffset));
+                        completionResultSet.addItem(new ValueCompletionItem(Utils.createEnumHint(valName), startOffset, caretOffset));
                     }
                 }
             }
