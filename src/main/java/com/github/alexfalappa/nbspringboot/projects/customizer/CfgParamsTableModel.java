@@ -21,7 +21,7 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 /**
- * An editable {@link JTable} model holding {@link CfgOverride} objects.
+ * An editable {@code JTable} model holding {@link CfgOverride} objects.
  * <p>
  * Backed by a {@link LinkedList}.
  *

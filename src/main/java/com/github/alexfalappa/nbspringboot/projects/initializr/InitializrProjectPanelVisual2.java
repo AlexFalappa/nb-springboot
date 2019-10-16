@@ -66,7 +66,7 @@ public class InitializrProjectPanelVisual2 extends JPanel {
      * <p>
      * Use the {@link #read(org.openide.WizardDescriptor)} method if inside a wizard.
      *
-     * @param meta
+     * @param meta JSON node for metadata
      */
     public void init(JsonNode meta) {
         pBootDependencies.init(meta);
@@ -81,7 +81,7 @@ public class InitializrProjectPanelVisual2 extends JPanel {
      * <p>
      * Does nothing if the panel has not been initialized.
      *
-     * @param bootVersion
+     * @param bootVersion Spring Boot version string
      */
     public void fixBootVersion(String bootVersion) {
         Objects.requireNonNull(bootVersion);

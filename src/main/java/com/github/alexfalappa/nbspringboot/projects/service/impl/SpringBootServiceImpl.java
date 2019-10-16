@@ -60,7 +60,7 @@ import static java.util.regex.Pattern.compile;
  * Project wide {@link SpringBootService} implementation.
  * <p>
  * It scans the classpath for {@code META-INF/spring-configuration-metadata.json} files, then unmarshals the files into the
- * corresponding {@link ConfigurationMetadata} classes and maintains indexed structures extracted out of it.
+ * corresponding {@code ConfigurationMetadata} classes and maintains indexed structures extracted out of it.
  * <p>
  * Registered for maven projects with jar and war packaging.
  *

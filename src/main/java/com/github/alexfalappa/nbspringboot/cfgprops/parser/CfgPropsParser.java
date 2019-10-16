@@ -39,7 +39,7 @@ import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgFile;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 
 /**
- * NetBeans Parsing & Lexing API parser for integrating the Parboiled parser.
+ * NetBeans Parsing and Lexing API parser for integrating the Parboiled parser.
  *
  * @author Alessandro Falappa
  */

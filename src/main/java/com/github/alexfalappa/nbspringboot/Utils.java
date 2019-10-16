@@ -422,7 +422,7 @@ public final class Utils {
     }
 
     /**
-     * Converts an icon from the current L&F defaults into an ImageIcon by painting it.
+     * Converts an icon from the current LAF defaults into an ImageIcon by painting it.
      * <p>
      * Some ui-icons misbehave in that they unconditionally class-cast to the component type they are mostly painted on.
      * Consequently they blow up if we are trying to paint them anywhere else (f.i. in a renderer). This method tries to
