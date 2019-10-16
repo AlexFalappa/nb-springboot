@@ -9,6 +9,7 @@
 		- Proposals for properties of data type List, Set and Map according to contained type
 		- Implemented 'Show Method Parameters' (Ctrl+P) to show data type of property under cursor in a tooltip
 		- Implemented 'Show Documentation' (Ctrl+Shift+Space Bar) to show the documentation popup of property under cursor
+    -  New option to prefer array notation in completion
     -  Upgrade of internal dependencies
 
 -  **2.0.1** (July 2018): Polishing

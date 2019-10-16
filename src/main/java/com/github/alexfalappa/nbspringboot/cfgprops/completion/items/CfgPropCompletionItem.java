@@ -39,8 +39,10 @@ import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
 import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
+import org.openide.util.NbPreferences;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
+import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.doc.CfgPropCompletionDocumentation;
 
@@ -122,16 +124,28 @@ public class CfgPropCompletionItem implements CompletionItem {
             doc.remove(propStartOffset, lenToRemove);
             // add a useful char depending on data type
             final String dataType = configurationMeta.getType();
+            final boolean isSequence = dataType.contains("List") || dataType.contains("Set") || dataType.contains("[]");
+            final boolean preferArray = NbPreferences.forModule(PrefConstants.class)
+                    .getBoolean(PrefConstants.PREF_ARRAY_NOTATION, false);
+            final boolean needEqualSign = !(overwrite && equalSignIndex >= 0);
             StringBuilder sb = new StringBuilder(getText());
+            int goBack = 0;
             if (dataType.contains("Map")) {
                 sb.append(".");
-            } else if (!dataType.contains("List")
-                    && !dataType.contains("Set")
-                    && !dataType.contains("[]")
-                    && !(overwrite && equalSignIndex >= 0)) {
+            } else if (isSequence && preferArray) {
+                sb.append("[]");
+                goBack = 1;
+                if (needEqualSign) {
+                    sb.append("=");
+                    goBack++;
+                }
+            } else if (needEqualSign) {
                 sb.append("=");
             }
             doc.insertString(propStartOffset, sb.toString(), null);
+            if (goBack != 0) {
+                jtc.setCaretPosition(jtc.getCaretPosition() - goBack);
+            }
             // close the code completion box
             Completion.get().hideAll();
         } catch (BadLocationException ex) {
