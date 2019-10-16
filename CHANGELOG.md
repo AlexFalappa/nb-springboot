@@ -1,15 +1,14 @@
 # Changelog
 
--  **2.1** (??? 2019): Work in Progress
+-  **3.0** (??? 2019): Completion galore
+    -  Minimum required NetBeans version is now **8.2**, minimum required JDK version is now **8**
     -  Configuration properties completion enhanced:
-		- Logger name value 
-		- Proposals for properties whose data type is a Java enumeration or Java boolean
-		- Completion of booleans and enumerations as map keys and values in properties whose data type is a java.util.Map
-		- Proposals from map key hints in properties whose data type is a java.util.Map
-		- Proposals for properties whose data type is a Java collection of enumeration or from value hints
+		- Logger name, class reference and handle-as value providers are now supported
+		- Proposals for properties whose data type is a Java enumeration, Java boolean, Spring Resource, Charset and Locale
+		- Proposals from map key hints
+		- Proposals for properties of data type List, Set and Map according to contained type
 		- Implemented 'Show Method Parameters' (Ctrl+P) to show data type of property under cursor in a tooltip
 		- Implemented 'Show Documentation' (Ctrl+Shift+Space Bar) to show the documentation popup of property under cursor
-    -  Minimum required NetBeans version is now **8.2**, minimum required JDK version is now **8**
     -  Upgrade of internal dependencies
 
 -  **2.0.1** (July 2018): Polishing
