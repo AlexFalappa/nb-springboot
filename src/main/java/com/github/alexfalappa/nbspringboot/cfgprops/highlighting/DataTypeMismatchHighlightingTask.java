@@ -185,6 +185,9 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                         } catch (Exception e2) {
                             // try another variant
                         }
+                        if (canceled) {
+                            break;
+                        }
                     }
                     return false;
                 } else {
