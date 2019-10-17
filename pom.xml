@@ -4,7 +4,7 @@
 
     <groupId>com.github.alexfalappa</groupId>
     <artifactId>nb-springboot-plugin</artifactId>
-    <version>3.0-SNAPSHOT</version>
+    <version>3.0</version>
     <packaging>nbm</packaging>
 
     <name>NB SpringBoot</name>
@@ -502,7 +502,7 @@
     <scm>
         <connection>scm:git:https://github.com/AlexFalappa/nb-springboot.git</connection>
         <developerConnection>scm:git:https://github.com/AlexFalappa/nb-springboot.git</developerConnection>
-        <tag>HEAD</tag>
+        <tag>v3.0</tag>
         <url>https://github.com/AlexFalappa/nb-springboot</url>
     </scm>
 
