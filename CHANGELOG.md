@@ -1,6 +1,6 @@
 # Changelog
 
--  **3.0** (??? 2019): Completion galore
+-  **3.0** (Oct 2019): Completion galore
     -  Minimum required NetBeans version is now **8.2**, minimum required JDK version is now **8**
     -  Configuration properties completion enhanced:
 		- Logger name, class reference and handle-as value providers are now supported
@@ -12,7 +12,7 @@
     -  New option to prefer array notation in completion
     -  Upgrade of internal dependencies
 
--  **2.0.1** (July 2018): Polishing
+-  **2.0.1** (Jul 2018): Polishing
     -  Use HTTPS protocol when contacting Spring Initializr service
     -  New Java files code template for command line runner beans
     -  Improved Spring Boot Restart action enablement and logic
