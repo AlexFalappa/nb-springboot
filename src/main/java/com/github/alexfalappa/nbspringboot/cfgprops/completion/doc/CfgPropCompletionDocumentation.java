@@ -54,9 +54,13 @@ public class CfgPropCompletionDocumentation implements CompletionDocumentation {
     @Override
     public String getText() {
         StringBuilder sb = new StringBuilder();
-        // name and type
+        // name
         sb.append("<b>").append(configurationMeta.getId()).append("</b>");
-        sb.append("<br/>").append(simpleHtmlEscape(configurationMeta.getType()));
+        // type (may be null for deprecated props)
+        final String type = configurationMeta.getType();
+        if (type!=null) {
+            sb.append("<br/>").append(simpleHtmlEscape(type));
+        }
         // deprecation (optional)
         Deprecation deprecation = configurationMeta.getDeprecation();
         if (deprecation != null) {
