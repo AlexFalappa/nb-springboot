@@ -1,16 +1,16 @@
 # Changelog
 
 -  **3.0** (Oct 2019): Completion galore
-    -  Minimum required NetBeans version is now **8.2**, minimum required JDK version is now **8**
-    -  Configuration properties completion enhanced:
+	-  Minimum required NetBeans version is now **8.2**, minimum required JDK version is now **8**
+	-  Configuration properties completion enhanced:
 		- Logger name, class reference and handle-as value providers are now supported
 		- Proposals for properties whose data type is a Java enumeration, Java boolean, Spring Resource, Charset and Locale
 		- Proposals from map key hints
 		- Proposals for properties of data type List, Set and Map according to contained type
-		- Implemented 'Show Method Parameters' (Ctrl+P) to show data type of property under cursor in a tooltip
-		- Implemented 'Show Documentation' (Ctrl+Shift+Space Bar) to show the documentation popup of property under cursor
-    -  New option to prefer array notation in completion
-    -  Upgrade of internal dependencies
+		- Implemented *Show Method Parameters* (`Ctrl+P`) to show data type of property under cursor in a tooltip
+		- Implemented *Show Documentation* (`Ctrl+Shift+Space Bar`) to show the documentation popup of property under cursor
+	-  New option to prefer array notation in completion
+	-  Upgrade of internal dependencies
 
 -  **2.0.1** (Jul 2018): Polishing
     -  Use HTTPS protocol when contacting Spring Initializr service
