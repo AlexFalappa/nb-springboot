@@ -11,6 +11,7 @@
 		- Implemented *Show Documentation* (`Ctrl+Shift+Space Bar`) to show the documentation popup of property under cursor
 	-  New option to prefer array notation in completion
 	-  Upgrade of internal dependencies
+    -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/14?closed=1)
 
 -  **2.0.1** (Jul 2018): Polishing
     -  Use HTTPS protocol when contacting Spring Initializr service
