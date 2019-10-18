@@ -54,8 +54,8 @@ public class MissingPomDependencies {
 
     @Hint(displayName = "#DN_CfgProcMissingHint", description = "#DESC_CfgProcMissingHint", category = "Spring Boot")
     @TriggerPatterns({
-        @TriggerPattern("org.springframework.boot.context.properties.ConfigurationProperties")
-        ,@TriggerPattern("org.springframework.boot.context.properties.EnableConfigurationProperties")
+        @TriggerPattern("org.springframework.boot.context.properties.ConfigurationProperties"),
+        @TriggerPattern("org.springframework.boot.context.properties.EnableConfigurationProperties")
     })
     @Messages({
         "DN_CfgProcMissingHint=Missing Spring Boot configuration processor",
@@ -115,9 +115,9 @@ public class MissingPomDependencies {
 
     @Hint(displayName = "#DN_DataMissingHint", description = "#DESC_DataMissingHint", category = "Spring Boot")
     @TriggerPatterns({
-        @TriggerPattern("org.springframework.data.repository.Repository")
-        ,@TriggerPattern("org.springframework.data.repository.CrudRepository")
-        ,@TriggerPattern("org.springframework.data.repository.PagingAndSortingRepository")
+        @TriggerPattern("org.springframework.data.repository.Repository"),
+        @TriggerPattern("org.springframework.data.repository.CrudRepository"),
+        @TriggerPattern("org.springframework.data.repository.PagingAndSortingRepository")
     })
     @Messages({
         "DN_DataMissingHint=Missing one of Spring Data starters",

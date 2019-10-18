@@ -274,8 +274,8 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 if (propType.equals("java.time.Duration")) {
                     for (Map.Entry<String, String> entry : DURATION_SUFFIXES.entrySet()) {
                         if (entry.getKey().toLowerCase().startsWith(unitPart)) {
-                            completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(entry.getKey(), entry.getValue()),
-                                    newStartOffset, caretOffset));
+                            completionResultSet.addItem(new ValueCompletionItem(
+                                    Utils.createHint(entry.getKey(), entry.getValue()), newStartOffset, caretOffset));
                         }
                     }
                 }
@@ -283,8 +283,8 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 if (propType.equals("org.springframework.util.unit.DataSize")) {
                     for (Map.Entry<String, String> entry : DATASIZE_SUFFIXES.entrySet()) {
                         if (entry.getKey().toLowerCase().startsWith(unitPart)) {
-                            completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(entry.getKey(), entry.getValue()),
-                                    newStartOffset, caretOffset));
+                            completionResultSet.addItem(new ValueCompletionItem(
+                                    Utils.createHint(entry.getKey(), entry.getValue()), newStartOffset, caretOffset));
                         }
                     }
                 }
@@ -319,7 +319,8 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 for (Object val : enumvals) {
                     final String valName = val.toString().toLowerCase();
                     if (valName.contains(filter)) {
-                        completionResultSet.addItem(new ValueCompletionItem(Utils.createEnumHint(valName), startOffset, caretOffset));
+                        completionResultSet.addItem(new ValueCompletionItem(Utils.createEnumHint(valName), startOffset,
+                                caretOffset));
                     }
                 }
             }

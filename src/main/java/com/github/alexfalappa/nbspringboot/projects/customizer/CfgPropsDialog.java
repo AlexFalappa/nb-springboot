@@ -61,8 +61,9 @@ public class CfgPropsDialog extends javax.swing.JDialog {
     private final TreeSet<ConfigurationMetadataProperty> sortedProps;
     private final boolean bDeprErrorShow;
 
-    /** 
+    /**
      * Creates new dialog CfgPropsDialog.
+     *
      * @param parent the parent dialog.
      */
     public CfgPropsDialog(java.awt.Dialog parent) {

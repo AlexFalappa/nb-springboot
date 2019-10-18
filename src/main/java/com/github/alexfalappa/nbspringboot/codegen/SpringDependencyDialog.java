@@ -39,8 +39,9 @@ public class SpringDependencyDialog extends javax.swing.JDialog {
     /** A return status code - returned if OK button has been pressed */
     public static final int RET_OK = 1;
 
-    /** 
+    /**
      * Creates new dialog SpringDependencyDialog.
+     *
      * @param parent the parent dialog.
      */
     public SpringDependencyDialog(java.awt.Frame parent) {

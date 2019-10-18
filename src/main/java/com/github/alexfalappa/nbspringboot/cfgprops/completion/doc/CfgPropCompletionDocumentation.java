@@ -37,7 +37,7 @@ import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 /**
  * The Spring Boot Configuration implementation of CompletionDocumentation.
  * <p>
- * It utilizes a {@link ConfigurationMetadataProperty} to display the documentation for that item and actions like opening the 
+ * It utilizes a {@link ConfigurationMetadataProperty} to display the documentation for that item and actions like opening the
  * source type of a property in editor and navigate to a general spring boot configuration documentation page.
  *
  * @author Aggelos Karalias
@@ -58,7 +58,7 @@ public class CfgPropCompletionDocumentation implements CompletionDocumentation {
         sb.append("<b>").append(configurationMeta.getId()).append("</b>");
         // type (may be null for deprecated props)
         final String type = configurationMeta.getType();
-        if (type!=null) {
+        if (type != null) {
             sb.append("<br/>").append(simpleHtmlEscape(type));
         }
         // deprecation (optional)

@@ -62,12 +62,13 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
+
 import java.io.IOException;
 import java.nio.file.DirectoryStream;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.nio.file.attribute.PosixFileAttributes;
+
 import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
+
 import org.openide.util.Exceptions;
 
 /**
@@ -361,7 +362,8 @@ public final class Utils {
                             if (Files.isReadable(p)) {
                                 String fname = p.toString().toLowerCase();
                                 if (fname.contains(filePart)) {
-                                    completionResultSet.addItem(new FileObjectCompletionItem(FileUtil.toFileObject(p.toFile()), startOffset, caretOffset));
+                                    completionResultSet.addItem(new FileObjectCompletionItem(FileUtil.toFileObject(p.toFile()),
+                                            startOffset, caretOffset));
                                 }
                             }
                         }

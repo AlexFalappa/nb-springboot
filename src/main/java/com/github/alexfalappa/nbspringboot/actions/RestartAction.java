@@ -61,9 +61,9 @@ import static java.util.logging.Level.FINE;
         displayName = "#CTL_RestartAction"
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/BuildProject", position = 57)
-    ,@ActionReference(path = "Toolbars/Build", position = 500)
-    ,@ActionReference(path = "Shortcuts", name = "DS-A")
+    @ActionReference(path = "Menu/BuildProject", position = 57),
+    @ActionReference(path = "Toolbars/Build", position = 500),
+    @ActionReference(path = "Shortcuts", name = "DS-A")
 })
 @Messages("CTL_RestartAction=S&pring Boot Restart")
 public final class RestartAction implements ActionListener {

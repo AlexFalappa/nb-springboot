@@ -48,7 +48,7 @@ public class HandleAsHintProvider implements HintProvider {
             // the first sourcegroup is src/main/java (the second is src/test/java)
             this.cpExec = ClassPath.getClassPath(srcGroups[0].getRootFolder(), ClassPath.EXECUTE);
         }
-        this.resourcesFolder=Utils.resourcesFolderForProj(prj);
+        this.resourcesFolder = Utils.resourcesFolderForProj(prj);
     }
 
     @Override
