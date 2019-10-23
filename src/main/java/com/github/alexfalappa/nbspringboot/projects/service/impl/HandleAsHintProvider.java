@@ -18,11 +18,6 @@ package com.github.alexfalappa.nbspringboot.projects.service.impl;
 import java.util.Map;
 
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.java.project.JavaProjectConstants;
-import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.api.project.SourceGroup;
-import org.netbeans.api.project.Sources;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.openide.filesystems.FileObject;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
@@ -41,14 +36,9 @@ public class HandleAsHintProvider implements HintProvider {
     private ClassPath cpExec = null;
     private final FileObject resourcesFolder;
 
-    public HandleAsHintProvider(Project prj) {
-        Sources srcs = ProjectUtils.getSources(prj);
-        SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
-        if (srcGroups.length > 0) {
-            // the first sourcegroup is src/main/java (the second is src/test/java)
-            this.cpExec = ClassPath.getClassPath(srcGroups[0].getRootFolder(), ClassPath.EXECUTE);
-        }
-        this.resourcesFolder = Utils.resourcesFolderForProj(prj);
+    public HandleAsHintProvider(FileObject resourcesFolder,ClassPath cpExec) {
+        this.resourcesFolder = resourcesFolder;
+        this.cpExec = cpExec;
     }
 
     @Override
