@@ -55,9 +55,11 @@ public class LoggerNameHintProvider implements HintProvider {
         }
         // fill in packages
         Set<String> packageNames = classIndex.getPackageNames(filter, true, EnumSet.allOf(ClassIndex.SearchScope.class));
-        packageNames.forEach(name -> {
-            completionResultSet.addItem(new JavaTypeCompletionItem(name, ElementKind.PACKAGE, dotOffset, caretOffset));
-        });
+        packageNames.stream()
+                .filter(name -> !name.isEmpty())
+                .forEach(name -> {
+                    completionResultSet.addItem(new JavaTypeCompletionItem(name, ElementKind.PACKAGE, dotOffset, caretOffset));
+                });
         // fill in types
         if (filter.contains(".")) {
             final int lastDotIdx = filter.lastIndexOf('.');
