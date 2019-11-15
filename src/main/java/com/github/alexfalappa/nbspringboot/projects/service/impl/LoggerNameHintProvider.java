@@ -51,31 +51,34 @@ public class LoggerNameHintProvider implements HintProvider {
     public void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter,
             CompletionResultSet completionResultSet, int dotOffset, int caretOffset) {
         if (filter == null) {
-            filter = "";
+            return;
         }
         // fill in packages
         Set<String> packageNames = classIndex.getPackageNames(filter, true, EnumSet.allOf(ClassIndex.SearchScope.class));
         for (String name : packageNames) {
+            // skip default package (empty string)
             if (!name.isEmpty()) {
-                    completionResultSet.addItem(new JavaTypeCompletionItem(name, ElementKind.PACKAGE, dotOffset, caretOffset));
+                completionResultSet.addItem(new JavaTypeCompletionItem(name, ElementKind.PACKAGE, dotOffset, caretOffset));
             }
         }
         // fill in types
+        String packageFilter = "";
+        String typeFilter = filter;
         if (filter.contains(".")) {
             final int lastDotIdx = filter.lastIndexOf('.');
-            final String packageFilter = filter.substring(0, lastDotIdx);
-            final String typeFilter = filter.substring(lastDotIdx + 1);
-            Set<ElementHandle<TypeElement>> types = classIndex.getDeclaredTypes(typeFilter,
-                    ClassIndex.NameKind.CASE_INSENSITIVE_PREFIX, Collections.singleton(new SinglePackageScope(packageFilter)));
-            types.forEach(type -> {
-                final String binaryName = type.getBinaryName();
-                Matcher matcher = PATTERN_ANONCLASSES.matcher(binaryName);
-                if (!matcher.matches()) {
-                    final String name = binaryName.substring(binaryName.lastIndexOf('.') + 1);
-                    completionResultSet.addItem(new JavaTypeCompletionItem(name, type.getKind(),
-                            dotOffset + packageFilter.length() + 1, caretOffset));
-                }
-            });
+            packageFilter = filter.substring(0, lastDotIdx);
+            typeFilter = filter.substring(lastDotIdx + 1);
+        }
+        Set<ElementHandle<TypeElement>> types = classIndex.getDeclaredTypes(typeFilter,
+                ClassIndex.NameKind.CASE_INSENSITIVE_PREFIX, Collections.singleton(new SinglePackageScope(packageFilter)));
+        for (ElementHandle<TypeElement> type : types) {
+            final String binaryName = type.getBinaryName();
+            Matcher matcher = PATTERN_ANONCLASSES.matcher(binaryName);
+            if (!matcher.matches()) {
+                final String name = binaryName.substring(binaryName.lastIndexOf('.') + 1);
+                completionResultSet.addItem(new JavaTypeCompletionItem(name, type.getKind(),
+                        dotOffset + packageFilter.length() + 1, caretOffset));
+            }
         }
     }
 
