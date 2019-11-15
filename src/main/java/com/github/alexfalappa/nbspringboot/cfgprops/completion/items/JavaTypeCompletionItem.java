@@ -140,7 +140,7 @@ public class JavaTypeCompletionItem implements CompletionItem {
 
     @Override
     public int getSortPriority() {
-        return elementKind == ElementKind.PACKAGE ? 1 : 0;
+        return elementKind == ElementKind.PACKAGE ? 2 : 1;
     }
 
     @Override
