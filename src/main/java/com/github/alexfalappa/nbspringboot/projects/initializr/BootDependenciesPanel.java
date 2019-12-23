@@ -263,7 +263,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         DependencyToggleBox dtb = new DependencyToggleBox();
         dtb.initFromMetadata(dn);
         if (!toggleBoxesMap.containsKey(group)) {
-            toggleBoxesMap.put(group, new ArrayList<DependencyToggleBox>());
+            toggleBoxesMap.put(group, new ArrayList<>());
         }
         toggleBoxesMap.get(group).add(dtb);
         return dtb;
@@ -355,9 +355,11 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
 
     private List<DependencyToggleBox> cbFilter(String group, String text) {
         ArrayList<DependencyToggleBox> ret = new ArrayList<>();
-        for (DependencyToggleBox dtb : toggleBoxesMap.get(group)) {
-            if (text == null || dtb.getText().toLowerCase().contains(text)) {
-                ret.add(dtb);
+        if (toggleBoxesMap.containsKey(group)) {
+            for (DependencyToggleBox dtb : toggleBoxesMap.get(group)) {
+                if (text == null || dtb.getText().toLowerCase().contains(text)) {
+                    ret.add(dtb);
+                }
             }
         }
         return ret;
