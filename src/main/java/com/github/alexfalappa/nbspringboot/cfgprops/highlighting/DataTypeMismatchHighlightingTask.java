@@ -150,6 +150,9 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
 
     private void check(String type, String text, Document document, CfgElement elem, List<ErrorDescription> errors, ClassLoader cl,
             Severity severity) throws BadLocationException {
+        if (canceled) {
+            return;
+        }
         if (text == null || text.isEmpty()) {
             return;
         }
