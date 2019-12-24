@@ -26,8 +26,10 @@ import javax.lang.model.element.TypeElement;
 
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.source.ClassIndex;
+import org.netbeans.api.java.source.ClasspathInfo;
 import org.netbeans.api.java.source.ElementHandle;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
+import org.openide.filesystems.FileObject;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.JavaTypeCompletionItem;
@@ -45,8 +47,8 @@ public class ClassReferenceHintProvider implements HintProvider {
     private final ClassIndex classIndex;
     private final ClassPath cpExec;
 
-    public ClassReferenceHintProvider(ClassIndex classIndex, ClassPath cpExec) {
-        this.classIndex = classIndex;
+    public ClassReferenceHintProvider(FileObject resourcesFolder, ClassPath cpExec) {
+        this.classIndex = ClasspathInfo.create(resourcesFolder).getClassIndex();
         this.cpExec = cpExec;
     }
 

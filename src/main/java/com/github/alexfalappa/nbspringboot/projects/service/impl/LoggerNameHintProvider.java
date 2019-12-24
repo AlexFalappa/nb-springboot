@@ -26,8 +26,10 @@ import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 
 import org.netbeans.api.java.source.ClassIndex;
+import org.netbeans.api.java.source.ClasspathInfo;
 import org.netbeans.api.java.source.ElementHandle;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
+import org.openide.filesystems.FileObject;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.JavaTypeCompletionItem;
@@ -43,8 +45,8 @@ public class LoggerNameHintProvider implements HintProvider {
     private final static Pattern PATTERN_ANONCLASSES = Pattern.compile(".*\\$\\d+");
     private final ClassIndex classIndex;
 
-    public LoggerNameHintProvider(ClassIndex classIndex) {
-        this.classIndex = classIndex;
+    public LoggerNameHintProvider(FileObject resourcesFolder) {
+        this.classIndex = ClasspathInfo.create(resourcesFolder).getClassIndex();
     }
 
     @Override

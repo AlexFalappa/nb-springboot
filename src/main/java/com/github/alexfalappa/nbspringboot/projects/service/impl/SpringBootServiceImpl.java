@@ -33,8 +33,6 @@ import java.util.regex.Pattern;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.java.source.ClassIndex;
-import org.netbeans.api.java.source.ClasspathInfo;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.modules.maven.api.NbMavenProject;
@@ -250,10 +248,9 @@ public class SpringBootServiceImpl implements SpringBootService {
                 }
             });
             // populate hint providers map
-            final ClassIndex classIndex = ClasspathInfo.create(mvnPrj.getProjectDirectory()).getClassIndex();
             FileObject resourcesFolder = Utils.resourcesFolderForProj(mvnPrj);
-            providerMap.put("logger-name", new LoggerNameHintProvider(classIndex));
-            providerMap.put("class-reference", new ClassReferenceHintProvider(classIndex, cpExec));
+            providerMap.put("logger-name", new LoggerNameHintProvider(resourcesFolder));
+            providerMap.put("class-reference", new ClassReferenceHintProvider(resourcesFolder, cpExec));
             providerMap.put("handle-as", new HandleAsHintProvider(resourcesFolder,cpExec));
             // build configuration properties maps
             updateConfigRepo();
