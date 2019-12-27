@@ -374,9 +374,9 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.codehaus.mojo</groupId>
+                <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>4.1</version>
+                <version>4.4</version>
                 <extensions>true</extensions>
                 <configuration>
                     <licenseFile>LICENSE</licenseFile>
@@ -399,9 +399,11 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>2.6</version>
+                <version>3.2.0</version>
                 <configuration>
-                    <useDefaultManifestFile>true</useDefaultManifestFile>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
                 </configuration>
             </plugin>
             <plugin>
