@@ -44,6 +44,11 @@ import com.github.alexfalappa.nbspringboot.templates.TemplateUtils;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_BOOT;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_BOOT;
 
+/**
+ * Wizard iterator for new additional metadata file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = FOLDER_SPRING_BOOT,
         iconBase = "com/github/alexfalappa/nbspringboot/templates/metadata/boot-json.png",

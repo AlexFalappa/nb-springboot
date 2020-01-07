@@ -31,6 +31,11 @@ import org.openide.util.Exceptions;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
+/**
+ * Wizard descriptor for new additional metadata file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public class MetadataWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor>, WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private MetadataVisualPanel1 component;

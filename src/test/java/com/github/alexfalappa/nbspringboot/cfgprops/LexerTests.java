@@ -15,6 +15,11 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops;
 
+/**
+ * Marker interface for lexer tests.
+ *
+ * @author Alessandro Falappa
+ */
 public interface LexerTests {
 
 }

@@ -57,6 +57,11 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_RESTART;
 
+/**
+ * Wizard iterator for Spring Boot basic projects.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = "Project/Maven2",
         displayName = "#BasicSpringbootProject_displayName",

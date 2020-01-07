@@ -21,6 +21,11 @@ import org.openide.WizardDescriptor;
 import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
 
+/**
+ * Wizard descriptor for new repository file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public class RepoWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor> {
 
     private WizardDescriptor wizardDescriptor;

@@ -26,7 +26,7 @@ To perform a manual install download the desired `nbm` package from the [release
     - @ConfigurationProperties annotation without `spring-boot-configuration-processor` dependency
     - Imports of Spring MVC annotations and Spring Data interfaces without relevant starter dependencies (e.g. `JpaRepository` without `spring-boot-starter-data-jpa` dependency)
 -  Code templates:
-    - Java templates for web request mapping annotations, Webflux router functions and `CommandLineRunner` beans
+    - Java templates for web request mapping annotations, WebFlux router functions and `CommandLineRunner` beans
     - Configuration properties templates for commonly used sets of properties 
 -  *Spring Boot* file templates:
     -  `CommandlineRunner` components
@@ -45,8 +45,8 @@ To perform a manual install download the desired `nbm` package from the [release
     -  `@Service` annotated classes
     -  `@Controller` annotated classes (Spring MVC)
     -  `@RestController` annotated classes (Spring MVC)
-    -  Reactive `@RestController` annotated classes (Spring Webflux)
-    -  Reactive handler classes (Spring Webflux)
+    -  Reactive `@RestController` annotated classes (Spring WebFlux)
+    -  Reactive handler classes (Spring WebFlux)
     -  Interfaces extending `Repository` both imperative and reactive (Spring Data)
 -  Additional code generators in `pom.xml` files:
     -  Add Spring Boot dependencies (dependency metadata is taken from the *Spring Initializr* web service)

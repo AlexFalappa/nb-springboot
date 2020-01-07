@@ -32,7 +32,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_METADATA;
 
 /**
- * Panel just asking for basic info.
+ * Wizard descriptor for first step in Spring Boot Initializr project wizard.
+ *
+ * @author Alessandro Falappa
  */
 public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel, WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {
 

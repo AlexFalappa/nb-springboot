@@ -31,6 +31,8 @@ import org.openide.util.NbBundle;
  * Panel asking for typical project info.
  * <p>
  * Asks for disk location, and project directory name in that location.
+ *
+ * @author Alessandro Falappa
  */
 public class BasicProjectWizardPanel implements WizardDescriptor.Panel,
         WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {

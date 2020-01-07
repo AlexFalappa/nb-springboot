@@ -25,6 +25,11 @@ import static com.github.alexfalappa.nbspringboot.templates.repository.RepoWizar
 import static com.github.alexfalappa.nbspringboot.templates.repository.RepoWizardIterator.WIZ_ENTITY_CLASS;
 import static com.github.alexfalappa.nbspringboot.templates.repository.RepoWizardIterator.WIZ_ID_CLASS;
 
+/**
+ * Options for new reactive repository file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public final class ReactRepoVisualPanel1 extends JPanel implements DocumentListener {
 
     private final ReactRepoWizardPanel1 panel;

@@ -1,6 +1,5 @@
 /*
- * Copyright 2015 Keevosh ULP.
- * Modifications copyright 2016 Alessandro Falappa.
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.

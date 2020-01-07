@@ -1,6 +1,5 @@
 /*
- * Copyright 2015 Keevosh ULP.
- * Modifications copyright 2016 Alessandro Falappa.
+ * Copyright 2016 Alessandro Falappa.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -38,6 +37,7 @@ import static java.util.logging.Level.FINE;
  * <p>
  * The entry point of completion support. This provider is registered for text/application+properties files.
  *
+ * @author Aggelos Karalias
  * @author Alessandro Falappa
  */
 @MimeRegistration(mimeType = CfgPropsLanguage.MIME_TYPE, service = CompletionProvider.class)

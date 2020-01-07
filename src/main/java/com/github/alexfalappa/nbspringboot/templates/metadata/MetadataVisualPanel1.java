@@ -24,6 +24,11 @@ import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataWiz
 import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataWizardIterator.WIZ_SECT_HINTS_VALUES;
 import static com.github.alexfalappa.nbspringboot.templates.metadata.MetadataWizardIterator.WIZ_SECT_PROPS;
 
+/**
+ * Options for new additional metadata file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public final class MetadataVisualPanel1 extends JPanel {
 
     public MetadataVisualPanel1() {

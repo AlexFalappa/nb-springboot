@@ -44,6 +44,11 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGO
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_FRAMEWORK;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.ICON_SPRING_CLASS;
 
+/**
+ * Wizard Iterator for new Controller class file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = FOLDER_SPRING_FRAMEWORK,
         iconBase = ICON_SPRING_CLASS,

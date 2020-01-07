@@ -33,6 +33,11 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_REMOVE_MVN_WRAPPER;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_USE_SB_MVN_PLUGIN;
 
+/**
+ * Options panel for third step in Spring Boot Initializr project wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public class InitializrProjectPanelVisual3 extends JPanel implements DocumentListener {
 
     public static final String PROP_PROJECT_NAME = "projectName";

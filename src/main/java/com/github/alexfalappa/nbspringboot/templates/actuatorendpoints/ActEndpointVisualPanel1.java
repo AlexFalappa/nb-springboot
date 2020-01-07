@@ -22,6 +22,11 @@ import org.openide.WizardDescriptor;
 import static com.github.alexfalappa.nbspringboot.templates.actuatorendpoints.ActEndpointWizardIterator.WIZ_SAMPLE_OPS;
 import static com.github.alexfalappa.nbspringboot.templates.actuatorendpoints.ActEndpointWizardIterator.WIZ_TECHNOLOGY;
 
+/**
+ * Options for new Actuator endpoint file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public final class ActEndpointVisualPanel1 extends JPanel {
 
     private final ActEndpointWizardPanel1 panel;

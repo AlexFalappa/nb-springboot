@@ -23,8 +23,6 @@ import org.springframework.boot.configurationmetadata.ConfigurationMetadataPrope
 
 /**
  * Service API for implementing support of Spring Boot related functionalities.
- * <p>
- * configuration properties metadata.
  *
  * @author Alessandro Falappa
  */

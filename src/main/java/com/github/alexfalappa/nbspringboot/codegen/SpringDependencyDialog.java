@@ -29,6 +29,7 @@ import javax.swing.KeyStroke;
 import com.fasterxml.jackson.databind.JsonNode;
 
 /**
+ * Dialog for selecting dependencies to add to a POM file.
  *
  * @author Alessandro Falappa
  */

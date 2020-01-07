@@ -18,6 +18,7 @@ package com.github.alexfalappa.nbspringboot.templates;
 import org.openide.WizardDescriptor;
 
 /**
+ * Utility methods for project wizard classes.
  *
  * @author Alessandro Falappa
  */

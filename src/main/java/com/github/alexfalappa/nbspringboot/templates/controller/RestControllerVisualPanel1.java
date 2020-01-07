@@ -22,6 +22,11 @@ import org.openide.WizardDescriptor;
 import static com.github.alexfalappa.nbspringboot.templates.controller.RestControllerWizardIterator.WIZ_CRUD_METHODS;
 import static com.github.alexfalappa.nbspringboot.templates.controller.RestControllerWizardIterator.WIZ_ERROR_HANDLING;
 
+/**
+ * Options for new RestController class file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public final class RestControllerVisualPanel1 extends JPanel {
 
     private final RestControllerWizardPanel1 panel;

@@ -37,6 +37,11 @@ import org.openide.windows.TopComponent;
 
 import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
 
+/**
+ * Data Object for Spring Boot configuration properties files.
+ *
+ * @author Alessandro Falappa
+ */
 @Messages({
     "MimeTypeDisplayName=Spring Boot Configuration Properties"
 })

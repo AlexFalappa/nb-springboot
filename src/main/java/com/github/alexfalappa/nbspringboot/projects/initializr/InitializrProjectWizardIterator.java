@@ -76,6 +76,11 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_USE_SB_MVN_PLUGIN;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_VERSION;
 
+/**
+ * Wizard iterator for Spring Boot Initializr projects.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = "Project/Maven2",
         displayName = "#InitializrSpringbootProject_displayName",

@@ -21,6 +21,11 @@ import org.openide.WizardDescriptor;
 
 import static com.github.alexfalappa.nbspringboot.templates.controller.ControllerWizardIterator.WIZ_ERROR_HANDLING;
 
+/**
+ * Options for new Controller class file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public final class ControllerVisualPanel1 extends JPanel {
 
     private final ControllerWizardPanel1 panel;

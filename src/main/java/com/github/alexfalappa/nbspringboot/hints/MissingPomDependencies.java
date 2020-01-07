@@ -49,7 +49,14 @@ import com.sun.source.util.TreePath;
 
 import static com.sun.source.tree.Tree.Kind.ANNOTATION;
 import static com.sun.source.tree.Tree.Kind.IMPORT;
-
+/**
+ * Java code hints.
+ * <p>
+ * Declares hints for Java code checking for usage of certain Spring Boot features without appropriate dependencies in the POM
+ * file.
+ *
+ * @author Alessandro Falappa
+ */
 public class MissingPomDependencies {
 
     @Hint(displayName = "#DN_CfgProcMissingHint", description = "#DESC_CfgProcMissingHint", category = "Spring Boot")

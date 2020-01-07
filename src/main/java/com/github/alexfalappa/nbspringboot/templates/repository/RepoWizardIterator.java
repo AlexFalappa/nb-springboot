@@ -43,6 +43,11 @@ import com.github.alexfalappa.nbspringboot.templates.TemplateUtils;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_DATA;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_FRAMEWORK;
 
+/**
+ * Wizard iterator for new repository file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = FOLDER_SPRING_FRAMEWORK,
         iconBase = "com/github/alexfalappa/nbspringboot/templates/repository/springdata-interface.png",

@@ -44,6 +44,11 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGO
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_BOOT;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.ICON_BOOT_CLASS;
 
+/**
+ * Wizard iterator for new Actuator endpoint file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = FOLDER_SPRING_BOOT,
         iconBase = ICON_BOOT_CLASS,

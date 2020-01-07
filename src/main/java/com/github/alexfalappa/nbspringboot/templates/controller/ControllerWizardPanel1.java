@@ -15,14 +15,17 @@
  */
 package com.github.alexfalappa.nbspringboot.templates.controller;
 
-import com.github.alexfalappa.nbspringboot.templates.actuatorendpoints.*;
-
 import javax.swing.event.ChangeListener;
 
 import org.openide.WizardDescriptor;
 import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
 
+/**
+ * Wizard descriptor for new Controller class file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public class ControllerWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor> {
 
     private ControllerVisualPanel1 component;

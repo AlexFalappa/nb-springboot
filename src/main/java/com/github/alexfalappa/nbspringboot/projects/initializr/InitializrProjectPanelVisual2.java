@@ -38,6 +38,11 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_DEPENDENCIES;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_METADATA;
 
+/**
+ * Options panel for second step in Spring Boot Initializr project wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public class InitializrProjectPanelVisual2 extends JPanel {
 
     private final DefaultComboBoxModel<NamedItem> dcbmBootVersion = new DefaultComboBoxModel<>();

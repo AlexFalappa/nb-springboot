@@ -26,7 +26,9 @@ import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
 /**
- * Panel just asking for basic info.
+ * Wizard descriptor for third step in Spring Boot Initializr project wizard.
+ *
+ * @author Alessandro Falappa
  */
 public class InitializrProjectWizardPanel3 implements WizardDescriptor.Panel<WizardDescriptor>, WizardDescriptor.ValidatingPanel<WizardDescriptor>, WizardDescriptor.FinishablePanel<WizardDescriptor> {
 

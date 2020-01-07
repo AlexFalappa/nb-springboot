@@ -51,6 +51,11 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGING;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_VERSION;
 
+/**
+ * Options panel for first step in Spring Boot Initializr project wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public class InitializrProjectPanelVisual1 extends JPanel implements DocumentListener, AsyncGUIJob {
 
     public static final String PROP_PROJECT_NAME = "projectName";

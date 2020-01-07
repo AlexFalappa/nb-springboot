@@ -63,6 +63,6 @@ public ${RET type="org.springframework.http.ResponseEntity" default="ResponseEnt
 public ${RET type="org.springframework.web.reactive.function.server.RouterFunction" default="RouterFunction" editable="false"}<${GEN type="org.springframework.web.reactive.function.server.ServerResponse" default="ServerResponse" editable="false"}> routes() {
 	return ${FUN type="org.springframework.web.reactive.function.server.RouterFunctions" default="RouterFunctions" editable="false"}.route(${PRED type="org.springframework.web.reactive.function.server.RequestPredicates" default="RequestPredicates" editable="false"}.GET("${url}"), ${HandlerClass}::${method})${cursor};
 }]]></code>
-        <description><![CDATA[Spring Webflux router function bean]]></description>
+        <description><![CDATA[Spring WebFlux router function bean]]></description>
     </codetemplate>
 </codetemplates>

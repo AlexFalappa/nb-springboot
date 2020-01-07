@@ -18,6 +18,9 @@ package com.github.alexfalappa.nbspringboot.cfgprops.fixes;
 import org.netbeans.spi.editor.hints.EnhancedFix;
 
 /**
+ * Base interface for code fixes.
+ * <p>
+ * Essentially used to define some constants.
  *
  * @author Alessandro Falappa
  */

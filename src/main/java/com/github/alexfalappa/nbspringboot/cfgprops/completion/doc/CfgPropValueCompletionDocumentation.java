@@ -25,6 +25,8 @@ import org.springframework.boot.configurationmetadata.ValueHint;
 import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 
 /**
+ * The implementation of {@code CompletionItem} for configuration properties values documentation.
+ *
  * @author Alessandro Falappa
  */
 public class CfgPropValueCompletionDocumentation implements CompletionDocumentation {

@@ -16,11 +16,13 @@
 package com.github.alexfalappa.nbspringboot;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.Deprecation;
 
+import static org.junit.Assert.*;
+
 /**
+ * Test Utils class.
  *
  * @author Hector Espert
  */

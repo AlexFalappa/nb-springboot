@@ -35,6 +35,11 @@ import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplW
 import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplWizardIterator.WIZ_LOCATION;
 import static com.github.alexfalappa.nbspringboot.templates.applproperties.ApplWizardIterator.WIZ_PROFILE;
 
+/**
+ * Options for new application properties file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public final class ApplVisualPanel1 extends JPanel implements DocumentListener {
 
     private final ApplWizardPanel1 panel;

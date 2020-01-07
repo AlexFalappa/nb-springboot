@@ -28,6 +28,11 @@ import org.openide.WizardDescriptor;
 import org.openide.WizardValidationException;
 import org.openide.filesystems.FileUtil;
 
+/**
+ * Options panel for Spring Boot basic projects.
+ *
+ * @author Alessandro Falappa
+ */
 public class BasicProjectPanelVisual extends JPanel implements DocumentListener {
 
     public static final String PROP_PROJECT_NAME = "projectName";

@@ -22,6 +22,11 @@ import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
 import org.openide.util.NbBundle;
 
+/**
+ * Wizard descriptor for new application properties file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public class ApplWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor>, WizardDescriptor.FinishablePanel<WizardDescriptor> {
 
     private WizardDescriptor wizardDescriptor;
