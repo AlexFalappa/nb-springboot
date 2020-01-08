@@ -30,8 +30,6 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.maven.NbMavenProjectImpl;
@@ -101,7 +99,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         logger.info("Refreshing Spring Boot service");
         // check maven project has a dependency starting with 'spring-boot'
         logger.fine("Checking maven project has a spring boot dependency");
-        boolean springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
+        boolean springBootAvailable = Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
         // clear and exit if no spring boot dependency detected
         if (!springBootAvailable) {
             reposInJars.clear();
@@ -201,7 +199,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
         if (cachedDepsPresence != null) {
             if (!cachedDepsPresence.containsKey(artifactId)) {
-                cachedDepsPresence.put(artifactId, dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), artifactId));
+                cachedDepsPresence.put(artifactId, Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), artifactId));
             }
             return cachedDepsPresence.get(artifactId);
         }
@@ -224,7 +222,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
         logger.info("Initializing Spring Boot service");
         // check maven project has a dependency starting with 'spring-boot'
-        boolean springBootAvailable = dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
+        boolean springBootAvailable = Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
         logger.fine("Checking maven project has a spring boot dependency");
         // early exit if no spring boot dependency detected
         if (!springBootAvailable) {
@@ -303,18 +301,6 @@ public class SpringBootServiceImpl implements SpringBootService {
                 }
             }
         }
-    }
-
-    // check if any of the project dependencies artifact ids contains the given string
-    private boolean dependencyArtifactIdContains(NbMavenProject nbMvn, String artifactId) {
-        MavenProject mPrj = nbMvn.getMavenProject();
-        for (Object o : mPrj.getDependencies()) {
-            Dependency d = (Dependency) o;
-            if (d.getArtifactId().contains(artifactId)) {
-                return true;
-            }
-        }
-        return false;
     }
 
     // tell if the project currently uses Spring Boot 2.x

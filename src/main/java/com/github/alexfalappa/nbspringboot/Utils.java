@@ -17,6 +17,8 @@ package com.github.alexfalappa.nbspringboot;
 
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.nio.file.DirectoryStream;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -36,6 +38,8 @@ import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
 
+import org.apache.maven.model.Dependency;
+import org.apache.maven.project.MavenProject;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.FileOwnerQuery;
@@ -43,10 +47,12 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
+import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.loaders.DataObject;
+import org.openide.util.Exceptions;
 import org.openide.util.Lookup;
 import org.openide.util.NbPreferences;
 import org.openide.util.Utilities;
@@ -62,14 +68,8 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
-
-import java.io.IOException;
-import java.nio.file.DirectoryStream;
-
 import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
-
-import org.openide.util.Exceptions;
 
 /**
  * Utility methods used in the plugin.
@@ -472,5 +472,23 @@ public final class Utils {
             ((AbstractButton) standInComponent).setModel(new DefaultButtonModel());
         }
         return standInComponent;
+    }
+
+    /**
+     * Check if any of the project dependencies artifact ids contains the given string.
+     *
+     * @param nbMvn NB maven project
+     * @param search string to look for
+     * @return true if the project has a dependency artifactId containing the search string
+     */
+    public static boolean dependencyArtifactIdContains(NbMavenProject nbMvn, String search) {
+        MavenProject mPrj = nbMvn.getMavenProject();
+        for (Object o : mPrj.getDependencies()) {
+            Dependency d = (Dependency) o;
+            if (d.getArtifactId().contains(search)) {
+                return true;
+            }
+        }
+        return false;
     }
 }
