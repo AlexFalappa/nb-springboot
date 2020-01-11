@@ -80,6 +80,8 @@ Templates and code generators were inspired by those found on [Spring Boot Tools
 
 Requestmappings navigator panel feature contributed by [Michael Simons](https://github.com/michael-simons).
 
+Badge on projects icon feature initially contributed by [Hector Espert](https://github.com/blackleg).
+
 ## Changelog
 
 See [the separate file](CHANGELOG.md)

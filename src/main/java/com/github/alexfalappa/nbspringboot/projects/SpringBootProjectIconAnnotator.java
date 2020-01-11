@@ -17,6 +17,7 @@ package com.github.alexfalappa.nbspringboot.projects;
 
 import java.awt.EventQueue;
 import java.awt.Image;
+import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
@@ -48,7 +49,8 @@ import com.github.alexfalappa.nbspringboot.Utils;
 public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {
 
     @StaticResource
-    private static final String BADGE_PATH = "com/github/alexfalappa/nbspringboot/projects/badge.png";    //NOI18N
+    private static final String BADGE_PATH = "com/github/alexfalappa/nbspringboot/projects/springboot-badge.png";    //NOI18N
+    private static final URL BADGE_URL = SpringBootProjectIconAnnotator.class.getClassLoader().getResource(BADGE_PATH);
     private final AtomicReference<Image> badgeCache = new AtomicReference<>();
     private final ChangeSupport cs = new ChangeSupport(this);
     private final Map<Project, Boolean> projectsMap = Collections.synchronizedMap(new WeakHashMap<>());
@@ -62,9 +64,12 @@ public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {
             if (badge != null) {
                 String tooltip = ImageUtilities.getImageToolTip(original);
                 if (!tooltip.contains("Boot")) {
+                    final String messageHtml = String.format(
+                            "<img src=\"%s\">&nbsp;Spring Boot application", //NOI18N
+                            BADGE_URL.toExternalForm());
                     annotated = ImageUtilities.mergeImages(
-                            ImageUtilities.addToolTipToImage(original, "Spring Boot application"),
-                            badge, 8, 8);
+                            ImageUtilities.addToolTipToImage(original, messageHtml),
+                            badge, 7, 7);
                 }
             }
         } else {

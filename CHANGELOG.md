@@ -1,6 +1,7 @@
 # Changelog
 
 -  **Unreleased**
+	-  Badge added on maven projects icon in Projects view for projects with Spring Boot dependencies (based on contribution by Hector Espert)
     -  Fixes to logger name completion provider
     -  Upgrade of internal dependencies
     -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/16?closed=1)
