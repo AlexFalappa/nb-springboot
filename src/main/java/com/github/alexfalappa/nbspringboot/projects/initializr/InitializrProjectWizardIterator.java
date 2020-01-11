@@ -85,7 +85,7 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
         folder = "Project/Maven2",
         displayName = "#InitializrSpringbootProject_displayName",
         description = "InitializrSpringbootProjectDescription.html",
-        iconBase = "com/github/alexfalappa/nbspringboot/projects/initializr/InitializrSpringbootProject.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/projects/springboot-project.png",
         content = "initializr-nbactions.xml.template",
         scriptEngine = "freemarker",
         position = 256

@@ -66,7 +66,7 @@ import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_REST
         folder = "Project/Maven2",
         displayName = "#BasicSpringbootProject_displayName",
         description = "BasicSpringbootProjectDescription.html",
-        iconBase = "com/github/alexfalappa/nbspringboot/projects/basic/BasicSpringbootProject.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/projects/springboot-project.png",
         content = "basic-nbactions.xml.template",
         scriptEngine = "freemarker",
         position = 255
