@@ -19,8 +19,7 @@ To perform a manual install download the desired `nbm` package from the [release
 -  Specific editor for configuration properties files with:
     -  extended syntax highlighting (dot separated keys, array notation)
     -  error highlighting for: syntax errors, duplicate properties, data type mismatches and unknown properties
-    -  completion and documentation of configuration properties names
-    -  completion and documentation of configuration properties values (`hints` in configuration metadata)
+    -  completion and documentation of configuration properties names and values (with support of [hint value providers](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-configuration-metadata.html#value-providers) defined in configuration metadata)
     -  quick fixes for: removing deprecated, unknown and duplicate properties or substituting deprecated properties with their replacement
 -  Java editor error highlighting and fixes for missing starter dependencies:
     - @ConfigurationProperties annotation without `spring-boot-configuration-processor` dependency
