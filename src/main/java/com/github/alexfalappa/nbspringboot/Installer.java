@@ -15,10 +15,16 @@
  */
 package com.github.alexfalappa.nbspringboot;
 
+import java.beans.PropertyChangeEvent;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.netbeans.api.debugger.ActionsManagerAdapter;
+import org.netbeans.api.debugger.DebuggerEngine;
+import org.netbeans.api.debugger.DebuggerManager;
+import org.netbeans.api.debugger.DebuggerManagerAdapter;
+import org.netbeans.api.debugger.Session;
 import org.netbeans.contrib.yenta.Yenta;
 
 /**
@@ -29,6 +35,46 @@ import org.netbeans.contrib.yenta.Yenta;
  * @author Alessandro Falappa
  */
 public class Installer extends Yenta {
+
+    @Override
+    public void restored() {
+        super.restored();
+        DebuggerManager dm = DebuggerManager.getDebuggerManager();
+        dm.addDebuggerListener(new DebuggerManagerAdapter() {
+            @Override
+            public void engineAdded(DebuggerEngine engine) {
+                System.out.println("DebuggerListener.engineAdded()");
+            }
+
+            @Override
+            public void sessionAdded(Session session) {
+                System.out.println("DebuggerListener.sessionAdded()");
+            }
+
+            @Override
+            public void sessionRemoved(Session session) {
+                System.out.println("DebuggerListener.sessionRemoved()");
+            }
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.out.format("DebuggerListener.propertyChange() - %s%n", evt.getPropertyName().toUpperCase());
+            }
+
+        });
+        dm.getActionsManager().addActionsManagerListener(new ActionsManagerAdapter() {
+            @Override
+            public void actionPerformed(Object action) {
+                System.out.println("ActionsManagerListener.actionPerformed()");
+            }
+
+            @Override
+            public void actionStateChanged(Object action, boolean enabled) {
+                System.out.println("ActionsManagerListener.actionStateChanged()");
+            }
+
+        });
+    }
 
     @Override
     protected Set<String> friends() {
