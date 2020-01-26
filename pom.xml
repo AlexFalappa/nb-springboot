@@ -436,9 +436,9 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
-                    <groups>com.github.alexfalappa.nbspringboot.cfgprops.ParserTests</groups>
-                    <!--uncomment following group to execute lexer tests-->
-                    <!--<groups>com.github.alexfalappa.nbspringboot.cfgprops.LexerTests</groups>-->
+                    <excludes>
+                        <exclude>com/github/alexfalappa/nbspringboot/cfgprops/lexer/*.java</exclude>
+                    </excludes>
                 </configuration>
             </plugin>
             <plugin>
@@ -531,6 +531,12 @@
     </distributionManagement>
 
     <profiles>
+        <profile>
+            <id>test</id>
+            <properties>
+                <skipTests>false</skipTests>
+            </properties>
+        </profile>
         <profile>
             <!--Generate SourceJar and JavadocJar-->
             <id>source-and-javadoc</id>
