@@ -436,6 +436,7 @@
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.2</version>
                 <configuration>
+                    <!--comment following exclusions when working on lexer and willing to execute lexer tests-->
                     <excludes>
                         <exclude>com/github/alexfalappa/nbspringboot/cfgprops/lexer/*.java</exclude>
                     </excludes>
@@ -531,6 +532,7 @@
     </distributionManagement>
 
     <profiles>
+        <!-- Execute tests -->
         <profile>
             <id>test</id>
             <properties>
@@ -538,7 +540,7 @@
             </properties>
         </profile>
         <profile>
-            <!--Generate SourceJar and JavadocJar-->
+            <!-- Generate SourceJar and JavadocJar -->
             <id>source-and-javadoc</id>
             <build>
                 <plugins>
