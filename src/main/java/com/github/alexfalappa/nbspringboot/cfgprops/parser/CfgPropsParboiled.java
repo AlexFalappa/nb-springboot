@@ -38,7 +38,7 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
 
     private static final Pattern PAT_UNICODES = compile("\\\\u[a-fA-F0-9]{4}");
     private static final Pattern PAT_ESCAPES = compile("\\\\.");
-    private static final Pattern PAT_ESCAPED_NEWLINE = compile("\\\\\\n\\s*");
+    private static final Pattern PAT_ESCAPED_NEWLINE = compile("\\\\(\\n|\\r|\\r\\n)\\s*");
     private Properties parsedProps = new Properties();
     private CfgFile cfgFile = new CfgFile();
 
@@ -240,7 +240,7 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
     }
 
     Rule eolChar() {
-        return FirstOf('\n', "\r\n", '\r');
+        return FirstOf("\r\n", '\n', '\r');
     }
 
     Rule notEolChar() {
