@@ -244,8 +244,11 @@ public class InitializrProjectPanelVisual2 extends JPanel {
         @Override
         public void keyPressed(KeyEvent e) {
             if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-                clearFilter();
-                e.consume();
+                // if empty let the event bubble up to parent components
+                if (!txFilter.getText().isEmpty()) {
+                    clearFilter();
+                    e.consume();
+                }
             }
         }
 
