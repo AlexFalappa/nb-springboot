@@ -47,7 +47,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService;
 
 import static java.util.logging.Level.INFO;
-import static java.util.logging.Logger.getLogger;
 
 /**
  * Maven POM code generator to add a Spring Boot dependency.
@@ -59,7 +58,7 @@ import static java.util.logging.Logger.getLogger;
  */
 public class SpringDependenciesGenerator implements CodeGenerator {
 
-    protected final Logger logger = getLogger(getClass().getName());
+    protected static final Logger logger = Logger.getLogger(SpringDependenciesGenerator.class.getName());
     protected final JTextComponent component;
     protected final POMModel model;
 
@@ -204,17 +203,32 @@ public class SpringDependenciesGenerator implements CodeGenerator {
 
     private void addBom(JsonNode depsMeta, String bomId) {
         JsonNode bomInfo = depsMeta.path("boms").path(bomId);
-        // create dependency management section in pom if missing
+        final String bomGroupId = bomInfo.path("groupId").asText();
+        final String bomArtifactId = bomInfo.path("artifactId").asText();
+        final String bomVersion = bomInfo.path("version").asText();
         DependencyManagement depMan = model.getProject().getDependencyManagement();
         if (depMan == null) {
+            // create dependency management section in pom if missing
             depMan = model.getFactory().createDependencyManagement();
             model.getProject().setDependencyManagement(depMan);
+        } else {
+            // check bom already present
+            List<Dependency> dependencies = depMan.getDependencies();
+            if (dependencies != null) {
+                for (Dependency dep : dependencies) {
+                    if (dep.getGroupId().equals(bomGroupId)
+                            && dep.getArtifactId().equals(bomArtifactId)
+                            && dep.getVersion().equals(bomVersion)) {
+                        return;
+                    }
+                }
+            }
         }
         // add a dependency with type pom and scope import
         Dependency dep = model.getFactory().createDependency();
-        dep.setGroupId(bomInfo.path("groupId").asText());
-        dep.setArtifactId(bomInfo.path("artifactId").asText());
-        dep.setVersion(bomInfo.path("version").asText());
+        dep.setGroupId(bomGroupId);
+        dep.setArtifactId(bomArtifactId);
+        dep.setVersion(bomVersion);
         dep.setType("pom");
         dep.setScope("import");
         depMan.addDependency(dep);
@@ -228,12 +242,32 @@ public class SpringDependenciesGenerator implements CodeGenerator {
     }
 
     private void addRepository(JsonNode depsMeta, String repoId) {
+        // check repository with given id already exists
+        List<Repository> repositories = model.getProject().getRepositories();
+        if (repositories != null) {
+            for (Repository repo : repositories) {
+                if (repo.getId().equals(repoId)) {
+                    return;
+                }
+            }
+        }
+        // proceed to add new repository
         Repository repository = model.getFactory().createRepository();
         fillRepository(depsMeta, repoId, repository);
         model.getProject().addRepository(repository);
     }
 
     private void addPluginRepository(JsonNode depsMeta, String repoId) {
+        // check plugin repository with given id already exists
+        List<Repository> plugRepositories = model.getProject().getPluginRepositories();
+        if (plugRepositories != null) {
+            for (Repository plugRepo : plugRepositories) {
+                if (plugRepo.getId().equals(repoId)) {
+                    return;
+                }
+            }
+        }
+        // proceed to add new plugin repository
         Repository repository = model.getFactory().createPluginRepository();
         fillRepository(depsMeta, repoId, repository);
         model.getProject().addPluginRepository(repository);
