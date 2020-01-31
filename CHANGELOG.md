@@ -1,6 +1,7 @@
 # Changelog
 
 -  **Unreleased**
+	-  Improved and updated code generator to inject a Spring Boot setup into a `pm.xml` file
 	-  Badge added on maven projects icon in Projects view for projects with Spring Boot dependencies (based on contribution by Hector Espert)
     -  Fixes to logger name completion provider
     -  Upgrade of internal dependencies
