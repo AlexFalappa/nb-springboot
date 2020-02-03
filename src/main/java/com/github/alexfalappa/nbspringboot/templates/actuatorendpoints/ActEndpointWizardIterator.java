@@ -57,7 +57,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.ICON_B
         description = "ActuatorEndpoint.html",
         scriptEngine = "freemarker",
         category = {CATEGORY_SPRING_BOOT_ACTUATOR},
-        position = 900)
+        position = 600)
 @NbBundle.Messages(value = "actend_displayName=Actuator Endpoint")
 public final class ActEndpointWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 

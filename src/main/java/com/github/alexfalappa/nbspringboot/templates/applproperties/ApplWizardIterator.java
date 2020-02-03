@@ -49,7 +49,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER
         description = "description.html",
         scriptEngine = "freemarker",
         category = {CATEGORY_SPRING_BOOT},
-        position = 400)
+        position = 700)
 @Messages(value = "applicprop_displayName=Application Properties")
 public final class ApplWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 

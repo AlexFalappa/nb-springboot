@@ -57,7 +57,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER
         description = "description.html",
         scriptEngine = "freemarker",
         category = {CATEGORY_SPRING_BOOT},
-        position = 500)
+        position = 800)
 @Messages(value = "addmetadata_displayName=Additional Properties Metadata")
 public final class MetadataWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 

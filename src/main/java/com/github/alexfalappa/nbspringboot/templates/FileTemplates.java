@@ -38,7 +38,7 @@ public class FileTemplates {
     public static final String CATEGORY_SPRING_MVC = "spring-mvc-types";
     public static final String CATEGORY_SPRING_DATA = "spring-data-types";
     public static final String CATEGORY_SPRING_REACT = "spring-reactive-types";
-    public static final String FOLDER_SPRING_FRAMEWORK = "SpringFramework";
+    public static final String FOLDER_SPRING_FRAMEWORK = "springframework";
     public static final String FOLDER_SPRING_BOOT = "springboot";
     public static final String ICON_BOOT_CLASS = "com/github/alexfalappa/nbspringboot/templates/boot-class.png";
     public static final String ICON_SPRING_CLASS = "com/github/alexfalappa/nbspringboot/templates/spring-class.png";
@@ -93,7 +93,7 @@ public class FileTemplates {
             description = "InfoContributor.html",
             scriptEngine = "freemarker",
             category = {CATEGORY_SPRING_BOOT_ACTUATOR},
-            position = 330)
+            position = 400)
     @NbBundle.Messages(value = "infocontributor_displayName=InfoContributor Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> infoContributor() {
         return JavaTemplates.createJavaTemplateIterator();
@@ -107,7 +107,7 @@ public class FileTemplates {
             description = "HealthIndicator.html",
             scriptEngine = "freemarker",
             category = {CATEGORY_SPRING_BOOT_ACTUATOR},
-            position = 360)
+            position = 500)
     @NbBundle.Messages(value = "healthindicator_displayName=HealthIndicator Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> healthIndicator() {
         return JavaTemplates.createJavaTemplateIterator();
@@ -163,7 +163,7 @@ public class FileTemplates {
             description = "ReactHandler.html",
             scriptEngine = "freemarker",
             category = {CATEGORY_SPRING_REACT},
-            position = 1000)
+            position = 1100)
     @NbBundle.Messages(value = "funchandler_displayName=Reactive Handler Class")
     public static WizardDescriptor.InstantiatingIterator<WizardDescriptor> reactHandler() {
         return JavaTemplates.createJavaTemplateIterator();

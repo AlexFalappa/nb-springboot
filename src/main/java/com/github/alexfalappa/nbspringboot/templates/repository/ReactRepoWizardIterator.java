@@ -58,7 +58,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER
         category = {CATEGORY_SPRING_DATA},
         position = 1000)
 @NbBundle.Messages(value = "reactmongorepos_displayName=Reactive Repository Interface")
-public final class ReactRepoWizardIterator1 implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
+public final class ReactRepoWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 
     public static final String WIZ_BASE_INTERF = "baseInterface";
     public static final String WIZ_ENTITY_CLASS = "entityClass";
