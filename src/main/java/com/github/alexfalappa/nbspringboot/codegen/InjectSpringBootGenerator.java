@@ -15,10 +15,13 @@
  */
 package com.github.alexfalappa.nbspringboot.codegen;
 
+import java.io.IOException;
 import java.util.Map;
+import java.util.prefs.Preferences;
 
 import javax.swing.text.JTextComponent;
 
+import org.netbeans.api.templates.FileBuilder;
 import org.netbeans.modules.maven.model.pom.Build;
 import org.netbeans.modules.maven.model.pom.Dependency;
 import org.netbeans.modules.maven.model.pom.Exclusion;
@@ -27,9 +30,14 @@ import org.netbeans.modules.maven.model.pom.Parent;
 import org.netbeans.modules.maven.model.pom.Plugin;
 import org.netbeans.modules.maven.model.pom.Project;
 import org.netbeans.modules.maven.model.pom.Properties;
+import org.openide.filesystems.FileObject;
+import org.openide.filesystems.FileUtil;
+import org.openide.util.NbPreferences;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
 
+import com.github.alexfalappa.nbspringboot.PrefConstants;
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.projects.basic.BasicProjectWizardIterator;
 
 /**
@@ -105,8 +113,33 @@ public class InjectSpringBootGenerator extends BaseCodeGenerator {
         plugin.setArtifactId("spring-boot-maven-plugin");
         build.addPlugin(plugin);
         prj.setBuild(build);
+        // create a nbactions.xml if not already present
+        final FileObject projectDirectory = Utils.getActiveProject().getProjectDirectory();
+        if (projectDirectory.getFileObject("nbactions.xml") == null) {
+            createNbActions(projectDirectory);
+        }
         // position caret at newly added parent declaration
         return model.getAccess().findPosition(parent.getPeer());
+    }
+
+    private void createNbActions(FileObject dir) throws IOException {
+        if (dir == null) {
+            return;
+        }
+        // retrieve default options from prefs
+        final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
+        final boolean bForceColor = prefs.getBoolean(PrefConstants.PREF_FORCE_COLOR_OUTPUT, true);
+        final boolean bManualRestart = prefs.getBoolean(PrefConstants.PREF_MANUAL_RESTART, false);
+        final String strVmOpts = Utils.vmOptsFromPrefs();
+        // use template file from Initializr Spring Boot wizard
+        FileObject foTmpl = FileUtil.getConfigFile("/Templates/Project/Maven2/initializr-nbactions.xml");
+        FileBuilder fb = new FileBuilder(foTmpl, dir)
+                .name("nbactions")
+                .param("forceColor", bForceColor)
+                .param("manualRestart", bManualRestart)
+                .param("isBoot2", BasicProjectWizardIterator.BOOTVERSION.startsWith("2"))
+                .param("vmOpts", strVmOpts);
+        fb.build();
     }
 
 }

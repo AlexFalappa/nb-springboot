@@ -13,12 +13,16 @@
     <#if (vmOpts)?has_content>
             <spring-boot.run.jvmArguments>${vmOpts}</spring-boot.run.jvmArguments>
     </#if>
+    <#if (mainClass)?has_content>
             <spring-boot.run.mainClass>${mainClass}</spring-boot.run.mainClass>
+    </#if>
 <#else>
     <#if (vmOpts)?has_content>
             <run.jvmArguments>${vmOpts}</run.jvmArguments>
     </#if>
+    <#if (mainClass)?has_content>
             <run.mainClass>${mainClass}</run.mainClass>
+    </#if>
 </#if>
 <#if forceColor?? && forceColor>
             <Env.SPRING_OUTPUT_ANSI_ENABLED>always</Env.SPRING_OUTPUT_ANSI_ENABLED>
@@ -49,14 +53,18 @@
     <#else>
             <spring-boot.run.jvmArguments>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${"$"}{jpda.address}</spring-boot.run.jvmArguments>
     </#if>
+    <#if (mainClass)?has_content>
             <spring-boot.run.mainClass>${mainClass}</spring-boot.run.mainClass>
+    </#if>
 <#else>
     <#if (vmOpts)?has_content>
             <run.jvmArguments>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${"$"}{jpda.address} ${vmOpts}</run.jvmArguments>
     <#else>
             <run.jvmArguments>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${"$"}{jpda.address}</run.jvmArguments>
     </#if>
+    <#if (mainClass)?has_content>
             <run.mainClass>${mainClass}</run.mainClass>
+    </#if>
 </#if>
 <#if forceColor?? && forceColor>
             <Env.SPRING_OUTPUT_ANSI_ENABLED>always</Env.SPRING_OUTPUT_ANSI_ENABLED>
@@ -83,7 +91,9 @@
             <goal>org.codehaus.mojo:exec-maven-plugin:1.2.1:exec</goal>
         </goals>
         <properties>
+<#if (mainClass)?has_content>
             <exec.args>-classpath %classpath ${mainClass}</exec.args>
+</#if>
             <exec.executable>java</exec.executable>
         </properties>
     </action>
