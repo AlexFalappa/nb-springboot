@@ -48,7 +48,8 @@ import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
 @MIMEResolver.Registration(
         displayName = "#MimeTypeDisplayName",
         resource = "cfgprops-resolver.xml",
-        position = 1000
+        // must be before PropertiesDataObject registration (120)
+        position = 119
 )
 @DataObject.Registration(
         mimeType = CfgPropsLanguage.MIME_TYPE,
