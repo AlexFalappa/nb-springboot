@@ -17,14 +17,13 @@ package com.github.alexfalappa.nbspringboot.projects.customizer;
 
 import javax.swing.JComponent;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.modules.maven.api.customizer.ModelHandle2;
 import org.netbeans.spi.project.ui.support.ProjectCustomizer;
 import org.openide.util.Lookup;
 
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 /**
@@ -65,13 +64,7 @@ public class BootPanelProvider implements ProjectCustomizer.CompositeCategoryPro
         if (prj != null) {
             NbMavenProject nbMvn = prj.getLookup().lookup(NbMavenProject.class);
             if (nbMvn != null) {
-                MavenProject mvnPrj = nbMvn.getMavenProject();
-                for (Object o : mvnPrj.getDependencies()) {
-                    Dependency d = (Dependency) o;
-                    if (d.getArtifactId().contains(txt)) {
-                        return true;
-                    }
-                }
+                return Utils.dependencyArtifactIdContains(nbMvn, txt);
             }
         }
         return false;
