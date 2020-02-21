@@ -19,9 +19,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JToolTip;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -58,6 +59,7 @@ import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
  */
 public class CfgPropCompletionItem implements CompletionItem {
 
+    private static final Logger logger = Logger.getLogger(CfgPropCompletionItem.class.getName());
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-property.png"));
     private final ConfigurationMetadataProperty configurationMeta;
@@ -95,6 +97,7 @@ public class CfgPropCompletionItem implements CompletionItem {
 
     @Override
     public void defaultAction(JTextComponent jtc) {
+        logger.log(Level.FINER, "Accepted name completion: {0}", configurationMeta.getId());
         try {
             StyledDocument doc = (StyledDocument) jtc.getDocument();
             // calculate the amount of chars to remove (by default from property start up to caret position)
@@ -121,16 +124,18 @@ public class CfgPropCompletionItem implements CompletionItem {
             }
             // remove characters from the property name start offset
             doc.remove(propStartOffset, lenToRemove);
-            // add a useful char depending on data type
+            // add some useful chars depending on data type and presence of successive equal signs
             final String dataType = configurationMeta.getType();
             final boolean isSequence = dataType.contains("List") || dataType.contains("Set") || dataType.contains("[]");
             final boolean preferArray = NbPreferences.forModule(PrefConstants.class)
                     .getBoolean(PrefConstants.PREF_ARRAY_NOTATION, false);
             final boolean needEqualSign = !(overwrite && equalSignIndex >= 0);
             StringBuilder sb = new StringBuilder(getText());
+            boolean closeCompletion = true;
             int goBack = 0;
             if (dataType.contains("Map")) {
                 sb.append(".");
+                closeCompletion = false;
             } else if (isSequence && preferArray) {
                 sb.append("[]");
                 goBack = 1;
@@ -140,13 +145,16 @@ public class CfgPropCompletionItem implements CompletionItem {
                 }
             } else if (needEqualSign) {
                 sb.append("=");
+                closeCompletion = false;
             }
             doc.insertString(propStartOffset, sb.toString(), null);
             if (goBack != 0) {
                 jtc.setCaretPosition(jtc.getCaretPosition() - goBack);
             }
             // close the code completion box
-            Completion.get().hideAll();
+            if (closeCompletion) {
+                Completion.get().hideAll();
+            }
         } catch (BadLocationException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -190,15 +198,7 @@ public class CfgPropCompletionItem implements CompletionItem {
 
     @Override
     public CompletionTask createToolTipTask() {
-        return new AsyncCompletionTask(new AsyncCompletionQuery() {
-            @Override
-            protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                JToolTip toolTip = new JToolTip();
-                toolTip.setTipText("Press Enter to insert \"" + getText() + "\"");
-                completionResultSet.setToolTip(toolTip);
-                completionResultSet.finish();
-            }
-        });
+        return null;
     }
 
     @Override

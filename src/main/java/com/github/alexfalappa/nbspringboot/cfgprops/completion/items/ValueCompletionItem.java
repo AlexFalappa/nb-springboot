@@ -19,12 +19,15 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
 import javax.swing.JToolTip;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
@@ -40,7 +43,6 @@ import org.openide.util.ImageUtilities;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.doc.CfgPropValueCompletionDocumentation;
-import javax.swing.text.Element;
 
 /**
  * The implementation of {@code CompletionItem} for Spring Boot value hints.
@@ -51,6 +53,7 @@ import javax.swing.text.Element;
  */
 public class ValueCompletionItem implements CompletionItem {
 
+    private static final Logger logger = Logger.getLogger(ValueCompletionItem.class.getName());
     private final ValueHint hint;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-value.png"));
@@ -78,6 +81,7 @@ public class ValueCompletionItem implements CompletionItem {
 
     @Override
     public void defaultAction(JTextComponent jtc) {
+        logger.log(Level.FINER, "Accepted value completion: {0}", hint.toString());
         try {
             StyledDocument doc = (StyledDocument) jtc.getDocument();
             // calculate the amount of chars to remove (by default from dot up to caret position)

@@ -19,9 +19,10 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JToolTip;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -51,6 +52,7 @@ import com.github.alexfalappa.nbspringboot.cfgprops.completion.doc.CfgPropValueC
  */
 public class KeyCompletionItem implements CompletionItem {
 
+    private static final Logger logger = Logger.getLogger(KeyCompletionItem.class.getName());
     private final ValueHint hint;
     private static final ImageIcon fieldIcon = new ImageIcon(ImageUtilities.loadImage(
             "com/github/alexfalappa/nbspringboot/cfgprops/completion/springboot-key.png"));
@@ -78,6 +80,7 @@ public class KeyCompletionItem implements CompletionItem {
 
     @Override
     public void defaultAction(JTextComponent jtc) {
+        logger.log(Level.FINER, "Accepted key value hint: {0}", hint.toString());
         try {
             StyledDocument doc = (StyledDocument) jtc.getDocument();
             // calculate the amount of chars to remove (by default from dot up to caret position)
@@ -100,16 +103,16 @@ public class KeyCompletionItem implements CompletionItem {
                     lenToRemove = lineElement.getStartOffset() + colonIndex - dotOffset;
                 }
             }
-            // add a final equal sign if not already detected
-            StringBuilder sb = new StringBuilder(getText());
-            if (equalSignIndex < 0 && colonIndex < 0) {
-                sb.append("=");
-            }
             // remove characters from dot then insert new text
             doc.remove(dotOffset, lenToRemove);
-            doc.insertString(dotOffset, sb.toString(), null);
-            // close the code completion box
-            Completion.get().hideAll();
+            if (equalSignIndex < 0 && colonIndex < 0) {
+                logger.log(Level.FINER, "Adding equal sign and continuing completion");
+                doc.insertString(dotOffset, getText().concat("="), null);
+            } else {
+                logger.log(Level.FINER, "Finish completion with no added chars");
+                doc.insertString(dotOffset, getText(), null);
+                Completion.get().hideAll();
+            }
         } catch (BadLocationException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -150,15 +153,7 @@ public class KeyCompletionItem implements CompletionItem {
 
     @Override
     public CompletionTask createToolTipTask() {
-        return new AsyncCompletionTask(new AsyncCompletionQuery() {
-            @Override
-            protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                JToolTip toolTip = new JToolTip();
-                toolTip.setTipText("Press Enter to insert \"" + getText() + "\"");
-                completionResultSet.setToolTip(toolTip);
-                completionResultSet.finish();
-            }
-        });
+        return null;
     }
 
     @Override

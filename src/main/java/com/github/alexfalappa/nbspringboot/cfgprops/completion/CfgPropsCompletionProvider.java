@@ -15,6 +15,7 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.completion;
 
+import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.text.JTextComponent;
@@ -72,6 +73,11 @@ public class CfgPropsCompletionProvider implements CompletionProvider {
 
     @Override
     public int getAutoQueryTypes(JTextComponent jtc, String string) {
+        // trigger autocompletion if user types '=' or '.' or ':'
+        if (string.endsWith("=") || string.endsWith(".") || string.endsWith(":")) {
+            logger.log(Level.FINER, "Automatic completion triggering on: {0}", string);
+            return CompletionProvider.COMPLETION_QUERY_TYPE;
+        }
         return 0;
     }
 

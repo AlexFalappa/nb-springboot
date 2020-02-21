@@ -50,6 +50,7 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_ERROR_SHOW;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_SORT_LAST;
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.FINER;
 
 /**
@@ -93,6 +94,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
 
     @Override
     protected void query(CompletionResultSet completionResultSet, Document document, int caretOffset) {
+        logger.finer("Starting completion");
         final StyledDocument styDoc = (StyledDocument) document;
         Element lineElement = styDoc.getParagraphElement(caretOffset);
         int lineStartOffset = lineElement.getStartOffset();
@@ -117,8 +119,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                             + lineToCaret.indexOf(valPrefix, equalSignOffset), caretOffset);
                 } else if (equalSignOffset >= 0) {
                     //value completion with empty filter
-                    completePropValue(completionResultSet, propPrefix, "", lineStartOffset + equalSignOffset + 1,
-                            caretOffset);
+                    completePropValue(completionResultSet, propPrefix, "", lineStartOffset + equalSignOffset + 1, caretOffset);
                 } else {
                     // property completion
                     completePropName(completionResultSet, propPrefix, lineStartOffset + propPrefixOffset, caretOffset);
@@ -142,7 +143,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             for (String mapProp : sbs.getMapPropertyNames()) {
                 if (filter.length() > mapProp.length() && filter.contains(mapProp)) {
                     String key = filter.substring(mapProp.length() + 1);
-                    logger.log(FINER, "Completing key for map property {0} from: {1}", new Object[]{mapProp, key});
+                    logger.log(FINER, "Completing key for map property {0} from: ''{1}''", new Object[]{mapProp, key});
                     final ConfigurationMetadataProperty propMetadata = sbs.getPropertyMetadata(mapProp);
                     // if key data type is an enum complete with enum values
                     final String keyDataType = extractMapKeyType(propMetadata);
@@ -181,7 +182,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                     if (!hints.getKeyProviders().isEmpty()) {
                         logger.log(FINER, "Key providers for {0}:", mapProp);
                         for (ValueProvider vp : hints.getKeyProviders()) {
-                            logger.log(FINER, "{0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
+                            logger.log(FINER, "  {0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
                             sbs.getHintProvider(vp.getName()).provide(vp.getParameters(), propMetadata, key, completionResultSet,
                                     startOffset + mapProp.length() + 1, caretOffset);
                         }
@@ -200,7 +201,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             }
         }
         final long elapsed = System.currentTimeMillis() - mark;
-        logger.log(FINER, "Name completion of ''{0}'' took: {1} msecs", new Object[]{filter, elapsed});
+        logger.log(FINE, "Name completion of ''{0}'' took: {1} msecs", new Object[]{filter, elapsed});
     }
 
     // Create a completion result list of properties values based on a property name, filter string and document offsets.
@@ -300,14 +301,14 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             if (!hints.getValueProviders().isEmpty()) {
                 logger.log(FINER, "Value providers for {0}:", propName);
                 for (ValueProvider vp : hints.getValueProviders()) {
-                    logger.log(FINER, "{0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
+                    logger.log(FINER, "  {0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
                     sbs.getHintProvider(vp.getName()).provide(vp.getParameters(), propMeta, filter, completionResultSet,
                             startOffset, caretOffset);
                 }
             }
         }
         final long elapsed = System.currentTimeMillis() - mark;
-        logger.log(FINER, "Value completion of ''{0}'' on ''{1}'' took: {2} msecs", new Object[]{filter, propName, elapsed});
+        logger.log(FINE, "Value completion of ''{0}'' on ''{1}'' took: {2} msecs", new Object[]{filter, propName, elapsed});
     }
 
     private void completeValueEnum(String dataType, String filter, CompletionResultSet completionResultSet, int startOffset,

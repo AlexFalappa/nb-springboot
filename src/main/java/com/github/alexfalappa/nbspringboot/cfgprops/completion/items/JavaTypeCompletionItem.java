@@ -19,6 +19,8 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.lang.model.element.ElementKind;
 import javax.swing.ImageIcon;
@@ -38,12 +40,13 @@ import org.openide.util.Exceptions;
 /**
  * The implementation of {@code CompletionItem} representing Java packages or types.
  * <p>
- * Used in logger name class reference and handle-ase provider results. The icon is based on the provided {@code ElementKind}.
+ * Used in logger name class reference and handle-as provider results. The icon is based on the provided {@code ElementKind}.
  *
  * @author Alessandro Falappa
  */
 public class JavaTypeCompletionItem implements CompletionItem {
 
+    private static final Logger logger = Logger.getLogger(JavaTypeCompletionItem.class.getName());
     private final String name;
     private final ElementKind elementKind;
     private final int dotOffset;
@@ -67,6 +70,7 @@ public class JavaTypeCompletionItem implements CompletionItem {
 
     @Override
     public void defaultAction(JTextComponent jtc) {
+        logger.log(Level.FINER, "Accepted java type completion: {0} {1}", new Object[]{elementKind.toString(), name});
         try {
             StyledDocument doc = (StyledDocument) jtc.getDocument();
             // calculate the amount of chars to remove (by default from dot up to caret position)
@@ -106,6 +110,9 @@ public class JavaTypeCompletionItem implements CompletionItem {
 
     @Override
     public void processKeyEvent(KeyEvent evt) {
+        if (evt.getKeyChar() == '.') {
+            logger.log(Level.FINER, "Fun stop on {0}", name);
+        }
         // detect if Ctrl + Enter is pressed
         overwrite = evt.getKeyCode() == KeyEvent.VK_ENTER && (evt.getModifiers() & KeyEvent.CTRL_MASK) != 0;
     }

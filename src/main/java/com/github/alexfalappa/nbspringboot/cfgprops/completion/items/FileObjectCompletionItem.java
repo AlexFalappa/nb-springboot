@@ -19,29 +19,23 @@ import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.event.KeyEvent;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
-import javax.swing.ImageIcon;
-import javax.swing.JToolTip;
 import javax.swing.UIManager;
-import javax.swing.filechooser.FileSystemView;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
 import org.netbeans.api.editor.completion.Completion;
 import org.netbeans.spi.editor.completion.CompletionItem;
-import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.netbeans.spi.editor.completion.CompletionTask;
-import org.netbeans.spi.editor.completion.support.AsyncCompletionQuery;
-import org.netbeans.spi.editor.completion.support.AsyncCompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 
-import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
 
 /**
@@ -51,11 +45,11 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
  */
 public class FileObjectCompletionItem implements CompletionItem {
 
+    private static final Logger logger = Logger.getLogger(FileObjectCompletionItem.class.getName());
     private final int caretOffset;
     private final FileObject fileObj;
     private final int dotOffset;
     private boolean overwrite;
-    private final static FileSystemView fsView = FileSystemView.getFileSystemView();
 
     public FileObjectCompletionItem(FileObject fileObj, int dotOffset, int caretOffset) {
         this.fileObj = fileObj;
@@ -73,6 +67,7 @@ public class FileObjectCompletionItem implements CompletionItem {
 
     @Override
     public void defaultAction(JTextComponent jtc) {
+        logger.log(Level.FINER, "Accepted file object completion: {0}", FileUtil.getFileDisplayName(fileObj));
         try {
             StyledDocument doc = (StyledDocument) jtc.getDocument();
             // calculate the amount of chars to remove (by default from dot up to caret position)
@@ -102,13 +97,14 @@ public class FileObjectCompletionItem implements CompletionItem {
             }
             // remove characters from dot then insert new text
             doc.remove(dotOffset, lenToRemove);
-            StringBuilder sb = new StringBuilder(getText());
             if (fileObj.isFolder() && !fileObj.isRoot()) {
-                sb.append('/');
+                logger.log(Level.FINER, "Adding equal sign and continuing completion");
+                doc.insertString(dotOffset, getText().concat("/"), null);
+            } else {
+                logger.log(Level.FINER, "Finish completion with no added chars");
+                doc.insertString(dotOffset, getText(), null);
+                Completion.get().hideAll();
             }
-            doc.insertString(dotOffset, sb.toString(), null);
-            // close the code completion box
-            Completion.get().hideAll();
         } catch (BadLocationException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -141,15 +137,7 @@ public class FileObjectCompletionItem implements CompletionItem {
 
     @Override
     public CompletionTask createToolTipTask() {
-        return new AsyncCompletionTask(new AsyncCompletionQuery() {
-            @Override
-            protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                JToolTip toolTip = new JToolTip();
-                toolTip.setTipText("Press Enter to insert \"" + getText() + "\"");
-                completionResultSet.setToolTip(toolTip);
-                completionResultSet.finish();
-            }
-        });
+        return null;
     }
 
     @Override
