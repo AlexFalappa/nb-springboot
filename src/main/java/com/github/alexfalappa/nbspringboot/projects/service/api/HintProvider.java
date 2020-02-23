@@ -27,7 +27,7 @@ import org.springframework.boot.configurationmetadata.ConfigurationMetadataPrope
  */
 public interface HintProvider {
 
-    void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter,
+    void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter, boolean isKey,
             CompletionResultSet completionResultSet, int dotOffset, int caretOffset);
 
 }

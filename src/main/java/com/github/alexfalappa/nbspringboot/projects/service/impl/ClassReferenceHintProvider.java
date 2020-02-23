@@ -53,7 +53,7 @@ public class ClassReferenceHintProvider implements HintProvider {
     }
 
     @Override
-    public void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter,
+    public void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter, boolean isKey,
             CompletionResultSet completionResultSet, int dotOffset, int caretOffset) {
         if (filter == null) {
             filter = "";

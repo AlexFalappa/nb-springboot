@@ -36,13 +36,13 @@ public class HandleAsHintProvider implements HintProvider {
     private ClassPath cpExec = null;
     private final FileObject resourcesFolder;
 
-    public HandleAsHintProvider(FileObject resourcesFolder,ClassPath cpExec) {
+    public HandleAsHintProvider(FileObject resourcesFolder, ClassPath cpExec) {
         this.resourcesFolder = resourcesFolder;
         this.cpExec = cpExec;
     }
 
     @Override
-    public void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter,
+    public void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter, boolean isKey,
             CompletionResultSet completionResultSet, int dotOffset, int caretOffset) {
         // target parameter is mandatory
         if (!params.containsKey("target")) {

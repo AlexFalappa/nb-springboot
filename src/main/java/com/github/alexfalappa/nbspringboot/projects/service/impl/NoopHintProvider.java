@@ -30,7 +30,7 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 public class NoopHintProvider implements HintProvider {
 
     @Override
-    public void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter,
+    public void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter, boolean isKey,
             CompletionResultSet completionResultSet, int dotOffset, int caretOffset) {
         // purposefully do nothing
     }

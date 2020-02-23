@@ -50,7 +50,7 @@ public class LoggerNameHintProvider implements HintProvider {
     }
 
     @Override
-    public void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter,
+    public void provide(Map<String, Object> params, ConfigurationMetadataProperty propMetadata, String filter, boolean isKey,
             CompletionResultSet completionResultSet, int dotOffset, int caretOffset) {
         if (filter == null) {
             return;
@@ -60,7 +60,7 @@ public class LoggerNameHintProvider implements HintProvider {
         for (String name : packageNames) {
             // skip default package (empty string)
             if (!name.isEmpty()) {
-                completionResultSet.addItem(new JavaTypeCompletionItem(name, ElementKind.PACKAGE, dotOffset, caretOffset));
+                completionResultSet.addItem(new JavaTypeCompletionItem(name, ElementKind.PACKAGE, dotOffset, caretOffset, isKey));
             }
         }
         // fill in types
@@ -79,7 +79,7 @@ public class LoggerNameHintProvider implements HintProvider {
             if (!matcher.matches()) {
                 final String name = binaryName.substring(binaryName.lastIndexOf('.') + 1);
                 completionResultSet.addItem(new JavaTypeCompletionItem(name, type.getKind(),
-                        dotOffset + packageFilter.length() + 1, caretOffset));
+                        dotOffset + packageFilter.length() + 1, caretOffset, isKey));
             }
         }
     }
