@@ -41,6 +41,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.doc.CfgPropValueCompletionDocumentation;
 
 /**
@@ -71,7 +72,7 @@ public class KeyCompletionItem implements CompletionItem {
     }
 
     public String getText() {
-        return hint.getValue().toString();
+        return Utils.simpleHtmlEscape(hint.getValue().toString());
     }
 
     public String getTextRight() {
@@ -107,10 +108,10 @@ public class KeyCompletionItem implements CompletionItem {
             doc.remove(dotOffset, lenToRemove);
             if (equalSignIndex < 0 && colonIndex < 0) {
                 logger.log(Level.FINER, "Adding equal sign and continuing completion");
-                doc.insertString(dotOffset, getText().concat("="), null);
+                doc.insertString(dotOffset, hint.getValue().toString().concat("="), null);
             } else {
                 logger.log(Level.FINER, "Finish completion with no added chars");
-                doc.insertString(dotOffset, getText(), null);
+                doc.insertString(dotOffset, hint.getValue().toString(), null);
                 Completion.get().hideAll();
             }
         } catch (BadLocationException ex) {
@@ -168,12 +169,12 @@ public class KeyCompletionItem implements CompletionItem {
 
     @Override
     public CharSequence getSortText() {
-        return getText();
+        return hint.getValue().toString();
     }
 
     @Override
     public CharSequence getInsertPrefix() {
-        return getText();
+        return hint.getValue().toString();
     }
 
 }

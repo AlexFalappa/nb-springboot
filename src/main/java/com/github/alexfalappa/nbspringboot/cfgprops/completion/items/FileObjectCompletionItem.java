@@ -36,7 +36,7 @@ import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
 
-import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
+import com.github.alexfalappa.nbspringboot.projects.service.impl.HintSupport;
 
 /**
  * The implementation of {@code CompletionItem} for file objects.
@@ -97,11 +97,15 @@ public class FileObjectCompletionItem implements CompletionItem {
             }
             // remove characters from dot then insert new text
             doc.remove(dotOffset, lenToRemove);
-            if (fileObj.isFolder() && !fileObj.isRoot()) {
-                logger.log(Level.FINER, "Adding equal sign and continuing completion");
+            if (fileObj.isRoot()) {
+                // TODO test on Windows
+                logger.log(Level.FINER, "Adding filesystem root and continuing completion");
+                doc.insertString(dotOffset, getText(), null);
+            } else if (fileObj.isFolder()) {
+                logger.log(Level.FINER, "Adding folder and continuing completion");
                 doc.insertString(dotOffset, getText().concat("/"), null);
             } else {
-                logger.log(Level.FINER, "Finish completion with no added chars");
+                logger.log(Level.FINER, "Adding file and finishing completion");
                 doc.insertString(dotOffset, getText(), null);
                 Completion.get().hideAll();
             }

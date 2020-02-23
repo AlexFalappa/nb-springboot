@@ -26,6 +26,7 @@ import javax.lang.model.element.ElementKind;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
@@ -52,12 +53,18 @@ public class JavaTypeCompletionItem implements CompletionItem {
     private final int dotOffset;
     private final int caretOffset;
     private boolean overwrite;
+    private boolean isKeyCompletion;
 
     public JavaTypeCompletionItem(String name, ElementKind elementKind, int dotOffset, int caretOffset) {
+        this(name, elementKind, dotOffset, caretOffset, false);
+    }
+
+    public JavaTypeCompletionItem(String name, ElementKind elementKind, int dotOffset, int caretOffset, boolean isKeyCompletion) {
         this.name = name;
         this.dotOffset = dotOffset;
         this.caretOffset = caretOffset;
         this.elementKind = elementKind;
+        this.isKeyCompletion = isKeyCompletion;
     }
 
     public String getText() {
@@ -100,9 +107,14 @@ public class JavaTypeCompletionItem implements CompletionItem {
             }
             // remove characters from dot then insert new text
             doc.remove(dotOffset, lenToRemove);
-            doc.insertString(dotOffset, getText(), null);
-            // close the code completion box
-            Completion.get().hideAll();
+            if (isKeyCompletion) {
+                // insert and continue completion
+                doc.insertString(dotOffset, name.concat("="), null);
+            } else {
+                // insert and close the code completion box
+                doc.insertString(dotOffset, name, null);
+                Completion.get().hideAll();
+            }
         } catch (BadLocationException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -110,8 +122,20 @@ public class JavaTypeCompletionItem implements CompletionItem {
 
     @Override
     public void processKeyEvent(KeyEvent evt) {
-        if (evt.getKeyChar() == '.') {
-            logger.log(Level.FINER, "Fun stop on {0}", name);
+        if (evt.getID() == KeyEvent.KEY_TYPED && evt.getKeyChar() == '.' && elementKind == ElementKind.PACKAGE) {
+            logger.log(Level.FINER, "Accepting package ''{0}'' and continuing completion", name);
+            Completion.get().hideDocumentation();
+            Completion.get().hideCompletion();
+            JTextComponent tc = (JTextComponent) evt.getSource();
+            Document doc = tc.getDocument();
+            try {
+                doc.remove(dotOffset, caretOffset - dotOffset);
+                doc.insertString(dotOffset, name.concat("."), null);
+            } catch (BadLocationException ble) {
+                //ignore
+            }
+            Completion.get().showCompletion();
+            evt.consume();
         }
         // detect if Ctrl + Enter is pressed
         overwrite = evt.getKeyCode() == KeyEvent.VK_ENTER && (evt.getModifiers() & KeyEvent.CTRL_MASK) != 0;

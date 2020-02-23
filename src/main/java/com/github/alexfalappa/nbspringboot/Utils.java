@@ -64,7 +64,7 @@ import org.springframework.boot.configurationmetadata.ValueHint;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.FileObjectCompletionItem;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
 import com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel;
-import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
+import com.github.alexfalappa.nbspringboot.projects.service.impl.HintSupport;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
@@ -96,13 +96,14 @@ public final class Utils {
     }
 
     /**
-     * Simplistic escape of angled brackets in the given string.
+     * Simplistic escape of ampersand and angled brackets in the given string.
      *
      * @param text the string to escape
      * @return escaped string
      */
     public static String simpleHtmlEscape(String text) {
-        return text.replace("<", "&lt;").replace(">", "&gt;");
+        // order of replacements matters
+        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     /**
@@ -318,6 +319,7 @@ public final class Utils {
     public static void completeSpringResource(FileObject resourcesFolder, String filter, CompletionResultSet completionResultSet,
             int dotOffset, int caretOffset) {
         if (filter.startsWith(PREFIX_CLASSPATH)) {
+            // classpath resource
             String resFilter = filter.substring(PREFIX_CLASSPATH.length());
             int startOffset = dotOffset + PREFIX_CLASSPATH.length();
             String filePart = resFilter;
@@ -336,9 +338,11 @@ public final class Utils {
                 }
             }
         } else if (filter.startsWith(PREFIX_FILE)) {
+            // filesystem resource
             String fileFilter = filter.substring(PREFIX_FILE.length());
             int startOffset = dotOffset + PREFIX_FILE.length();
             if (fileFilter.isEmpty()) {
+                // special case: filesystem root
                 Iterable<Path> rootDirs = FileSystems.getDefault().getRootDirectories();
                 for (Path rootDir : rootDirs) {
                     FileObject foRoot = FileUtil.toFileObject(rootDir.toFile());
@@ -375,7 +379,8 @@ public final class Utils {
         } else {
             for (String rp : resourcePrefixes) {
                 if (rp.contains(filter)) {
-                    completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(rp), dotOffset, caretOffset));
+                    completionResultSet.addItem(new ValueCompletionItem(Utils.createHint(rp), dotOffset, caretOffset,
+                            rp.equals(PREFIX_CLASSPATH) || rp.equals(PREFIX_FILE)));
                 }
             }
         }

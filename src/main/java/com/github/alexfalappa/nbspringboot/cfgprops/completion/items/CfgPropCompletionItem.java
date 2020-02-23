@@ -41,6 +41,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.openide.util.NbPreferences;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
+import org.springframework.boot.configurationmetadata.Hints;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
@@ -131,28 +132,35 @@ public class CfgPropCompletionItem implements CompletionItem {
                     .getBoolean(PrefConstants.PREF_ARRAY_NOTATION, false);
             final boolean needEqualSign = !(overwrite && equalSignIndex >= 0);
             StringBuilder sb = new StringBuilder(getText());
-            boolean closeCompletion = true;
+            boolean continueCompletion = false;
             int goBack = 0;
             if (dataType.contains("Map")) {
                 sb.append(".");
-                closeCompletion = false;
-            } else if (isSequence && preferArray) {
-                sb.append("[]");
-                goBack = 1;
-                if (needEqualSign) {
-                    sb.append("=");
-                    goBack++;
+                continueCompletion = canCompleteKey();
+            } else if (isSequence) {
+                if (preferArray) {
+                    sb.append("[]");
+                    goBack = 1;
+                    if (needEqualSign) {
+                        sb.append("=");
+                        goBack++;
+                    }
+                } else {
+                    if (needEqualSign) {
+                        sb.append("=");
+                        continueCompletion = canCompleteValue();
+                    }
                 }
             } else if (needEqualSign) {
                 sb.append("=");
-                closeCompletion = false;
+                continueCompletion = canCompleteValue();
             }
             doc.insertString(propStartOffset, sb.toString(), null);
             if (goBack != 0) {
                 jtc.setCaretPosition(jtc.getCaretPosition() - goBack);
             }
-            // close the code completion box
-            if (closeCompletion) {
+            // optinally close the code completion box
+            if (!continueCompletion) {
                 Completion.get().hideAll();
             }
         } catch (BadLocationException ex) {
@@ -219,6 +227,63 @@ public class CfgPropCompletionItem implements CompletionItem {
     @Override
     public CharSequence getInsertPrefix() {
         return getText();
+    }
+
+    private boolean canCompleteKey() {
+        final Hints hints = configurationMeta.getHints();
+        if (hints == null) {
+            return false;
+        }
+        if (!hints.getKeyHints().isEmpty()) {
+            return true;
+        }
+        if (!hints.getKeyProviders().isEmpty()) {
+            return true;
+        }
+        return isCompletableType();
+    }
+
+    private boolean canCompleteValue() {
+        final Hints hints = configurationMeta.getHints();
+        if (hints == null) {
+            return false;
+        }
+        if (!hints.getValueHints().isEmpty()) {
+            return true;
+        }
+        if (!hints.getValueProviders().isEmpty()) {
+            return true;
+        }
+        return isCompletableType();
+    }
+
+    private boolean isCompletableType() {
+        final String dataType = configurationMeta.getType();
+        switch (dataType) {
+            case "java.lang.Boolean":
+            case "java.nio.charset.Charset":
+            case "java.util.Locale":
+            case "org.springframework.core.io.Resource":
+            case "org.springframework.util.MimeType":
+            case "java.util.List<java.lang.Boolean>":
+            case "java.util.Set<java.lang.Boolean>":
+            case "java.util.List<org.springframework.core.io.Resource>":
+            case "java.util.Set<org.springframework.core.io.Resource>":
+            case "java.util.List<java.nio.charset.Charset>":
+            case "java.util.Set<java.nio.charset.Charset>":
+            case "java.util.List<java.util.Locale>":
+            case "java.util.Set<java.util.Locale>":
+                return true;
+            default:
+// TODO try to interpret the targetType as an enum
+//                try {
+//                    Object[] enumvals = cp.getClassLoader(true).loadClass(dataType).getEnumConstants();
+//                    return enumvals != null;
+//                } catch (ClassNotFoundException ex) {
+//                    return false;
+//                }
+        }
+        return false;
     }
 
 }

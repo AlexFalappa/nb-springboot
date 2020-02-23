@@ -23,7 +23,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import javax.swing.ImageIcon;
-import javax.swing.JToolTip;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -42,6 +41,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.ImageUtilities;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.doc.CfgPropValueCompletionDocumentation;
 
 /**
@@ -60,11 +60,17 @@ public class ValueCompletionItem implements CompletionItem {
     private final int caretOffset;
     private final int dotOffset;
     private boolean overwrite;
+    private boolean continueCompletion;
 
     public ValueCompletionItem(ValueHint hint, int dotOffset, int caretOffset) {
+        this(hint, dotOffset, caretOffset, false);
+    }
+
+    public ValueCompletionItem(ValueHint hint, int dotOffset, int caretOffset, boolean continueCompletion) {
         this.hint = hint;
         this.dotOffset = dotOffset;
         this.caretOffset = caretOffset;
+        this.continueCompletion = continueCompletion;
     }
 
     public ValueHint getHint() {
@@ -72,7 +78,7 @@ public class ValueCompletionItem implements CompletionItem {
     }
 
     public String getText() {
-        return hint.getValue().toString();
+        return Utils.simpleHtmlEscape(hint.getValue().toString());
     }
 
     public String getTextRight() {
@@ -111,9 +117,11 @@ public class ValueCompletionItem implements CompletionItem {
             }
             // remove characters from dot then insert new text
             doc.remove(dotOffset, lenToRemove);
-            doc.insertString(dotOffset, getText(), null);
+            doc.insertString(dotOffset, hint.getValue().toString(), null);
             // close the code completion box
-            Completion.get().hideAll();
+            if (!continueCompletion) {
+                Completion.get().hideAll();
+            }
         } catch (BadLocationException ex) {
             Exceptions.printStackTrace(ex);
         }
@@ -133,8 +141,9 @@ public class ValueCompletionItem implements CompletionItem {
     @Override
     public void render(Graphics g, Font defaultFont, Color defaultColor, Color backgroundColor, int width, int height,
             boolean selected) {
-        CompletionUtilities.renderHtml(fieldIcon, getText(), getTextRight(), g, defaultFont, (selected ? UIManager.getColor(
-                "List.selectionForeground") : UIManager.getColor("List.foreground")), width, height, selected);
+        CompletionUtilities.renderHtml(fieldIcon, getText(), getTextRight(), g, defaultFont,
+                (selected ? UIManager.getColor("List.selectionForeground") : UIManager.getColor("List.foreground")),
+                width, height, selected);
     }
 
     @Override
@@ -154,15 +163,7 @@ public class ValueCompletionItem implements CompletionItem {
 
     @Override
     public CompletionTask createToolTipTask() {
-        return new AsyncCompletionTask(new AsyncCompletionQuery() {
-            @Override
-            protected void query(CompletionResultSet completionResultSet, Document document, int i) {
-                JToolTip toolTip = new JToolTip();
-                toolTip.setTipText("Press Enter to insert \"" + getText() + "\"");
-                completionResultSet.setToolTip(toolTip);
-                completionResultSet.finish();
-            }
-        });
+        return null;
     }
 
     @Override
@@ -177,12 +178,12 @@ public class ValueCompletionItem implements CompletionItem {
 
     @Override
     public CharSequence getSortText() {
-        return getText();
+        return hint.getValue().toString();
     }
 
     @Override
     public CharSequence getInsertPrefix() {
-        return getText();
+        return hint.getValue().toString();
     }
 
 }

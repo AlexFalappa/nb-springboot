@@ -45,8 +45,8 @@ import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.CfgPropCompletionItem;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.KeyCompletionItem;
 import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
-import com.github.alexfalappa.nbspringboot.projects.service.api.HintSupport;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
+import com.github.alexfalappa.nbspringboot.projects.service.impl.HintSupport;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_ERROR_SHOW;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_DEPR_SORT_LAST;
@@ -183,8 +183,8 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                         logger.log(FINER, "Key providers for {0}:", mapProp);
                         for (ValueProvider vp : hints.getKeyProviders()) {
                             logger.log(FINER, "  {0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
-                            sbs.getHintProvider(vp.getName()).provide(vp.getParameters(), propMetadata, key, completionResultSet,
-                                    startOffset + mapProp.length() + 1, caretOffset);
+                            sbs.getHintProvider(vp.getName()).provide(vp.getParameters(), propMetadata, key, true,
+                                    completionResultSet, startOffset + mapProp.length() + 1, caretOffset);
                         }
                     }
                 }
@@ -220,6 +220,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 if (idx > 0) {
                     startOffset = startOffset + idx + 1;
                     filter = filter.substring(idx + 1);
+                    filterLowcase = filter.toLowerCase();
                 }
             }
             // check if data type or map value type is boolean
@@ -302,8 +303,8 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
                 logger.log(FINER, "Value providers for {0}:", propName);
                 for (ValueProvider vp : hints.getValueProviders()) {
                     logger.log(FINER, "  {0} - params: {1}", new Object[]{vp.getName(), vp.getParameters()});
-                    sbs.getHintProvider(vp.getName()).provide(vp.getParameters(), propMeta, filter, completionResultSet,
-                            startOffset, caretOffset);
+                    sbs.getHintProvider(vp.getName()).provide(vp.getParameters(), propMeta, filter, false,
+                            completionResultSet, startOffset, caretOffset);
                 }
             }
         }
