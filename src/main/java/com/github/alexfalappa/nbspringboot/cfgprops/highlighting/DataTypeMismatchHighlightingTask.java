@@ -27,6 +27,7 @@ import javax.swing.text.Document;
 import org.apache.commons.lang.LocaleUtils;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.project.Project;
+import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
@@ -80,7 +81,7 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
     }
 
     @Override
-    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document,
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, BaseDocument document,
             List<ErrorDescription> errors, Severity severity) {
         logger.fine("Highlighting data type mismatches");
         final Project prj = Utils.getActiveProject();

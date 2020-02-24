@@ -19,8 +19,8 @@ import java.util.List;
 import java.util.logging.Level;
 
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 
+import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.parsing.spi.ParseException;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
@@ -66,7 +66,7 @@ public class SyntaxErrorHighlightingTask extends BaseHighlightingTask {
     }
 
     @Override
-    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document,
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, BaseDocument document,
             List<ErrorDescription> errors, Severity severity) {
         logger.fine("Highlighting syntax errors");
         try {
