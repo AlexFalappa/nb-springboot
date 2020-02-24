@@ -26,13 +26,13 @@ import javax.lang.model.element.ElementKind;
 import javax.swing.ImageIcon;
 import javax.swing.UIManager;
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import javax.swing.text.Element;
 import javax.swing.text.JTextComponent;
 import javax.swing.text.StyledDocument;
 
 import org.netbeans.api.editor.completion.Completion;
 import org.netbeans.api.java.source.ui.ElementIcons;
+import org.netbeans.editor.BaseDocument;
 import org.netbeans.spi.editor.completion.CompletionItem;
 import org.netbeans.spi.editor.completion.CompletionTask;
 import org.netbeans.spi.editor.completion.support.CompletionUtilities;
@@ -127,13 +127,18 @@ public class JavaTypeCompletionItem implements CompletionItem {
             Completion.get().hideDocumentation();
             Completion.get().hideCompletion();
             JTextComponent tc = (JTextComponent) evt.getSource();
-            Document doc = tc.getDocument();
-            try {
-                doc.remove(dotOffset, caretOffset - dotOffset);
-                doc.insertString(dotOffset, name.concat("."), null);
-            } catch (BadLocationException ble) {
-                //ignore
-            }
+            BaseDocument doc = (BaseDocument) tc.getDocument();
+            doc.runAtomic(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        doc.remove(dotOffset, caretOffset - dotOffset);
+                        doc.insertString(dotOffset, name.concat("."), null);
+                    } catch (BadLocationException ble) {
+                        //ignore
+                    }
+                }
+            });
             Completion.get().showCompletion();
             evt.consume();
         }
@@ -171,7 +176,7 @@ public class JavaTypeCompletionItem implements CompletionItem {
 
     @Override
     public int getSortPriority() {
-        return elementKind == ElementKind.PACKAGE ? 2 : 1;
+        return elementKind == ElementKind.PACKAGE ? 1 : 2;
     }
 
     @Override
