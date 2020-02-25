@@ -98,7 +98,6 @@ public class FileObjectCompletionItem implements CompletionItem {
             // remove characters from dot then insert new text
             doc.remove(dotOffset, lenToRemove);
             if (fileObj.isRoot()) {
-                // TODO test on Windows
                 logger.log(Level.FINER, "Adding filesystem root and continuing completion");
                 doc.insertString(dotOffset, getText(), null);
             } else if (fileObj.isFolder()) {
