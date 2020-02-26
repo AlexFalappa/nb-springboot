@@ -66,6 +66,7 @@ import static java.util.logging.Level.FINE;
 })
 @Messages("CTL_RestartAction=S&pring Boot Restart")
 public final class RestartAction implements ActionListener {
+
     /*
  * NOTE: an alternative way to obtain an action that operates on the currently active project is using
  * ProjectSensitiveActions.projectSensitiveAction(...) from projectuiapi module as indicated by Jan Lahoda on
@@ -75,10 +76,8 @@ public final class RestartAction implements ActionListener {
 
     public static final String TRIGGER_FILE = ".nbRestartTrigger";
     private static final Logger logger = Logger.getLogger(RestartAction.class.getName());
-    private final DataObject unused;
 
     public RestartAction(DataObject context) {
-        this.unused = context;
     }
 
     @Override

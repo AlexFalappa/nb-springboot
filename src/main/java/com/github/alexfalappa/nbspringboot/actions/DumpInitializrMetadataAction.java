@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.projects.initializr;
+package com.github.alexfalappa.nbspringboot.actions;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -34,6 +34,8 @@ import org.openide.NotifyDescriptor;
 import org.openide.awt.ActionID;
 import org.openide.awt.ActionReference;
 import org.openide.awt.ActionRegistration;
+import org.openide.awt.StatusDisplayer;
+import org.openide.loaders.DataObject;
 import org.openide.util.Exceptions;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.WindowManager;
@@ -45,7 +47,7 @@ import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 /**
- * Debug action to dump Spring Initializr metadata to a CSV file.
+ * Debug action to dump Spring Boot configuration properties metadata to a CSV file.
  *
  * @author Alessandro Falappa
  */
@@ -60,39 +62,52 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 @Messages("CTL_DumpInitializrMetadataAction=Dump Initializr Metadata")
 public final class DumpInitializrMetadataAction implements ActionListener {
 
+    public DumpInitializrMetadataAction(DataObject context) {
+    }
+
     @Override
     public void actionPerformed(ActionEvent e) {
-        try {
-            JFileChooser jfc = new JFileChooser();
-            jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-            jfc.setAcceptAllFileFilterUsed(false);
-            jfc.setFileFilter(new FileNameExtensionFilter("CSV files", "csv"));
-            if (JFileChooser.APPROVE_OPTION == jfc.showSaveDialog(WindowManager.getDefault().getMainWindow())) {
-                Path path = jfc.getSelectedFile().toPath();
-                if (path != null) {
-                    final String fileName = path.getFileName().toString();
-                    if (!fileName.endsWith(".csv")) {
-                        path = path.getParent().resolve(fileName.concat(".csv"));
-                    }
-                    if (Files.exists(path)) {
-                        Object ret = DialogDisplayer.getDefault().notify(new NotifyDescriptor.Confirmation("OK to overwrite?"));
-                        if (!NotifyDescriptor.OK_OPTION.equals(ret)) {
-                            return;
+        final StatusDisplayer stDisp = StatusDisplayer.getDefault();
+        Project prj = Utils.getActiveProject();
+        SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
+        if (sbs != null) {
+            try {
+                // prepare file chooser
+                JFileChooser jfc = new JFileChooser();
+                jfc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+                jfc.setAcceptAllFileFilterUsed(false);
+                jfc.setFileFilter(new FileNameExtensionFilter("CSV files", "csv"));
+                // as for file to save
+                if (JFileChooser.APPROVE_OPTION == jfc.showSaveDialog(WindowManager.getDefault().getMainWindow())) {
+                    Path path = jfc.getSelectedFile().toPath();
+                    if (path != null) {
+                        // check filename ends with ".csv"
+                        final String fileName = path.getFileName().toString();
+                        if (!fileName.endsWith(".csv")) {
+                            path = path.getParent().resolve(fileName.concat(".csv"));
                         }
-                    }
-                    Project prj = Utils.getActiveProject();
-                    SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
-                    if (sbs != null) {
-                        convertToCsv(sbs, path);
+                        // check/ask to overwrite existing file
+                        if (Files.exists(path)) {
+                            Object ret = DialogDisplayer.getDefault()
+                                    .notify(new NotifyDescriptor.Confirmation("OK to overwrite?"));
+                            if (!NotifyDescriptor.OK_OPTION.equals(ret)) {
+                                return;
+                            }
+                        }
+                        // do actual dump
+                        dumpToCsv(sbs, path);
+                        stDisp.setStatusText("Metadata dumped");
                     }
                 }
+            } catch (Exception ex) {
+                Exceptions.printStackTrace(ex);
             }
-        } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+        } else {
+            stDisp.setStatusText("Selected project is not a Spring Boot project");
         }
     }
 
-    private void convertToCsv(SpringBootService sbs, Path path) {
+    private void dumpToCsv(SpringBootService sbs, Path path) {
         try (BufferedWriter bw = Files.newBufferedWriter(path);
                 PrintWriter pw = new PrintWriter(bw)) {
             pw.println("Name,DataType,"
@@ -101,6 +116,7 @@ public final class DumpInitializrMetadataAction implements ActionListener {
                     + "Default");
             for (String name : new TreeSet<>(sbs.getPropertyNames())) {
                 ConfigurationMetadataProperty cfg = sbs.getPropertyMetadata(name);
+                // skip deprecated properties
                 if (cfg.isDeprecated()) {
                     continue;
                 }
@@ -125,6 +141,8 @@ public final class DumpInitializrMetadataAction implements ActionListener {
                         valueProvider = vp.getName();
                         valueProviderParams = vp.getParameters().toString();
                     }
+                } else {
+                    System.out.format("%s has null hints object%n", name);
                 }
                 String defaultValue = "";
                 final Object def = cfg.getDefaultValue();
