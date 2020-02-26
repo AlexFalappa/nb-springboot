@@ -1,10 +1,13 @@
 # Changelog
 
 -  **Unreleased**
+    -  Action to dump Spring Boot configuration properties metadata to a CSV file (mostly useful for debugging)
+    -  All completions add missing chars and continue when sensible
+	-  Java completion in logger name accepts package by pressing dot key
     -  Updated project content for Basic Spring Boot project wizard
 	-  Improved and updated code generator to inject a Spring Boot setup into a `pom.xml` file
 	-  Badge added on maven projects icon in Projects view for projects with Spring Boot dependencies (based on contribution by Hector Espert)
-    -  Fixes to logger name completion provider
+    -  Fixes to logger name completion provider and configuration properties highlighters
     -  Upgrade of internal dependencies
     -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/16?closed=1)
 
