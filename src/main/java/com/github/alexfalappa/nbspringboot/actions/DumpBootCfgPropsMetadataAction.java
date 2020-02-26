@@ -59,10 +59,10 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
         displayName = "#CTL_DumpInitializrMetadataAction"
 )
 @ActionReference(path = "Menu/Tools", position = 1800, separatorBefore = 1750)
-@Messages("CTL_DumpInitializrMetadataAction=Dump Initializr Metadata")
-public final class DumpInitializrMetadataAction implements ActionListener {
+@Messages("CTL_DumpInitializrMetadataAction=Dump Spring Boot Metadata")
+public final class DumpBootCfgPropsMetadataAction implements ActionListener {
 
-    public DumpInitializrMetadataAction(DataObject context) {
+    public DumpBootCfgPropsMetadataAction(DataObject context) {
     }
 
     @Override
