@@ -248,8 +248,8 @@ public class SpringBootServiceImpl implements SpringBootService {
             // populate hint providers map
             FileObject resourcesFolder = Utils.resourcesFolderForProj(mvnPrj);
             providerMap.put("logger-name", new LoggerNameHintProvider(resourcesFolder));
-            providerMap.put("class-reference", new ClassReferenceHintProvider(resourcesFolder, cpExec));
-            providerMap.put("handle-as", new HandleAsHintProvider(resourcesFolder,cpExec));
+            providerMap.put("class-reference", new ClassReferenceHintProvider(mvnPrj.getProjectDirectory(), cpExec));
+            providerMap.put("handle-as", new HandleAsHintProvider(resourcesFolder, cpExec));
             // build configuration properties maps
             updateConfigRepo();
         }

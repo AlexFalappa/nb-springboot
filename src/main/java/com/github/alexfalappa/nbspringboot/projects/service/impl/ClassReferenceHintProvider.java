@@ -47,8 +47,8 @@ public class ClassReferenceHintProvider implements HintProvider {
     private final ClassIndex classIndex;
     private final ClassPath cpExec;
 
-    public ClassReferenceHintProvider(FileObject resourcesFolder, ClassPath cpExec) {
-        this.classIndex = ClasspathInfo.create(resourcesFolder).getClassIndex();
+    public ClassReferenceHintProvider(FileObject referenceFolder, ClassPath cpExec) {
+        this.classIndex = ClasspathInfo.create(referenceFolder).getClassIndex();
         this.cpExec = cpExec;
     }
 
