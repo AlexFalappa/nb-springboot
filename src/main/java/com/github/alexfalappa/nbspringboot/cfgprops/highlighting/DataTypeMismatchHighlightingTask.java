@@ -36,6 +36,7 @@ import org.openide.util.Exceptions;
 import org.springframework.boot.bind.RelaxedNames;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.convert.DurationStyle;
+import org.springframework.boot.convert.PeriodStyle;
 import org.springframework.util.ClassUtils;
 import org.springframework.util.unit.DataSize;
 
@@ -206,6 +207,9 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                                 return true;
                             case "java.time.Duration":
                                 DurationStyle.detectAndParse(text);
+                                return true;
+                            case "java.time.Period":
+                                PeriodStyle.detectAndParse(text);
                                 return true;
                             case "org.springframework.util.unit.DataSize":
                                 DataSize.parse(text);
