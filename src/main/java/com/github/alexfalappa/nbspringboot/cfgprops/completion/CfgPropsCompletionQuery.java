@@ -65,6 +65,7 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
     private static final Pattern PATTERN_MAPKEY_DATATYPE = Pattern.compile("java.util.Map<([^,]+),.*>");
     private static final Pattern PATTERN_MAPVALUE_DATATYPE = Pattern.compile("java.util.Map<.*,(.*)>");
     private static final Pattern PATTERN_NUMBER_UNIT = Pattern.compile("\\d+(\\w*)");
+    private static final Map<String, String> PERIOD_SUFFIXES = new HashMap<>();
     private static final Map<String, String> DURATION_SUFFIXES = new HashMap<>();
     private static final Map<String, String> DATASIZE_SUFFIXES = new HashMap<>();
     private final SpringBootService sbs;
@@ -72,6 +73,10 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
     private final FileObject resourcesFolder;
 
     static {
+        PERIOD_SUFFIXES.put("y", "years");
+        PERIOD_SUFFIXES.put("m", "months");
+        PERIOD_SUFFIXES.put("w", "weeks");
+        PERIOD_SUFFIXES.put("d", "days");
         DURATION_SUFFIXES.put("ns", "nanoseconds");
         DURATION_SUFFIXES.put("us", "microseconds");
         DURATION_SUFFIXES.put("ms", "milliseconds");
@@ -272,6 +277,15 @@ public class CfgPropsCompletionQuery extends AsyncCompletionQuery {
             if (m.matches()) {
                 String unitPart = m.group(1).toLowerCase();
                 final int newStartOffset = startOffset + filter.length() - unitPart.length();
+                // if data type is java.time.Period offer simple form suffixes
+                if (propType.equals("java.time.Period")) {
+                    for (Map.Entry<String, String> entry : PERIOD_SUFFIXES.entrySet()) {
+                        if (entry.getKey().toLowerCase().startsWith(unitPart)) {
+                            completionResultSet.addItem(new ValueCompletionItem(
+                                    Utils.createHint(entry.getKey(), entry.getValue()), newStartOffset, caretOffset));
+                        }
+                    }
+                }
                 // if data type is java.time.Duration offer simple form suffixes
                 if (propType.equals("java.time.Duration")) {
                     for (Map.Entry<String, String> entry : DURATION_SUFFIXES.entrySet()) {
