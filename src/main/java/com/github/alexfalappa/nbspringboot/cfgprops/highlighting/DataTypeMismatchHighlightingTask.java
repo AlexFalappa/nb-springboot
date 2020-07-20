@@ -48,6 +48,8 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 import com.github.drapostolos.typeparser.TypeParser;
 
 import static java.util.regex.Pattern.compile;
+import org.springframework.boot.convert.ApplicationConversionService;
+import org.springframework.core.convert.TypeDescriptor;
 
 /**
  * Highlighting task for data type mismatch in configuration properties values.
@@ -59,6 +61,7 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
     private final Pattern pOneGenTypeArg = compile("([^<>]+)<(.+)>");
     private final Pattern pTwoGenTypeArgs = compile("([^<>]+)<(.+),(.+)>");
     private final TypeParser parser = TypeParser.newBuilder().enablePropertyEditor().build();
+    private final ApplicationConversionService conversionService = new ApplicationConversionService();
 
     @Override
     protected String getHighlightPrefName() {
@@ -175,52 +178,68 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
     }
 
     private boolean checkType(String type, String text, ClassLoader cl) throws IllegalArgumentException {
-        Class<?> clazz = ClassUtils.resolveClassName(type, cl);
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(type);
+        } catch (ClassNotFoundException ex) {
+            clazz = ClassUtils.resolveClassName(type, cl);
+        }
         if (clazz != null) {
-            try {
-                parser.parseType(text, clazz);
-            } catch (Exception e1) {
-                if (clazz.isEnum()) {
-                    // generate and try relaxed variants of value
-                    for (String relaxedName : new RelaxedNames(text)) {
-                        try {
-                            parser.parseType(relaxedName, clazz);
-                            return true;
-                        } catch (Exception e2) {
-                            // try another variant
-                        }
-                        if (canceled) {
-                            break;
-                        }
-                    }
-                    return false;
+            try{
+                Object obj = conversionService.convert(text, TypeDescriptor.forObject(text), TypeDescriptor.valueOf(clazz));
+                if (obj!=null) {
+                    System.out.println(obj.toString());
                 } else {
-                    try {
-                        // handle a few specific cases where no direct constructor from string or converter exist
-                        switch (type) {
-                            case "java.nio.file.Path":
-                                Paths.get(text);
-                                return true;
-                            case "java.util.Locale":
-                                LocaleUtils.toLocale(text);
-                                return true;
-                            case "java.time.Duration":
-                                DurationStyle.detectAndParse(text);
-                                return true;
-                            case "org.springframework.util.unit.DataSize":
-                                DataSize.parse(text);
-                                return true;
-                            case "java.lang.Class":
-                                cl.loadClass(text);
-                                return true;
-                            default:
-                                return false;
-                        }
-                    } catch (Exception e3) {
-                        return false;
-                    }
+                    System.out.println("Null object returned");
                 }
+                return obj!=null;
+            }catch(Exception ex){
+                return false;
             }
+//            try {
+//                parser.parseType(text, clazz);
+//            } catch (Exception ignored) {
+//                if (clazz.isEnum()) {
+//                    // generate and try relaxed variants of value
+//                    for (String relaxedName : new RelaxedNames(text)) {
+//                        try {
+//                            parser.parseType(relaxedName, clazz);
+//                            return true;
+//                        } catch (Exception e2) {
+//                            // try another variant
+//                        }
+//                        if (canceled) {
+//                            break;
+//                        }
+//                    }
+//                    return false;
+//                } else {
+//                    try {
+//                        // handle a few specific cases where no direct constructor from string or converter exist
+//                        switch (type) {
+//                            case "java.nio.file.Path":
+//                                Paths.get(text);
+//                                return true;
+//                            case "java.util.Locale":
+//                                LocaleUtils.toLocale(text);
+//                                return true;
+//                            case "java.time.Duration":
+//                                DurationStyle.detectAndParse(text);
+//                                return true;
+//                            case "org.springframework.util.unit.DataSize":
+//                                DataSize.parse(text);
+//                                return true;
+//                            case "java.lang.Class":
+//                                cl.loadClass(text);
+//                                return true;
+//                            default:
+//                                return false;
+//                        }
+//                    } catch (Exception e3) {
+//                        return false;
+//                    }
+//                }
+//            }
         }
         // unresolvable/unknown class, assume user knows what is doing
         return true;
