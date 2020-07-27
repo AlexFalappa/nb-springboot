@@ -15,7 +15,6 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -24,7 +23,6 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-import org.apache.commons.lang.LocaleUtils;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.project.Project;
 import org.netbeans.editor.BaseDocument;
@@ -33,11 +31,8 @@ import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Exceptions;
-import org.springframework.boot.bind.RelaxedNames;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
-import org.springframework.boot.convert.DurationStyle;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.unit.DataSize;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
@@ -45,7 +40,6 @@ import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
-import com.github.drapostolos.typeparser.TypeParser;
 
 import static java.util.regex.Pattern.compile;
 import org.springframework.boot.convert.ApplicationConversionService;
@@ -60,7 +54,6 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
 
     private final Pattern pOneGenTypeArg = compile("([^<>]+)<(.+)>");
     private final Pattern pTwoGenTypeArgs = compile("([^<>]+)<(.+),(.+)>");
-    private final TypeParser parser = TypeParser.newBuilder().enablePropertyEditor().build();
     private final ApplicationConversionService conversionService = new ApplicationConversionService();
 
     @Override
@@ -191,7 +184,7 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
         }
         if (clazz != null) {
             try {
-                Object obj = conversionService.convert(text, TypeDescriptor.forObject(text), TypeDescriptor.valueOf(clazz));
+                Object obj = conversionService.convert(text, TypeDescriptor.valueOf(String.class), TypeDescriptor.valueOf(clazz));
                 return obj != null;
             } catch (Exception ex) {
                 return false;

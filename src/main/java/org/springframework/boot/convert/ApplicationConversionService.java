@@ -120,6 +120,7 @@ public class ApplicationConversionService extends FormattingConversionService {
 		registry.addConverter(new NumberToDataSizeConverter());
 		registry.addConverter(new StringToFileConverter());
 		registry.addConverter(new InputStreamSourceToByteArrayConverter());
+		registry.addConverter(new StringToPathConverter());
 		registry.addConverterFactory(new LenientStringToEnumConverterFactory());
 		registry.addConverterFactory(new LenientBooleanToEnumConverterFactory());
 	}
