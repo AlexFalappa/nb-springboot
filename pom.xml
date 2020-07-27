@@ -53,11 +53,6 @@
             <artifactId>parboiled-java</artifactId>
             <version>1.1.8</version>
         </dependency>
-        <dependency>
-            <groupId>com.github.drapostolos</groupId>
-            <artifactId>type-parser</artifactId>
-            <version>0.6.0</version>
-        </dependency>
         <!--NetBeans Platform dependencies-->
         <dependency>
             <groupId>org.netbeans.api</groupId>
