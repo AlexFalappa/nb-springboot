@@ -15,7 +15,6 @@
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.highlighting;
 
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.regex.Matcher;
@@ -24,7 +23,6 @@ import java.util.regex.Pattern;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-import org.apache.commons.lang.LocaleUtils;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.project.Project;
 import org.netbeans.editor.BaseDocument;
@@ -33,11 +31,8 @@ import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
 import org.netbeans.spi.editor.hints.Severity;
 import org.openide.util.Exceptions;
-import org.springframework.boot.bind.RelaxedNames;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
-import org.springframework.boot.convert.DurationStyle;
 import org.springframework.util.ClassUtils;
-import org.springframework.util.unit.DataSize;
 
 import com.github.alexfalappa.nbspringboot.PrefConstants;
 import com.github.alexfalappa.nbspringboot.Utils;
@@ -45,9 +40,10 @@ import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
-import com.github.drapostolos.typeparser.TypeParser;
 
 import static java.util.regex.Pattern.compile;
+import org.springframework.boot.convert.ApplicationConversionService;
+import org.springframework.core.convert.TypeDescriptor;
 
 /**
  * Highlighting task for data type mismatch in configuration properties values.
@@ -58,7 +54,7 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
 
     private final Pattern pOneGenTypeArg = compile("([^<>]+)<(.+)>");
     private final Pattern pTwoGenTypeArgs = compile("([^<>]+)<(.+),(.+)>");
-    private final TypeParser parser = TypeParser.newBuilder().enablePropertyEditor().build();
+    private final ApplicationConversionService conversionService = new ApplicationConversionService();
 
     @Override
     protected String getHighlightPrefName() {
@@ -96,47 +92,52 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                     final String pName = key.getText();
                     final String pValue = value != null ? value.getText() : "";
                     ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
-                    if (cfgMeta != null) {
-                        try {
-                            final String type = cfgMeta.getType();
-                            if (type.contains("<")) {
-                                // maps
-                                Matcher mMap = pTwoGenTypeArgs.matcher(type);
-                                if (mMap.matches() && mMap.groupCount() == 3) {
-                                    String keyType = mMap.group(2);
-                                    check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, key, errors, cl,
-                                            severity);
-                                    String valueType = mMap.group(3);
-                                    check(valueType, pValue, document, value, errors, cl, severity);
-                                }
-                                // collections
-                                Matcher mColl = pOneGenTypeArg.matcher(type);
-                                if (mColl.matches() && mColl.groupCount() == 2) {
-                                    String genericType = mColl.group(2);
-                                    if (pValue.contains(",")) {
-                                        for (String val : pValue.split("\\s*,\\s*")) {
-                                            check(genericType, val, document, value, errors, cl, severity);
-                                        }
-                                    } else {
-                                        check(genericType, pValue, document, value, errors, cl, severity);
-                                    }
-                                }
-                            } else {
-                                if (pValue.contains(",") && type.endsWith("[]")) {
+                    if (cfgMeta == null) {
+                        continue;
+                    }
+                    try {
+                        final String type = cfgMeta.getType();
+                        // type is null for deprecated configuration properties
+                        if (type == null) {
+                            continue;
+                        }
+                        if (type.contains("<")) {
+                            // maps
+                            Matcher mMap = pTwoGenTypeArgs.matcher(type);
+                            if (mMap.matches() && mMap.groupCount() == 3) {
+                                String keyType = mMap.group(2);
+                                check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, key, errors, cl,
+                                        severity);
+                                String valueType = mMap.group(3);
+                                check(valueType, pValue, document, value, errors, cl, severity);
+                            }
+                            // collections
+                            Matcher mColl = pOneGenTypeArg.matcher(type);
+                            if (mColl.matches() && mColl.groupCount() == 2) {
+                                String genericType = mColl.group(2);
+                                if (pValue.contains(",")) {
                                     for (String val : pValue.split("\\s*,\\s*")) {
-                                        check(type.substring(0, type.length() - 2), val, document, value, errors, cl, severity);
+                                        check(genericType, val, document, value, errors, cl, severity);
                                     }
                                 } else {
-                                    if (type.endsWith("[]")) {
-                                        check(type.substring(0, type.length() - 2), pValue, document, value, errors, cl, severity);
-                                    } else {
-                                        check(type, pValue, document, value, errors, cl, severity);
-                                    }
+                                    check(genericType, pValue, document, value, errors, cl, severity);
                                 }
                             }
-                        } catch (BadLocationException ex) {
-                            Exceptions.printStackTrace(ex);
+                        } else {
+                            if (pValue.contains(",") && type.endsWith("[]")) {
+                                for (String val : pValue.split("\\s*,\\s*")) {
+                                    check(type.substring(0, type.length() - 2), val, document, value, errors, cl, severity);
+                                }
+                            } else {
+                                if (type.endsWith("[]")) {
+                                    check(type.substring(0, type.length() - 2), pValue, document, value, errors, cl, severity);
+                                } else {
+                                    check(type, pValue, document, value, errors, cl, severity);
+                                }
+                            }
                         }
+                    } catch (BadLocationException ex) {
+                        Exceptions.printStackTrace(ex);
                     }
                     if (canceled) {
                         break;
@@ -175,51 +176,18 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
     }
 
     private boolean checkType(String type, String text, ClassLoader cl) throws IllegalArgumentException {
-        Class<?> clazz = ClassUtils.resolveClassName(type, cl);
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(type);
+        } catch (ClassNotFoundException ex) {
+            clazz = ClassUtils.resolveClassName(type, cl);
+        }
         if (clazz != null) {
             try {
-                parser.parseType(text, clazz);
-            } catch (Exception e1) {
-                if (clazz.isEnum()) {
-                    // generate and try relaxed variants of value
-                    for (String relaxedName : new RelaxedNames(text)) {
-                        try {
-                            parser.parseType(relaxedName, clazz);
-                            return true;
-                        } catch (Exception e2) {
-                            // try another variant
-                        }
-                        if (canceled) {
-                            break;
-                        }
-                    }
-                    return false;
-                } else {
-                    try {
-                        // handle a few specific cases where no direct constructor from string or converter exist
-                        switch (type) {
-                            case "java.nio.file.Path":
-                                Paths.get(text);
-                                return true;
-                            case "java.util.Locale":
-                                LocaleUtils.toLocale(text);
-                                return true;
-                            case "java.time.Duration":
-                                DurationStyle.detectAndParse(text);
-                                return true;
-                            case "org.springframework.util.unit.DataSize":
-                                DataSize.parse(text);
-                                return true;
-                            case "java.lang.Class":
-                                cl.loadClass(text);
-                                return true;
-                            default:
-                                return false;
-                        }
-                    } catch (Exception e3) {
-                        return false;
-                    }
-                }
+                Object obj = conversionService.convert(text, TypeDescriptor.valueOf(String.class), TypeDescriptor.valueOf(clazz));
+                return obj != null;
+            } catch (Exception ex) {
+                return false;
             }
         }
         // unresolvable/unknown class, assume user knows what is doing

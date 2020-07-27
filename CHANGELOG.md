@@ -1,6 +1,7 @@
 # Changelog
 
 -  **Unreleased**
+    -  Support of `java.time.Period` configuration properties in completion and data type mismatch highlighting (new feature in Spring Boot 2.3.x)
     -  Action to dump Spring Boot configuration properties metadata to a CSV file (mostly useful for debugging)
     -  All completions add missing chars and continue when sensible
 	-  Java completion in logger name accepts package by pressing dot key

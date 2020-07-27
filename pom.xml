@@ -14,14 +14,20 @@
         <netbeans.api.version>RELEASE82</netbeans.api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <skipTests>true</skipTests>
-        <spring.framework.version>5.2.0.RELEASE</spring.framework.version>
+        <spring.framework.version>5.2.7.RELEASE</spring.framework.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-metadata</artifactId>
-            <version>2.2.0.RELEASE</version>
+            <version>2.3.1.RELEASE</version>
+        </dependency>
+        <dependency>
+            <!--Became a runtime dependency but runtime deps are not included in NBM-->
+            <groupId>com.vaadin.external.google</groupId>
+            <artifactId>android-json</artifactId>
+            <version>0.0.20131108.vaadin1</version>
         </dependency>
         <dependency>
             <groupId>org.springframework</groupId>
@@ -46,17 +52,12 @@
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.10.0</version>
+            <version>2.11.0</version>
         </dependency>
         <dependency>
             <groupId>org.parboiled</groupId>
             <artifactId>parboiled-java</artifactId>
             <version>1.1.8</version>
-        </dependency>
-        <dependency>
-            <groupId>com.github.drapostolos</groupId>
-            <artifactId>type-parser</artifactId>
-            <version>0.6.0</version>
         </dependency>
         <!--NetBeans Platform dependencies-->
         <dependency>
