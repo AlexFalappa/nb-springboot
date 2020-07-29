@@ -30,6 +30,7 @@ public class UtilsTest {
     
     @Test
     public void testSimpleHtmlEscape() {
+        System.out.println("simpleHtmlEscape");
         String result = Utils.simpleHtmlEscape("<p>STRING</p>");
         String expected = "&lt;p&gt;STRING&lt;/p&gt;";
         assertEquals(expected, result);
@@ -40,6 +41,7 @@ public class UtilsTest {
      */
     @Test
     public void testVmOptsFromPrefs() {
+        System.out.println("vmOptsFromPrefs");
         String expResult = "-noverify -XX:TieredStopAtLevel=1 ";
         String result = Utils.vmOptsFromPrefs();
         assertEquals(expResult, result);
@@ -50,12 +52,15 @@ public class UtilsTest {
      */
     @Test
     public void testIsErrorDeprecated() {
+        System.out.println("isErrorDeprecated");
         ConfigurationMetadataProperty meta = new ConfigurationMetadataProperty();
         assertFalse(Utils.isErrorDeprecated(meta));
+
         Deprecation deprecation = new Deprecation();
         deprecation.setLevel(Deprecation.Level.WARNING);
         meta.setDeprecation(deprecation);
         assertFalse(Utils.isErrorDeprecated(meta));
+
         deprecation.setLevel(Deprecation.Level.ERROR);
         meta.setDeprecation(deprecation);
         assertTrue(Utils.isErrorDeprecated(meta));

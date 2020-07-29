@@ -167,11 +167,11 @@ public class DependencyToggleBox extends javax.swing.JPanel {
         }
     }
 
-    public void adaptToBootVersion(String bootVersion) {
+    public void adaptToBootVersion(String bootVersion, ArtifactVersion artifactBootVersion) {
         currentBootVersion = bootVersion;
         String verRange = (String) this.getClientProperty(PROP_VERSION_RANGE);
         String description = (String) this.getClientProperty(PROP_DESCRIPTION);
-        final boolean allowable = allowable(verRange, bootVersion);
+        final boolean allowable = allowable(verRange, artifactBootVersion);
         chDep.setEnabled(allowable);
         lDesc.setText(prepDescription(description, allowable, verRange));
     }
@@ -265,11 +265,9 @@ public class DependencyToggleBox extends javax.swing.JPanel {
         bGuide.putClientProperty(PROP_GUIDE_TEMPLATE_URL, url);
     }
 
-    private boolean allowable(String verRange, String bootVersion) {
-        boolean ret = true;
+    private boolean allowable(String verRange, ArtifactVersion bootVersion) {
         if (verRange != null && !verRange.isEmpty()) {
-            if (verRange.indexOf('[') >= 0 || verRange.indexOf('(') >= 0
-                    || verRange.indexOf(']') >= 0 || verRange.indexOf(')') >= 0) {
+            if (verRange.indexOf('[') >= 0 || verRange.indexOf('(') >= 0 || verRange.indexOf(']') >= 0 || verRange.indexOf(')') >= 0) {
                 // bounded range
                 String[] bounds = verRange.substring(1, verRange.length() - 1).split(",");
                 // check there are two bounds
@@ -277,25 +275,28 @@ public class DependencyToggleBox extends javax.swing.JPanel {
                     return false;
                 }
                 // test various cases
-                if (bootVersion.compareTo(bounds[0]) > 0 && bootVersion.compareTo(bounds[1]) < 0) {
+                ArtifactVersion lower = ArtifactVersion.of(bounds[0]);
+                ArtifactVersion upper = ArtifactVersion.of(bounds[1]);
+                if (bootVersion.compareTo(lower) > 0 && bootVersion.compareTo(upper) < 0) {
                     return true;
-                } else if (bootVersion.compareTo(bounds[0]) == 0 && verRange.startsWith("[")) {
+                } else if (bootVersion.compareTo(lower) == 0 && verRange.startsWith("[")) {
                     return true;
-                } else if (bootVersion.compareTo(bounds[0]) == 0 && verRange.startsWith("(")) {
+                } else if (bootVersion.compareTo(lower) == 0 && verRange.startsWith("(")) {
                     return false;
-                } else if (bootVersion.compareTo(bounds[1]) == 0 && verRange.endsWith("]")) {
+                } else if (bootVersion.compareTo(upper) == 0 && verRange.endsWith("]")) {
                     return true;
-                } else if (bootVersion.compareTo(bounds[1]) == 0 && verRange.endsWith(")")) {
+                } else if (bootVersion.compareTo(upper) == 0 && verRange.endsWith(")")) {
                     return false;
                 } else {
                     return false;
                 }
             } else {
                 // unbounded range
-                return bootVersion.compareTo(verRange) >= 0;
+                ArtifactVersion bound = ArtifactVersion.of(verRange);
+                return bootVersion.compareTo(bound) >= 0;
             }
         }
-        return ret;
+        return true;
     }
 
     private String prepDescription(String description, boolean allowable, String versRange) {

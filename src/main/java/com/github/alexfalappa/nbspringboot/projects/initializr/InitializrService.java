@@ -86,7 +86,7 @@ public class InitializrService {
                     PrefConstants.DEFAULT_INITIALIZR_URL);
             RequestEntity<Void> req = RequestEntity
                     .get(new URI(serviceUrl))
-                    .accept(MediaType.valueOf("application/vnd.initializr.v2.1+json"))
+                    .accept(MediaType.valueOf("application/vnd.initializr.v2.2+json"))
                     .header("User-Agent", REST_USER_AGENT)
                     .build();
             // connect

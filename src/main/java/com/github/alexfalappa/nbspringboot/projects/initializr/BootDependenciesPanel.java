@@ -301,9 +301,12 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     // End of variables declaration//GEN-END:variables
 
     void adaptToBootVersion(String bootVersion) {
+        // replace BUILD-SNAPSHOT with SNAPSHOT to make dev versions more recent
+        // than milestones (Mx), release candidates (RCx) and releases (RELEASE)
+        ArtifactVersion bootArtifactVersion=ArtifactVersion.of(bootVersion.replace("BUILD-SNAPSHOT", "SNAPSHOT"));
         for (List<DependencyToggleBox> dtbList : toggleBoxesMap.values()) {
             for (DependencyToggleBox dtb : dtbList) {
-                dtb.adaptToBootVersion(bootVersion);
+                dtb.adaptToBootVersion(bootVersion,bootArtifactVersion);
             }
         }
     }
