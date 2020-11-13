@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,6 +21,11 @@ import org.openide.WizardDescriptor;
 import org.openide.util.ChangeSupport;
 import org.openide.util.HelpCtx;
 
+/**
+ * Wizard descriptor for new reactive repository file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public class ReactRepoWizardPanel1 implements WizardDescriptor.Panel<WizardDescriptor> {
 
     private WizardDescriptor wizardDescriptor;

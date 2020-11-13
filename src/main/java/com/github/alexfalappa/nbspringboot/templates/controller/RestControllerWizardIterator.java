@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,11 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGO
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_FRAMEWORK;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.ICON_SPRING_CLASS;
 
+/**
+ * Wizard Iterator for new RestController class file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = FOLDER_SPRING_FRAMEWORK,
         iconBase = ICON_SPRING_CLASS,

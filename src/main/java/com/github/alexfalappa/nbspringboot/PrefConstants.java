@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Alessandro Falappa.
+ * Copyright 2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,6 +35,7 @@ public final class PrefConstants {
     public static final String PREF_HLIGHT_LEV_DTMISMATCH = "nbspringboot.highlight-level.data-type-mismatches";
     public static final String PREF_HLIGHT_LEV_UNKNOWN = "nbspringboot.highlight-level.unknown-props";
     public static final String PREF_HLIGHT_LEV_DEPRECATED = "nbspringboot.highlight-level.deprecated-props";
+    public static final String PREF_ARRAY_NOTATION = "nbspringboot.completion.arraynotation";
 
     public static final String DEFAULT_INITIALIZR_URL = "https://start.spring.io";
 

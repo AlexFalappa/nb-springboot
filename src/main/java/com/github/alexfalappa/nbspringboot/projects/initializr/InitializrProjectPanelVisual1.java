@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,6 +51,11 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_PACKAGING;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_VERSION;
 
+/**
+ * Options panel for first step in Spring Boot Initializr project wizard.
+ *
+ * @author Alessandro Falappa
+ */
 public class InitializrProjectPanelVisual1 extends JPanel implements DocumentListener, AsyncGUIJob {
 
     public static final String PROP_PROJECT_NAME = "projectName";

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Alessandro Falappa.
+ * Copyright 2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import java.util.prefs.Preferences;
 
-import javax.swing.text.Document;
-
+import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.parsing.spi.ParserResultTask;
 import org.netbeans.modules.parsing.spi.Scheduler;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
@@ -49,12 +48,14 @@ public abstract class BaseHighlightingTask extends ParserResultTask<CfgPropsPars
         final Preferences prefs = NbPreferences.forModule(PrefConstants.class);
         final int sevLevel = prefs.getInt(getHighlightPrefName(), getHighlightDefaultValue());
         List<ErrorDescription> errors = new ArrayList<>();
-        final Document document = cfgResult.getSnapshot().getSource().getDocument(false);
+        final BaseDocument document = (BaseDocument) cfgResult.getSnapshot().getSource().getDocument(false);
         if (document != null) {
             // skip error calculation if preference set to "None"
             if (sevLevel > 0) {
                 Severity severity = decodeSeverity(sevLevel);
+                document.readLock();
                 internalRun(cfgResult, se, document, errors, severity);
+                document.readUnlock();
             }
             HintsController.setErrors(document, getErrorLayerName(), errors);
         }
@@ -79,7 +80,8 @@ public abstract class BaseHighlightingTask extends ParserResultTask<CfgPropsPars
 
     protected abstract String getErrorLayerName();
 
-    protected abstract void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity);
+    protected abstract void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, BaseDocument document,
+            List<ErrorDescription> errors, Severity severity);
 
     private Severity decodeSeverity(int level) {
         switch (level) {

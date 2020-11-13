@@ -1,6 +1,32 @@
 # Changelog
 
--  **2.0.1** (July 2018): Polishing
+-  **3.1** (July 2020): Refinements
+    -  Single column layout of Spring Boot Dependencies in Initializr wizard and _Add Spring Boot Dependencies_ dialog
+    -  Support of `java.time.Period` configuration properties in completion and data type mismatch highlighting (new feature in Spring Boot 2.3.x)
+    -  Action to dump Spring Boot configuration properties metadata to a CSV file (mostly useful for debugging)
+    -  All completions add missing chars and continue when sensible
+    -  Java completion in logger name accepts package by pressing dot key
+    -  Updated project content for Basic Spring Boot project wizard
+    -  Improved and updated code generator to inject a Spring Boot setup into a `pom.xml` file
+    -  Badge added on maven projects icon in Projects view for projects with Spring Boot dependencies (based on contribution by Hector Espert)
+    -  Fixes to logger name completion provider and configuration properties highlighters
+    -  Upgrade of internal dependencies
+    -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/16?closed=1)
+
+-  **3.0** (Oct 2019): Completion galore
+    -  Minimum required NetBeans version is now **8.2**, minimum required JDK version is now **8**
+    -  Configuration properties completion enhanced:
+        - Logger name, class reference and handle-as value providers are now supported
+        - Proposals for properties whose data type is a Java enumeration, Java boolean, Spring Resource, Charset and Locale
+        - Proposals from map key hints
+        - Proposals for properties of data type List, Set and Map according to contained type
+        - Implemented *Show Method Parameters* (`Ctrl+P`) to show data type of property under cursor in a tooltip
+        - Implemented *Show Documentation* (`Ctrl+Shift+Space Bar`) to show the documentation popup of property under cursor
+    -  New option to prefer array notation in completion
+    -  Upgrade of internal dependencies
+    -  [List of closed issues](https://github.com/AlexFalappa/nb-springboot/milestone/14?closed=1)
+
+-  **2.0.1** (Jul 2018): Polishing
     -  Use HTTPS protocol when contacting Spring Initializr service
     -  New Java files code template for command line runner beans
     -  Improved Spring Boot Restart action enablement and logic

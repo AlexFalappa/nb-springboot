@@ -21,6 +21,10 @@ limitations under the License.
             <attr name="displayName" stringvalue="Spring Boot"/>
             <attr name="position" intvalue="805"/>
         </folder>
+        <folder name="springframework">
+            <attr name="displayName" stringvalue="Spring Framework"/>
+            <attr name="position" intvalue="810"/>
+        </folder>
     </folder>
 
     <folder name="Editors">

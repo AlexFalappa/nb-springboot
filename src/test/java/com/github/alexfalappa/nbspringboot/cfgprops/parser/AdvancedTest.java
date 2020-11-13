@@ -16,7 +16,8 @@ public class AdvancedTest extends TestBase {
     @Test
     public void testSingleEqualContinuation() throws URISyntaxException, IOException {
         System.out.println("\n-- single equal continuation");
-        parseMatch("key=val\\\non next line");
+        parseMatch("key=val\\\n"
+                + "on next line");
     }
 
     @Test

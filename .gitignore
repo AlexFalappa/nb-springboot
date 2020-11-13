@@ -24,5 +24,4 @@ buildNumber.properties
 
 ### NBM signing ###
 /keystore.jks
-/nbactions.xml
 /nbproject/

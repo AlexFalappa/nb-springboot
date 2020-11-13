@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@ import java.util.List;
 import javax.swing.table.AbstractTableModel;
 
 /**
- * An editable {@link JTable} model holding {@link CfgOverride} objects.
+ * An editable {@code JTable} model holding {@link CfgOverride} objects.
  * <p>
  * Backed by a {@link LinkedList}.
  *

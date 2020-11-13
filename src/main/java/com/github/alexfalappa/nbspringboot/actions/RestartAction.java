@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,11 +46,10 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 
 import static java.util.logging.Level.FINE;
 
-/*
- * NOTE: an alternative way to obtain an action that operates on the currently active project is using
- * ProjectSensitiveActions.projectSensitiveAction(...) from projectuiapi module as indicated by Jan Lahoda on
- * Apache NetBeans devs mailing lists:
- * http://mail-archives.apache.org/mod_mbox/netbeans-dev/201807.mbox/%3CCALd%3D3dEa815Kik-cgZ6Cdymwnqd6FELruJoLesALxJac1SmofA%40mail.gmail.com%3E
+/**
+ * Project action for restarting Spring Boot application when launched with Dev Tools.
+ *
+ * @author Alessandro Falappa
  */
 @ActionID(
         category = "Build",
@@ -61,19 +60,24 @@ import static java.util.logging.Level.FINE;
         displayName = "#CTL_RestartAction"
 )
 @ActionReferences({
-    @ActionReference(path = "Menu/BuildProject", position = 57)
-    ,@ActionReference(path = "Toolbars/Build", position = 500)
-    ,@ActionReference(path = "Shortcuts", name = "DS-A")
+    @ActionReference(path = "Menu/BuildProject", position = 57),
+    @ActionReference(path = "Toolbars/Build", position = 500),
+    @ActionReference(path = "Shortcuts", name = "DS-A")
 })
 @Messages("CTL_RestartAction=S&pring Boot Restart")
 public final class RestartAction implements ActionListener {
 
+    /*
+ * NOTE: an alternative way to obtain an action that operates on the currently active project is using
+ * ProjectSensitiveActions.projectSensitiveAction(...) from projectuiapi module as indicated by Jan Lahoda on
+ * Apache NetBeans devs mailing lists:
+ * http://mail-archives.apache.org/mod_mbox/netbeans-dev/201807.mbox/%3CCALd%3D3dEa815Kik-cgZ6Cdymwnqd6FELruJoLesALxJac1SmofA%40mail.gmail.com%3E
+     */
+
     public static final String TRIGGER_FILE = ".nbRestartTrigger";
     private static final Logger logger = Logger.getLogger(RestartAction.class.getName());
-    private final DataObject unused;
 
     public RestartAction(DataObject context) {
-        this.unused = context;
     }
 
     @Override

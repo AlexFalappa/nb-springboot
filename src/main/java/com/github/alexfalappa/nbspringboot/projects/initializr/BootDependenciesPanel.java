@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static javax.swing.SwingConstants.HORIZONTAL;
 
 /**
- * Specialized scrollable panel to manage a list of checkboxes groups each containing two columns of checkboxes.
+ * Specialized scrollable panel to manage a list of checkboxes groups each containing a column of {@code DependencyToggleBox}es.
  * <p>
  * The panel is dynamically filled processing a JSON tree received from the Spring Initializr REST service.
  *
@@ -117,19 +117,15 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             grpLabels.add(lGroup);
             this.add(lGroup, constraintsForGroupLabel(true));
             // prepare frequently used dependencies checkboxes
-            int columnCounter = 0;
             for (int i = 0; i < nodeNum; i++) {
                 JsonNode gn = depArray.get(i);
-                // starter checkboxes in two columns
                 final JsonNode valArray = gn.path("values");
                 for (int j = 0; j < valArray.size(); j++) {
                     JsonNode dn = valArray.get(j);
                     final String id = dn.path("id").asText();
                     if (freqDepsSet.contains(id)) {
                         // distribute on 2 columns
-                        this.add(toggleBoxForNode(LABEL_FREQUENTLY_USED, dn),
-                                (columnCounter % 2 == 0) ? constraintsForFirstColumn() : constraintsForSecondColumn());
-                        columnCounter++;
+                        this.add(toggleBoxForNode(LABEL_FREQUENTLY_USED, dn), constraintsForDepCheckbox());
                     }
                 }
             }
@@ -145,18 +141,13 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             lGroup.setFont(lGroup.getFont().deriveFont(Font.BOLD, lGroup.getFont().getSize() + 2));
             grpLabels.add(lGroup);
             this.add(lGroup, constraintsForGroupLabel(i == 0 && freqDepsSet.isEmpty()));
-            // starter checkboxes in two columns
+            // starter checkboxes
             final JsonNode valArray = gn.path("values");
-            int columnCounter = 0;
             for (int j = 0; j < valArray.size(); j++) {
-                // first column
                 JsonNode dn = valArray.get(j);
                 final String id = dn.path("id").asText();
                 if (!freqDepsSet.contains(id)) {
-                    // depending on column
-                    this.add(toggleBoxForNode(groupName, dn),
-                            (columnCounter % 2 == 0) ? constraintsForFirstColumn() : constraintsForSecondColumn());
-                    columnCounter++;
+                    this.add(toggleBoxForNode(groupName, dn), constraintsForDepCheckbox());
                 }
             }
         }
@@ -220,7 +211,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     public Dimension getPreferredScrollableViewportSize() {
         Dimension size = getPreferredSize();
         if (initialized) {
-            size = new Dimension(size.width, size.height / 8);
+            size = new Dimension(size.width, size.height / 24);
         }
         return size;
     }
@@ -263,29 +254,18 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         DependencyToggleBox dtb = new DependencyToggleBox();
         dtb.initFromMetadata(dn);
         if (!toggleBoxesMap.containsKey(group)) {
-            toggleBoxesMap.put(group, new ArrayList<DependencyToggleBox>());
+            toggleBoxesMap.put(group, new ArrayList<>());
         }
         toggleBoxesMap.get(group).add(dtb);
         return dtb;
     }
 
-    private GridBagConstraints constraintsForFirstColumn() {
+    private GridBagConstraints constraintsForDepCheckbox() {
         GridBagConstraints gbc;
         gbc = new java.awt.GridBagConstraints();
-        gbc.gridx = 0;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(INNER_GAP, INDENT, 0, 0);
-        gbc.anchor = GridBagConstraints.LINE_START;
-        return gbc;
-    }
-
-    private GridBagConstraints constraintsForSecondColumn() {
-        GridBagConstraints gbc;
-        gbc = new java.awt.GridBagConstraints();
-        gbc.gridx = 1;
         gbc.gridwidth = GridBagConstraints.REMAINDER;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.insets = new Insets(INNER_GAP, INDENT, 0, 0);
+        gbc.insets = new Insets(INNER_GAP, INDENT, 0, OUTER_GAP);
         gbc.anchor = GridBagConstraints.LINE_START;
         return gbc;
     }
@@ -321,9 +301,12 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
     // End of variables declaration//GEN-END:variables
 
     void adaptToBootVersion(String bootVersion) {
+        // replace BUILD-SNAPSHOT with SNAPSHOT to make dev versions more recent
+        // than milestones (Mx), release candidates (RCx) and releases (RELEASE)
+        ArtifactVersion bootArtifactVersion=ArtifactVersion.of(bootVersion.replace("BUILD-SNAPSHOT", "SNAPSHOT"));
         for (List<DependencyToggleBox> dtbList : toggleBoxesMap.values()) {
             for (DependencyToggleBox dtb : dtbList) {
-                dtb.adaptToBootVersion(bootVersion);
+                dtb.adaptToBootVersion(bootVersion,bootArtifactVersion);
             }
         }
     }
@@ -339,13 +322,8 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             List<DependencyToggleBox> dtbList = cbFilter(lGroup.getText(), text);
             if (!dtbList.isEmpty()) {
                 this.add(lGroup, constraintsForGroupLabel(cg++ == 0));
-                int cd = 1;
                 for (DependencyToggleBox dtb : dtbList) {
-                    if (cd++ % 2 == 0) {
-                        this.add(dtb, constraintsForSecondColumn());
-                    } else {
-                        this.add(dtb, constraintsForFirstColumn());
-                    }
+                    this.add(dtb, constraintsForDepCheckbox());
                 }
             }
         }
@@ -355,9 +333,11 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
 
     private List<DependencyToggleBox> cbFilter(String group, String text) {
         ArrayList<DependencyToggleBox> ret = new ArrayList<>();
-        for (DependencyToggleBox dtb : toggleBoxesMap.get(group)) {
-            if (text == null || dtb.getText().toLowerCase().contains(text)) {
-                ret.add(dtb);
+        if (toggleBoxesMap.containsKey(group)) {
+            for (DependencyToggleBox dtb : toggleBoxesMap.get(group)) {
+                if (text == null || dtb.getText().toLowerCase().contains(text)) {
+                    ret.add(dtb);
+                }
             }
         }
         return ret;
@@ -371,7 +351,7 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
                 return list.get(0).getPreferredSize().height;
             }
         }
-        return getPreferredSize().height / 24;
+        return getPreferredSize().height / 32;
     }
 
     private Integer computeBlockIncrement() {
@@ -382,6 +362,6 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
                 return list.get(0).getPreferredSize().height * 5;
             }
         }
-        return getPreferredSize().height / 8;
+        return getPreferredSize().height / 16;
     }
 }

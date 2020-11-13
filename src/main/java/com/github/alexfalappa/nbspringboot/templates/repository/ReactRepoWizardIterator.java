@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,6 +43,11 @@ import com.github.alexfalappa.nbspringboot.templates.TemplateUtils;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_DATA;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_FRAMEWORK;
 
+/**
+ * Wizard iterator for new reactive repository file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = FOLDER_SPRING_FRAMEWORK,
         iconBase = "com/github/alexfalappa/nbspringboot/templates/repository/springdata-interface.png",
@@ -53,7 +58,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER
         category = {CATEGORY_SPRING_DATA},
         position = 1000)
 @NbBundle.Messages(value = "reactmongorepos_displayName=Reactive Repository Interface")
-public final class ReactRepoWizardIterator1 implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
+public final class ReactRepoWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 
     public static final String WIZ_BASE_INTERF = "baseInterface";
     public static final String WIZ_ENTITY_CLASS = "entityClass";

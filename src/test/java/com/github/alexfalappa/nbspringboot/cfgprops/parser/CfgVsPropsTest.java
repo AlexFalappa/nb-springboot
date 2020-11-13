@@ -49,8 +49,11 @@ public class CfgVsPropsTest extends TestBase {
             assertTrue("Failed parsing", pr.matched);
             assertEquals("Different loaded/parsed sizes", loaded.size(), parsed.size());
             for (Map.Entry<Object, Object> entry : loaded.entrySet()) {
-                assertTrue("Missing key in parsed", parsed.containsKey(entry.getKey()));
-                assertEquals("Different loaded-parsed value", entry.getValue(), parsed.get(entry.getKey().toString()));
+                assertTrue(String.format("Missing key %s in parsed", entry.getKey()),
+                        parsed.containsKey(entry.getKey()));
+                assertEquals(String.format("Different loaded-parsed values for key %s", entry.getKey()),
+                        entry.getValue(),
+                        parsed.get(entry.getKey().toString()));
             }
         }
     }

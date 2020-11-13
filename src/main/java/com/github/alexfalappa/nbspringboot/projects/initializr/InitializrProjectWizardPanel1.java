@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_METADATA;
 
 /**
- * Panel just asking for basic info.
+ * Wizard descriptor for first step in Spring Boot Initializr project wizard.
+ *
+ * @author Alessandro Falappa
  */
 public class InitializrProjectWizardPanel1 implements WizardDescriptor.Panel, WizardDescriptor.ValidatingPanel, WizardDescriptor.FinishablePanel {
 

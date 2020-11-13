@@ -1,5 +1,5 @@
 /*
- * Copyright 2015 Keevosh ULP.
+ * Copyright 2019 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.cfgprops.completion;
+package com.github.alexfalappa.nbspringboot.cfgprops.completion.doc;
 
 import java.net.URL;
 
@@ -25,19 +25,20 @@ import org.springframework.boot.configurationmetadata.ValueHint;
 import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 
 /**
+ * The implementation of {@code CompletionItem} for configuration properties values documentation.
+ *
  * @author Alessandro Falappa
  */
 public class CfgPropValueCompletionDocumentation implements CompletionDocumentation {
 
-    private final CfgPropValueCompletionItem item;
+    private final ValueHint valueHint;
 
-    public CfgPropValueCompletionDocumentation(CfgPropValueCompletionItem item) {
-        this.item = item;
+    public CfgPropValueCompletionDocumentation(ValueHint valueHint) {
+        this.valueHint = valueHint;
     }
 
     @Override
     public String getText() {
-        ValueHint valueHint = item.getHint();
         StringBuilder sb = new StringBuilder();
         // name and type
         sb.append("<b>").append(valueHint.getValue()).append("</b>");

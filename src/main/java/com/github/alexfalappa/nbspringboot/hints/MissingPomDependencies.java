@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Alessandro Falappa.
+ * Copyright 2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -49,13 +49,20 @@ import com.sun.source.util.TreePath;
 
 import static com.sun.source.tree.Tree.Kind.ANNOTATION;
 import static com.sun.source.tree.Tree.Kind.IMPORT;
-
+/**
+ * Java code hints.
+ * <p>
+ * Declares hints for Java code checking for usage of certain Spring Boot features without appropriate dependencies in the POM
+ * file.
+ *
+ * @author Alessandro Falappa
+ */
 public class MissingPomDependencies {
 
     @Hint(displayName = "#DN_CfgProcMissingHint", description = "#DESC_CfgProcMissingHint", category = "Spring Boot")
     @TriggerPatterns({
-        @TriggerPattern("org.springframework.boot.context.properties.ConfigurationProperties")
-        ,@TriggerPattern("org.springframework.boot.context.properties.EnableConfigurationProperties")
+        @TriggerPattern("org.springframework.boot.context.properties.ConfigurationProperties"),
+        @TriggerPattern("org.springframework.boot.context.properties.EnableConfigurationProperties")
     })
     @Messages({
         "DN_CfgProcMissingHint=Missing Spring Boot configuration processor",
@@ -90,7 +97,8 @@ public class MissingPomDependencies {
                         if (sbs.hasPomDependency("spring-boot") && !sbs.hasPomDependency(artifactId)) {
                             NbMavenProject mPrj = prj.getLookup().lookup(NbMavenProject.class);
                             if (mPrj != null) {
-                                return ErrorDescriptionFactory.forName(ctx, tp, hintMex, new AddDepFix(mPrj, artifactId, optional));
+                                return ErrorDescriptionFactory
+                                        .forName(ctx, tp, hintMex, new AddDepFix(mPrj, artifactId, optional));
                             } else {
                                 return ErrorDescriptionFactory.forName(ctx, tp, hintMex);
                             }
@@ -114,9 +122,9 @@ public class MissingPomDependencies {
 
     @Hint(displayName = "#DN_DataMissingHint", description = "#DESC_DataMissingHint", category = "Spring Boot")
     @TriggerPatterns({
-        @TriggerPattern("org.springframework.data.repository.Repository")
-        ,@TriggerPattern("org.springframework.data.repository.CrudRepository")
-        ,@TriggerPattern("org.springframework.data.repository.PagingAndSortingRepository")
+        @TriggerPattern("org.springframework.data.repository.Repository"),
+        @TriggerPattern("org.springframework.data.repository.CrudRepository"),
+        @TriggerPattern("org.springframework.data.repository.PagingAndSortingRepository")
     })
     @Messages({
         "DN_DataMissingHint=Missing one of Spring Data starters",
@@ -143,7 +151,8 @@ public class MissingPomDependencies {
         "ERR_JpaMissingHint=Missing Spring Data JPA boot starter in project pom"
     })
     public static ErrorDescription jpaRepos(HintContext ctx) {
-        return importWarning(ctx, "spring-boot-starter-data-jpa", Bundle.ERR_JpaMissingHint(), new String[]{"spring-boot-starter-data-jpa"});
+        return importWarning(ctx, "spring-boot-starter-data-jpa", Bundle.ERR_JpaMissingHint(),
+                new String[]{"spring-boot-starter-data-jpa"});
     }
 
     @Hint(displayName = "#DN_MongoMissingHint", description = "#DESC_MongoMissingHint", category = "Spring Boot")

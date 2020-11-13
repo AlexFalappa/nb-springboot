@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -76,11 +76,16 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_USE_SB_MVN_PLUGIN;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_VERSION;
 
+/**
+ * Wizard iterator for Spring Boot Initializr projects.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = "Project/Maven2",
         displayName = "#InitializrSpringbootProject_displayName",
         description = "InitializrSpringbootProjectDescription.html",
-        iconBase = "com/github/alexfalappa/nbspringboot/projects/initializr/InitializrSpringbootProject.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/projects/springboot-project.png",
         content = "initializr-nbactions.xml.template",
         scriptEngine = "freemarker",
         position = 256
@@ -121,7 +126,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
         handle.progress(1);
         try {
             // invoke initializr webservice
-            InputStream stream = InitializrService.getInstance().getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion, 
+            InputStream stream = InitializrService.getInstance().getProject(bootVersion, mvnGroup, mvnArtifact, mvnVersion,
                     mvnName, mvnDesc, packaging, pkg, lang, javaVersion, deps);
             handle.progress(2);
             // unzip response
@@ -158,7 +163,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
             String[] splitDeps = deps.split(",");
             // add to counts in prefs
             for (String depName : splitDeps) {
-                prefs.putInt(depName, prefs.getInt(depName,0) + 1);
+                prefs.putInt(depName, prefs.getInt(depName, 0) + 1);
             }
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);

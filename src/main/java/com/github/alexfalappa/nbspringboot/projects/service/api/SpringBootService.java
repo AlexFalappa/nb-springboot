@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,12 +20,9 @@ import java.util.Set;
 
 import org.netbeans.api.java.classpath.ClassPath;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
-import org.springframework.boot.configurationmetadata.ValueHint;
 
 /**
  * Service API for implementing support of Spring Boot related functionalities.
- * <p>
- * configuration properties metadata.
  *
  * @author Alessandro Falappa
  */
@@ -48,7 +45,7 @@ public interface SpringBootService {
 
     List<ConfigurationMetadataProperty> queryPropertyMetadata(String filter);
 
-    List<ValueHint> queryHintMetadata(String propertyName, String filter);
+    HintProvider getHintProvider(String name);
 
     boolean hasPomDependency(String artifactId);
 

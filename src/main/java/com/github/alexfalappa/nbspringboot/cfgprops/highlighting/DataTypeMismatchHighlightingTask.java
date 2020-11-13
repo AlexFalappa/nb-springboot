@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Alessandro Falappa.
+ * Copyright 2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -24,11 +24,8 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.api.project.SourceGroup;
-import org.netbeans.api.project.Sources;
+import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
@@ -43,9 +40,10 @@ import com.github.alexfalappa.nbspringboot.cfgprops.ast.CfgElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.ast.PairElement;
 import com.github.alexfalappa.nbspringboot.cfgprops.parser.CfgPropsParser;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
-import com.github.drapostolos.typeparser.TypeParser;
 
 import static java.util.regex.Pattern.compile;
+import org.springframework.boot.convert.ApplicationConversionService;
+import org.springframework.core.convert.TypeDescriptor;
 
 /**
  * Highlighting task for data type mismatch in configuration properties values.
@@ -56,7 +54,7 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
 
     private final Pattern pOneGenTypeArg = compile("([^<>]+)<(.+)>");
     private final Pattern pTwoGenTypeArgs = compile("([^<>]+)<(.+),(.+)>");
-    private final TypeParser parser = TypeParser.newBuilder().enablePropertyEditor().build();
+    private final ApplicationConversionService conversionService = new ApplicationConversionService();
 
     @Override
     protected String getHighlightPrefName() {
@@ -79,13 +77,13 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
     }
 
     @Override
-    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document,
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, BaseDocument document,
             List<ErrorDescription> errors, Severity severity) {
         logger.fine("Highlighting data type mismatches");
         final Project prj = Utils.getActiveProject();
         if (prj != null) {
             final SpringBootService sbs = prj.getLookup().lookup(SpringBootService.class);
-            final ClassPath cp = getProjectClasspath(prj);
+            final ClassPath cp = Utils.execClasspathForProj(prj);
             if (sbs != null && cp != null) {
                 final ClassLoader cl = cp.getClassLoader(true);
                 for (PairElement pair : cfgResult.getCfgFile().getElements()) {
@@ -94,46 +92,52 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
                     final String pName = key.getText();
                     final String pValue = value != null ? value.getText() : "";
                     ConfigurationMetadataProperty cfgMeta = sbs.getPropertyMetadata(pName);
-                    if (cfgMeta != null) {
-                        try {
-                            final String type = cfgMeta.getType();
-                            if (type.contains("<")) {
-                                // maps
-                                Matcher mMap = pTwoGenTypeArgs.matcher(type);
-                                if (mMap.matches() && mMap.groupCount() == 3) {
-                                    String keyType = mMap.group(2);
-                                    check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, key, errors, cl, severity);
-                                    String valueType = mMap.group(3);
-                                    check(valueType, pValue, document, value, errors, cl, severity);
-                                }
-                                // collections
-                                Matcher mColl = pOneGenTypeArg.matcher(type);
-                                if (mColl.matches() && mColl.groupCount() == 2) {
-                                    String genericType = mColl.group(2);
-                                    if (pValue.contains(",")) {
-                                        for (String val : pValue.split("\\s*,\\s*")) {
-                                            check(genericType, val, document, value, errors, cl, severity);
-                                        }
-                                    } else {
-                                        check(genericType, pValue, document, value, errors, cl, severity);
-                                    }
-                                }
-                            } else {
-                                if (pValue.contains(",") && type.endsWith("[]")) {
+                    if (cfgMeta == null) {
+                        continue;
+                    }
+                    try {
+                        final String type = cfgMeta.getType();
+                        // type is null for deprecated configuration properties
+                        if (type == null) {
+                            continue;
+                        }
+                        if (type.contains("<")) {
+                            // maps
+                            Matcher mMap = pTwoGenTypeArgs.matcher(type);
+                            if (mMap.matches() && mMap.groupCount() == 3) {
+                                String keyType = mMap.group(2);
+                                check(keyType, pName.substring(pName.lastIndexOf('.') + 1), document, key, errors, cl,
+                                        severity);
+                                String valueType = mMap.group(3);
+                                check(valueType, pValue, document, value, errors, cl, severity);
+                            }
+                            // collections
+                            Matcher mColl = pOneGenTypeArg.matcher(type);
+                            if (mColl.matches() && mColl.groupCount() == 2) {
+                                String genericType = mColl.group(2);
+                                if (pValue.contains(",")) {
                                     for (String val : pValue.split("\\s*,\\s*")) {
-                                        check(type.substring(0, type.length() - 2), val, document, value, errors, cl, severity);
+                                        check(genericType, val, document, value, errors, cl, severity);
                                     }
                                 } else {
-                                    if (type.endsWith("[]")) {
-                                        check(type.substring(0, type.length() - 2), pValue, document, value, errors, cl, severity);
-                                    } else {
-                                        check(type, pValue, document, value, errors, cl, severity);
-                                    }
+                                    check(genericType, pValue, document, value, errors, cl, severity);
                                 }
                             }
-                        } catch (BadLocationException ex) {
-                            Exceptions.printStackTrace(ex);
+                        } else {
+                            if (pValue.contains(",") && type.endsWith("[]")) {
+                                for (String val : pValue.split("\\s*,\\s*")) {
+                                    check(type.substring(0, type.length() - 2), val, document, value, errors, cl, severity);
+                                }
+                            } else {
+                                if (type.endsWith("[]")) {
+                                    check(type.substring(0, type.length() - 2), pValue, document, value, errors, cl, severity);
+                                } else {
+                                    check(type, pValue, document, value, errors, cl, severity);
+                                }
+                            }
                         }
+                    } catch (BadLocationException ex) {
+                        Exceptions.printStackTrace(ex);
                     }
                     if (canceled) {
                         break;
@@ -146,19 +150,11 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
         }
     }
 
-    private ClassPath getProjectClasspath(Project prj) {
-        Sources srcs = ProjectUtils.getSources(prj);
-        SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
-        for (SourceGroup group : srcGroups) {
-            if (group.getName().toLowerCase().contains("source")) {
-                return ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
-            }
-        }
-        return null;
-    }
-
     private void check(String type, String text, Document document, CfgElement elem, List<ErrorDescription> errors, ClassLoader cl,
             Severity severity) throws BadLocationException {
+        if (canceled) {
+            return;
+        }
         if (text == null || text.isEmpty()) {
             return;
         }
@@ -180,22 +176,21 @@ public class DataTypeMismatchHighlightingTask extends BaseHighlightingTask {
     }
 
     private boolean checkType(String type, String text, ClassLoader cl) throws IllegalArgumentException {
-        Class<?> clazz = ClassUtils.resolveClassName(type, cl);
+        Class<?> clazz;
+        try {
+            clazz = Class.forName(type);
+        } catch (ClassNotFoundException ex) {
+            clazz = ClassUtils.resolveClassName(type, cl);
+        }
         if (clazz != null) {
             try {
-                Object parsed = parser.parseType(text, clazz);
-            } catch (Exception e1) {
-                if (clazz.isEnum()) {
-                    try {
-                        Object parsed = parser.parseType(text.toUpperCase(), clazz);
-                    } catch (Exception e2) {
-                        return false;
-                    }
-                } else {
-                    return false;
-                }
+                Object obj = conversionService.convert(text, TypeDescriptor.valueOf(String.class), TypeDescriptor.valueOf(clazz));
+                return obj != null;
+            } catch (Exception ex) {
+                return false;
             }
         }
+        // unresolvable/unknown class, assume user knows what is doing
         return true;
     }
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,11 +57,16 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_FORCE_COLOR_OUTPUT;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_RESTART;
 
+/**
+ * Wizard iterator for Spring Boot basic projects.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = "Project/Maven2",
         displayName = "#BasicSpringbootProject_displayName",
         description = "BasicSpringbootProjectDescription.html",
-        iconBase = "com/github/alexfalappa/nbspringboot/projects/basic/BasicSpringbootProject.png",
+        iconBase = "com/github/alexfalappa/nbspringboot/projects/springboot-project.png",
         content = "basic-nbactions.xml.template",
         scriptEngine = "freemarker",
         position = 255
@@ -69,7 +74,7 @@ import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_REST
 @Messages("BasicSpringbootProject_displayName=Spring Boot basic project")
 public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInstantiatingIterator {
 
-    private static final String BOOTVERSION = "2.0.3.RELEASE";
+    public static final String BOOTVERSION = "2.3.2.RELEASE";
 
     private int index;
     private WizardDescriptor.Panel[] panels;

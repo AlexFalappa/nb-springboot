@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@ package com.github.alexfalappa.nbspringboot.templates;
 import org.openide.WizardDescriptor;
 
 /**
+ * Utility methods for project wizard classes.
  *
  * @author Alessandro Falappa
  */
@@ -30,8 +31,8 @@ public final class TemplateUtils {
     /**
      * Merge the steps list to set in visual components of wizard pages.
      * <p>
-     * This is usually used in initialize(WizardDescriptor wz) methods of Iterators classes when preparing the wizard pages and related
-     * visual components.
+     * This is usually used in initialize(WizardDescriptor wz) methods of Iterators classes when preparing the wizard pages and
+     * related visual components.
      *
      * @param before previous step names
      * @param after step names of the wizard
@@ -60,8 +61,8 @@ public final class TemplateUtils {
     /**
      * Merge the steps list to set in visual components of wizard pages.
      * <p>
-     * This is usually used in initialize(WizardDescriptor wz) methods of Iterators classes when preparing the wizard pages and related
-     * visual components.
+     * This is usually used in initialize(WizardDescriptor wz) methods of Iterators classes when preparing the wizard pages and
+     * related visual components.
      *
      * @param wizard the wizard descriptor to take previous step names from
      * @param after step names of the wizard

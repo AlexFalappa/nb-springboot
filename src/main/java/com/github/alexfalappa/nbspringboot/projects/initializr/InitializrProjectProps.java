@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,5 +40,6 @@ public class InitializrProjectProps {
     public static final String WIZ_PROJ_LOCATION = "project.location";
     public static final String WIZ_USE_SB_MVN_PLUGIN = "use.sbmavenplugin";
     public static final String WIZ_REMOVE_MVN_WRAPPER = "remove.mavenwrapper";
-    public static final String REST_USER_AGENT = NbBundle.getMessage(InitializrProjectProps.class, "InitializrProjectProps.REST_USER_AGENT");
+    public static final String REST_USER_AGENT = NbBundle.getMessage(InitializrProjectProps.class,
+            "InitializrProjectProps.REST_USER_AGENT");
 }

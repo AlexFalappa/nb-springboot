@@ -1,6 +1,5 @@
 /*
- * Copyright 2015 Keevosh ULP.
- * Modifications copyright 2016 Alessandro Falappa.
+ * Copyright 2015 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.alexfalappa.nbspringboot.cfgprops.completion;
+package com.github.alexfalappa.nbspringboot.cfgprops.completion.doc;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -31,36 +30,36 @@ import org.springframework.boot.configurationmetadata.Hints;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
 import com.github.alexfalappa.nbspringboot.Utils;
-import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static com.github.alexfalappa.nbspringboot.Utils.simpleHtmlEscape;
 
 /**
  * The Spring Boot Configuration implementation of CompletionDocumentation.
  * <p>
- * It utilizes a {@link CfgPropCompletionItem} to display the documentation for that item and actions like opening the source type of a
- * property in editor and navigate to a general spring boot configuration documentation page.
+ * It utilizes a {@link ConfigurationMetadataProperty} to display the documentation for that item and actions like opening the
+ * source type of a property in editor and navigate to a general spring boot configuration documentation page.
  *
  * @author Aggelos Karalias
  * @author Alessandro Falappa
  */
 public class CfgPropCompletionDocumentation implements CompletionDocumentation {
 
-    private final CfgPropCompletionItem item;
-    private final SpringBootService bootService;
+    private final ConfigurationMetadataProperty configurationMeta;
 
-    public CfgPropCompletionDocumentation(CfgPropCompletionItem item, SpringBootService sbs) {
-        this.item = item;
-        this.bootService = sbs;
+    public CfgPropCompletionDocumentation(ConfigurationMetadataProperty configurationMeta) {
+        this.configurationMeta = configurationMeta;
     }
 
     @Override
     public String getText() {
-        ConfigurationMetadataProperty configurationMeta = item.getConfigurationMetadata();
         StringBuilder sb = new StringBuilder();
-        // name and type
+        // name
         sb.append("<b>").append(configurationMeta.getId()).append("</b>");
-        sb.append("<br/>").append(simpleHtmlEscape(configurationMeta.getType()));
+        // type (may be null for deprecated props)
+        final String type = configurationMeta.getType();
+        if (type != null) {
+            sb.append("<br/>").append(simpleHtmlEscape(type));
+        }
         // deprecation (optional)
         Deprecation deprecation = configurationMeta.getDeprecation();
         if (deprecation != null) {

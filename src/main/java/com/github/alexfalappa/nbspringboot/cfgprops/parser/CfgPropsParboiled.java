@@ -23,13 +23,13 @@ import static java.util.regex.Pattern.compile;
 /**
  * Spring Boot configuration properties parser based on Parboiled library.
  * <p>
- * This parser implements a grammar accepting the Java Properties format (with some minor exceptions) and adding dot separated keys, array
- * notation ({@code array[index]=value} and map notation ({@code map[key]=value}.
+ * This parser implements a grammar accepting the Java Properties format (with some minor exceptions) and adding dot separated
+ * keys, array notation ({@code array[index]=value} and map notation ({@code map[key]=value}.
  * <p>
  * Differences with base Java Properties syntax:
  * <ul>
- * <li>values must be explicitly separated from keys by a <tt>=</tt> (equal sign) or <tt>:</tt> (colon), first occurring whitespace as
- * separator is not supported.
+ * <li>values must be explicitly separated from keys by a <tt>=</tt> (equal sign) or <tt>:</tt> (colon), first occurring
+ * whitespace as separator is not supported.
  * </ul>
  *
  * @author Alessandro Falappa
@@ -38,7 +38,7 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
 
     private static final Pattern PAT_UNICODES = compile("\\\\u[a-fA-F0-9]{4}");
     private static final Pattern PAT_ESCAPES = compile("\\\\.");
-    private static final Pattern PAT_ESCAPED_NEWLINE = compile("\\\\\\n\\s*");
+    private static final Pattern PAT_ESCAPED_NEWLINE = compile("\\\\(\\n|\\r|\\r\\n)\\s*");
     private Properties parsedProps = new Properties();
     private CfgFile cfgFile = new CfgFile();
 
@@ -240,7 +240,7 @@ public class CfgPropsParboiled extends BaseParser<CfgElement> {
     }
 
     Rule eolChar() {
-        return FirstOf('\n', "\r\n", '\r');
+        return FirstOf("\r\n", '\n', '\r');
     }
 
     Rule notEolChar() {

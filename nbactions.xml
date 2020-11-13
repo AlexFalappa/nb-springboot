@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<actions>
+	<action>
+		<actionName>run</actionName>
+		<packagings>
+			<packaging>nbm</packaging>
+		</packagings>
+		<goals>
+			<goal>nbm:cluster</goal>
+			<goal>nbm:run-ide</goal>
+		</goals>
+		<properties>
+			<netbeans.run.params>-J-Dcom.github.alexfalappa.nbspringboot.level=100 -J-Dcom.github.alexfalappa.nbspringboot.actions.level=600</netbeans.run.params>
+		</properties>
+	</action>
+	<action>
+		<actionName>debug</actionName>
+		<packagings>
+			<packaging>nbm</packaging>
+		</packagings>
+		<goals>
+			<goal>nbm:cluster</goal>
+			<goal>nbm:run-ide</goal>
+		</goals>
+		<properties>
+			<jpda.listen>true</jpda.listen>
+			<netbeans.run.params.debug>-J-Xdebug -J-Xrunjdwp:transport=dt_socket,suspend=n,server=n,address=${jpda.address} -J-Dcom.github.alexfalappa.nbspringboot.level=100 -J-Dcom.github.alexfalappa.nbspringboot.actions.level=600</netbeans.run.params.debug>
+		</properties>
+	</action>
+</actions>

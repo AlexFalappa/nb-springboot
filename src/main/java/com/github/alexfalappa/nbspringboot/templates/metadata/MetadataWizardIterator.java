@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,11 @@ import com.github.alexfalappa.nbspringboot.templates.TemplateUtils;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGORY_SPRING_BOOT;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_BOOT;
 
+/**
+ * Wizard iterator for new additional metadata file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = FOLDER_SPRING_BOOT,
         iconBase = "com/github/alexfalappa/nbspringboot/templates/metadata/boot-json.png",
@@ -52,7 +57,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER
         description = "description.html",
         scriptEngine = "freemarker",
         category = {CATEGORY_SPRING_BOOT},
-        position = 500)
+        position = 800)
 @Messages(value = "addmetadata_displayName=Additional Properties Metadata")
 public final class MetadataWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 

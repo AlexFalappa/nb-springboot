@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,9 +14,6 @@
  * limitations under the License.
  */
 package com.github.alexfalappa.nbspringboot.cfgprops.filetype;
-
-
-import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
 
 import java.io.IOException;
 
@@ -38,12 +35,21 @@ import org.openide.util.Lookup;
 import org.openide.util.NbBundle.Messages;
 import org.openide.windows.TopComponent;
 
+import com.github.alexfalappa.nbspringboot.cfgprops.lexer.CfgPropsLanguage;
+
+/**
+ * Data Object for Spring Boot configuration properties files.
+ *
+ * @author Alessandro Falappa
+ */
 @Messages({
     "MimeTypeDisplayName=Spring Boot Configuration Properties"
 })
 @MIMEResolver.Registration(
         displayName = "#MimeTypeDisplayName",
-        resource = "cfgprops-resolver.xml"
+        resource = "cfgprops-resolver.xml",
+        // must be before PropertiesDataObject registration (120)
+        position = 119
 )
 @DataObject.Registration(
         mimeType = CfgPropsLanguage.MIME_TYPE,
@@ -57,47 +63,47 @@ import org.openide.windows.TopComponent;
             id = @ActionID(category = "System", id = "org.openide.actions.OpenAction"),
             position = 100,
             separatorAfter = 200
-    )
-    ,@ActionReference(
+    ),
+    @ActionReference(
             path = "Loaders/text/application+properties/Actions",
             id = @ActionID(category = "Edit", id = "org.openide.actions.CutAction"),
             position = 300
-    )
-    ,@ActionReference(
+    ),
+    @ActionReference(
             path = "Loaders/text/application+properties/Actions",
             id = @ActionID(category = "Edit", id = "org.openide.actions.CopyAction"),
             position = 400,
             separatorAfter = 500
-    )
-    ,@ActionReference(
+    ),
+    @ActionReference(
             path = "Loaders/text/application+properties/Actions",
             id = @ActionID(category = "Edit", id = "org.openide.actions.DeleteAction"),
             position = 600
-    )
-    ,@ActionReference(
+    ),
+    @ActionReference(
             path = "Loaders/text/application+properties/Actions",
             id = @ActionID(category = "System", id = "org.openide.actions.RenameAction"),
             position = 700,
             separatorAfter = 800
-    )
-    ,@ActionReference(
+    ),
+    @ActionReference(
             path = "Loaders/text/application+properties/Actions",
             id = @ActionID(category = "System", id = "org.openide.actions.SaveAsTemplateAction"),
             position = 900,
             separatorAfter = 1000
-    )
-    ,@ActionReference(
+    ),
+    @ActionReference(
             path = "Loaders/text/application+properties/Actions",
             id = @ActionID(category = "System", id = "org.openide.actions.FileSystemAction"),
             position = 1100,
             separatorAfter = 1200
-    )
-    ,@ActionReference(
+    ),
+    @ActionReference(
             path = "Loaders/text/application+properties/Actions",
             id = @ActionID(category = "System", id = "org.openide.actions.ToolsAction"),
             position = 1300
-    )
-    ,@ActionReference(
+    ),
+    @ActionReference(
             path = "Loaders/text/application+properties/Actions",
             id = @ActionID(category = "System", id = "org.openide.actions.PropertiesAction"),
             position = 1400

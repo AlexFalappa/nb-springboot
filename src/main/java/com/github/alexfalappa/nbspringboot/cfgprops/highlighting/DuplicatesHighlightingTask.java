@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 Alessandro Falappa.
+ * Copyright 2017 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,9 +22,9 @@ import java.util.Map;
 import java.util.logging.Level;
 
 import javax.swing.text.BadLocationException;
-import javax.swing.text.Document;
 import javax.swing.text.StyledDocument;
 
+import org.netbeans.editor.BaseDocument;
 import org.netbeans.modules.parsing.spi.SchedulerEvent;
 import org.netbeans.spi.editor.hints.ErrorDescription;
 import org.netbeans.spi.editor.hints.ErrorDescriptionFactory;
@@ -67,7 +67,8 @@ public class DuplicatesHighlightingTask extends BaseHighlightingTask {
     }
 
     @Override
-    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, Document document, List<ErrorDescription> errors, Severity severity) {
+    protected void internalRun(CfgPropsParser.CfgPropsParserResult cfgResult, SchedulerEvent se, BaseDocument document,
+            List<ErrorDescription> errors, Severity severity) {
         logger.fine("Highlighting duplicate props");
         Map<String, Integer> firstOccur = new HashMap<>();
         for (PairElement pair : cfgResult.getCfgFile().getElements()) {

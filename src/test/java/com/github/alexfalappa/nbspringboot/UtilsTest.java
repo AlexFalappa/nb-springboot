@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 Alessandro Falappa.
+ * Copyright 2018 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,13 @@
 package com.github.alexfalappa.nbspringboot;
 
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataProperty;
 import org.springframework.boot.configurationmetadata.Deprecation;
 
+import static org.junit.Assert.*;
+
 /**
+ * Test Utils class.
  *
  * @author Hector Espert
  */
@@ -28,6 +30,7 @@ public class UtilsTest {
     
     @Test
     public void testSimpleHtmlEscape() {
+        System.out.println("simpleHtmlEscape");
         String result = Utils.simpleHtmlEscape("<p>STRING</p>");
         String expected = "&lt;p&gt;STRING&lt;/p&gt;";
         assertEquals(expected, result);
@@ -38,6 +41,7 @@ public class UtilsTest {
      */
     @Test
     public void testVmOptsFromPrefs() {
+        System.out.println("vmOptsFromPrefs");
         String expResult = "-noverify -XX:TieredStopAtLevel=1 ";
         String result = Utils.vmOptsFromPrefs();
         assertEquals(expResult, result);
@@ -48,12 +52,15 @@ public class UtilsTest {
      */
     @Test
     public void testIsErrorDeprecated() {
+        System.out.println("isErrorDeprecated");
         ConfigurationMetadataProperty meta = new ConfigurationMetadataProperty();
         assertFalse(Utils.isErrorDeprecated(meta));
+
         Deprecation deprecation = new Deprecation();
         deprecation.setLevel(Deprecation.Level.WARNING);
         meta.setDeprecation(deprecation);
         assertFalse(Utils.isErrorDeprecated(meta));
+
         deprecation.setLevel(Deprecation.Level.ERROR);
         meta.setDeprecation(deprecation);
         assertTrue(Utils.isErrorDeprecated(meta));

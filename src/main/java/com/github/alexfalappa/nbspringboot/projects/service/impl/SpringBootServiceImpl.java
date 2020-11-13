@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,14 +30,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.maven.model.Dependency;
-import org.apache.maven.project.MavenProject;
 import org.netbeans.api.java.classpath.ClassPath;
-import org.netbeans.api.java.project.JavaProjectConstants;
 import org.netbeans.api.project.Project;
-import org.netbeans.api.project.ProjectUtils;
-import org.netbeans.api.project.SourceGroup;
-import org.netbeans.api.project.Sources;
 import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.spi.project.ProjectServiceProvider;
@@ -50,21 +44,22 @@ import org.springframework.boot.configurationmetadata.ConfigurationMetadataPrope
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepository;
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepositoryJsonBuilder;
 import org.springframework.boot.configurationmetadata.SimpleConfigurationMetadataRepository;
-import org.springframework.boot.configurationmetadata.ValueHint;
 
+import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
 
 /**
  * Project wide {@link SpringBootService} implementation.
  * <p>
- * It reads Spring Boot configuration properties metadata and maintains indexed structures extracted out of it.
+ * It scans the classpath for {@code META-INF/spring-configuration-metadata.json} files, then unmarshals the files into the
+ * corresponding {@code ConfigurationMetadata} classes and maintains indexed structures extracted out of it.
  * <p>
- * Registered for maven projects.
+ * Registered for maven projects with jar and war packaging.
  *
  * @author Alessandro Falappa
  */
@@ -79,7 +74,8 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     private static final Logger logger = Logger.getLogger(SpringBootServiceImpl.class.getName());
     private static final String METADATA_JSON = "META-INF/spring-configuration-metadata.json";
-    private final Pattern pArrayNotation = compile("(.+)\\[\\d+\\]");
+    private static final Pattern PATTERN_ARRAY_NOTATION = compile("(.+)\\[\\d+\\]");
+    private static final NoopHintProvider NOOP_HINT_PROVIDER = new NoopHintProvider();
     private SimpleConfigurationMetadataRepository repo = new SimpleConfigurationMetadataRepository();
     private final Map<String, ConfigurationMetadataRepository> reposInJars = new HashMap<>();
     private NbMavenProjectImpl mvnPrj;
@@ -88,13 +84,14 @@ public class SpringBootServiceImpl implements SpringBootService {
     private Map<String, Boolean> cachedDepsPresence = new HashMap<>();
     private final Set<String> collectionProperties = new HashSet<>();
     private final Set<String> mapProperties = new HashSet<>();
+    private final Map<String, HintProvider> providerMap = new HashMap<>();
 
     public SpringBootServiceImpl(Project p) {
         if (p instanceof NbMavenProjectImpl) {
             this.mvnPrj = (NbMavenProjectImpl) p;
         }
-        logger.log(Level.INFO, "Creating Spring Boot service for project {0}",
-                FileUtil.getFileDisplayName(p.getProjectDirectory()));
+        final FileObject projectDirectory = mvnPrj.getProjectDirectory();
+        logger.log(Level.INFO, "Creating Spring Boot service for project {0}", FileUtil.getFileDisplayName(projectDirectory));
     }
 
     @Override
@@ -102,7 +99,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         logger.info("Refreshing Spring Boot service");
         // check maven project has a dependency starting with 'spring-boot'
         logger.fine("Checking maven project has a spring boot dependency");
-        boolean springBootAvailable = hasSpringBootDependency(mvnPrj.getProjectWatcher(), null);
+        boolean springBootAvailable = Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
         // clear and exit if no spring boot dependency detected
         if (!springBootAvailable) {
             reposInJars.clear();
@@ -146,6 +143,11 @@ public class SpringBootServiceImpl implements SpringBootService {
     }
 
     @Override
+    public HintProvider getHintProvider(String name) {
+        return providerMap.getOrDefault(name, NOOP_HINT_PROVIDER);
+    }
+
+    @Override
     public ConfigurationMetadataProperty getPropertyMetadata(String propertyName) {
         if (cpExec == null) {
             init();
@@ -157,7 +159,7 @@ public class SpringBootServiceImpl implements SpringBootService {
                     return cachedProperties.get(relaxedName);
                 } else {
                     // try to interpret array notation (strip '[index]' from pName)
-                    Matcher mArrNot = pArrayNotation.matcher(relaxedName);
+                    Matcher mArrNot = PATTERN_ARRAY_NOTATION.matcher(relaxedName);
                     if (mArrNot.matches()) {
                         return cachedProperties.get(mArrNot.group(1));
                     } else {
@@ -191,30 +193,13 @@ public class SpringBootServiceImpl implements SpringBootService {
     }
 
     @Override
-    public List<ValueHint> queryHintMetadata(String propertyName, String filter) {
-        if (cpExec == null) {
-            init();
-        }
-        List<ValueHint> ret = new LinkedList<>();
-        ConfigurationMetadataProperty cfgMeta = getPropertyMetadata(propertyName);
-        if (cfgMeta != null) {
-            for (ValueHint valueHint : cfgMeta.getHints().getValueHints()) {
-                if (filter == null || valueHint.getValue().toString().contains(filter)) {
-                    ret.add(valueHint);
-                }
-            }
-        }
-        return ret;
-    }
-
-    @Override
     public boolean hasPomDependency(String artifactId) {
         if (cpExec == null) {
             init();
         }
         if (cachedDepsPresence != null) {
             if (!cachedDepsPresence.containsKey(artifactId)) {
-                cachedDepsPresence.put(artifactId, dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), artifactId));
+                cachedDepsPresence.put(artifactId, Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), artifactId));
             }
             return cachedDepsPresence.get(artifactId);
         }
@@ -237,7 +222,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
         logger.info("Initializing Spring Boot service");
         // check maven project has a dependency starting with 'spring-boot'
-        boolean springBootAvailable = hasSpringBootDependency(mvnPrj.getProjectWatcher(), null);
+        boolean springBootAvailable = Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
         logger.fine("Checking maven project has a spring boot dependency");
         // early exit if no spring boot dependency detected
         if (!springBootAvailable) {
@@ -246,19 +231,7 @@ public class SpringBootServiceImpl implements SpringBootService {
         logger.log(INFO, "Initializing SpringBootService for project {0}", new Object[]{mvnPrj.toString()});
         cachedDepsPresence.clear();
         // set up a reference to the execute classpath object
-        Sources srcs = ProjectUtils.getSources(mvnPrj);
-        SourceGroup[] srcGroups = srcs.getSourceGroups(JavaProjectConstants.SOURCES_TYPE_JAVA);
-        boolean srcGroupFound = false;
-        for (SourceGroup group : srcGroups) {
-            if (group.getName().toLowerCase().contains("source")) {
-                srcGroupFound = true;
-                cpExec = ClassPath.getClassPath(group.getRootFolder(), ClassPath.EXECUTE);
-                break;
-            }
-        }
-        if (!srcGroupFound) {
-            logger.log(WARNING, "No sources found for project: {0}", new Object[]{mvnPrj.toString()});
-        }
+        cpExec = Utils.execClasspathForProj(mvnPrj);
         if (cpExec != null) {
             // listen for pom changes
             logger.info("Adding maven pom listener...");
@@ -272,6 +245,11 @@ public class SpringBootServiceImpl implements SpringBootService {
                     }
                 }
             });
+            // populate hint providers map
+            FileObject resourcesFolder = Utils.resourcesFolderForProj(mvnPrj);
+            providerMap.put("logger-name", new LoggerNameHintProvider(resourcesFolder));
+            providerMap.put("class-reference", new ClassReferenceHintProvider(mvnPrj.getProjectDirectory(), cpExec));
+            providerMap.put("handle-as", new HandleAsHintProvider(resourcesFolder, cpExec));
             // build configuration properties maps
             updateConfigRepo();
         }
@@ -313,39 +291,16 @@ public class SpringBootServiceImpl implements SpringBootService {
             final String type = entry.getValue().getType();
             if (type != null) {
                 final String key = entry.getKey();
-                if (type.contains("Map<")) {
+                if (type.startsWith("java.util.Map<")) {
                     mapProperties.add(key);
                 }
-                if (type.contains("List<") || type.contains("Set<") || type.contains("Collection<")) {
+                if (type.startsWith("java.util.List<")
+                        || type.startsWith("java.util.Set<")
+                        || type.startsWith("java.util.Collection<")) {
                     collectionProperties.add(key);
                 }
             }
         }
-    }
-
-    // check if any of the project dependencies artifact ids contains the given string
-    private boolean dependencyArtifactIdContains(NbMavenProject nbMvn, String artifactId) {
-        MavenProject mPrj = nbMvn.getMavenProject();
-        for (Object o : mPrj.getDependencies()) {
-            Dependency d = (Dependency) o;
-            if (d.getArtifactId().contains(artifactId)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    
-    private boolean hasSpringBootDependency(NbMavenProject nbMvn, String majorVersion) {
-        MavenProject mPrj = nbMvn.getMavenProject();
-        for (Object o : mPrj.getDependencies()) {
-            Dependency d = (Dependency) o;
-            if ("org.springframework.boot".equals(d.getGroupId()) 
-                && d.getArtifactId().startsWith("spring-boot")
-                && (majorVersion == null || d.getVersion().startsWith(majorVersion))) {
-                return true;
-            }
-        }
-        return false;
     }
 
     // tell if the project currently uses Spring Boot 2.x

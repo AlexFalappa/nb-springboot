@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,9 +46,9 @@ import static java.util.logging.Level.FINER;
 import static java.util.logging.Level.SEVERE;
 
 /**
- * This class proxies the original ContextGlobalProvider and ensures the current project remains in the GlobalContext regardless of the
- * TopComponent selection. The class also ensures that when a child node is selected within the in Projects tab, the parent Project will be
- * in the lookup.
+ * This class proxies the original ContextGlobalProvider and ensures the current project remains in the GlobalContext regardless
+ * of the TopComponent selection. The class also ensures that when a child node is selected within the in Projects tab, the parent
+ * Project will be in the lookup.
  * <p>
  * To use this class you must have an implementation dependency on org.openide.windows module.
  * <p>
@@ -112,7 +112,8 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
     }
 
     /**
-     * Returns a ProxyLookup that adds the current Project instance to the global selection returned by Utilities.actionsGlobalContext().
+     * Returns a ProxyLookup that adds the current Project instance to the global selection returned by
+     * Utilities.actionsGlobalContext().
      *
      * @return a ProxyLookup that includes the original global context lookup.
      */
@@ -142,7 +143,8 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
                 if (projectsTab == null) {
                     projectsTab = WindowManager.getDefault().findTopComponent(PROJECT_LOGICAL_TAB_ID);
                     if (projectsTab == null) {
-                        logger.log(SEVERE, "propertyChange: cannot find the Projects logical window ({0})", PROJECT_LOGICAL_TAB_ID);
+                        logger.log(SEVERE, "propertyChange: cannot find the Projects logical window ({0})",
+                                PROJECT_LOGICAL_TAB_ID);
                         return;
                     }
                 }
@@ -182,8 +184,8 @@ public class GlobalActionContextProxy implements ContextGlobalProvider {
     }
 
     /**
-     * This class listens for changes in the Project results, and ensures a Project remains in the Utilities.actionsGlobalContext() if a
-     * project is open.
+     * This class listens for changes in the Project results, and ensures a Project remains in the
+     * Utilities.actionsGlobalContext() if a project is open.
      */
     private class LookupListenerImpl implements LookupListener {
 

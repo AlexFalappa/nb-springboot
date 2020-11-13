@@ -1,5 +1,5 @@
 /*
- * Copyright 2016 Alessandro Falappa.
+ * Copyright 2016 the original author or authors.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,11 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.CATEGO
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.FOLDER_SPRING_BOOT;
 import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.ICON_BOOT_CLASS;
 
+/**
+ * Wizard iterator for new Actuator endpoint file wizard.
+ *
+ * @author Alessandro Falappa
+ */
 @TemplateRegistration(
         folder = FOLDER_SPRING_BOOT,
         iconBase = ICON_BOOT_CLASS,
@@ -52,7 +57,7 @@ import static com.github.alexfalappa.nbspringboot.templates.FileTemplates.ICON_B
         description = "ActuatorEndpoint.html",
         scriptEngine = "freemarker",
         category = {CATEGORY_SPRING_BOOT_ACTUATOR},
-        position = 900)
+        position = 600)
 @NbBundle.Messages(value = "actend_displayName=Actuator Endpoint")
 public final class ActEndpointWizardIterator implements WizardDescriptor.InstantiatingIterator<WizardDescriptor> {
 
