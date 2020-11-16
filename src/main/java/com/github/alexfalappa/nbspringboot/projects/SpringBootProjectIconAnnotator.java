@@ -18,16 +18,11 @@ package com.github.alexfalappa.nbspringboot.projects;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.net.URL;
-import java.util.Collections;
-import java.util.Map;
-import java.util.WeakHashMap;
-import java.util.concurrent.atomic.AtomicReference;
 
 import javax.swing.event.ChangeListener;
 
 import org.netbeans.api.annotations.common.StaticResource;
 import org.netbeans.api.project.Project;
-import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.spi.project.ProjectIconAnnotator;
 import org.openide.util.ChangeSupport;
 import org.openide.util.ImageUtilities;
@@ -35,6 +30,9 @@ import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 import com.github.alexfalappa.nbspringboot.Utils;
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
 
 /**
  * Add badge to project icon for Spring Boot projects.
@@ -49,9 +47,10 @@ import com.github.alexfalappa.nbspringboot.Utils;
 public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {
 
     @StaticResource
-    private static final String BADGE_PATH = "com/github/alexfalappa/nbspringboot/projects/springboot-badge.png";    //NOI18N
-    private static final URL BADGE_URL = SpringBootProjectIconAnnotator.class.getClassLoader().getResource(BADGE_PATH);
-    private final AtomicReference<Image> badgeCache = new AtomicReference<>();
+    private static final String SPRING_BOOT_PROJECT_BADGE_PATH = "com/github/alexfalappa/nbspringboot/projects/springboot-badge.png";    //NOI18N
+    private static final URL SPRING_BOOT_PROJECT_BADGE_URL = SpringBootProjectIconAnnotator.class.getClassLoader().getResource(SPRING_BOOT_PROJECT_BADGE_PATH);
+    private static final Image SPRING_BOOT_PROJECT_BADGE = ImageUtilities.loadImage(SPRING_BOOT_PROJECT_BADGE_PATH);
+    private static final String SPRING_BOOT_PROJECT_TOOLTIP_TEXT = "Spring Boot application";
     private final ChangeSupport cs = new ChangeSupport(this);
     private final Map<Project, Boolean> projectsMap = Collections.synchronizedMap(new WeakHashMap<>());
 
@@ -59,18 +58,18 @@ public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {
     public Image annotateIcon(final Project p, Image original, final boolean openedNode) {
         Image annotated = original;
         Boolean type = projectsMap.get(p);
+        // TODO: once the project is detected as spring-boot is not evaluated anymore until netbeans restart
         if (type != null && type == true) {
-            final Image badge = getBootBadge();
-            if (badge != null) {
-                String tooltip = ImageUtilities.getImageToolTip(original);
-                if (!tooltip.contains("Boot")) {
-                    final String messageHtml = String.format(
-                            "<img src=\"%s\">&nbsp;Spring Boot application", //NOI18N
-                            BADGE_URL.toExternalForm());
-                    annotated = ImageUtilities.mergeImages(
-                            ImageUtilities.addToolTipToImage(original, messageHtml),
-                            badge, 7, 7);
-                }
+            String tooltip = ImageUtilities.getImageToolTip(original);
+            if (!tooltip.contains(SPRING_BOOT_PROJECT_TOOLTIP_TEXT)) {
+                final String messageHtml = String.format(
+                        "<img src=\"%s\">&nbsp;" + SPRING_BOOT_PROJECT_TOOLTIP_TEXT, //NOI18N
+                        SPRING_BOOT_PROJECT_BADGE_URL.toExternalForm());
+                annotated = ImageUtilities.mergeImages(
+                        ImageUtilities.addToolTipToImage(original, messageHtml),
+                        SPRING_BOOT_PROJECT_BADGE,
+                        7,
+                        7);
             }
         } else {
             evaluateProject(p);
@@ -93,26 +92,9 @@ public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {
         cs.fireChange();
     }
 
-    private Image getBootBadge() {
-        Image img = badgeCache.get();
-        if (img == null) {
-            if (!EventQueue.isDispatchThread()) {
-                img = ImageUtilities.loadImage(BADGE_PATH);
-                badgeCache.set(img);
-            } else {
-                final RequestProcessor RP = new RequestProcessor(SpringBootProjectIconAnnotator.class.getName());
-                RP.post(() -> {
-                    badgeCache.set(ImageUtilities.loadImage(BADGE_PATH));
-                    cs.fireChange();
-                });
-            }
-        }
-        return img;
-    }
-
     private void evaluateProject(final Project prj) {
         final Runnable runEvaluateProject = () -> {
-            boolean flag = isBootProject(prj);
+            boolean flag = Utils.isSpringBootProject(prj);
             projectsMap.put(prj, flag);
             if (flag == true) {
                 cs.fireChange();
@@ -124,14 +106,6 @@ public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {
             final RequestProcessor RP = new RequestProcessor(SpringBootProjectIconAnnotator.class.getName());
             RP.post(runEvaluateProject);
         }
-    }
-
-    private static boolean isBootProject(final Project prj) {
-        if (prj instanceof NbMavenProjectImpl) {
-            NbMavenProjectImpl mvnPrj = (NbMavenProjectImpl) prj;
-            return Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
-        }
-        return false;
     }
 
 }
