@@ -36,7 +36,7 @@ public class BootPanelProvider implements ProjectCustomizer.CompositeCategoryPro
 
     @Override
     public ProjectCustomizer.Category createCategory(Lookup context) {
-        if (prjHasDepContaining(context, "spring-boot")) {
+        if (Utils.isSpringBootProject(context.lookup(Project.class))) {
             return ProjectCustomizer.Category.create("boot", "Spring Boot", null);
         }
         return null;
@@ -47,7 +47,7 @@ public class BootPanelProvider implements ProjectCustomizer.CompositeCategoryPro
         final BootPanel bootPanel = new BootPanel();
         // NOTE order of invocations is important here!
         bootPanel.init(context.lookup(ModelHandle2.class), prjBootService(context));
-        bootPanel.setDevToolsEnabled(prjHasDepContaining(context, "devtools"));
+        bootPanel.setDevToolsEnabled(prjHasDepContaining(context, "spring-boot-devtools"));
         return bootPanel;
     }
 
