@@ -28,13 +28,14 @@ import org.netbeans.modules.maven.model.pom.Dependency;
 import org.netbeans.modules.maven.model.pom.DependencyContainer;
 import org.netbeans.modules.maven.model.pom.DependencyManagement;
 import org.netbeans.modules.maven.model.pom.POMModel;
-import org.netbeans.modules.maven.model.pom.Parent;
 import org.netbeans.modules.maven.model.pom.Repository;
 import org.netbeans.modules.maven.model.pom.RepositoryPolicy;
 import org.openide.windows.WindowManager;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.github.alexfalappa.nbspringboot.Utils;
 import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService;
+import org.netbeans.api.project.Project;
 
 /**
  * Maven POM code generator to add a Spring Boot dependency.
@@ -57,18 +58,8 @@ public class SpringDependenciesGenerator extends BaseCodeGenerator {
 
     @Override
     protected int pomInvoke(POMModel model, int caretPosition) throws Exception {
-        // retrieve boot version from parent pom declaration if present
-        String bootVersion = null;
-        final Parent pomParent = model.getProject().getPomParent();
-        if (pomParent != null) {
-            if (pomParent.getArtifactId().contains("spring-boot")) {
-                bootVersion = pomParent.getVersion();
-            } else {
-                logger.fine("Parent pom is not 'spring-boot-starter-parent'. Unable to determine boot version.");
-            }
-        } else {
-            logger.fine("No parent pom declaration found. Unable to determine boot version.");
-        }
+        final Project prj = Utils.getActiveProject();
+        String bootVersion = Utils.getSpringBootVersion(prj).orElse(null);
         // prepare and show dependency chooser dialog
         final Frame mainWindow = WindowManager.getDefault().getMainWindow();
         SpringDependencyDialog sdd = new SpringDependencyDialog(mainWindow);
