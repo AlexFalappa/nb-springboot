@@ -130,7 +130,7 @@ public class InitializrService {
                     .header("User-Agent", REST_USER_AGENT)
                     .build();
             // connect
-            logger.log(INFO, "Getting Spring Initializr dependencies metadata from: {0}", template);
+            logger.log(INFO, "Getting Spring Initializr dependencies metadata from: {0}", template.expand(bootVersion));
             logger.log(INFO, "Asking metadata as: {0}", REST_USER_AGENT);
             long start = System.currentTimeMillis();
             ResponseEntity<String> respEntity = rt.exchange(req, String.class);
