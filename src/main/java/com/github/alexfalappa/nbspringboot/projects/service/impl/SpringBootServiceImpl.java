@@ -15,8 +15,10 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.service.impl;
 
+import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
@@ -25,10 +27,14 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
+import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import static java.util.regex.Pattern.compile;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.maven.NbMavenProjectImpl;
@@ -44,15 +50,6 @@ import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepos
 import org.springframework.boot.configurationmetadata.ConfigurationMetadataRepositoryJsonBuilder;
 import org.springframework.boot.configurationmetadata.SimpleConfigurationMetadataRepository;
 
-import com.github.alexfalappa.nbspringboot.Utils;
-import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
-import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
-
-import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.INFO;
-import static java.util.logging.Level.SEVERE;
-import static java.util.regex.Pattern.compile;
-
 /**
  * Project wide {@link SpringBootService} implementation.
  * <p>
@@ -62,6 +59,7 @@ import static java.util.regex.Pattern.compile;
  * Registered for maven projects with jar and war packaging.
  *
  * @author Alessandro Falappa
+ * @author Diego Díez Ricondo
  */
 @ProjectServiceProvider(
         service = SpringBootService.class,
@@ -79,7 +77,7 @@ public class SpringBootServiceImpl implements SpringBootService {
     private SimpleConfigurationMetadataRepository repo = new SimpleConfigurationMetadataRepository();
     private final Map<String, ConfigurationMetadataRepository> reposInJars = new HashMap<>();
     private NbMavenProjectImpl mvnPrj;
-    private String springBootVersion;    
+    private String springBootVersion;
     private ClassPath cpExec;
     private Map<String, ConfigurationMetadataProperty> cachedProperties;
     private final Map<String, Boolean> cachedDepsPresence = new HashMap<>();
@@ -89,41 +87,36 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     public SpringBootServiceImpl(Project p) {
         final FileObject projectDirectory = p.getProjectDirectory();
-        if(p instanceof NbMavenProjectImpl){
+        if (p instanceof NbMavenProjectImpl) {
             logger.log(INFO, "Creating Spring Boot service for project {0}", FileUtil.getFileDisplayName(projectDirectory));
-            this.mvnPrj = (NbMavenProjectImpl) p;        
-
-            logger.fine("Checking maven project has a spring boot dependency");
+            this.mvnPrj = (NbMavenProjectImpl) p;
             // check maven project is a spring-boot project
-            this.springBootVersion = Utils.getSpringBootVersion(mvnPrj).orElse(null);            
+            logger.fine("Checking maven project has a spring boot dependency");
+            this.springBootVersion = Utils.getSpringBootVersion(mvnPrj).orElse(null);
             // early exit if no spring boot dependency detected
             if (springBootVersion == null) {
                 return;
             }
-            
             // listen for pom changes
             logger.info("Adding maven pom listener...");
-            this.mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if (NbMavenProject.PROP_PROJECT.equals(evt.getPropertyName())) {
-                        logger.log(FINE, "Maven pom change ({0})", evt.getPropertyName());
-                        long start = System.currentTimeMillis();
-                        refresh();
-                        long elapsedMs = System.currentTimeMillis() - start;
-                        logger.log(FINE, "Spring Boot service refresh took {0}ms", elapsedMs);
-                    }
+            this.mvnPrj.getProjectWatcher().addPropertyChangeListener((PropertyChangeEvent evt) -> {
+                if (NbMavenProject.PROP_PROJECT.equals(evt.getPropertyName())) {
+                    logger.log(FINE, "Maven pom change ({0})", evt.getPropertyName());
+                    long start = System.currentTimeMillis();
+                    refresh();
+                    long elapsedMs = System.currentTimeMillis() - start;
+                    logger.log(FINE, "Spring Boot service refresh took {0}ms", elapsedMs);
                 }
-            });            
+            });
         } else {
-            logger.log(SEVERE, "Error creating Spring Boot service for project {0}",  FileUtil.getFileDisplayName(projectDirectory));
+            logger.log(SEVERE, "Error creating Spring Boot service for project {0}", FileUtil.getFileDisplayName(projectDirectory));
         }
     }
 
     @Override
     public void refresh() {
         logger.info("Refreshing Spring Boot service");
-        // check maven project has a dependency starting with 'spring-boot'
+        // re-check maven project is a spring-boot project
         logger.fine("Checking maven project has a spring boot dependency");
         springBootVersion = Utils.getSpringBootVersion(mvnPrj).orElse(null);
         // clear and exit if no spring boot dependency detected
@@ -134,7 +127,7 @@ public class SpringBootServiceImpl implements SpringBootService {
             // TODO delete nbactions.xml file from project dir ?
             return;
         }
-        cachedDepsPresence.clear();        
+        cachedDepsPresence.clear();
         if (cpExec == null) {
             init();
         } else {
@@ -309,8 +302,8 @@ public class SpringBootServiceImpl implements SpringBootService {
         // only adjust nbactions.xml if necessary
         if (foNbAct != null && isAdjustingNeeded(foNbAct)) {
             logger.fine("Adjusting nbactions.xml file");
-            try (FileLock lock = foNbAct.lock()) {
-                try (PrintWriter pw = new PrintWriter(foPrjDir.createAndOpen("nbactions.tmp"))) {
+            try ( FileLock lock = foNbAct.lock()) {
+                try ( PrintWriter pw = new PrintWriter(foPrjDir.createAndOpen("nbactions.tmp"))) {
                     if (isBoot2()) {
                         for (String line : foNbAct.asLines()) {
                             line = line.replace(ENV_RESTART_15, ENV_RESTART_20);
@@ -332,7 +325,7 @@ public class SpringBootServiceImpl implements SpringBootService {
                 Exceptions.printStackTrace(ex);
             }
             FileObject foTmp = foPrjDir.getFileObject("nbactions.tmp");
-            try (FileLock lock = foTmp.lock()) {
+            try ( FileLock lock = foTmp.lock()) {
                 foTmp.move(lock, foPrjDir, "nbactions", "xml");
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
@@ -340,14 +333,14 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
     }
 
-    private boolean isAdjustingNeeded(FileObject nbActions){
+    private boolean isAdjustingNeeded(FileObject nbActions) {
         try {
             String wrongPluginPropsPrefix = isBoot2() ? "<run." : "<spring-boot.run.";
             String wrongRestartTriggerFile = isBoot2() ? ENV_RESTART_15 : ENV_RESTART_20;
             return nbActions.asLines().stream()
-                .anyMatch(line -> line.contains(wrongPluginPropsPrefix) || line.contains(wrongRestartTriggerFile));
-        } catch (IOException ex){
-            Exceptions.printStackTrace(ex);
+                    .anyMatch(line -> line.contains(wrongPluginPropsPrefix) || line.contains(wrongRestartTriggerFile));
+        } catch (IOException ex) {
+            logger.log(WARNING, "IO problem examining nbactions.xml file", ex);
             return false;
         }
     }

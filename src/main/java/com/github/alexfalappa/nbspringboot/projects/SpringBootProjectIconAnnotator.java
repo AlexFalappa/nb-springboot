@@ -15,12 +15,14 @@
  */
 package com.github.alexfalappa.nbspringboot.projects;
 
+import com.github.alexfalappa.nbspringboot.Utils;
 import java.awt.EventQueue;
 import java.awt.Image;
 import java.net.URL;
-
+import java.util.Collections;
+import java.util.Map;
+import java.util.WeakHashMap;
 import javax.swing.event.ChangeListener;
-
 import org.netbeans.api.annotations.common.StaticResource;
 import org.netbeans.api.project.Project;
 import org.netbeans.spi.project.ProjectIconAnnotator;
@@ -29,19 +31,15 @@ import org.openide.util.ImageUtilities;
 import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
-import com.github.alexfalappa.nbspringboot.Utils;
-import java.util.Collections;
-import java.util.Map;
-import java.util.WeakHashMap;
-
 /**
  * Add badge to project icon for Spring Boot projects.
  * <p>
  * Based on project icon annotator for JavaFX projects in NetBeans:
  * javafx/javafx2.project/src/org/netbeans/modules/javafx2/project/JFXProjectIconAnnotator.java
  *
- * @author Hector Espert
  * @author Alessandro Falappa
+ * @author Hector Espert
+ * @author Diego Díez Ricondo
  */
 @ServiceProvider(service = ProjectIconAnnotator.class, position = 10)
 public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {

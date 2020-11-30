@@ -15,15 +15,17 @@
  */
 package com.github.alexfalappa.nbspringboot.codegen;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService;
 import java.awt.Frame;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Level;
-
 import javax.swing.text.JTextComponent;
-
+import org.netbeans.api.project.Project;
 import org.netbeans.modules.maven.model.pom.Dependency;
 import org.netbeans.modules.maven.model.pom.DependencyContainer;
 import org.netbeans.modules.maven.model.pom.DependencyManagement;
@@ -32,11 +34,6 @@ import org.netbeans.modules.maven.model.pom.Repository;
 import org.netbeans.modules.maven.model.pom.RepositoryPolicy;
 import org.openide.windows.WindowManager;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.github.alexfalappa.nbspringboot.Utils;
-import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService;
-import org.netbeans.api.project.Project;
-
 /**
  * Maven POM code generator to add a Spring Boot dependency.
  * <p>
@@ -44,6 +41,7 @@ import org.netbeans.api.project.Project;
  *
  * @see InitializrService
  * @author Alessandro Falappa
+ * @author Diego Díez Ricondo
  */
 public class SpringDependenciesGenerator extends BaseCodeGenerator {
 

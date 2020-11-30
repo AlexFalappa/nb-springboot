@@ -15,21 +15,20 @@
  */
 package com.github.alexfalappa.nbspringboot.projects.customizer;
 
+import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 import javax.swing.JComponent;
-
 import org.netbeans.api.project.Project;
 import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.modules.maven.api.customizer.ModelHandle2;
 import org.netbeans.spi.project.ui.support.ProjectCustomizer;
 import org.openide.util.Lookup;
 
-import com.github.alexfalappa.nbspringboot.Utils;
-import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
-
 /**
  * Creates the Spring Boot customizer panel when maven projects have a dependency named 'spring-boot-####'.
  *
  * @author Alessandro Falappa
+ * @author Diego Díez Ricondo
  */
 @ProjectCustomizer.CompositeCategoryProvider.Registration(projectType = "org-netbeans-modules-maven", position = 1300)
 public class BootPanelProvider implements ProjectCustomizer.CompositeCategoryProvider {

@@ -15,6 +15,12 @@
  */
 package com.github.alexfalappa.nbspringboot;
 
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
+import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.FileObjectCompletionItem;
+import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
+import com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel;
+import com.github.alexfalappa.nbspringboot.projects.service.impl.HintSupport;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
@@ -24,12 +30,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashSet;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.logging.Level;
+import static java.util.logging.Level.FINE;
+import static java.util.logging.Level.WARNING;
 import java.util.logging.Logger;
 import java.util.regex.Pattern;
-
+import static java.util.regex.Pattern.compile;
+import java.util.stream.Stream;
 import javax.swing.AbstractButton;
 import javax.swing.DefaultButtonModel;
 import javax.swing.Icon;
@@ -37,7 +48,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.UIManager;
-
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.project.MavenProject;
 import org.netbeans.api.java.classpath.ClassPath;
@@ -47,6 +58,7 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
+import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.openide.filesystems.FileObject;
@@ -61,26 +73,11 @@ import org.springframework.boot.configurationmetadata.ConfigurationMetadataPrope
 import org.springframework.boot.configurationmetadata.Deprecation;
 import org.springframework.boot.configurationmetadata.ValueHint;
 
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.FileObjectCompletionItem;
-import com.github.alexfalappa.nbspringboot.cfgprops.completion.items.ValueCompletionItem;
-import com.github.alexfalappa.nbspringboot.projects.customizer.BootPanel;
-import com.github.alexfalappa.nbspringboot.projects.service.impl.HintSupport;
-
-import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
-import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
-import java.util.Objects;
-import java.util.Optional;
-import static java.util.logging.Level.FINE;
-import static java.util.logging.Level.WARNING;
-import static java.util.regex.Pattern.compile;
-import java.util.stream.Stream;
-import org.apache.maven.artifact.Artifact;
-import org.netbeans.modules.maven.NbMavenProjectImpl;
-
 /**
  * Utility methods used in the plugin.
  *
  * @author Alessandro Falappa
+ * @author Diego Díez Ricondo
  */
 public final class Utils {
 
@@ -367,7 +364,7 @@ public final class Utils {
                     startOffset -= filePart.length();
                 }
                 if (pTest != null) {
-                    try (DirectoryStream<Path> stream = Files.newDirectoryStream(pTest)) {
+                    try ( DirectoryStream<Path> stream = Files.newDirectoryStream(pTest)) {
                         for (Path p : stream) {
                             if (Files.isReadable(p)) {
                                 String fname = p.toString().toLowerCase();
@@ -502,27 +499,38 @@ public final class Utils {
         }
         return false;
     }
-    
-    // find the 'spring-boot-starter' dependency (direct or transitive) and get its effective version
+
+    /**
+     * Find the 'spring-boot-starter' dependency (direct or transitive) and get its effective version.
+     *
+     * @param project The poject to examine
+     * @return the version of the found 'spring-boot-starter' artifact
+     */
     public static Optional<String> getSpringBootVersion(Project project) {
         return Stream.of(project)
                 .filter(Objects::nonNull)
                 .filter(NbMavenProjectImpl.class::isInstance)
                 .map(NbMavenProjectImpl.class::cast)
                 // All dependencies that this project has, including transitive ones.
-                .flatMap(p -> ((Set<Artifact>)p.getOriginalMavenProject().getArtifacts()).stream())
+                .flatMap(p -> ((Set<Artifact>) p.getOriginalMavenProject().getArtifacts()).stream())
                 .filter(Utils::isSpringBootStarterArtifact)
                 .map(Artifact::getVersion)
                 .peek(springBootVersion -> logger.log(FINE, "Spring Boot version {0} detected", springBootVersion))
                 .findFirst();
     }
-    
-    public static boolean isSpringBootProject(Project project){
-        return getSpringBootVersion(project).isPresent();
-    }
-    
-    public static boolean isSpringBootStarterArtifact(Artifact artifact){
+
+    private static boolean isSpringBootStarterArtifact(Artifact artifact) {
         return "org.springframework.boot".equals(artifact.getGroupId())
                 && "spring-boot-starter".equals(artifact.getArtifactId());
+    }
+
+    /**
+     * Tells whether a project is a Spring Boot project (i.e. has a 'spring-boot-starter' dependency).
+     *
+     * @param project The poject to examine
+     * @return true if the project is a Spring Boot project
+     */
+    public static boolean isSpringBootProject(Project project) {
+        return getSpringBootVersion(project).isPresent();
     }
 }
