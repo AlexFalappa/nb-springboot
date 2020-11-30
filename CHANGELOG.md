@@ -1,5 +1,9 @@
 # Changelog
 
+-  **Unreleased**
+    -  Fix NPE when trying to access Spring Boot section of project properties dialog on the parent in a multimodule project (contribution by Diego Díez Ricondo)
+    -  Under the hood improvements to badge icon project annotation and Spring Boot version detection (contribution by Diego Díez Ricondo)
+
 -  **3.1** (July 2020): Refinements
     -  Single column layout of Spring Boot Dependencies in Initializr wizard and _Add Spring Boot Dependencies_ dialog
     -  Support of `java.time.Period` configuration properties in completion and data type mismatch highlighting (new feature in Spring Boot 2.3.x)
