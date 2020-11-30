@@ -25,7 +25,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -51,6 +50,7 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootServic
 
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
+import static java.util.logging.Level.SEVERE;
 import static java.util.regex.Pattern.compile;
 
 /**
@@ -79,19 +79,45 @@ public class SpringBootServiceImpl implements SpringBootService {
     private SimpleConfigurationMetadataRepository repo = new SimpleConfigurationMetadataRepository();
     private final Map<String, ConfigurationMetadataRepository> reposInJars = new HashMap<>();
     private NbMavenProjectImpl mvnPrj;
+    private String springBootVersion;    
     private ClassPath cpExec;
     private Map<String, ConfigurationMetadataProperty> cachedProperties;
-    private Map<String, Boolean> cachedDepsPresence = new HashMap<>();
+    private final Map<String, Boolean> cachedDepsPresence = new HashMap<>();
     private final Set<String> collectionProperties = new HashSet<>();
     private final Set<String> mapProperties = new HashSet<>();
     private final Map<String, HintProvider> providerMap = new HashMap<>();
 
     public SpringBootServiceImpl(Project p) {
-        if (p instanceof NbMavenProjectImpl) {
-            this.mvnPrj = (NbMavenProjectImpl) p;
+        final FileObject projectDirectory = p.getProjectDirectory();
+        if(p instanceof NbMavenProjectImpl){
+            logger.log(INFO, "Creating Spring Boot service for project {0}", FileUtil.getFileDisplayName(projectDirectory));
+            this.mvnPrj = (NbMavenProjectImpl) p;        
+
+            logger.fine("Checking maven project has a spring boot dependency");
+            // check maven project is a spring-boot project
+            this.springBootVersion = Utils.getSpringBootVersion(mvnPrj).orElse(null);            
+            // early exit if no spring boot dependency detected
+            if (springBootVersion == null) {
+                return;
+            }
+            
+            // listen for pom changes
+            logger.info("Adding maven pom listener...");
+            this.mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if (NbMavenProject.PROP_PROJECT.equals(evt.getPropertyName())) {
+                        logger.log(FINE, "Maven pom change ({0})", evt.getPropertyName());
+                        long start = System.currentTimeMillis();
+                        refresh();
+                        long elapsedMs = System.currentTimeMillis() - start;
+                        logger.log(FINE, "Spring Boot service refresh took {0}ms", elapsedMs);
+                    }
+                }
+            });            
+        } else {
+            logger.log(SEVERE, "Error creating Spring Boot service for project {0}",  FileUtil.getFileDisplayName(projectDirectory));
         }
-        final FileObject projectDirectory = mvnPrj.getProjectDirectory();
-        logger.log(Level.INFO, "Creating Spring Boot service for project {0}", FileUtil.getFileDisplayName(projectDirectory));
     }
 
     @Override
@@ -99,16 +125,16 @@ public class SpringBootServiceImpl implements SpringBootService {
         logger.info("Refreshing Spring Boot service");
         // check maven project has a dependency starting with 'spring-boot'
         logger.fine("Checking maven project has a spring boot dependency");
-        boolean springBootAvailable = Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
+        springBootVersion = Utils.getSpringBootVersion(mvnPrj).orElse(null);
         // clear and exit if no spring boot dependency detected
-        if (!springBootAvailable) {
+        if (springBootVersion == null) {
             reposInJars.clear();
             collectionProperties.clear();
             mapProperties.clear();
             // TODO delete nbactions.xml file from project dir ?
             return;
         }
-        cachedDepsPresence.clear();
+        cachedDepsPresence.clear();        
         if (cpExec == null) {
             init();
         } else {
@@ -194,16 +220,10 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public boolean hasPomDependency(String artifactId) {
-        if (cpExec == null) {
-            init();
+        if (!cachedDepsPresence.containsKey(artifactId)) {
+            cachedDepsPresence.put(artifactId, Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), artifactId));
         }
-        if (cachedDepsPresence != null) {
-            if (!cachedDepsPresence.containsKey(artifactId)) {
-                cachedDepsPresence.put(artifactId, Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), artifactId));
-            }
-            return cachedDepsPresence.get(artifactId);
-        }
-        return false;
+        return cachedDepsPresence.get(artifactId);
     }
 
     @Override
@@ -217,34 +237,9 @@ public class SpringBootServiceImpl implements SpringBootService {
     }
 
     private void init() {
-        if (mvnPrj == null) {
-            return;
-        }
-        logger.info("Initializing Spring Boot service");
-        // check maven project has a dependency starting with 'spring-boot'
-        boolean springBootAvailable = Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), "spring-boot");
-        logger.fine("Checking maven project has a spring boot dependency");
-        // early exit if no spring boot dependency detected
-        if (!springBootAvailable) {
-            return;
-        }
-        logger.log(INFO, "Initializing SpringBootService for project {0}", new Object[]{mvnPrj.toString()});
-        cachedDepsPresence.clear();
         // set up a reference to the execute classpath object
         cpExec = Utils.execClasspathForProj(mvnPrj);
         if (cpExec != null) {
-            // listen for pom changes
-            logger.info("Adding maven pom listener...");
-            mvnPrj.getProjectWatcher().addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    final String propertyName = String.valueOf(evt.getPropertyName());
-                    logger.log(FINE, "Maven pom change ({0})", propertyName);
-                    if (propertyName.equals("MavenProject")) {
-                        refresh();
-                    }
-                }
-            });
             // populate hint providers map
             FileObject resourcesFolder = Utils.resourcesFolderForProj(mvnPrj);
             providerMap.put("logger-name", new LoggerNameHintProvider(resourcesFolder));
@@ -305,21 +300,14 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     // tell if the project currently uses Spring Boot 2.x
     private boolean isBoot2() {
-        boolean flag = false;
-        if (mvnPrj != null) {
-            // retrieve boot version from parent pom declaration if present
-            // TODO also look into parent hierarchy
-            // TODO also try to look in dependency management section (inclusion of spring boot BOM)
-            String bootVer = mvnPrj.getOriginalMavenProject().getParentArtifact().getVersion();
-            flag = bootVer.startsWith("2");
-        }
-        return flag;
+        return springBootVersion != null && springBootVersion.startsWith("2");
     }
 
     private void adjustNbActions() {
         final FileObject foPrjDir = mvnPrj.getProjectDirectory();
         FileObject foNbAct = foPrjDir.getFileObject("nbactions.xml");
-        if (foNbAct != null) {
+        // only adjust nbactions.xml if necessary
+        if (foNbAct != null && isAdjustingNeeded(foNbAct)) {
             logger.fine("Adjusting nbactions.xml file");
             try (FileLock lock = foNbAct.lock()) {
                 try (PrintWriter pw = new PrintWriter(foPrjDir.createAndOpen("nbactions.tmp"))) {
@@ -349,6 +337,18 @@ public class SpringBootServiceImpl implements SpringBootService {
             } catch (IOException ex) {
                 Exceptions.printStackTrace(ex);
             }
+        }
+    }
+
+    private boolean isAdjustingNeeded(FileObject nbActions){
+        try {
+            String wrongPluginPropsPrefix = isBoot2() ? "<run." : "<spring-boot.run.";
+            String wrongRestartTriggerFile = isBoot2() ? ENV_RESTART_15 : ENV_RESTART_20;
+            return nbActions.asLines().stream()
+                .anyMatch(line -> line.contains(wrongPluginPropsPrefix) || line.contains(wrongRestartTriggerFile));
+        } catch (IOException ex){
+            Exceptions.printStackTrace(ex);
+            return false;
         }
     }
 

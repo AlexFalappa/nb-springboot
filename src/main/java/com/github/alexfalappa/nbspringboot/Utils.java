@@ -68,8 +68,14 @@ import com.github.alexfalappa.nbspringboot.projects.service.impl.HintSupport;
 
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS;
 import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_VM_OPTS_LAUNCH;
+import java.util.Objects;
+import java.util.Optional;
+import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.WARNING;
 import static java.util.regex.Pattern.compile;
+import java.util.stream.Stream;
+import org.apache.maven.artifact.Artifact;
+import org.netbeans.modules.maven.NbMavenProjectImpl;
 
 /**
  * Utility methods used in the plugin.
@@ -495,5 +501,28 @@ public final class Utils {
             }
         }
         return false;
+    }
+    
+    // find the 'spring-boot-starter' dependency (direct or transitive) and get its effective version
+    public static Optional<String> getSpringBootVersion(Project project) {
+        return Stream.of(project)
+                .filter(Objects::nonNull)
+                .filter(NbMavenProjectImpl.class::isInstance)
+                .map(NbMavenProjectImpl.class::cast)
+                // All dependencies that this project has, including transitive ones.
+                .flatMap(p -> ((Set<Artifact>)p.getOriginalMavenProject().getArtifacts()).stream())
+                .filter(Utils::isSpringBootStarterArtifact)
+                .map(Artifact::getVersion)
+                .peek(springBootVersion -> logger.log(FINE, "Spring Boot version {0} detected", springBootVersion))
+                .findFirst();
+    }
+    
+    public static boolean isSpringBootProject(Project project){
+        return getSpringBootVersion(project).isPresent();
+    }
+    
+    public static boolean isSpringBootStarterArtifact(Artifact artifact){
+        return "org.springframework.boot".equals(artifact.getGroupId())
+                && "spring-boot-starter".equals(artifact.getArtifactId());
     }
 }
