@@ -523,7 +523,7 @@ public class BootPanel extends javax.swing.JPanel {
                         logger.log(FINER, "Overridden cfg property: {0}", ovr);
                         break;
                     default:
-                        logger.log(WARNING, "Couldn't reparse command line argument: {0}", arg);
+                        logger.log(WARNING, "Couldn''t reparse command line argument: {0}", arg);
                 }
             } else {
                 // other command line arg

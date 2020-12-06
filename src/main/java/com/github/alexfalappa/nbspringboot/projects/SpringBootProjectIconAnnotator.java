@@ -32,7 +32,7 @@ import org.openide.util.RequestProcessor;
 import org.openide.util.lookup.ServiceProvider;
 
 /**
- * Add badge to project icon for Spring Boot projects.
+ * Add badge to project icon of Spring Boot projects.
  * <p>
  * Based on project icon annotator for JavaFX projects in NetBeans:
  * javafx/javafx2.project/src/org/netbeans/modules/javafx2/project/JFXProjectIconAnnotator.java
@@ -45,10 +45,10 @@ import org.openide.util.lookup.ServiceProvider;
 public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {
 
     @StaticResource
-    private static final String SPRING_BOOT_PROJECT_BADGE_PATH = "com/github/alexfalappa/nbspringboot/projects/springboot-badge.png";    //NOI18N
-    private static final URL SPRING_BOOT_PROJECT_BADGE_URL = SpringBootProjectIconAnnotator.class.getClassLoader().getResource(SPRING_BOOT_PROJECT_BADGE_PATH);
-    private static final Image SPRING_BOOT_PROJECT_BADGE = ImageUtilities.loadImage(SPRING_BOOT_PROJECT_BADGE_PATH);
-    private static final String SPRING_BOOT_PROJECT_TOOLTIP_TEXT = "Spring Boot application";
+    private static final String BOOT_PROJECT_BADGE_PATH = "com/github/alexfalappa/nbspringboot/projects/springboot-badge.png";    //NOI18N
+    private static final URL BOOT_PROJECT_BADGE_URL = SpringBootProjectIconAnnotator.class.getClassLoader().getResource(BOOT_PROJECT_BADGE_PATH);
+    private static final Image BOOT_PROJECT_BADGE_IMG = ImageUtilities.loadImage(BOOT_PROJECT_BADGE_PATH);
+    private static final String BOOT_PROJECT_TOOLTIP_TEXT = "Spring Boot application";
     private final ChangeSupport cs = new ChangeSupport(this);
     private final Map<Project, Boolean> projectsMap = Collections.synchronizedMap(new WeakHashMap<>());
 
@@ -59,15 +59,15 @@ public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {
         // TODO: once the project is detected as spring-boot is not evaluated anymore until netbeans restart
         if (type != null && type == true) {
             String tooltip = ImageUtilities.getImageToolTip(original);
-            if (!tooltip.contains(SPRING_BOOT_PROJECT_TOOLTIP_TEXT)) {
-                final String messageHtml = String.format(
-                        "<img src=\"%s\">&nbsp;" + SPRING_BOOT_PROJECT_TOOLTIP_TEXT, //NOI18N
-                        SPRING_BOOT_PROJECT_BADGE_URL.toExternalForm());
+            if (!tooltip.contains(BOOT_PROJECT_TOOLTIP_TEXT)) {
+                final String htmlMessage = "<img src=\"" //NOI18N
+                        + BOOT_PROJECT_BADGE_URL.toExternalForm()
+                        + "\">&nbsp;" //NOI18N
+                        + BOOT_PROJECT_TOOLTIP_TEXT;
                 annotated = ImageUtilities.mergeImages(
-                        ImageUtilities.addToolTipToImage(original, messageHtml),
-                        SPRING_BOOT_PROJECT_BADGE,
-                        7,
-                        7);
+                        ImageUtilities.addToolTipToImage(original, htmlMessage),
+                        BOOT_PROJECT_BADGE_IMG,
+                        7, 7);
             }
         } else {
             evaluateProject(p);
@@ -98,11 +98,11 @@ public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {
                 cs.fireChange();
             }
         };
-        if (!EventQueue.isDispatchThread()) {
+        if (EventQueue.isDispatchThread()) {
             runEvaluateProject.run();
         } else {
-            final RequestProcessor RP = new RequestProcessor(SpringBootProjectIconAnnotator.class.getName());
-            RP.post(runEvaluateProject);
+            final RequestProcessor rp = new RequestProcessor(SpringBootProjectIconAnnotator.class.getName());
+            rp.post(runEvaluateProject);
         }
     }
 

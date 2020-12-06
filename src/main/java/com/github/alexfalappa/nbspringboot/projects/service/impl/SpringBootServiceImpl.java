@@ -92,7 +92,7 @@ public class SpringBootServiceImpl implements SpringBootService {
             this.mvnPrj = (NbMavenProjectImpl) p;
             // check maven project is a spring-boot project
             logger.fine("Checking maven project has a spring boot dependency");
-            this.springBootVersion = Utils.getSpringBootVersion(mvnPrj).orElse(null);
+            springBootVersion = Utils.getSpringBootVersion(mvnPrj).orElse(null);
             // early exit if no spring boot dependency detected
             if (springBootVersion == null) {
                 return;
