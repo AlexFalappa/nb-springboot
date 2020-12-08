@@ -22,6 +22,8 @@ import java.net.URL;
 import java.util.Collections;
 import java.util.Map;
 import java.util.WeakHashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.event.ChangeListener;
 import org.netbeans.api.annotations.common.StaticResource;
 import org.netbeans.api.project.Project;
@@ -49,25 +51,29 @@ public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {
     private static final URL BOOT_PROJECT_BADGE_URL = SpringBootProjectIconAnnotator.class.getClassLoader().getResource(BOOT_PROJECT_BADGE_PATH);
     private static final Image BOOT_PROJECT_BADGE_IMG = ImageUtilities.loadImage(BOOT_PROJECT_BADGE_PATH);
     private static final String BOOT_PROJECT_TOOLTIP_TEXT = "Spring Boot application";
+    private static final Logger logger = Logger.getLogger(SpringBootProjectIconAnnotator.class.getName());
     private final ChangeSupport cs = new ChangeSupport(this);
     private final Map<Project, Boolean> projectsMap = Collections.synchronizedMap(new WeakHashMap<>());
 
     @Override
     public Image annotateIcon(final Project p, Image original, final boolean openedNode) {
         Image annotated = original;
-        Boolean type = projectsMap.get(p);
-        // TODO: once the project is detected as spring-boot is not evaluated anymore until netbeans restart
-        if (type != null && type == true) {
-            String tooltip = ImageUtilities.getImageToolTip(original);
-            if (!tooltip.contains(BOOT_PROJECT_TOOLTIP_TEXT)) {
-                final String htmlMessage = "<img src=\"" //NOI18N
-                        + BOOT_PROJECT_BADGE_URL.toExternalForm()
-                        + "\">&nbsp;" //NOI18N
-                        + BOOT_PROJECT_TOOLTIP_TEXT;
-                annotated = ImageUtilities.mergeImages(
-                        ImageUtilities.addToolTipToImage(original, htmlMessage),
-                        BOOT_PROJECT_BADGE_IMG,
-                        7, 7);
+        Boolean isBootPrj = projectsMap.get(p);
+        if (isBootPrj != null) {
+            // TODO: once the project is detected as spring-boot is not evaluated anymore until netbeans restart
+            if (isBootPrj) {
+                logger.log(Level.FINE, "Annotating icon for {0}", p.toString());
+                String tooltip = ImageUtilities.getImageToolTip(original);
+                if (!tooltip.contains(BOOT_PROJECT_TOOLTIP_TEXT)) {
+                    final String htmlMessage = "<img src=\"" //NOI18N
+                            + BOOT_PROJECT_BADGE_URL.toExternalForm()
+                            + "\">&nbsp;" //NOI18N
+                            + BOOT_PROJECT_TOOLTIP_TEXT;
+                    annotated = ImageUtilities.mergeImages(
+                            ImageUtilities.addToolTipToImage(original, htmlMessage),
+                            BOOT_PROJECT_BADGE_IMG,
+                            7, 7);
+                }
             }
         } else {
             evaluateProject(p);
@@ -85,20 +91,16 @@ public class SpringBootProjectIconAnnotator implements ProjectIconAnnotator {
         cs.removeChangeListener(listener);
     }
 
-    public void fireChange(final Project p, boolean type) {
-        projectsMap.put(p, type);
-        cs.fireChange();
-    }
-
     private void evaluateProject(final Project prj) {
         final Runnable runEvaluateProject = () -> {
+            logger.log(Level.FINE, "Evaluating icon badge for {0}", prj.toString());
             boolean flag = Utils.isSpringBootProject(prj);
             projectsMap.put(prj, flag);
             if (flag == true) {
                 cs.fireChange();
             }
         };
-        if (EventQueue.isDispatchThread()) {
+        if (!EventQueue.isDispatchThread()) {
             runEvaluateProject.run();
         } else {
             final RequestProcessor rp = new RequestProcessor(SpringBootProjectIconAnnotator.class.getName());
