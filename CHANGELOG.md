@@ -1,6 +1,7 @@
 # Changelog
 
 -  **Unreleased**
+    -  Frequently used dependencies counts are also updated using the _Add Spring Boot Dependencies_ dialog
     -  Fix NPE when trying to access Spring Boot section of project properties dialog on the parent in a multimodule project (contribution by Diego Díez Ricondo)
     -  Under the hood improvements to badge icon project annotation and Spring Boot version detection (contribution by Diego Díez Ricondo)
 

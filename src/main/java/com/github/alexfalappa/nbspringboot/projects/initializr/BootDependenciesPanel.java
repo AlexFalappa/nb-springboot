@@ -42,6 +42,7 @@ import org.openide.util.Exceptions;
 import org.openide.util.NbPreferences;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.util.Collection;
 
 import static javax.swing.SwingConstants.HORIZONTAL;
 
@@ -157,8 +158,12 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
         blockIncrement = null;
     }
 
-    public static Preferences depsCountPrefNode() {
-        return NbPreferences.forModule(BootDependenciesPanel.class).node("depsUseCount");
+    public static void updateRememberedDeps(Collection<String> deps) {
+        // add to counts in prefs
+        Preferences prefs = depsCountPrefNode();
+        for (String depName : deps) {
+            prefs.putInt(depName, prefs.getInt(depName, 0) + 1);
+        }
     }
 
     public String getSelectedDependenciesString() {
@@ -363,5 +368,9 @@ public class BootDependenciesPanel extends javax.swing.JPanel implements Scrolla
             }
         }
         return getPreferredSize().height / 16;
+    }
+
+    private static Preferences depsCountPrefNode() {
+        return NbPreferences.forModule(BootDependenciesPanel.class).node("depsUseCount");
     }
 }

@@ -75,6 +75,8 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_REMOVE_MVN_WRAPPER;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_USE_SB_MVN_PLUGIN;
 import static com.github.alexfalappa.nbspringboot.projects.initializr.InitializrProjectProps.WIZ_VERSION;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Wizard iterator for Spring Boot Initializr projects.
@@ -159,12 +161,8 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
                 ProjectChooser.setProjectsFolder(parent);
             }
             // remember used deps
-            final Preferences prefs = BootDependenciesPanel.depsCountPrefNode();
-            String[] splitDeps = deps.split(",");
-            // add to counts in prefs
-            for (String depName : splitDeps) {
-                prefs.putInt(depName, prefs.getInt(depName, 0) + 1);
-            }
+            List<String> depList = Arrays.asList(deps.split(","));
+            BootDependenciesPanel.updateRememberedDeps(depList);
         } catch (Exception ex) {
             Exceptions.printStackTrace(ex);
         }

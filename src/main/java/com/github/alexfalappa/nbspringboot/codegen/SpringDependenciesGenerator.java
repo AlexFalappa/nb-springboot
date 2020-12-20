@@ -119,9 +119,13 @@ public class SpringDependenciesGenerator extends BaseCodeGenerator {
                     container.addDependency(dep);
                     logger.log(Level.FINE, "Added {0}:{1}", new Object[]{groupId, artifactId});
                     newCaretPos = model.getAccess().findPosition(dep.getPeer());
+                } else {
+                    // remove for later remembering
+                    selectedDeps.remove(entry.getKey());
                 }
             }
         }
+        BootDependenciesPanel.updateRememberedDeps(selectedDeps);
         return newCaretPos;
     }
 
