@@ -17,6 +17,7 @@ package com.github.alexfalappa.nbspringboot.codegen;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.github.alexfalappa.nbspringboot.Utils;
+import com.github.alexfalappa.nbspringboot.projects.initializr.BootDependenciesPanel;
 import com.github.alexfalappa.nbspringboot.projects.initializr.InitializrService;
 import java.awt.Frame;
 import java.util.Iterator;
@@ -95,7 +96,7 @@ public class SpringDependenciesGenerator extends BaseCodeGenerator {
                     dep.setArtifactId(artifactId);
                     // set scope only if not 'compile'
                     if (!scope.equals("compile")) {
-                        if (scope.equals("compileOnly")) {
+                        if (scope.equals("compileOnly") || scope.equals("annotationProcessor")) {
                             dep.setOptional(Boolean.TRUE);
                         } else {
                             // scope is 'runtime' or 'test'
