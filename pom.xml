@@ -14,7 +14,7 @@
         <netbeans.api.version>RELEASE82</netbeans.api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <skipTests>true</skipTests>
-        <spring.framework.version>5.2.8.RELEASE</spring.framework.version>
+        <spring.framework.version>6.0.0</spring.framework.version>
     </properties>
 
     <dependencies>
