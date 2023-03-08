@@ -221,12 +221,12 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     @Override
     public String getRestartEnvVarName() {
-        return isBoot2() ? ENV_RESTART_20 : ENV_RESTART_15;
+        return isBoot1() ? ENV_RESTART_15 : ENV_RESTART;
     }
 
     @Override
     public String getPluginPropsPrefix() {
-        return isBoot2() ? "spring-boot.run" : "run";
+        return isBoot1() ? "run" : "spring-boot.run";
     }
 
     private void init() {
@@ -291,9 +291,9 @@ public class SpringBootServiceImpl implements SpringBootService {
         }
     }
 
-    // tell if the project currently uses Spring Boot 2.x
-    private boolean isBoot2() {
-        return springBootVersion != null && springBootVersion.startsWith("2");
+    // tell if the project currently uses Spring Boot 1.x
+    private boolean isBoot1() {
+        return springBootVersion != null && springBootVersion.startsWith("1");
     }
 
     private void adjustNbActions() {
@@ -304,18 +304,18 @@ public class SpringBootServiceImpl implements SpringBootService {
             logger.fine("Adjusting nbactions.xml file");
             try ( FileLock lock = foNbAct.lock()) {
                 try ( PrintWriter pw = new PrintWriter(foPrjDir.createAndOpen("nbactions.tmp"))) {
-                    if (isBoot2()) {
+                    if (isBoot1()) {
                         for (String line : foNbAct.asLines()) {
-                            line = line.replace(ENV_RESTART_15, ENV_RESTART_20);
-                            line = line.replace("<run.", "<spring-boot.run.");
-                            line = line.replace("</run.", "</spring-boot.run.");
-                            pw.println(line);
-                        }
-                    } else {
-                        for (String line : foNbAct.asLines()) {
-                            line = line.replace(ENV_RESTART_20, ENV_RESTART_15);
+                            line = line.replace(ENV_RESTART, ENV_RESTART_15);
                             line = line.replace("<spring-boot.run.", "<run.");
                             line = line.replace("</spring-boot.run.", "</run.");
+                            pw.println(line);
+                        }
+                    } else {                        
+                        for (String line : foNbAct.asLines()) {
+                            line = line.replace(ENV_RESTART_15, ENV_RESTART);
+                            line = line.replace("<run.", "<spring-boot.run.");
+                            line = line.replace("</run.", "</spring-boot.run.");
                             pw.println(line);
                         }
                     }
@@ -335,8 +335,8 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     private boolean isAdjustingNeeded(FileObject nbActions) {
         try {
-            String wrongPluginPropsPrefix = isBoot2() ? "<run." : "<spring-boot.run.";
-            String wrongRestartTriggerFile = isBoot2() ? ENV_RESTART_15 : ENV_RESTART_20;
+            String wrongPluginPropsPrefix = isBoot1() ? "<run." : "<spring-boot.run.";
+            String wrongRestartTriggerFile = isBoot1() ? ENV_RESTART_15 : ENV_RESTART;
             return nbActions.asLines().stream()
                     .anyMatch(line -> line.contains(wrongPluginPropsPrefix) || line.contains(wrongRestartTriggerFile));
         } catch (IOException ex) {

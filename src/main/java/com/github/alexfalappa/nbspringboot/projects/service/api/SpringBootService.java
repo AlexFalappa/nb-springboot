@@ -29,7 +29,7 @@ import org.springframework.boot.configurationmetadata.ConfigurationMetadataPrope
 public interface SpringBootService {
 
     public static final String ENV_RESTART_15 = "SPRING_DEVTOOLS_RESTART_TRIGGER_FILE";
-    public static final String ENV_RESTART_20 = "SPRING_DEVTOOLS_RESTART_TRIGGERFILE";
+    public static final String ENV_RESTART = "SPRING_DEVTOOLS_RESTART_TRIGGERFILE";
 
     void refresh();
 

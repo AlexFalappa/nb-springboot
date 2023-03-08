@@ -262,7 +262,7 @@ public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInst
         final boolean bManualRestart = prefs.getBoolean(PREF_MANUAL_RESTART, false);
         final String strVmOpts = Utils.vmOptsFromPrefs();
         // compute name of devtools restart trigger file
-        String triggerFileEnv = BOOTVERSION.startsWith("2") ? SpringBootService.ENV_RESTART_20 : SpringBootService.ENV_RESTART_15;
+        String triggerFileEnv = BOOTVERSION.startsWith("1") ? SpringBootService.ENV_RESTART_15 : SpringBootService.ENV_RESTART;
         // create nbactions.xml from template
         FileObject foTmpl = Templates.getTemplate(wiz);
         new FileBuilder(foTmpl, dir)
