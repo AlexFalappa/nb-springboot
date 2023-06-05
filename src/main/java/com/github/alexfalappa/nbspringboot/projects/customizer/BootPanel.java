@@ -476,7 +476,7 @@ public class BootPanel extends javax.swing.JPanel {
             }
         }
         if (sbEnabled.length() > 0) {
-            final String csv = sbEnabled.toString().trim().replaceAll("\\s+", ",");
+            final String csv = sbEnabled.toString().trim().replaceAll("\\s+", " ");
             runProps.put(propRunArgs, csv);
             debugProps.put(propRunArgs, csv);
         } else {
@@ -484,7 +484,7 @@ public class BootPanel extends javax.swing.JPanel {
             debugProps.remove(propRunArgs);
         }
         if (sbDisabled.length() > 0) {
-            final String csv = sbDisabled.toString().trim().replaceAll("\\s+", ",");
+            final String csv = sbDisabled.toString().trim().replaceAll("\\s+", " ");
             runProps.put(propDisablebArgs, csv);
             debugProps.put(propDisablebArgs, csv);
         } else {
@@ -508,7 +508,7 @@ public class BootPanel extends javax.swing.JPanel {
 
     private void parseProperty(StringBuilder sb, String prop, boolean enabled) {
         logger.log(FINE, "Parsing project property: {0}", prop);
-        for (String arg : prop.split(",")) {
+        for (String arg : prop.split(" ")) {
             if (arg.startsWith("--")) {
                 // configuration properties override
                 String[] parts = arg.substring(2).split("=");
