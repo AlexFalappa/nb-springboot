@@ -2,6 +2,7 @@
 
 NetBeans IDE plugin supporting programming with [Spring Boot](http://projects.spring.io/spring-boot).
 
+![Downloads](https://img.shields.io/endpoint?url=https://openbeans.org/plugin-counter/api/4)
 
 ## Requirements and Installation
 
