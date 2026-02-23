@@ -23,7 +23,6 @@ import java.util.logging.Logger;
 
 import org.apache.commons.collections4.map.LRUMap;
 import org.openide.util.NbPreferences;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
@@ -43,6 +42,7 @@ import static com.github.alexfalappa.nbspringboot.projects.initializr.Initializr
 import static java.util.logging.Level.FINE;
 import static java.util.logging.Level.INFO;
 import static org.springframework.http.HttpStatus.OK;
+import org.springframework.http.HttpStatusCode;
 import static org.springframework.http.MediaType.APPLICATION_OCTET_STREAM;
 
 /**
@@ -95,7 +95,7 @@ public class InitializrService {
             long start = System.currentTimeMillis();
             ResponseEntity<String> respEntity = rt.exchange(req, String.class);
             // analyze response
-            final HttpStatus statusCode = respEntity.getStatusCode();
+            final HttpStatusCode statusCode = respEntity.getStatusCode();
             if (statusCode == OK) {
                 ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
                 metadata = mapper.readTree(respEntity.getBody());
@@ -135,7 +135,7 @@ public class InitializrService {
             long start = System.currentTimeMillis();
             ResponseEntity<String> respEntity = rt.exchange(req, String.class);
             // analyze response
-            final HttpStatus statusCode = respEntity.getStatusCode();
+            final HttpStatusCode statusCode = respEntity.getStatusCode();
             if (statusCode == OK) {
                 ObjectMapper mapper = new ObjectMapper().enable(SerializationFeature.INDENT_OUTPUT);
                 final JsonNode depMeta = mapper.readTree(respEntity.getBody());
@@ -164,7 +164,7 @@ public class InitializrService {
         // prepare parameterized url
         final String serviceUrl = NbPreferences.forModule(PrefConstants.class).get(PREF_INITIALIZR_URL,
                 PrefConstants.DEFAULT_INITIALIZR_URL);
-        UriComponentsBuilder builder = UriComponentsBuilder.fromHttpUrl(serviceUrl.concat("/starter.zip"))
+        UriComponentsBuilder builder = UriComponentsBuilder.fromUriString(serviceUrl.concat("/starter.zip"))
                 .queryParam("type", "maven-project")
                 .queryParam("bootVersion", bootVersion)
                 .queryParam("groupId", mvnGroup)
@@ -190,7 +190,7 @@ public class InitializrService {
         long start = System.currentTimeMillis();
         ResponseEntity<byte[]> respEntity = rt.exchange(req, byte[].class);
         // analyze response outcome
-        final HttpStatus statusCode = respEntity.getStatusCode();
+        final HttpStatusCode statusCode = respEntity.getStatusCode();
         if (statusCode == OK) {
             final ByteArrayInputStream stream = new ByteArrayInputStream(respEntity.getBody());
             logger.log(INFO, "Retrieved archived project from Spring Initializr service. Took {0} msec",

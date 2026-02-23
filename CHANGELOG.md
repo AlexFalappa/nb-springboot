@@ -1,5 +1,14 @@
 # Changelog
 
+-  **4.0-SNAPSHOT** (February 2026): Modernization and Upgrades
+    -  Update project to support modern Java environments (JDK 17 through JDK 25) and Spring Boot 4.x
+    -  Upgrade NetBeans Platform dependencies to `RELEASE270` for Apache NetBeans 27+ compatibility
+    -  Fix plugin installation blocker ("Yenta API is requested") by repackaging the dependency under the hood
+    -  Fix missing `Bundle` class errors on JDK 21+ by enabling full annotation processing (`-proc:full`)
+    -  Fix Maven build issues by removing obsolete `bits.netbeans.org` repository and excluding broken transitive dependencies
+    -  Refactor `InitializrService` to support modern Spring Web APIs (`HttpStatusCode`, `fromUriString`)
+    -  Update `spring-boot-configuration-metadata` to `4.0.1`
+
 -  **Unreleased**
     -  Frequently used dependencies counts are also updated using the _Add Spring Boot Dependencies_ dialog
     -  Fix NPE when trying to access Spring Boot section of project properties dialog on the parent in a multimodule project (contribution by Diego Díez Ricondo)
