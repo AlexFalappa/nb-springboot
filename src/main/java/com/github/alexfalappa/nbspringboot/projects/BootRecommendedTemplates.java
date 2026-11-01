@@ -58,7 +58,7 @@ public class BootRecommendedTemplates implements RecommendedTemplates {
     public String[] getRecommendedTypes() {
         NbMavenProject project = prj.getLookup().lookup(NbMavenProject.class);
         EnumSet<SpringDeps> deps = EnumSet.noneOf(SpringDeps.class);
-        List compileArtifacts = project.getMavenProject().getCompileArtifacts();
+        Set<Artifact> compileArtifacts = project.getMavenProject().getArtifacts();
         for (Object obj : compileArtifacts) {
             if (obj instanceof Artifact) {
                 Artifact artifact = (Artifact) obj;

@@ -6,11 +6,54 @@ NetBeans IDE plugin supporting programming with [Spring Boot](http://projects.sp
 
 ## Requirements and Installation
 
-This plugin requires **NetBeans 8.2** or above running on **JDK 8** or above.
+This development version builds against **Apache NetBeans 30** by default. Use **JDK 21** and **Maven 3.8 or later** to build it:
+
+```sh
+mvn clean verify
+```
+
+The files are generated as `target/nb-springboot-plugin-3.2.jar` and `target/nbm/nb-springboot-plugin-3.2.nbm`. The module identity, name, authors and Apache 2.0 license are preserved. This is a local development build, not a release published by the original author or verified by the NetBeans Plugin Portal.
+
+### Targeted NetBeans builds
+
+The Maven integration requires implementation dependencies on NetBeans Maven modules. Some of these modules include the IDE build identifier in their implementation version. Consequently, **one NBM cannot be claimed to work across all NetBeans releases**. Build for the IDE you intend to use:
+
+```sh
+mvn -Dnetbeans.target=22 clean verify
+mvn -Dnetbeans.target=30 clean verify
+```
+
+These select `RELEASE220` and `RELEASE300`, respectively. Rebuild cleanly when switching targets. NetBeans 32 remains a future target: it requires its published APIs, a separate build and validation. Do not install the NetBeans 22 package in NetBeans 30.
+
+The plugin's own sources target Java 17; the JDK running NetBeans must also meet that IDE's requirements. An application's Java version is separate: the Initializr wizard validates the Java minimum for the selected Spring Boot generation.
+
+### Modernization scope
+
+- Spring Framework 6.2, configuration metadata 3.5, Jackson 2.21 and Parboiled 1.4 replace the older embedded libraries.
+- Run/debug properties use the modern Maven prefix for Spring Boot 2, 3 and 4.
+- `nbactions.xml` migration changes recognized properties only in Spring Boot run actions, preserves unrelated actions and uses atomic replacement. If that operation is unsupported, the original is preserved and a warning is logged.
+- The legacy Yenta installer that changed access to NetBeans internals has been removed. Maven dependencies are explicit and package verification remains strict.
+- Controller templates choose `javax.servlet` for Boot 2 and `jakarta.servlet` for Boot 3/4, with compile-classpath detection for projects without an identified Boot version.
+- The offline basic project uses Spring Boot 3.5.7 and Java 17; Initializr provides the versions currently offered by its service.
+- Initializr cache invalidation is fixed, service errors propagate to the creation wizard and incompatible Java/Boot combinations are rejected.
+- Injecting Boot setup preserves existing build plugins and refuses to overwrite an existing parent POM.
+- Tests run by default. Legacy standalone lexer tests remain excluded because they require a different generated scanner; existing parser and combined lexer tests still run.
+
+Detailed test output is saved under `target/surefire-reports/`; the console retains test summaries and failure reports. SLF4J uses the Java logging backend so plugin messages can use the IDE's logging infrastructure.
+
+Deterministic tests use a local HTTP server. To additionally test the real Initializr metadata, dependencies and project archive:
+
+```sh
+mvn -Dinitializr.live=true clean verify
+```
+
+Interactive installation, Run/Debug, DevTools and editor testing inside each target IDE are still required before declaring that IDE version fully verified. YAML completion, configuration imports and multidocument configuration support remain future work. The upstream issue about editing NetBeans' Run panel is not yet verified as resolved.
+
+Validation on 2026-11-01: the NetBeans 30 package built cleanly with JDK 21 and strict NBM dependency verification. All 99 tests passed, including live Initializr metadata, dependencies and project generation. All 43 declared module dependencies were compared successfully with the installed NetBeans 30 distribution. Earlier regression runs against the NetBeans 22 APIs passed on Java 17 and 21; the final NetBeans 30 package requires its own matching IDE modules.
 
 To perform a manual install download the desired `nbm` package from the [releases page](https://github.com/AlexFalappa/nb-springboot/releases) , go to *Tools > Plugins > Downloaded* and click the *Add Plugins...* button. Choose the downloaded `nbm` package file then click *Install*.
 
-The plugin may be available in the *Plugin Portal Update Center* thus it can be downloaded and installed trough *Tools > Plugins > Available Plugins*. Please note that new releases become available on the *Update Center* after they are verified by the folks at the *NetBeans Plugin Portal*. Note that current NetBeans Plugin Portal (http://plugins.netbeans.org) is undergoing migration at Apache Foundation. A new plugin portal is being set-up (currently at http://netbeans-vm.apache.org/pluginportal but subject to change) and may become the new official source of plugins.
+The upstream plugin is listed in the [NetBeans Plugin Portal](https://plugins.netbeans.apache.org/catalogue/?id=4). That listing does not certify this development build.
 
 ## Features
 

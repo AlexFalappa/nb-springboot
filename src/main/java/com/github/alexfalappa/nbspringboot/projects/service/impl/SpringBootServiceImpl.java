@@ -20,7 +20,6 @@ import com.github.alexfalappa.nbspringboot.projects.service.api.HintProvider;
 import com.github.alexfalappa.nbspringboot.projects.service.api.SpringBootService;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -37,10 +36,8 @@ import java.util.regex.Pattern;
 import static java.util.regex.Pattern.compile;
 import org.netbeans.api.java.classpath.ClassPath;
 import org.netbeans.api.project.Project;
-import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.spi.project.ProjectServiceProvider;
-import org.openide.filesystems.FileLock;
 import org.openide.filesystems.FileObject;
 import org.openide.filesystems.FileUtil;
 import org.openide.util.Exceptions;
@@ -76,10 +73,10 @@ public class SpringBootServiceImpl implements SpringBootService {
     private static final NoopHintProvider NOOP_HINT_PROVIDER = new NoopHintProvider();
     private SimpleConfigurationMetadataRepository repo = new SimpleConfigurationMetadataRepository();
     private final Map<String, ConfigurationMetadataRepository> reposInJars = new HashMap<>();
-    private NbMavenProjectImpl mvnPrj;
+    private Project mvnPrj;
     private String springBootVersion;
     private ClassPath cpExec;
-    private Map<String, ConfigurationMetadataProperty> cachedProperties;
+    private Map<String, ConfigurationMetadataProperty> cachedProperties = java.util.Collections.emptyMap();
     private final Map<String, Boolean> cachedDepsPresence = new HashMap<>();
     private final Set<String> collectionProperties = new HashSet<>();
     private final Set<String> mapProperties = new HashSet<>();
@@ -87,19 +84,15 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     public SpringBootServiceImpl(Project p) {
         final FileObject projectDirectory = p.getProjectDirectory();
-        if (p instanceof NbMavenProjectImpl) {
+        if (p.getLookup().lookup(NbMavenProject.class) != null) {
             logger.log(INFO, "Creating Spring Boot service for project {0}", FileUtil.getFileDisplayName(projectDirectory));
-            this.mvnPrj = (NbMavenProjectImpl) p;
+            this.mvnPrj = p;
             // check maven project is a spring-boot project
             logger.fine("Checking maven project has a spring boot dependency");
             springBootVersion = Utils.getSpringBootVersion(mvnPrj).orElse(null);
-            // early exit if no spring boot dependency detected
-            if (springBootVersion == null) {
-                return;
-            }
             // listen for pom changes
             logger.info("Adding maven pom listener...");
-            this.mvnPrj.getProjectWatcher().addPropertyChangeListener((PropertyChangeEvent evt) -> {
+            this.mvnPrj.getLookup().lookup(NbMavenProject.class).addPropertyChangeListener((PropertyChangeEvent evt) -> {
                 if (NbMavenProject.PROP_PROJECT.equals(evt.getPropertyName())) {
                     logger.log(FINE, "Maven pom change ({0})", evt.getPropertyName());
                     long start = System.currentTimeMillis();
@@ -124,6 +117,8 @@ public class SpringBootServiceImpl implements SpringBootService {
             reposInJars.clear();
             collectionProperties.clear();
             mapProperties.clear();
+            cachedProperties = java.util.Collections.emptyMap();
+            cachedDepsPresence.clear();
             // TODO delete nbactions.xml file from project dir ?
             return;
         }
@@ -214,7 +209,7 @@ public class SpringBootServiceImpl implements SpringBootService {
     @Override
     public boolean hasPomDependency(String artifactId) {
         if (!cachedDepsPresence.containsKey(artifactId)) {
-            cachedDepsPresence.put(artifactId, Utils.dependencyArtifactIdContains(mvnPrj.getProjectWatcher(), artifactId));
+            cachedDepsPresence.put(artifactId, Utils.dependencyArtifactIdContains(mvnPrj.getLookup().lookup(NbMavenProject.class), artifactId));
         }
         return cachedDepsPresence.get(artifactId);
     }
@@ -246,6 +241,8 @@ public class SpringBootServiceImpl implements SpringBootService {
     // Update internal configuration metadata repository
     private void updateConfigRepo() {
         logger.fine("Updating config metadata repo");
+        collectionProperties.clear();
+        mapProperties.clear();
         repo = new SimpleConfigurationMetadataRepository();
         final List<FileObject> cfgMetaFiles = cpExec.findAllResources(METADATA_JSON);
         for (FileObject fo : cfgMetaFiles) {
@@ -293,56 +290,16 @@ public class SpringBootServiceImpl implements SpringBootService {
 
     // tell if the project currently uses Spring Boot 1.x
     private boolean isBoot1() {
-        return springBootVersion != null && springBootVersion.startsWith("1");
+        return com.github.alexfalappa.nbspringboot.projects.BootCompatibility.major(springBootVersion) == 1;
     }
 
     private void adjustNbActions() {
-        final FileObject foPrjDir = mvnPrj.getProjectDirectory();
-        FileObject foNbAct = foPrjDir.getFileObject("nbactions.xml");
-        // only adjust nbactions.xml if necessary
-        if (foNbAct != null && isAdjustingNeeded(foNbAct)) {
-            logger.fine("Adjusting nbactions.xml file");
-            try ( FileLock lock = foNbAct.lock()) {
-                try ( PrintWriter pw = new PrintWriter(foPrjDir.createAndOpen("nbactions.tmp"))) {
-                    if (isBoot1()) {
-                        for (String line : foNbAct.asLines()) {
-                            line = line.replace(ENV_RESTART, ENV_RESTART_15);
-                            line = line.replace("<spring-boot.run.", "<run.");
-                            line = line.replace("</spring-boot.run.", "</run.");
-                            pw.println(line);
-                        }
-                    } else {                        
-                        for (String line : foNbAct.asLines()) {
-                            line = line.replace(ENV_RESTART_15, ENV_RESTART);
-                            line = line.replace("<run.", "<spring-boot.run.");
-                            line = line.replace("</run.", "</spring-boot.run.");
-                            pw.println(line);
-                        }
-                    }
-                }
-                foNbAct.delete(lock);
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-            FileObject foTmp = foPrjDir.getFileObject("nbactions.tmp");
-            try ( FileLock lock = foTmp.lock()) {
-                foTmp.move(lock, foPrjDir, "nbactions", "xml");
-            } catch (IOException ex) {
-                Exceptions.printStackTrace(ex);
-            }
-        }
-    }
-
-    private boolean isAdjustingNeeded(FileObject nbActions) {
+        FileObject actions = mvnPrj.getProjectDirectory().getFileObject("nbactions.xml");
+        if (actions == null) return;
         try {
-            String wrongPluginPropsPrefix = isBoot1() ? "<run." : "<spring-boot.run.";
-            String wrongRestartTriggerFile = isBoot1() ? ENV_RESTART_15 : ENV_RESTART;
-            return nbActions.asLines().stream()
-                    .anyMatch(line -> line.contains(wrongPluginPropsPrefix) || line.contains(wrongRestartTriggerFile));
+            NbActionsMigration.update(actions, isBoot1());
         } catch (IOException ex) {
-            logger.log(WARNING, "IO problem examining nbactions.xml file", ex);
-            return false;
+            logger.log(WARNING, "Could not migrate Spring Boot actions; original file preserved", ex);
         }
     }
-
 }

@@ -86,7 +86,7 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
     }
 
     @Override
-    public List visitClass(final ClassTree node, final Void p) {
+    public List<MappedElement> visitClass(final ClassTree node, final Void p) {
         final List<MappedElement> mappedElements = new ArrayList<>();
         if (canceled || node == null) {
             return mappedElements;
@@ -163,14 +163,13 @@ public final class MappedElementExtractor extends TreeScanner<List<MappedElement
      * Helper for concatenating several arrays.
      *
      * @param <T>
-     * @param data
-     * @return A list with the elements of the arrays in <code>data</code> concatenated
+     * @param first first array
+     * @param second second array
+     * @return a list containing both arrays in order
      */
-    <T> List<T> concatValues(final T[]... data) {
-        final List<T> rv = new ArrayList<>();
-        for (T[] values : data) {
-            rv.addAll(Arrays.asList(values));
-        }
+    <T> List<T> concatValues(final T[] first, final T[] second) {
+        final List<T> rv = new ArrayList<>(Arrays.asList(first));
+        rv.addAll(Arrays.asList(second));
         return rv;
     }
 

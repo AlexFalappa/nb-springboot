@@ -74,7 +74,8 @@ import static com.github.alexfalappa.nbspringboot.PrefConstants.PREF_MANUAL_REST
 @Messages("BasicSpringbootProject_displayName=Spring Boot basic project")
 public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInstantiatingIterator {
 
-    public static final String BOOTVERSION = "2.4.0";
+    // Offline starter baseline; the Initializr wizard offers versions published by its service.
+    public static final String BOOTVERSION = "3.5.7";
 
     private int index;
     private WizardDescriptor.Panel[] panels;
@@ -241,7 +242,7 @@ public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInst
 
     private static void writeFile(ZipInputStream zis, FileObject fo) throws IOException {
         try (OutputStream out = fo.getOutputStream()) {
-            FileUtil.copy(zis, out);
+            zis.transferTo(out);
         }
     }
 
@@ -250,7 +251,7 @@ public class BasicProjectWizardIterator implements WizardDescriptor.ProgressInst
         try (PrintWriter pw = new PrintWriter(fo.getOutputStream())) {
             String line;
             while ((line = br.readLine()) != null) {
-                pw.println(line.replace("#BOOTVERSION#", BOOTVERSION));
+                pw.println(line.replace("#BOOTVERSION#", BOOTVERSION).replace("<java.version>1.8</java.version>", "<java.version>17</java.version>"));
             }
         }
     }

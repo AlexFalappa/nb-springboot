@@ -78,7 +78,7 @@ public class SpringDependenciesGenerator extends BaseCodeGenerator {
     private int addDeps(POMModel model, String bootVersion, final Set<String> selectedDeps) throws Exception {
         logger.log(Level.INFO, "Adding Spring Boot dependencies: {0}", selectedDeps.toString());
         JsonNode depsMeta = InitializrService.getInstance().getDependencies(bootVersion);
-        Iterator<Map.Entry<String, JsonNode>> it = depsMeta.path("dependencies").fields();
+        Iterator<Map.Entry<String, JsonNode>> it = depsMeta.path("dependencies").properties().iterator();
         DependencyContainer container = model.getProject();
         // iterate on "dependencies" JSON object (fields are dependency ids)
         int newCaretPos = -1;

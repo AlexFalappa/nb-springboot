@@ -58,7 +58,6 @@ import org.netbeans.api.project.Project;
 import org.netbeans.api.project.ProjectUtils;
 import org.netbeans.api.project.SourceGroup;
 import org.netbeans.api.project.Sources;
-import org.netbeans.modules.maven.NbMavenProjectImpl;
 import org.netbeans.modules.maven.api.NbMavenProject;
 import org.netbeans.spi.editor.completion.CompletionResultSet;
 import org.openide.filesystems.FileObject;
@@ -459,7 +458,7 @@ public final class Utils {
                 Class<?> clazz = Class.forName(className);
                 JComponent standInComponent = getSubstitute(clazz);
                 ico.paintIcon(standInComponent, g2, 0, 0);
-            } catch (ClassNotFoundException | IllegalAccessException ex) {
+            } catch (ReflectiveOperationException ex) {
                 // fallback
                 g2.drawRect(0, 0, 16, 16);
                 g2.drawLine(0, 0, 16, 16);
@@ -470,10 +469,10 @@ public final class Utils {
         return new ImageIcon(image);
     }
 
-    private static JComponent getSubstitute(Class<?> clazz) throws IllegalAccessException {
+    private static JComponent getSubstitute(Class<?> clazz) throws ReflectiveOperationException {
         JComponent standInComponent;
         try {
-            standInComponent = (JComponent) clazz.newInstance();
+            standInComponent = (JComponent) clazz.getDeclaredConstructor().newInstance();
         } catch (InstantiationException e) {
             standInComponent = new AbstractButton() {
             };
@@ -509,10 +508,10 @@ public final class Utils {
     public static Optional<String> getSpringBootVersion(Project project) {
         return Stream.of(project)
                 .filter(Objects::nonNull)
-                .filter(NbMavenProjectImpl.class::isInstance)
-                .map(NbMavenProjectImpl.class::cast)
+                .map(p -> p.getLookup().lookup(NbMavenProject.class))
+                .filter(Objects::nonNull)
                 // All dependencies that this project has, including transitive ones.
-                .flatMap(p -> ((Set<Artifact>) p.getOriginalMavenProject().getArtifacts()).stream())
+                .flatMap(p -> ((Set<Artifact>) p.getMavenProject().getArtifacts()).stream())
                 .filter(Utils::isSpringBootStarterArtifact)
                 .map(Artifact::getVersion)
                 .peek(springBootVersion -> logger.log(FINE, "Spring Boot version {0} detected", springBootVersion))
@@ -521,7 +520,7 @@ public final class Utils {
 
     private static boolean isSpringBootStarterArtifact(Artifact artifact) {
         return "org.springframework.boot".equals(artifact.getGroupId())
-                && "spring-boot-starter".equals(artifact.getArtifactId());
+                && ("spring-boot-starter".equals(artifact.getArtifactId()) || "spring-boot".equals(artifact.getArtifactId()));
     }
 
     /**

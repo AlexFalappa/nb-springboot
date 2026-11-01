@@ -74,6 +74,7 @@ public final class ControllerWizardIterator implements WizardDescriptor.Instanti
         DataObject doTemplate = DataObject.find(foTemplate);
         DataFolder df = DataFolder.findFolder(foDir);
         Map<String, Object> props = new HashMap<>();
+        props.put("servletPackage", TemplateUtils.servletPackage(Templates.getProject(wizard)));
         props.put(WIZ_ERROR_HANDLING, wizard.getProperty(WIZ_ERROR_HANDLING));
         DataObject doCreated = doTemplate.createFromTemplate(df, targetName, props);
         FileObject foCreated = doCreated.getPrimaryFile();

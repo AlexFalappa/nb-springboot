@@ -164,9 +164,10 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
             List<String> depList = Arrays.asList(deps.split(","));
             BootDependenciesPanel.updateRememberedDeps(depList);
         } catch (Exception ex) {
-            Exceptions.printStackTrace(ex);
+            throw new IOException("Could not create the Spring Initializr project: " + ex.getMessage(), ex);
+        } finally {
+            handle.finish();
         }
-        handle.finish();
         return resultSet;
     }
 
@@ -303,14 +304,14 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
 
     private static void writeFile(ZipInputStream str, FileObject fo) throws IOException {
         try (OutputStream out = fo.getOutputStream()) {
-            FileUtil.copy(str, out);
+            str.transferTo(out);
         }
     }
 
     private static void filterProjectXML(FileObject fo, ZipInputStream str, String name) throws IOException {
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            FileUtil.copy(str, baos);
+            str.transferTo(baos);
             Document doc = XMLUtil.parse(new InputSource(new ByteArrayInputStream(baos.toByteArray())), false, false, null, null);
             NodeList nl = doc.getDocumentElement().getElementsByTagName("name");
             if (nl != null) {
@@ -354,7 +355,7 @@ public class InitializrProjectWizardIterator implements WizardDescriptor.Progres
                 .param("mainClass", mainClass.toString())
                 .param("forceColor", bForceColor)
                 .param("manualRestart", bManualRestart)
-                .param("isBoot2", bootVersion.startsWith("2"))
+                .param("isBoot2", com.github.alexfalappa.nbspringboot.projects.BootCompatibility.usesModernMavenProperties(bootVersion))
                 .param("vmOpts", strVmOpts)
                 .build();
     }

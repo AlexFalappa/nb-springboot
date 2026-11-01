@@ -48,7 +48,7 @@ public class CfgPropsParser extends Parser {
     private static final Logger logger = Logger.getLogger(CfgPropsParser.class.getName());
     private final CfgPropsParboiled parboiled;
     private Snapshot snapshot;
-    private ParsingResult parbResult;
+    private ParsingResult<CfgElement> parbResult;
 
     public CfgPropsParser() {
         parboiled = Parboiled.createParser(CfgPropsParboiled.class);
@@ -58,7 +58,7 @@ public class CfgPropsParser extends Parser {
     public void parse(Snapshot snapshot, Task task, SourceModificationEvent sme) throws ParseException {
         logger.fine("Parsing...");
         this.snapshot = snapshot;
-        RecoveringParseRunner runner = new RecoveringParseRunner(parboiled.cfgProps());
+        RecoveringParseRunner<CfgElement> runner = new RecoveringParseRunner<>(parboiled.cfgProps());
         parboiled.reset();
         parbResult = runner.run(snapshot.getText().toString());
         logParsingResult();
@@ -99,12 +99,12 @@ public class CfgPropsParser extends Parser {
 
     public static class CfgPropsParserResult extends ParserResult {
 
-        private final ParsingResult parbResult;
+        private final ParsingResult<CfgElement> parbResult;
         private final Properties parsedProps;
         private boolean valid = true;
         private final CfgFile cfgFile;
 
-        CfgPropsParserResult(Snapshot snapshot, ParsingResult parbResult, Properties parsedProps, CfgFile cfgFile) {
+        CfgPropsParserResult(Snapshot snapshot, ParsingResult<CfgElement> parbResult, Properties parsedProps, CfgFile cfgFile) {
             super(snapshot);
             this.parbResult = parbResult;
             this.parsedProps = parsedProps;
@@ -116,7 +116,7 @@ public class CfgPropsParser extends Parser {
             valid = false;
         }
 
-        public ParsingResult getParbResult() throws org.netbeans.modules.parsing.spi.ParseException {
+        public ParsingResult<CfgElement> getParbResult() throws org.netbeans.modules.parsing.spi.ParseException {
             if (!valid) {
                 throw new org.netbeans.modules.parsing.spi.ParseException();
             }
@@ -133,7 +133,7 @@ public class CfgPropsParser extends Parser {
 
         @Override
         public List<? extends Error> getDiagnostics() {
-            return Collections.EMPTY_LIST;
+            return Collections.emptyList();
         }
 
     }
