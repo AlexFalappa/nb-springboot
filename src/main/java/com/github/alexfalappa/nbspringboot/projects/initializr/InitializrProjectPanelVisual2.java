@@ -202,7 +202,14 @@ public class InitializrProjectPanelVisual2 extends JPanel {
     }
 
     void validate(WizardDescriptor d) throws WizardValidationException {
-        // nothing to validate
+        NamedItem boot = (NamedItem) cbBootVersion.getSelectedItem();
+        NamedItem java = (NamedItem) d.getProperty(InitializrProjectProps.WIZ_JAVA_VERSION);
+        if (boot == null || java == null) throw new WizardValidationException(cbBootVersion, "Select a Boot and Java version", null);
+        try {
+            com.github.alexfalappa.nbspringboot.projects.BootCompatibility.validateJava(boot.getId(), java.getId());
+        } catch (IllegalArgumentException ex) {
+            throw new WizardValidationException(cbBootVersion, ex.getMessage(), ex.getMessage());
+        }
     }
 
     private void fillCombo(JsonNode attrNode) {

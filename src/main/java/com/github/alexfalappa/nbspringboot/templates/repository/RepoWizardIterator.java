@@ -96,7 +96,7 @@ public final class RepoWizardIterator implements WizardDescriptor.InstantiatingI
         panel = JavaTemplates.createPackageChooser(project, groups, new RepoWizardPanel1(), true);
         // force creation of visual part
         JComponent cmp = (JComponent) panel.getComponent();
-        cmp.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(0));
+        cmp.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, Integer.valueOf(0));
         cmp.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, TemplateUtils.createSteps(wizard, new String[]{cmp.getName()}));
     }
 

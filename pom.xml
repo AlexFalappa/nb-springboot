@@ -4,24 +4,31 @@
 
     <groupId>com.github.alexfalappa</groupId>
     <artifactId>nb-springboot-plugin</artifactId>
-    <version>3.2-SNAPSHOT</version>
+    <version>3.2</version>
     <packaging>nbm</packaging>
 
     <name>NB SpringBoot</name>
     <description>NetBeans IDE plugin for developing with Spring Boot and the Spring framework</description>
 
     <properties>
-        <netbeans.api.version>RELEASE82</netbeans.api.version>
+        <netbeans.target>30</netbeans.target>
+        <netbeans.api.version>RELEASE${netbeans.target}0</netbeans.api.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <skipTests>true</skipTests>
-        <spring.framework.version>5.2.8.RELEASE</spring.framework.version>
+        <skipTests>false</skipTests>
+        <spring.framework.version>6.2.19</spring.framework.version>
     </properties>
 
     <dependencies>
+        <dependency><groupId>org.jetbrains</groupId><artifactId>annotations</artifactId><version>26.0.1</version></dependency>
+        <dependency><groupId>org.slf4j</groupId><artifactId>slf4j-api</artifactId><version>2.0.17</version></dependency>
+        <dependency><groupId>org.slf4j</groupId><artifactId>slf4j-jdk14</artifactId><version>2.0.17</version><scope>runtime</scope></dependency>
+        <dependency><groupId>com.google.code.findbugs</groupId><artifactId>jsr305</artifactId><version>3.0.2</version></dependency>
+        <dependency><groupId>javax.annotation</groupId><artifactId>javax.annotation-api</artifactId><version>1.3.2</version></dependency>
+        <dependency><groupId>org.freemarker</groupId><artifactId>freemarker</artifactId><version>2.3.34</version><scope>test</scope></dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-configuration-metadata</artifactId>
-            <version>2.3.2.RELEASE</version>
+            <version>3.5.7</version>
         </dependency>
         <dependency>
             <!--Became a runtime dependency but runtime deps are not included in NBM-->
@@ -47,17 +54,17 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-collections4</artifactId>
-            <version>4.1</version>
+            <version>4.5.0</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
-            <version>2.11.1</version>
+            <version>2.21.4</version>
         </dependency>
         <dependency>
             <groupId>org.parboiled</groupId>
             <artifactId>parboiled-java</artifactId>
-            <version>1.1.8</version>
+            <version>1.4.1</version>
         </dependency>
         <!--NetBeans Platform dependencies-->
         <dependency>
@@ -275,17 +282,11 @@
             <artifactId>org-netbeans-core-multiview</artifactId>
             <version>${netbeans.api.version}</version>
         </dependency>
-        <dependency>
-            <groupId>org.netbeans.contrib.yenta</groupId>
-            <artifactId>api</artifactId>
-            <version>1.1</version>
-            <scope>provided</scope>
-        </dependency>
         <!--test dependencies-->
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.13.1</version>
+            <version>4.13.2</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -297,6 +298,7 @@
     </dependencies>
 
     <build>
+        <finalName>${project.artifactId}-${project.version}</finalName>
         <resources>
             <resource>
                 <directory>src/main/resources</directory>
@@ -314,30 +316,9 @@
             </resource>
         </resources>
         <plugins>
-            <plugin>
-                <!-- Keep pom.xml sorted -->
-                <groupId>com.github.ekryd.sortpom</groupId>
-                <artifactId>sortpom-maven-plugin</artifactId>
-                <version>2.4.0</version>
-                <configuration>
-                    <predefinedSortOrder>custom_1</predefinedSortOrder>
-                    <nrOfIndentSpace>4</nrOfIndentSpace>
-                    <lineSeparator>\n</lineSeparator>
-                    <encoding>${project.build.sourceEncoding}</encoding>
-                    <sortProperties>true</sortProperties>
-                    <keepBlankLines>true</keepBlankLines>
-                    <sortDependencies>scope</sortDependencies>
-                    <createBackupFile>false</createBackupFile>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>sort</goal>
-                        </goals>
-                        <phase>verify</phase>
-                    </execution>
-                </executions>
-            </plugin>
+            <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-resources-plugin</artifactId><version>3.3.1</version><configuration><propertiesEncoding>UTF-8</propertiesEncoding></configuration></plugin>
+            <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-clean-plugin</artifactId><version>3.3.2</version></plugin>
+            <plugin><groupId>org.apache.maven.plugins</groupId><artifactId>maven-install-plugin</artifactId><version>3.1.2</version></plugin>
             <!--use only when generating scanner class
 			<plugin>
 					<groupId>de.jflex</groupId>
@@ -362,7 +343,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-enforcer-plugin</artifactId>
-                <version>3.0.0-M2</version>
+                <version>3.5.0</version>
                 <executions>
                     <execution>
                         <id>enforce-java</id>
@@ -372,7 +353,7 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <version>[1.8,1.9)</version>
+                                    <version>[21,)</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -382,67 +363,49 @@
             <plugin>
                 <groupId>org.apache.netbeans.utilities</groupId>
                 <artifactId>nbm-maven-plugin</artifactId>
-                <version>4.4</version>
+                <version>14.4</version>
                 <extensions>true</extensions>
                 <configuration>
                     <licenseFile>LICENSE</licenseFile>
                     <licenseName>Apache 2.0</licenseName>
-                    <keystore>keystore.jks</keystore>
-                    <keystorealias>AlexFalappa</keystorealias>
-                    <verifyRuntime>warn</verifyRuntime>
+                    <verifyRuntime>fail</verifyRuntime>
+                    <!-- NetBeans exposes Maven integration to friend modules only.
+                         Declare implementation dependencies explicitly rather than suppressing verification. -->
+                    <moduleDependencies>
+                        <dependency><id>org.netbeans.modules:org-netbeans-modules-maven</id><type>impl</type></dependency>
+                        <dependency><id>org.netbeans.modules:org-netbeans-modules-maven-model</id><type>impl</type></dependency>
+                        <dependency><id>org.netbeans.modules:org-netbeans-modules-maven-embedder</id><type>impl</type></dependency>
+                    </moduleDependencies>
                     <requiresRestart>true</requiresRestart>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.13.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <release>17</release>
+                    <proc>full</proc>
+                    <showDeprecation>true</showDeprecation>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
-                <version>3.2.0</version>
+                <version>3.3.0</version>
                 <configuration>
                     <archive>
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
                     </archive>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-dependency-plugin</artifactId>
-                <version>3.1.1</version>
-                <executions>
-                    <execution>
-                        <id>unpack</id>
-                        <goals>
-                            <goal>unpack</goal>
-                        </goals>
-                        <phase>prepare-package</phase>
-                        <configuration>
-                            <artifactItems>
-                                <artifactItem>
-                                    <groupId>org.netbeans.contrib.yenta</groupId>
-                                    <artifactId>api</artifactId>
-                                    <version>1.1</version>
-                                    <type>jar</type>
-                                    <includes>**/*.class</includes>
-                                    <outputDirectory>${project.build.directory}/classes</outputDirectory>
-                                </artifactItem>
-                            </artifactItems>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
+                    <plugin>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.22.2</version>
+                <version>3.2.5</version>
                 <configuration>
                     <!--comment following exclusions when working on lexer and willing to execute lexer tests-->
+                    <argLine>--add-opens=java.base/java.net=ALL-UNNAMED</argLine>
+                    <redirectTestOutputToFile>true</redirectTestOutputToFile>
                     <excludes>
                         <exclude>com/github/alexfalappa/nbspringboot/cfgprops/lexer/*.java</exclude>
                     </excludes>

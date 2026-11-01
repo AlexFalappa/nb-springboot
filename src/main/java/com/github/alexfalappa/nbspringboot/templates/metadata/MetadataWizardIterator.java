@@ -126,7 +126,7 @@ public final class MetadataWizardIterator implements WizardDescriptor.Instantiat
         // force creation of visual part
         MetadataVisualPanel1 cmp = panel.getComponent();
         // Make sure list of steps is accurate.
-        cmp.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, new Integer(0));
+        cmp.putClientProperty(WizardDescriptor.PROP_CONTENT_SELECTED_INDEX, Integer.valueOf(0));
         cmp.putClientProperty(WizardDescriptor.PROP_CONTENT_DATA, TemplateUtils.createSteps(wizard, new String[]{cmp.getName()}));
     }
 

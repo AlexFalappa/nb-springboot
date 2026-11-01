@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.ExceptionHandler;
   <#break>
   <#case 3>
-import javax.servlet.http.HttpServletRequest;
+import ${servletPackage!"javax.servlet"}.http.HttpServletRequest;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
   <#break>

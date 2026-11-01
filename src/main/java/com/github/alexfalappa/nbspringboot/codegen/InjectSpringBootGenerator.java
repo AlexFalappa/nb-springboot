@@ -66,6 +66,17 @@ public class InjectSpringBootGenerator extends BaseCodeGenerator {
     @Override
     protected int pomInvoke(POMModel model, int caretPosition) throws Exception {
         Project prj = model.getProject();
+        if (prj.getPomParent() != null) {
+            throw new IOException("This project already has a parent POM. Configure Spring Boot explicitly to preserve its parent and inherited settings.");
+        }
+        if (prj.getProperties() != null) {
+            Map<String, String> current = prj.getProperties().getProperties();
+            String javaVersion = current.getOrDefault(PROP_JAVAVERSION,
+                    current.getOrDefault("maven.compiler.release", current.getOrDefault(PROP_COMPILER_SOURCE, "17")));
+            if (!javaVersion.startsWith("${")) {
+                com.github.alexfalappa.nbspringboot.projects.BootCompatibility.validateJava(BasicProjectWizardIterator.BOOTVERSION, javaVersion);
+            }
+        }
         // add parent pom declaration
         Parent parent = model.getFactory().createParent();
         parent.setGroupId("org.springframework.boot");
@@ -74,12 +85,20 @@ public class InjectSpringBootGenerator extends BaseCodeGenerator {
         parent.setRelativePath("");
         prj.setPomParent(parent);
         // add 'java.version' property deducing it from 'maven.compiler.source' if present
-        final Properties propertiesElement = prj.getProperties();
+        Properties propertiesElement = prj.getProperties();
+        if (propertiesElement == null) {
+            propertiesElement = model.getFactory().createProperties();
+            prj.setProperties(propertiesElement);
+        }
         final Map<String, String> propertiesMap = propertiesElement.getProperties();
-        if (propertiesMap.containsKey(PROP_COMPILER_SOURCE)) {
+        if (propertiesMap.containsKey(PROP_JAVAVERSION)) {
+            // Preserve the project's explicit Java version.
+        } else if (propertiesMap.containsKey("maven.compiler.release")) {
+            propertiesElement.setProperty(PROP_JAVAVERSION, propertiesMap.get("maven.compiler.release"));
+        } else if (propertiesMap.containsKey(PROP_COMPILER_SOURCE)) {
             propertiesElement.setProperty(PROP_JAVAVERSION, propertiesMap.get(PROP_COMPILER_SOURCE));
         } else {
-            propertiesElement.setProperty(PROP_JAVAVERSION, "1.8");
+            propertiesElement.setProperty(PROP_JAVAVERSION, "17");
         }
         // remove maven.compiler.source and maven.compiler.target properties if present
         final Element propertiesElem = propertiesElement.getPeer();
@@ -107,15 +126,19 @@ public class InjectSpringBootGenerator extends BaseCodeGenerator {
         dep.addExclusion(exclsn);
         // add 'spring-boot-maven-plugin'
         prj.addDependency(dep);
-        Build build = model.getFactory().createBuild();
+        Build build = prj.getBuild();
+        if (build == null) {
+            build = model.getFactory().createBuild();
+            prj.setBuild(build);
+        }
         Plugin plugin = model.getFactory().createPlugin();
         plugin.setGroupId("org.springframework.boot");
         plugin.setArtifactId("spring-boot-maven-plugin");
         build.addPlugin(plugin);
-        prj.setBuild(build);
         // create a nbactions.xml if not already present
-        final FileObject projectDirectory = Utils.getActiveProject().getProjectDirectory();
-        if (projectDirectory.getFileObject("nbactions.xml") == null) {
+        FileObject pomFile = model.getModelSource().getLookup().lookup(FileObject.class);
+        final FileObject projectDirectory = pomFile == null ? null : pomFile.getParent();
+        if (projectDirectory != null && projectDirectory.getFileObject("nbactions.xml") == null) {
             createNbActions(projectDirectory);
         }
         // position caret at newly added parent declaration
@@ -137,7 +160,7 @@ public class InjectSpringBootGenerator extends BaseCodeGenerator {
                 .name("nbactions")
                 .param("forceColor", bForceColor)
                 .param("manualRestart", bManualRestart)
-                .param("isBoot2", BasicProjectWizardIterator.BOOTVERSION.startsWith("2"))
+                .param("isBoot2", com.github.alexfalappa.nbspringboot.projects.BootCompatibility.usesModernMavenProperties(BasicProjectWizardIterator.BOOTVERSION))
                 .param("vmOpts", strVmOpts);
         fb.build();
     }

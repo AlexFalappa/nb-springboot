@@ -130,7 +130,7 @@ public class ValueCompletionItem implements CompletionItem {
     @Override
     public void processKeyEvent(KeyEvent evt) {
         // detect if Ctrl + Enter is pressed
-        overwrite = evt.getKeyCode() == KeyEvent.VK_ENTER && (evt.getModifiers() & KeyEvent.CTRL_MASK) != 0;
+        overwrite = evt.getKeyCode() == KeyEvent.VK_ENTER && (evt.getModifiersEx() & KeyEvent.CTRL_DOWN_MASK) != 0;
     }
 
     @Override

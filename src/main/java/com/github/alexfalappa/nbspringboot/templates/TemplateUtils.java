@@ -24,6 +24,21 @@ import org.openide.WizardDescriptor;
  */
 public final class TemplateUtils {
 
+    public static String servletPackage(org.netbeans.api.project.Project project) {
+        java.util.Optional<String> bootVersion = com.github.alexfalappa.nbspringboot.Utils.getSpringBootVersion(project);
+        if (bootVersion.isPresent()) return com.github.alexfalappa.nbspringboot.projects.BootCompatibility.usesJakarta(bootVersion.get())
+                ? "jakarta.servlet" : "javax.servlet";
+        if (project != null) {
+            for (org.netbeans.api.project.SourceGroup group : org.netbeans.api.project.ProjectUtils.getSources(project)
+                    .getSourceGroups(org.netbeans.api.java.project.JavaProjectConstants.SOURCES_TYPE_JAVA)) {
+                org.netbeans.api.java.classpath.ClassPath cp = org.netbeans.api.java.classpath.ClassPath.getClassPath(
+                        group.getRootFolder(), org.netbeans.api.java.classpath.ClassPath.COMPILE);
+                if (cp != null && cp.findResource("jakarta/servlet/http/HttpServletRequest.class") != null) return "jakarta.servlet";
+            }
+        }
+        return "javax.servlet";
+    }
+
     // prevent instantiation
     private TemplateUtils() {
     }

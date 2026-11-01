@@ -1,6 +1,17 @@
 # Changelog
 
 -  **Unreleased**
+    -  Modern build using JDK 21, Java 17 source compatibility and target-specific NetBeans APIs (default: 30)
+    -  Upgrade embedded Spring, configuration metadata, Jackson and parser libraries
+    -  Correct Maven run/debug conventions for Spring Boot 3 and 4
+    -  Preserve custom actions and migrate nbactions.xml through atomic replacement
+    -  Replace private Maven class access with exported interfaces; remove the legacy Yenta installer
+    -  Explicit Maven implementation dependencies and strict NBM runtime verification
+    -  Select javax/jakarta servlet imports based on the application and compile classpath
+    -  Update the offline basic project to Spring Boot 3.5.7 and Java 17
+    -  Fix Initializr cache invalidation, validate Java/Boot minimums and propagate creation errors
+    -  Preserve existing build configuration when injecting Boot setup and refuse parent replacement
+    -  Add regression tests and an opt-in live Initializr integration check
     -  Frequently used dependencies counts are also updated using the _Add Spring Boot Dependencies_ dialog
     -  Fix NPE when trying to access Spring Boot section of project properties dialog on the parent in a multimodule project (contribution by Diego Díez Ricondo)
     -  Under the hood improvements to badge icon project annotation and Spring Boot version detection (contribution by Diego Díez Ricondo)
